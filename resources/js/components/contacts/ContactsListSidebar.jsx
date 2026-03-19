@@ -67,8 +67,9 @@ export default function ContactsListSidebar({
       </div>
       <div className="mt-2 flex items-center justify-between gap-2 text-xs text-app-faint">
         <span>
-          {filteredContacts.length} match
-          {filteredContacts.length === 1 ? "" : "es"}
+          {t("sidebar.match_count", {
+            count: filteredContacts.length,
+          })}
         </span>
         {hasContactFilters ? (
           <button

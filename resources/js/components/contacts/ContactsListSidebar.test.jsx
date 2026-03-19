@@ -53,6 +53,7 @@ describe("ContactsListSidebar", () => {
     const props = buildProps();
 
     render(<ContactsListSidebar {...props} />);
+    expect(screen.getByText("2 matches")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "New" }));
     expect(props.onStartNewContact).toHaveBeenCalledTimes(1);
@@ -98,5 +99,21 @@ describe("ContactsListSidebar", () => {
 
     expect(screen.getByText("No contacts yet.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Clear" })).not.toBeInTheDocument();
+  });
+
+  it("uses singular match copy when one contact is filtered", () => {
+    const props = buildProps({
+      filteredContacts: [CONTACTS[0]],
+      paginatedContacts: [CONTACTS[0]],
+      contactsPageSize: 20,
+      firstContactIndex: 0,
+      lastContactIndex: 1,
+      currentContactPage: 1,
+      totalContactPages: 1,
+    });
+
+    render(<ContactsListSidebar {...props} />);
+
+    expect(screen.getByText("1 match")).toBeInTheDocument();
   });
 });

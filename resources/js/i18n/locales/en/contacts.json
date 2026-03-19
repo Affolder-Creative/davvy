@@ -25,6 +25,8 @@
     "clear_filters": "Clear",
     "no_contacts": "No contacts yet.",
     "no_contacts_match_filter": "No contacts match this filter.",
+    "match_count_one": "{{count}} match",
+    "match_count_other": "{{count}} matches",
     "address_book_count": "{{count}} address book{{plural}}",
     "page": "Page {{current}} / {{total}}",
     "prev_page": "Prev",

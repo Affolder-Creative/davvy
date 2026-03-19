@@ -25,6 +25,8 @@
     "clear_filters": "Limpiar",
     "no_contacts": "Todavía no hay contactos.",
     "no_contacts_match_filter": "Ningún contacto coincide con este filtro.",
+    "match_count_one": "{{count}} coincidencia",
+    "match_count_other": "{{count}} coincidencias",
     "address_book_count": "{{count}} libreta{{plural}} de direcciones",
     "page": "Página {{current}} / {{total}}",
     "prev_page": "Anterior",
