@@ -8,20 +8,11 @@
     "resolvedAddressIdsJson": "Resolved address book IDs must be valid JSON.",
     "resolvedAddressIdsArray": "Resolved address book IDs must be an array of positive integers."
   },
-  "notice": {
-    "approved": "Request approved.",
-    "denied": "Request denied.",
-    "bulk": "{{processed}} request group(s) processed. {{skipped}} skipped."
-  },
   "bulk": {
     "confirm": "This will {{verb}} {{count}} queued request(s) in the current filtered view. Continue?",
     "approve": "approve",
     "deny": "deny"
   },
-  "title": "Contact Change Review Queue",
-  "subtitle": "Review queued editor changes for contacts before they are applied.",
-  "approveAll": "Approve All ({{count}})",
-  "denyAll": "Deny All ({{count}})",
   "filters": {
     "open": "Open",
     "pending": "Pending",
@@ -34,8 +25,6 @@
     "searchPlaceholder": "Search by contact/requester...",
     "refresh": "Refresh"
   },
-  "loading": "Loading review queue...",
-  "empty": "No queued requests for this filter.",
   "card": {
     "group": "Group",
     "unnamedContact": "Unnamed Contact",
@@ -67,7 +56,24 @@
     "applied": "Applied",
     "denied": "Denied"
   },
-  "operation": {
+  "notices": {
+    "approved": "Request approved.",
+    "denied": "Request denied.",
+    "bulk": "{{processed}} request group(s) processed. {{skipped}} skipped."
+  },
+  "page": {
+    "title": "Contact Change Review Queue",
+    "subtitle": "Review queued editor changes for contacts before they are applied."
+  },
+  "actions": {
+    "approveAll": "Approve All ({{count}})",
+    "denyAll": "Deny All ({{count}})"
+  },
+  "states": {
+    "loading": "Loading review queue...",
+    "empty": "No queued requests for this filter."
+  },
+  "operations": {
     "delete": "Delete",
     "update": "Update"
   }

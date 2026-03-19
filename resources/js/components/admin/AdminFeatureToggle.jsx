@@ -37,7 +37,7 @@ export default function AdminFeatureToggle({ label, enabled, onClick }) {
             : "border-app-edge text-app-faint"
         }`}
       >
-        {enabled ? t("toggleOn") : t("toggleOff")}
+        {enabled ? t("labels.toggle.on") : t("labels.toggle.off")}
       </span>
     </button>
   );

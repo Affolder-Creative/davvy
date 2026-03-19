@@ -23,7 +23,13 @@
       "sharedWith": "Compartido con: {name} ({email})"
     },
     "enabled": "Habilitado",
-    "disabled": "Deshabilitado"
+    "disabled": "Deshabilitado",
+    "toggle": {
+      "on": "Activado",
+      "off": "Desactivado"
+    },
+    "backupLocal": "Local",
+    "backupS3": "S3"
   },
   "weekdays": {
     "0": "Domingo",
@@ -48,8 +54,6 @@
     "11": "Noviembre",
     "12": "Diciembre"
   },
-  "toggleOn": "Activado",
-  "toggleOff": "Desactivado",
   "controlPanel": {
     "title": "Panel de control de administración",
     "toggle": {
@@ -151,7 +155,6 @@
     "lastRun": "Última ejecución: {{lastRunLabel}}"
   },
   "admin": {
-    "loadingAdminData": "Cargando datos de administración...",
     "createUser": "Crear usuario",
     "deleteUser": "Borrar usuario",
     "deleteUserTitle": "Borrar a {{name}}",
@@ -176,16 +179,6 @@
     "statusPendingApproval": "Estado: aprobación pendiente",
     "assignShareAccess": "Asignar acceso compartido",
     "userDetails": "Rol: {{role}} | Calendarios: {{calendars}} | Libretas de direcciones: {{address_books}} | 2FA: {{two_factor}}"
-  },
-  "api": {
-    "invitationSent": "Correo electrónico de invitación enviado a {{targetEmail}}.",
-    "invitationUrl": "Comparte este enlace de invitación con {{targetEmail}}.",
-    "userCreated": "Usuario {{targetEmail}} creado.",
-    "transferredData": "Se eliminó a {{deletedUserName}} y se transfirieron {{transferredCalendars}} calendario(s), {{transferredAddressBooks}} libreta(s) de direcciones y {{transferredContacts}} contacto(s) a {{transferTargetName || 'el propietario seleccionado'}}.",
-    "deletedUser": "Se eliminó a {{deletedUserName}} y todos los datos de su propiedad.",
-    "approvePending": "¿Deshabilitar el requisito de aprobación de registro?\n\n{{pendingCount}} cuenta(s) están pendientes de aprobación.\n\nHaz clic en Aceptar para aprobar ahora todas las cuentas pendientes, o en Cancelar para dejarlas pendientes.",
-    "approvedPending": "Se aprobaron {{approvedCount}} cuenta(s) pendiente(s).",
-    "backupRunSuccess": "La copia de seguridad se completó correctamente."
   },
   "errors": {
     "loadingAdminData": "No se pudieron cargar los datos de administración.",
@@ -214,10 +207,21 @@
     "backupConfigurationRequired": "Configura al menos un destino (local o S3) antes de ejecutar una copia de seguridad.",
     "backupRunFailed": "No se pudo ejecutar la copia de seguridad ahora.",
     "backupRestoreNoArchive": "Selecciona un archivo ZIP de copia de seguridad antes de ejecutar la restauración.",
-    "backupRestoreCompleted": "La restauración de la copia de seguridad se completó.",
-    "backupRestoreBroken": "No se pudo restaurar el archivo de copia de seguridad.",
-    "backupLastRunNoRun": "Todavía no se ha ejecutado ninguna copia de seguridad.",
-    "backupLocal": "Local",
-    "backupS3": "S3"
+    "backupRestoreBroken": "No se pudo restaurar el archivo de copia de seguridad."
+  },
+  "notices": {
+    "invitationSent": "Correo electrónico de invitación enviado a {{targetEmail}}.",
+    "invitationUrl": "Comparte este enlace de invitación con {{targetEmail}}.",
+    "userCreated": "Usuario {{targetEmail}} creado.",
+    "transferredData": "Se eliminó a {{deletedUserName}} y se transfirieron {{transferredCalendars}} calendario(s), {{transferredAddressBooks}} libreta(s) de direcciones y {{transferredContacts}} contacto(s) a {{transferTargetName || 'el propietario seleccionado'}}.",
+    "deletedUser": "Se eliminó a {{deletedUserName}} y todos los datos de su propiedad.",
+    "approvePending": "¿Deshabilitar el requisito de aprobación de registro?\n\n{{pendingCount}} cuenta(s) están pendientes de aprobación.\n\nHaz clic en Aceptar para aprobar ahora todas las cuentas pendientes, o en Cancelar para dejarlas pendientes.",
+    "approvedPending": "Se aprobaron {{approvedCount}} cuenta(s) pendiente(s).",
+    "backupRunSuccess": "La copia de seguridad se completó correctamente.",
+    "backupRestoreCompleted": "La restauración de la copia de seguridad se completó."
+  },
+  "states": {
+    "loadingAdminData": "Cargando datos de administración...",
+    "backupLastRunNoRun": "Todavía no se ha ejecutado ninguna copia de seguridad."
   }
 }

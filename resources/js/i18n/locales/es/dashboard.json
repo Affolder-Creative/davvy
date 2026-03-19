@@ -14,11 +14,6 @@
     "appleCompat": "No se pudieron actualizar los ajustes de compatibilidad de Apple.",
     "milestones": "No se pudieron actualizar los ajustes de cumpleaños/aniversarios."
   },
-  "loadingResources": "Cargando recursos...",
-  "shareStatus": {
-    "shared": "{{name}} ahora está compartido.",
-    "unshared": "{{name}} ya no está compartido."
-  },
   "overview": {
     "endpointTitle": "Punto de conexión DAV",
     "endpointHelper": "Usa esta URL en la configuración de conexión del cliente.",
@@ -93,5 +88,14 @@
     "sourcesTitle": "Libretas de origen para reflejar",
     "noSources": "No hay libretas propias/compartidas elegibles disponibles.",
     "save": "Guardar ajustes de compatibilidad de Apple"
+  },
+  "states": {
+    "loadingResources": "Cargando recursos..."
+  },
+  "notices": {
+    "shareStatus": {
+      "shared": "{{name}} ahora está compartido.",
+      "unshared": "{{name}} ya no está compartido."
+    }
   }
 }

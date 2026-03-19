@@ -73,15 +73,6 @@
     "appPasswordLastUsed": "Last used: {{last_used_at}}",
     "appPasswordNeverUsed": "Never"
   },
-  "api": {
-    "passwordSuccess": "Password updated. Use your new password for app login and DAV clients.",
-    "2faSetupSuccess": "Setup initialized. Scan the QR code and enter a verification code.",
-    "2faEnableSuccess": "Two-factor authentication has been enabled.",
-    "2faDisableSuccess": "Two-factor authentication has been disabled and DAV app passwords were revoked.",
-    "backupCodesRegenerated": "Backup codes regenerated.",
-    "appPasswordCreated": "DAV app password created.",
-    "appPasswordRevoked": "DAV app password revoked."
-  },
   "errors": {
     "updateLocale": "Unable to update language right now.",
     "loadAppPasswords": "Unable to load DAV app passwords right now.",
@@ -93,5 +84,16 @@
     "createAppPassword": "Unable to create DAV app password.",
     "revokeAppPassword": "Unable to revoke DAV app password."
   },
-  "confirmDisable2fa": "Disable two-factor authentication and revoke all DAV app passwords?"
+  "notices": {
+    "passwordSuccess": "Password updated. Use your new password for app login and DAV clients.",
+    "2faSetupSuccess": "Setup initialized. Scan the QR code and enter a verification code.",
+    "2faEnableSuccess": "Two-factor authentication has been enabled.",
+    "2faDisableSuccess": "Two-factor authentication has been disabled and DAV app passwords were revoked.",
+    "backupCodesRegenerated": "Backup codes regenerated.",
+    "appPasswordCreated": "DAV app password created.",
+    "appPasswordRevoked": "DAV app password revoked."
+  },
+  "confirmations": {
+    "disable2fa": "Disable two-factor authentication and revoke all DAV app passwords?"
+  }
 }

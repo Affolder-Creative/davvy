@@ -1,7 +1,4 @@
 {
-  "brand": "Davvy",
-  "subtitle": "Administrador CalDAV + CardDAV",
-  "signedInAs": "Sesión iniciada como {{email}}",
   "tabs": {
     "dashboard": "Panel",
     "contacts": "Contactos",
@@ -25,5 +22,12 @@
     "title": "Apoya a Davvy",
     "subtitle": "Elige un enlace para patrocinar el proyecto.",
     "close": "Cerrar"
+  },
+  "app": {
+    "brand": "Davvy",
+    "subtitle": "Administrador CalDAV + CardDAV"
+  },
+  "session": {
+    "signedInAs": "Sesión iniciada como {{email}}"
   }
 }

@@ -14,11 +14,6 @@
     "appleCompat": "Unable to update Apple compatibility settings.",
     "milestones": "Unable to update birthday/anniversary calendar settings."
   },
-  "loadingResources": "Loading resources...",
-  "shareStatus": {
-    "shared": "{{name}} is now shared.",
-    "unshared": "{{name}} is no longer shared."
-  },
   "overview": {
     "endpointTitle": "DAV Endpoint",
     "endpointHelper": "Use this URL in client connection settings.",
@@ -93,5 +88,14 @@
     "sourcesTitle": "Source address books to mirror",
     "noSources": "No eligible owned/shared address books available.",
     "save": "Save Apple Compatibility Settings"
+  },
+  "states": {
+    "loadingResources": "Loading resources..."
+  },
+  "notices": {
+    "shareStatus": {
+      "shared": "{{name}} is now shared.",
+      "unshared": "{{name}} is no longer shared."
+    }
   }
 }

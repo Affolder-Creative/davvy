@@ -116,7 +116,7 @@ export default function ContactChangeQueuePage({
         `/api/contact-change-requests/${row.id}/approve`,
         payload,
       );
-      setNotice(t("notice.approved"));
+      setNotice(t("notices.approved"));
       await loadQueue({ withLoading: false });
       window.dispatchEvent(new Event("review-queue-updated"));
     } catch (err) {
@@ -132,7 +132,7 @@ export default function ContactChangeQueuePage({
 
     try {
       await api.patch(`/api/contact-change-requests/${row.id}/deny`);
-      setNotice(t("notice.denied"));
+      setNotice(t("notices.denied"));
       await loadQueue({ withLoading: false });
       window.dispatchEvent(new Event("review-queue-updated"));
     } catch (err) {
@@ -172,7 +172,7 @@ export default function ContactChangeQueuePage({
 
       const processed = Number(response.data?.processed ?? 0);
       const skipped = Number(response.data?.skipped ?? 0);
-      setNotice(t("notice.bulk", { processed, skipped }));
+      setNotice(t("notices.bulk", { processed, skipped }));
       await loadQueue({ withLoading: false });
       window.dispatchEvent(new Event("review-queue-updated"));
     } catch (err) {
@@ -251,10 +251,10 @@ export default function ContactChangeQueuePage({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-2xl font-bold text-app-strong">
-              {t("title")}
+              {t("page.title")}
             </h2>
             <p className="mt-1 text-sm text-app-muted">
-              {t("subtitle")}
+              {t("page.subtitle")}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -264,7 +264,7 @@ export default function ContactChangeQueuePage({
               disabled={submitting || actionableRows.length === 0}
               onClick={() => runBulkAction("approve")}
             >
-              {t("approveAll", { count: actionableRows.length })}
+              {t("actions.approveAll", { count: actionableRows.length })}
             </button>
             <button
               className="btn-outline btn-outline-sm text-app-danger"
@@ -272,7 +272,7 @@ export default function ContactChangeQueuePage({
               disabled={submitting || actionableRows.length === 0}
               onClick={() => runBulkAction("deny")}
             >
-              {t("denyAll", { count: actionableRows.length })}
+              {t("actions.denyAll", { count: actionableRows.length })}
             </button>
           </div>
         </div>
@@ -324,12 +324,12 @@ export default function ContactChangeQueuePage({
       </section>
 
       {loading ? (
-        <FullPageState label={t("loading")} compact />
+        <FullPageState label={t("states.loading")} compact />
       ) : (
         <section className="mt-6 space-y-3">
           {rows.length === 0 ? (
             <div className="surface rounded-2xl p-4 text-sm text-app-faint">
-              {t("empty")}
+              {t("states.empty")}
             </div>
           ) : (
             rows.map((row) => (

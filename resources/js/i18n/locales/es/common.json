@@ -1,5 +1,4 @@
 {
-  "loadingApp": "Cargando Davvy...",
   "copy": {
     "copied": "¡Copiado!",
     "copyFailed": "Error al copiar",
@@ -18,5 +17,8 @@
     "invalidTimestamp": "Marca de tiempo no válida",
     "na": "n/d",
     "unknown": "Desconocido"
+  },
+  "states": {
+    "loadingApp": "Cargando Davvy..."
   }
 }

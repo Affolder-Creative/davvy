@@ -8,20 +8,11 @@
     "resolvedAddressIdsJson": "Los IDs de libreta resueltos deben ser JSON válido.",
     "resolvedAddressIdsArray": "Los IDs de libreta resueltos deben ser un arreglo de enteros positivos."
   },
-  "notice": {
-    "approved": "Solicitud aprobada.",
-    "denied": "Solicitud rechazada.",
-    "bulk": "{{processed}} grupo(s) de solicitud procesado(s). {{skipped}} omitido(s)."
-  },
   "bulk": {
     "confirm": "Esto {{verb}} {{count}} solicitud(es) en cola en la vista filtrada actual. ¿Continuar?",
     "approve": "aprobará",
     "deny": "rechazará"
   },
-  "title": "Cola de revisión de cambios de contacto",
-  "subtitle": "Revisa cambios en cola antes de aplicarlos a los contactos.",
-  "approveAll": "Aprobar todo ({{count}})",
-  "denyAll": "Rechazar todo ({{count}})",
   "filters": {
     "open": "Abiertas",
     "pending": "Pendientes",
@@ -34,8 +25,6 @@
     "searchPlaceholder": "Buscar por contacto/solicitante...",
     "refresh": "Actualizar"
   },
-  "loading": "Cargando cola de revisión...",
-  "empty": "No hay solicitudes en cola para este filtro.",
   "card": {
     "group": "Grupo",
     "unnamedContact": "Contacto sin nombre",
@@ -67,7 +56,24 @@
     "applied": "Aplicada",
     "denied": "Rechazada"
   },
-  "operation": {
+  "notices": {
+    "approved": "Solicitud aprobada.",
+    "denied": "Solicitud rechazada.",
+    "bulk": "{{processed}} grupo(s) de solicitud procesado(s). {{skipped}} omitido(s)."
+  },
+  "page": {
+    "title": "Cola de revisión de cambios de contacto",
+    "subtitle": "Revisa cambios en cola antes de aplicarlos a los contactos."
+  },
+  "actions": {
+    "approveAll": "Aprobar todo ({{count}})",
+    "denyAll": "Rechazar todo ({{count}})"
+  },
+  "states": {
+    "loading": "Cargando cola de revisión...",
+    "empty": "No hay solicitudes en cola para este filtro."
+  },
+  "operations": {
     "delete": "Eliminar",
     "update": "Actualizar"
   }

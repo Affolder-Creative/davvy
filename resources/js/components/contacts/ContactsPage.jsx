@@ -192,7 +192,7 @@ export default function ContactsPage({
       ) : null}
 
       {loading ? (
-        <FullPageState label={t("loading")} compact />
+        <FullPageState label={t("states.loading")} compact />
       ) : (
         <>
           <div

@@ -7,7 +7,6 @@
     "userTitle": "User",
     "userHelper": "Contact ownership is scoped to your account."
   },
-  "loading": "Loading contacts...",
   "mobile": {
     "viewAria": "Contact mobile view",
     "contacts": "Contacts",
@@ -280,5 +279,8 @@
       "dragAria": "Drag to reorder {{rowLabel}} {{rowNumber}}",
       "dragTitle": "Drag to reorder"
     }
+  },
+  "states": {
+    "loading": "Loading contacts..."
   }
 }

@@ -105,8 +105,8 @@ export default function DashboardPage({
       await api.patch(url, { is_sharable: next });
       setShareStatusNotice(
         next
-          ? t("shareStatus.shared", { name: displayName })
-          : t("shareStatus.unshared", { name: displayName }),
+          ? t("notices.shareStatus.shared", { name: displayName })
+          : t("notices.shareStatus.unshared", { name: displayName }),
       );
       await loadDashboard({ withLoading: false });
     } catch (err) {
@@ -242,7 +242,7 @@ export default function DashboardPage({
           {error}
         </div>
       ) : null}
-      {loading ? <FullPageState label={t("loadingResources")} compact /> : null}
+      {loading ? <FullPageState label={t("states.loadingResources")} compact /> : null}
 
       {!loading ? (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">

@@ -23,7 +23,13 @@
       "sharedWith": "Shared with: {name} ({email})"
     },
     "enabled": "Enabled",
-    "disabled": "Disabled"
+    "disabled": "Disabled",
+    "toggle": {
+      "on": "On",
+      "off": "Off"
+    },
+    "backupLocal": "Local",
+    "backupS3": "S3"
   },
   "weekdays": {
     "0": "Sunday",
@@ -48,8 +54,6 @@
     "11": "November",
     "12": "December"
   },
-  "toggleOn": "On",
-  "toggleOff": "Off",
   "controlPanel": {
     "title": "Admin Control Panel",
     "toggle": {
@@ -151,7 +155,6 @@
     "lastRun": "Last Run: {{lastRunLabel}}"
   },
   "admin": {
-    "loadingAdminData": "Loading admin data...",
     "createUser": "Create User",
     "deleteUser": "Delete User",
     "deleteUserTitle": "Delete {{name}}",
@@ -176,16 +179,6 @@
     "statusPendingApproval": "Status: pending approval",
     "assignShareAccess": "Assign Share Access",
     "userDetails": "Role: {{role}} | Calendars: {{calendars}} | Address books: {{address_books}} | 2FA: {{two_factor}}"
-  },
-  "api": {
-    "invitationSent": "Invitation email sent to {{targetEmail}}.",
-    "invitationUrl": "Share this invitation link with {{targetEmail}}.",
-    "userCreated": "User {{targetEmail}} created.",
-    "transferredData": "Deleted {{deletedUserName}} and transferred {{transferredCalendars}} calendar(s), {{transferredAddressBooks}} address book(s), and {{transferredContacts}} contact(s) to {{transferTargetName || 'the selected owner'}}.",
-    "deletedUser": "Deleted {{deletedUserName}} and all owned data.",
-    "approvePending": "Disable registration approval requirement?\n\n{{pendingCount}} account(s) are pending approval.\n\nClick OK to approve all pending accounts now, or Cancel to leave them pending.",
-    "approvedPending": "Approved {{approvedCount}} pending account(s).",
-    "backupRunSuccess": "Backup completed successfully."
   },
   "errors": {
     "loadingAdminData": "Unable to load admin data.",
@@ -214,10 +207,21 @@
     "backupConfigurationRequired": "Configure at least one destination (local or S3) before running a backup.",
     "backupRunFailed": "Unable to run backup now.",
     "backupRestoreNoArchive": "Select a backup ZIP archive before running restore.",
-    "backupRestoreCompleted": "Backup restore completed.",
-    "backupRestoreBroken": "Unable to restore backup archive.",
-    "backupLastRunNoRun": "No backup has run yet.",
-    "backupLocal": "Local",
-    "backupS3": "S3"
+    "backupRestoreBroken": "Unable to restore backup archive."
+  },
+  "notices": {
+    "invitationSent": "Invitation email sent to {{targetEmail}}.",
+    "invitationUrl": "Share this invitation link with {{targetEmail}}.",
+    "userCreated": "User {{targetEmail}} created.",
+    "transferredData": "Deleted {{deletedUserName}} and transferred {{transferredCalendars}} calendar(s), {{transferredAddressBooks}} address book(s), and {{transferredContacts}} contact(s) to {{transferTargetName || 'the selected owner'}}.",
+    "deletedUser": "Deleted {{deletedUserName}} and all owned data.",
+    "approvePending": "Disable registration approval requirement?\n\n{{pendingCount}} account(s) are pending approval.\n\nClick OK to approve all pending accounts now, or Cancel to leave them pending.",
+    "approvedPending": "Approved {{approvedCount}} pending account(s).",
+    "backupRunSuccess": "Backup completed successfully.",
+    "backupRestoreCompleted": "Backup restore completed."
+  },
+  "states": {
+    "loadingAdminData": "Loading admin data...",
+    "backupLastRunNoRun": "No backup has run yet."
   }
 }

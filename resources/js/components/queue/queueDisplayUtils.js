@@ -70,6 +70,6 @@ export function queueStatusLabel(status) {
  */
 export function queueOperationLabel(operation) {
   return operation === "delete"
-    ? i18n.t("operation.delete", { ns: "queue", defaultValue: "Delete" })
-    : i18n.t("operation.update", { ns: "queue", defaultValue: "Update" });
+    ? i18n.t("operations.delete", { ns: "queue", defaultValue: "Delete" })
+    : i18n.t("operations.update", { ns: "queue", defaultValue: "Update" });
 }

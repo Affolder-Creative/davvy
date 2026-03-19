@@ -7,7 +7,6 @@
     "userTitle": "Usuario",
     "userHelper": "La propiedad de los contactos está limitada a tu cuenta."
   },
-  "loading": "Cargando contactos...",
   "mobile": {
     "viewAria": "Vista móvil de contactos",
     "contacts": "Contactos",
@@ -280,5 +279,8 @@
       "dragAria": "Arrastrar para reordenar {{rowLabel}} {{rowNumber}}",
       "dragTitle": "Arrastrar para reordenar"
     }
+  },
+  "states": {
+    "loading": "Cargando contactos..."
   }
 }

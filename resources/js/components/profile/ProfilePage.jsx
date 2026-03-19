@@ -199,7 +199,7 @@ export default function ProfilePage({
       await api.patch("/api/auth/password", passwordForm);
       setPasswordSuccess(
         // "Password updated. Use your new password for app login and DAV clients.",
-        t("api.passwordSuccess"),
+        t("notices.passwordSuccess"),
       );
       setPasswordForm({
         current_password: "",
@@ -224,7 +224,7 @@ export default function ProfilePage({
       setBackupCodes([]);
       setSecuritySuccess(
         // "Setup initialized. Scan the QR code and enter a verification code.",
-        t("api.2faSetupSuccess"),
+        t("notices.2faSetupSuccess"),
       );
     } catch (err) {
       setSecurityError(extractError(err, t("errors.startTwoFactor")));
@@ -250,7 +250,7 @@ export default function ProfilePage({
       setTwoFactorSetup(null);
       await auth.refreshAuth?.();
       // setSecuritySuccess("Two-factor authentication has been enabled.");
-      setSecuritySuccess(t("api.2faEnableSuccess"));
+      setSecuritySuccess(t("notices.2faEnableSuccess"));
     } catch (err) {
       setSecurityError(extractError(err, t("errors.enableTwoFactor")));
     } finally {
@@ -259,7 +259,7 @@ export default function ProfilePage({
   };
 
   const disableTwoFactor = async () => {
-    if (!window.confirm(t("confirmDisable2fa"))) {
+    if (!window.confirm(t("confirmations.disable2fa"))) {
       return;
     }
 
@@ -278,7 +278,7 @@ export default function ProfilePage({
       await auth.refreshAuth?.();
       setSecuritySuccess(
         // "Two-factor authentication has been disabled and DAV app passwords were revoked.",
-        t("api.2faDisableSuccess"),
+        t("notices.2faDisableSuccess"),
       );
     } catch (err) {
       setSecurityError(extractError(err, t("errors.disableTwoFactor")));
@@ -301,7 +301,7 @@ export default function ProfilePage({
       );
       setTwoFactorActionCode("");
       // setSecuritySuccess("Backup codes regenerated.");
-      setSecuritySuccess(t("api.backupCodesRegenerated"));
+      setSecuritySuccess(t("notices.backupCodesRegenerated"));
     } catch (err) {
       setSecurityError(extractError(err, t("errors.regenerateCodes")));
     } finally {
@@ -325,7 +325,7 @@ export default function ProfilePage({
       setAppPasswordCode("");
       await loadAppPasswords();
       // setSecuritySuccess("DAV app password created.");
-      setSecuritySuccess(t("api.appPasswordCreated"));
+      setSecuritySuccess(t("notices.appPasswordCreated"));
     } catch (err) {
       setSecurityError(extractError(err, t("errors.createAppPassword")));
     } finally {
@@ -346,7 +346,7 @@ export default function ProfilePage({
       });
       await loadAppPasswords();
       // setSecuritySuccess("DAV app password revoked.");
-      setSecuritySuccess(t("api.appPasswordRevoked"));
+      setSecuritySuccess(t("notices.appPasswordRevoked"));
     } catch (err) {
       setSecurityError(extractError(err, t("errors.revokeAppPassword")));
     } finally {

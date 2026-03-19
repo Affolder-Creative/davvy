@@ -73,15 +73,6 @@
     "appPasswordLastUsed": "Último uso: {{last_used_at}}",
     "appPasswordNeverUsed": "Nunca"
   },
-  "api": {
-    "passwordSuccess": "Contraseña actualizada. Utilice su nueva contraseña para iniciar sesión en la aplicación y en los clientes DAV.",
-    "2faSetupSuccess": "Configuración iniciada. Escanee el código QR e introduzca un código de verificación.",
-    "2faEnableSuccess": "Se ha habilitado la autenticación de dos factores.",
-    "2faDisableSuccess": "La autenticación de dos factores ha sido deshabilitada y las contraseñas de aplicaciones DAV han sido revocadas.",
-    "backupCodesRegenerated": "Códigos de respaldo regenerados.",
-    "appPasswordCreated": "Contraseña de la aplicación DAV creada.",
-    "appPasswordRevoked": "Contraseña de la aplicación DAV revocada."
-  },
   "errors": {
     "updateLocale": "No se pudo actualizar el idioma en este momento.",
     "loadAppPasswords": "No se pudieron cargar las contraseñas DAV en este momento.",
@@ -93,5 +84,16 @@
     "createAppPassword": "No se pudo crear la contraseña DAV.",
     "revokeAppPassword": "No se pudo revocar la contraseña DAV."
   },
-  "confirmDisable2fa": "¿Deshabilitar la autenticación de dos factores y revocar todas las contraseñas DAV?"
+  "notices": {
+    "passwordSuccess": "Contraseña actualizada. Utilice su nueva contraseña para iniciar sesión en la aplicación y en los clientes DAV.",
+    "2faSetupSuccess": "Configuración iniciada. Escanee el código QR e introduzca un código de verificación.",
+    "2faEnableSuccess": "Se ha habilitado la autenticación de dos factores.",
+    "2faDisableSuccess": "La autenticación de dos factores ha sido deshabilitada y las contraseñas de aplicaciones DAV han sido revocadas.",
+    "backupCodesRegenerated": "Códigos de respaldo regenerados.",
+    "appPasswordCreated": "Contraseña de la aplicación DAV creada.",
+    "appPasswordRevoked": "Contraseña de la aplicación DAV revocada."
+  },
+  "confirmations": {
+    "disable2fa": "¿Deshabilitar la autenticación de dos factores y revocar todas las contraseñas DAV?"
+  }
 }

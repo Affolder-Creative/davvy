@@ -378,10 +378,10 @@ export default function AdminPage({
       setUserForm({ name: "", email: "", role: "regular" });
       setUserInviteResult({
         message: created?.invitation_sent
-          ? t("api.invitationSent", { targetEmail })
+          ? t("notices.invitationSent", { targetEmail })
           : created?.invitation_url
-            ? t("api.invitationUrl", { targetEmail })
-            : t("api.userCreated", { targetEmail }),
+            ? t("notices.invitationUrl", { targetEmail })
+            : t("notices.userCreated", { targetEmail }),
         invitationUrl:
           typeof created?.invitation_url === "string"
             ? created.invitation_url
@@ -481,14 +481,14 @@ export default function AdminPage({
       setBackupRunToast({
         status: "success",
         message: transferOwnerId
-          ? t("api.transferredData", {
+          ? t("notices.transferredData", {
               deletedUserName,
               transferredCalendars,
               transferredAddressBooks,
               transferredContacts,
               transferTargetName,
             })
-          : t("api.deletedUser", { deletedUserName }),
+          : t("notices.deletedUser", { deletedUserName }),
       });
 
       await load();
@@ -570,7 +570,7 @@ export default function AdminPage({
 
       if (pendingCount > 0) {
         approvePending = window.confirm(
-          t("api.approvePending", { pendingCount }),
+          t("notices.approvePending", { pendingCount }),
         );
       }
     }
@@ -598,7 +598,7 @@ export default function AdminPage({
         const approvedCount = Number(bulkApproval.data?.approved_count ?? 0);
         setBackupRunToast({
           status: "success",
-          message: t("api.approvedPending", { approvedCount }),
+          message: t("notices.approvedPending", { approvedCount }),
         });
         await load();
       }
@@ -1034,7 +1034,7 @@ export default function AdminPage({
       const response = await api.post("/api/admin/backups/run");
       const result = response.data ?? {};
       const nextStatus = result.status || "success";
-      const nextMessage = result.reason || t("api.backupRunSuccess");
+      const nextMessage = result.reason || t("notices.backupRunSuccess");
 
       setState((prev) => ({
         ...prev,
@@ -1107,7 +1107,7 @@ export default function AdminPage({
       setBackupRestoreResult(result);
       setBackupRunToast({
         status: result.status || "success",
-        message: result.reason || t("errors.backupRestoreCompleted"),
+        message: result.reason || t("notices.backupRestoreCompleted"),
       });
 
       if (!backupRestoreDryRun) {
@@ -1160,9 +1160,9 @@ export default function AdminPage({
     ? `${state.backupLastRunStatus.toUpperCase()} at ${formatAdminTimestamp(
         state.backupLastRunAt,
       )}`
-    : t("errors.backupLastRunNoRun");
+    : t("states.backupLastRunNoRun");
   const backupDestinationSummary = [
-    state.backupLocalEnabled ? t("errors.backupLocal") : null,
+    state.backupLocalEnabled ? t("labels.backupLocal") : null,
     state.backupS3Enabled ? `S3 (${state.backupS3Disk})` : null,
   ]
     .filter(Boolean)
@@ -2154,7 +2154,7 @@ export default function AdminPage({
       ) : null}
 
       {state.loading ? (
-        <FullPageState label={t("admin.loadingAdminData")} compact />
+        <FullPageState label={t("states.loadingAdminData")} compact />
       ) : (
         <div className="mt-6 grid gap-6 xl:grid-cols-2">
           <section className="surface rounded-3xl p-6">

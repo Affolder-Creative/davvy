@@ -1,5 +1,4 @@
 {
-  "loadingApp": "Loading Davvy...",
   "copy": {
     "copied": "Copied!",
     "copyFailed": "Copy failed",
@@ -18,5 +17,8 @@
     "invalidTimestamp": "Invalid timestamp",
     "na": "n/a",
     "unknown": "Unknown"
+  },
+  "states": {
+    "loadingApp": "Loading Davvy..."
   }
 }

@@ -116,17 +116,17 @@ export default function AppShell({
           <div>
             <Link className="block" to="/">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-app-accent">
-                {t("brand")}
+                {t("app.brand")}
               </p>
             </Link>
             <Link className="block" to="/">
               <h1 className="text-2xl font-bold text-app-strong">
-                {t("subtitle")}
+                {t("app.subtitle")}
               </h1>
             </Link>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
               <p className="text-sm text-app-muted">
-                {t("signedInAs", { email: auth.user.email })}
+                {t("session.signedInAs", { email: auth.user.email })}
               </p>
             </div>
           </div>
