@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Contact Editor Address Books Section component.
@@ -14,6 +15,7 @@ export default function ContactEditorAddressBooksSection({
   form,
   toggleAssignedAddressBook,
 }) {
+  const { t } = useTranslation("contacts");
   return (
     <section className="rounded-2xl border border-app-edge bg-app-surface p-3">
       <button
@@ -24,18 +26,20 @@ export default function ContactEditorAddressBooksSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            Address Books
+            {t("editor.address_books_section.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            Choose where this contact will be stored.
+            {t("editor.address_books_section.description")}
           </span>
         </span>
         <span className="flex items-center gap-2">
           <span className="rounded-full border border-app-warn-edge bg-app-warn-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-base">
-            Required
+            {t("editor.address_books_section.required")}
           </span>
           <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-faint">
-            {selectedAddressBookCount} selected
+            {t("editor.address_books_section.total_selected", {
+              count: selectedAddressBookCount,
+            })}
           </span>
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
             {isOpen ? "-" : "+"}
@@ -46,11 +50,13 @@ export default function ContactEditorAddressBooksSection({
       {isOpen ? (
         <div className="mt-3 space-y-3 px-1 pb-1">
           <p className="text-xs text-app-faint">
-            Choose one or more address books for this contact.
+            {t("editor.address_books_section.hint")}
           </p>
           <div className="space-y-2">
             {addressBooks.length === 0 ? (
-              <p className="text-sm text-app-faint">No writable address books.</p>
+              <p className="text-sm text-app-faint">
+                {t("editor.address_books_section.no_address_books")}
+              </p>
             ) : (
               addressBooks.map((book) => {
                 const isAssigned = form.address_book_ids.includes(book.id);
@@ -83,11 +89,14 @@ export default function ContactEditorAddressBooksSection({
                           }`}
                           aria-hidden={!isAssigned}
                         >
-                          Selected
+                          {t("editor.address_books_section.selected")}
                         </span>
                       </span>
                       <span className="block text-xs text-app-faint">
-                        /{book.uri} • {book.scope === "owned" ? "Owned" : "Shared"}
+                        /{book.uri} •{" "}
+                        {book.scope === "owned"
+                          ? t("editor.address_books_section.owned")
+                          : t("editor.address_books_section.shared")}
                         {book.owner_name ? ` • ${book.owner_name}` : ""}
                       </span>
                     </span>

@@ -1,0 +1,267 @@
+{
+  "summary": {
+    "contacts_title": "Contactos",
+    "contacts_helper": "Contactos administrados en esta interfaz web.",
+    "books_title": "Libretas editables",
+    "books_helper": "Libretas donde puedes agregar o editar contactos.",
+    "user_title": "Usuario",
+    "user_helper": "La propiedad de los contactos está limitada a tu cuenta."
+  },
+  "loading": "Cargando contactos...",
+  "mobile": {
+    "view_aria": "Vista móvil de contactos",
+    "contacts": "Contactos",
+    "editor_edit": "Editar",
+    "editor_new_edit": "Nuevo/Editar"
+  },
+  "filters": {
+    "clear": "Limpiar filtros"
+  },
+  "sidebar": {
+    "title": "Contactos",
+    "new": "Nuevo",
+    "search_placeholder": "Buscar contactos...",
+    "filter_all_option": "Todas las libretas de direcciones",
+    "clear_filters": "Limpiar",
+    "no_contacts": "Todavía no hay contactos.",
+    "no_contacts_match_filter": "Ningún contacto coincide con este filtro.",
+    "address_book_count": "{{count}} libreta{{plural}} de direcciones",
+    "page": "Página {{current}} / {{total}}",
+    "prev_page": "Anterior",
+    "next_page": "Siguiente"
+  },
+  "field_labels": {
+    "pronouns": {
+      "not_set": "No establecido",
+      "she_her": "ella/la",
+      "he_him": "él/lo",
+      "they_them": "elle/le",
+      "xe_xem": "xe/xem",
+      "custom": "Personalizado..."
+    },
+    "phone": {
+      "mobile": "Móvil",
+      "iphone": "iPhone",
+      "apple_watch": "Apple Watch",
+      "home": "Casa",
+      "work": "Trabajo",
+      "main": "Principal",
+      "home_fax": "Fax de casa",
+      "work_fax": "Fax del trabajo",
+      "other_fax": "Otro fax",
+      "pager": "Buscapersonas",
+      "other": "Otro",
+      "custom": "Personalizado..."
+    },
+    "email": {
+      "home": "Casa",
+      "work": "Trabajo",
+      "other": "Otro",
+      "custom": "Personalizado..."
+    },
+    "url": {
+      "homepage": "Página principal",
+      "home": "Casa",
+      "work": "Trabajo",
+      "other": "Otro",
+      "custom": "Personalizado..."
+    },
+    "address": {
+      "home": "Casa",
+      "work": "Trabajo",
+      "school": "Escuela",
+      "other": "Otro",
+      "custom": "Personalizado..."
+    },
+    "date": {
+      "anniversary": "Aniversario",
+      "other": "Otro",
+      "custom": "Personalizado..."
+    },
+    "related": {
+      "spouse": "Cónyuge",
+      "partner": "Pareja",
+      "parent": "Padre/Madre",
+      "child": "Hijo/a",
+      "sibling": "Hermano/a",
+      "assistant": "Asistente",
+      "friend": "Amigo/a",
+      "other": "Otro",
+      "custom": "Personalizado..."
+    },
+    "im": {
+      "home": "Casa",
+      "work": "Trabajo",
+      "other": "Otro",
+      "custom": "Personalizado..."
+    }
+  },
+  "editor": {
+    "new": "Nuevo contacto",
+    "edit": "Editar contacto",
+    "description": "Ingresa al menos un nombre, apellido o empresa. La asignación de libreta de direcciones admite una o más selecciones.",
+    "delete": "Eliminar",
+    "save": "Guardar contacto",
+    "saving": "Guardando...",
+    "no_address_books": "Actualmente no tienes acceso de escritura a ninguna libreta de direcciones.",
+    "name_section": {
+      "label": "Nombre",
+      "description": "Campos básicos de identidad y nombre fonético.",
+      "field": {
+        "prefix": "Prefijo",
+        "first": "Nombre",
+        "middle": "Segundo nombre",
+        "last": "Apellido",
+        "suffix": "Sufijo",
+        "nickname": "Apodo",
+        "maiden_name": "Apellido de soltera",
+        "phonetic_first_name": "Nombre fonético",
+        "phonetic_last_name": "Apellido fonético"
+      }
+    },
+    "work_section": {
+      "label": "Trabajo",
+      "description": "Detalles de la empresa y del cargo.",
+      "field": {
+        "company": "Empresa",
+        "phonetic_company": "Empresa fonética",
+        "job_title": "Cargo",
+        "department": "Departamento"
+      }
+    },
+    "personal_section": {
+      "label": "Personal",
+      "description": "Detalles personales.",
+      "field": {
+        "pronouns": "Pronombres",
+        "pronouns_custom": "Pronombres personalizados",
+        "pronouns_custom_placeholder": "Valor personalizado opcional",
+        "ringtone": "Tono de llamada",
+        "text_tone": "Tono de mensaje",
+        "verification_code": "Código de verificación",
+        "profile": "Perfil",
+        "household_label": "Hogar",
+        "head_of_household": "Cabeza de familia"
+      },
+      "milestones_dates": {
+        "label": "Hitos y fechas",
+        "description": "Cumpleaños, fechas destacadas y comportamiento del calendario.",
+        "birthday": "Cumpleaños",
+        "month": "Mes",
+        "month_placeholder": "MM",
+        "day": "Día",
+        "day_placeholder": "DD",
+        "year": "Año",
+        "year_placeholder": "AAAA",
+        "calendar_behavior": "Comportamiento del calendario",
+        "exclude_from_milestone_calendars": "Excluir de los calendarios de hitos",
+        "exclude_from_milestone_calendars_description": "Omitir eventos de cumpleaños y aniversario para este contacto en los calendarios de hitos generados."
+      }
+    },
+    "communication_section": {
+      "label": "Comunicación",
+      "description": "Métodos de contacto y direcciones.",
+      "field": {
+        "phone": {
+          "title": "Teléfono",
+          "placeholder": "Número de teléfono",
+          "add_label": "Agregar teléfono"
+        },
+        "email": {
+          "title": "Correo electrónico",
+          "placeholder": "Dirección de correo electrónico",
+          "add_label": "Agregar correo electrónico"
+        },
+        "address": {
+          "title": "Dirección"
+        },
+        "url": {
+          "title": "URL",
+          "placeholder": "https://example.com",
+          "add_label": "Agregar URL"
+        },
+        "instant_message": {
+          "title": "Mensaje instantáneo",
+          "placeholder": "im:usuario@example.com",
+          "add_label": "Agregar MI"
+        }
+      }
+    },
+    "optional_field_section": {
+      "label": "Agregar campo opcional",
+      "description": "Personaliza este formulario según sea necesario",
+      "all_added": "Todos los campos opcionales han sido agregados",
+      "search": "Buscar campos opcionales...",
+      "no_matching": "No hay campos opcionales coincidentes.",
+      "add_field": "Agregar campo",
+      "hidden_by_default": "Los campos opcionales están ocultos de forma predeterminada.",
+      "hide_field": "Ocultar {{pendingHideFieldLabel}}"
+    },
+    "hide_field_modal": {
+      "title": "¿Ocultar {{pendingHideFieldLabel}}?",
+      "description": "Este campo actualmente contiene datos. Mantén el valor oculto o bórralo antes de ocultar el campo.",
+      "cancel": "Cancelar",
+      "keep_hidden_value": "Mantener valor oculto",
+      "clear_and_hide": "Borrar y ocultar"
+    },
+    "address_books_section": {
+      "label": "Libretas de direcciones",
+      "description": "Elige dónde se almacenará este contacto.",
+      "required": "Obligatorio",
+      "total_selected": "{{count}} seleccionada(s)",
+      "hint": "Elige una o más libretas de direcciones para este contacto.",
+      "no_address_books": "No hay libretas de direcciones con permiso de escritura.",
+      "selected": "Seleccionado",
+      "owned": "Propio",
+      "shared": "Compartido"
+    },
+    "address_editor": {
+      "title": "Dirección",
+      "address": "Dirección",
+      "add_address": "Agregar dirección",
+      "no_addresses": "No hay direcciones.",
+      "street_placeholder": "Calle",
+      "city_placeholder": "Ciudad",
+      "state_placeholder": "Estado / Región",
+      "zip_placeholder": "Código postal",
+      "country_placeholder": "País",
+      "custom_label_placeholder": "Etiqueta personalizada"
+    },
+    "date_editor": {
+      "title": "Fecha",
+      "add_date": "Agregar fecha",
+      "no_dates": "No hay fechas.",
+      "month_placeholder": "MM",
+      "day_placeholder": "DD",
+      "year_placeholder": "AAAA",
+      "remove": "Eliminar",
+      "custom_label_placeholder": "Etiqueta personalizada"
+    },
+    "labeled_value_editor": {
+      "custom_label_placeholder": "Etiqueta personalizada",
+      "no_entries": "No hay entradas."
+    },
+    "related_name_editor": {
+      "title": "Nombre relacionado",
+      "add_related_name": "Agregar nombre relacionado",
+      "no_related_names": "No hay nombres relacionados.",
+      "name_placeholder": "Nombre",
+      "no_matching_contacts": "No hay contactos coincidentes. Sigue escribiendo para usar un nombre personalizado.",
+      "linked_to_contact": "Vinculado al contacto #{{contactId}}.",
+      "match_found": "Coincidencia encontrada: {{name}}",
+      "link": "Vincular",
+      "dismiss": "Descartar",
+      "custom_label_placeholder": "Etiqueta personalizada"
+    },
+    "row_reorder_controls": {
+      "move_up_aria": "Mover {{rowLabel}} {{rowNumber}} hacia arriba",
+      "move_up": "Mover hacia arriba",
+      "move_down_aria": "Mover {{rowLabel}} {{rowNumber}} hacia abajo",
+      "move_down": "Mover hacia abajo",
+      "remove_aria": "Eliminar {{rowLabel}} {{rowNumber}}",
+      "remove": "Eliminar",
+      "drag_aria": "Arrastrar para reordenar {{rowLabel}} {{rowNumber}}",
+      "drag_title": "Arrastrar para reordenar"
+    }
+  }
+}

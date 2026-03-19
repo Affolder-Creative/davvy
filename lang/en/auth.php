@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'public_registration_disabled' => 'Public registration is currently disabled.',
+    'registration_submitted_verify_and_wait_approval' => 'Registration submitted. Verify your email address and wait for administrator approval before signing in.',
+    'registration_submitted_verify_before_signin' => 'Registration submitted. Verify your email address before signing in.',
+    'registration_submitted_pending_approval' => 'Registration submitted. An administrator must approve your account before you can sign in.',
+    'verification_link_invalid_or_expired' => 'Verification link is invalid or expired.',
+    'email_verified_pending_approval' => 'Email verified. Your account is pending administrator approval.',
+    'invitation_link_invalid_or_expired' => 'Invitation link is invalid or expired.',
+    'invitation_accepted_pending_approval' => 'Invitation accepted. Your account is pending administrator approval.',
+    'credentials_invalid' => 'The provided credentials are invalid.',
+    'account_pending_approval' => 'Your account is pending administrator approval.',
+    'verify_email_before_signin' => 'Verify your email address before signing in.',
+    'two_factor_code_required' => 'Two-factor code required to complete sign in.',
+    'no_pending_two_factor_challenge' => 'No pending two-factor challenge. Start a new sign in attempt.',
+    'invalid_authentication_code' => 'Invalid authentication code.',
+    'two_factor_already_enabled' => 'Two-factor authentication is already enabled.',
+    'two_factor_setup_expired' => 'Two-factor setup has expired. Start setup again.',
+    'two_factor_code_invalid' => 'The two-factor code is invalid.',
+    'two_factor_not_enabled' => 'Two-factor authentication is not enabled.',
+    'enable_two_factor_before_managing_app_passwords' => 'Enable two-factor authentication before managing app passwords.',
+    'enable_two_factor_before_creating_app_passwords' => 'Enable two-factor authentication before creating app passwords.',
+    'two_factor_setup_required_before_accessing_resource' => 'Two-factor authentication setup is required before accessing this resource.',
+];

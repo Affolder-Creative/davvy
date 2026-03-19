@@ -1,0 +1,74 @@
+{
+  "errors": {
+    "load": "Unable to load change requests.",
+    "approve": "Unable to approve request.",
+    "deny": "Unable to deny request.",
+    "bulk": "Unable to process bulk action.",
+    "resolved_payload_json": "Resolved payload must be valid JSON.",
+    "resolved_address_ids_json": "Resolved address book IDs must be valid JSON.",
+    "resolved_address_ids_array": "Resolved address book IDs must be an array of positive integers."
+  },
+  "notice": {
+    "approved": "Request approved.",
+    "denied": "Request denied.",
+    "bulk": "{{processed}} request group(s) processed. {{skipped}} skipped."
+  },
+  "bulk": {
+    "confirm": "This will {{verb}} {{count}} queued request(s) in the current filtered view. Continue?",
+    "approve": "approve",
+    "deny": "deny"
+  },
+  "title": "Contact Change Review Queue",
+  "subtitle": "Review queued editor changes for contacts before they are applied.",
+  "approve_all": "Approve All ({{count}})",
+  "deny_all": "Deny All ({{count}})",
+  "filters": {
+    "open": "Open",
+    "pending": "Pending",
+    "manual_merge_needed": "Manual Merge Needed",
+    "history": "History",
+    "all": "All",
+    "all_operations": "All operations",
+    "updates": "Updates",
+    "deletes": "Deletes",
+    "search_placeholder": "Search by contact/requester...",
+    "refresh": "Refresh"
+  },
+  "loading": "Loading review queue...",
+  "empty": "No queued requests for this filter.",
+  "card": {
+    "group": "Group",
+    "unnamed_contact": "Unnamed Contact",
+    "status": "Status",
+    "requested": "Requested",
+    "edit_approve": "Edit & Approve",
+    "approve": "Approve",
+    "deny": "Deny",
+    "requester": "Requester",
+    "approval_owner": "Approval Owner",
+    "source": "Source",
+    "reviewer": "Reviewer",
+    "not_reviewed": "Not reviewed yet",
+    "changed_fields": "Changed fields"
+  },
+  "modal": {
+    "title": "Edit Request #{{id}} Before Approve",
+    "subtitle": "Adjust payload/address book IDs, then approve this queued request.",
+    "resolved_payload": "Resolved Payload JSON",
+    "resolved_address_ids": "Resolved Address Book IDs JSON Array",
+    "cancel": "Cancel",
+    "approve": "Save Edits & Approve",
+    "approving": "Approving..."
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved (awaiting others)",
+    "manual_merge_needed": "Manual Merge Needed",
+    "applied": "Applied",
+    "denied": "Denied"
+  },
+  "operation": {
+    "delete": "Delete",
+    "update": "Update"
+  }
+}

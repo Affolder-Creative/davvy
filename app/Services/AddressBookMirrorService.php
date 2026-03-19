@@ -82,7 +82,7 @@ class AddressBookMirrorService
 
         foreach ($sanitizedSourceIds as $sourceId) {
             if (! in_array($sourceId, $eligibleIds, true)) {
-                abort(422, 'One or more selected address books are not eligible for Apple compatibility mirroring.');
+                abort(422, __('contacts.selected_address_books_not_eligible_for_apple_compat_mirroring'));
             }
         }
 
@@ -249,7 +249,7 @@ class AddressBookMirrorService
         }
 
         if (! $actor) {
-            throw new Forbidden('Write access denied for mirrored source address book.');
+            throw new Forbidden(__('contacts.write_access_denied_for_mirrored_source_address_book'));
         }
 
         $sourceAddressBook = AddressBook::query()->find($link->source_address_book_id);
@@ -260,11 +260,11 @@ class AddressBookMirrorService
 
         if (! $sourceAddressBook || ! $sourceCard) {
             $this->deleteMirroredLink($link);
-            throw new NotFound('Source contact no longer exists.');
+            throw new NotFound(__('contacts.source_contact_no_longer_exists'));
         }
 
         if (! $this->accessService->userCanWriteAddressBook($actor, $sourceAddressBook)) {
-            throw new Forbidden('Write access denied for mirrored source address book.');
+            throw new Forbidden(__('contacts.write_access_denied_for_mirrored_source_address_book'));
         }
 
         $sourceUid = trim((string) $sourceCard->uid);
@@ -325,7 +325,7 @@ class AddressBookMirrorService
         }
 
         if (! $actor) {
-            throw new Forbidden('Write access denied for mirrored source address book.');
+            throw new Forbidden(__('contacts.write_access_denied_for_mirrored_source_address_book'));
         }
 
         $sourceAddressBook = AddressBook::query()->find($link->source_address_book_id);
@@ -336,7 +336,7 @@ class AddressBookMirrorService
         }
 
         if (! $this->accessService->userCanWriteAddressBook($actor, $sourceAddressBook)) {
-            throw new Forbidden('Write access denied for mirrored source address book.');
+            throw new Forbidden(__('contacts.write_access_denied_for_mirrored_source_address_book'));
         }
 
         $sourceCard = Card::query()
@@ -667,11 +667,11 @@ class AddressBookMirrorService
         try {
             $vcard = Reader::read($incomingCardData);
         } catch (Throwable) {
-            throw new BadRequest('Invalid vCard payload.');
+            throw new BadRequest(__('dav.invalid_vcard_payload'));
         }
 
         if (! $vcard instanceof VCard) {
-            throw new BadRequest('Expected VCARD payload.');
+            throw new BadRequest(__('dav.expected_vcard_payload'));
         }
 
         $uidProperties = $vcard->select('UID');

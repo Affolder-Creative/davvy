@@ -502,7 +502,7 @@ class ContactService
     private function assertCanMutateContact(User $actor, Contact $contact): void
     {
         if (! $this->canUserWriteContact($actor, $contact)) {
-            abort(403, 'You cannot modify this contact.');
+            abort(403, __('contacts.cannot_modify_contact'));
         }
     }
 
@@ -523,7 +523,7 @@ class ContactService
 
         if ($ids === []) {
             throw ValidationException::withMessages([
-                'address_book_ids' => ['Select at least one address book.'],
+                'address_book_ids' => [__('contacts.select_at_least_one_address_book')],
             ]);
         }
 
@@ -536,14 +536,14 @@ class ContactService
             $book = $books->get($id);
             if (! $book) {
                 throw ValidationException::withMessages([
-                    'address_book_ids' => ['One or more selected address books could not be found.'],
+                    'address_book_ids' => [__('contacts.selected_address_books_not_found')],
                 ]);
             }
 
             if (! $this->accessService->userCanWriteAddressBook($actor, $book)) {
                 throw ValidationException::withMessages([
                     'address_book_ids' => [
-                        'You do not have write access to one or more selected address books.',
+                        __('contacts.no_write_access_to_selected_address_books'),
                     ],
                 ]);
             }
@@ -569,7 +569,7 @@ class ContactService
 
         if ($ids === []) {
             throw ValidationException::withMessages([
-                'address_book_ids' => ['Select at least one address book.'],
+                'address_book_ids' => [__('contacts.select_at_least_one_address_book')],
             ]);
         }
 
@@ -581,7 +581,7 @@ class ContactService
         foreach ($ids as $id) {
             if (! $books->has($id)) {
                 throw ValidationException::withMessages([
-                    'address_book_ids' => ['One or more selected address books could not be found.'],
+                    'address_book_ids' => [__('contacts.selected_address_books_not_found')],
                 ]);
             }
         }
@@ -1132,11 +1132,10 @@ class ContactService
         if ($query->exists()) {
             throw ValidationException::withMessages([
                 'address_book_ids' => [
-                    sprintf(
-                        'A contact with UID "%s" already exists in "%s".',
-                        $uid,
-                        $addressBook->display_name,
-                    ),
+                    __('contacts.contact_with_uid_already_exists_in_address_book', [
+                        'uid' => $uid,
+                        'address_book' => $addressBook->display_name,
+                    ]),
                 ],
             ]);
         }

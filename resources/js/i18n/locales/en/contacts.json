@@ -1,0 +1,267 @@
+{
+  "summary": {
+    "contacts_title": "Contacts",
+    "contacts_helper": "Managed contacts in this web UI.",
+    "books_title": "Writable Books",
+    "books_helper": "Address books where you can add or edit contacts.",
+    "user_title": "User",
+    "user_helper": "Contact ownership is scoped to your account."
+  },
+  "loading": "Loading contacts...",
+  "mobile": {
+    "view_aria": "Contact mobile view",
+    "contacts": "Contacts",
+    "editor_edit": "Edit",
+    "editor_new_edit": "New/Edit"
+  },
+  "filters": {
+    "clear": "Clear filters"
+  },
+  "sidebar": {
+    "title": "Contacts",
+    "new": "New",
+    "search_placeholder": "Search contacts...",
+    "filter_all_option": "All address books",
+    "clear_filters": "Clear",
+    "no_contacts": "No contacts yet.",
+    "no_contacts_match_filter": "No contacts match this filter.",
+    "address_book_count": "{{count}} address book{{plural}}",
+    "page": "Page {{current}} / {{total}}",
+    "prev_page": "Prev",
+    "next_page": "Next"
+  },
+  "field_labels": {
+    "pronouns": {
+      "not_set": "Not set",
+      "she_her": "she/her",
+      "he_him": "he/him",
+      "they_them": "they/them",
+      "xe_xem": "xe/xem",
+      "custom": "Custom..."
+    },
+    "phone": {
+      "mobile": "Mobile",
+      "iphone": "iPhone",
+      "apple_watch": "Apple Watch",
+      "home": "Home",
+      "work": "Work",
+      "main": "Main",
+      "home_fax": "Home Fax",
+      "work_fax": "Work Fax",
+      "other_fax": "Other Fax",
+      "pager": "Pager",
+      "other": "Other",
+      "custom": "Custom..."
+    },
+    "email": {
+      "home": "Home",
+      "work": "Work",
+      "other": "Other",
+      "custom": "Custom..."
+    },
+    "url": {
+      "homepage": "Home Page",
+      "home": "Home",
+      "work": "Work",
+      "other": "Other",
+      "custom": "Custom..."
+    },
+    "address": {
+      "home": "Home",
+      "work": "Work",
+      "school": "School",
+      "other": "Other",
+      "custom": "Custom..."
+    },
+    "date": {
+      "anniversary": "Anniversary",
+      "other": "Other",
+      "custom": "Custom..."
+    },
+    "related": {
+      "spouse": "Spouse",
+      "partner": "Partner",
+      "parent": "Parent",
+      "child": "Child",
+      "sibling": "Sibling",
+      "assistant": "Assistant",
+      "friend": "Friend",
+      "other": "Other",
+      "custom": "Custom..."
+    },
+    "im": {
+      "home": "Home",
+      "work": "Work",
+      "other": "Other",
+      "custom": "Custom..."
+    }
+  },
+  "editor": {
+    "new": "New Contact",
+    "edit": "Edit Contact",
+    "description": "Enter at least a First Name, Last Name, or Company. Address book assignment supports one or more selections.",
+    "delete": "Delete",
+    "save": "Save Contact",
+    "saving": "Saving...",
+    "no_address_books": "You do not currently have write access to any address books.",
+    "name_section": {
+      "label": "Name",
+      "description": "Basic identity and phonetic naming fields.",
+      "field": {
+        "prefix": "Prefix",
+        "first": "First Name",
+        "middle": "Middle Name",
+        "last": "Last Name",
+        "suffix": "Suffix",
+        "nickname": "Nickname",
+        "maiden_name": "Maiden Name",
+        "phonetic_first_name": "Phonetic First Name",
+        "phonetic_last_name": "Phonetic Last Name"
+      }
+    },
+    "work_section": {
+      "label": "Work",
+      "description": "Company and role details.",
+      "field": {
+        "company": "Company",
+        "phonetic_company": "Phonetic Company",
+        "job_title": "Job Title",
+        "department": "Department"
+      }
+    },
+    "personal_section": {
+      "label": "Personal",
+      "description": "Personal details.",
+      "field": {
+        "pronouns": "Pronouns",
+        "pronouns_custom": "Custom Pronouns",
+        "pronouns_custom_placeholder": "Optional custom value",
+        "ringtone": "Ringtone",
+        "text_tone": "Text Tone",
+        "verification_code": "Verification Code",
+        "profile": "Profile",
+        "household_label": "Household",
+        "head_of_household": "Head of Household"
+      },
+      "milestones_dates": {
+        "label": "Milestones & Dates",
+        "description": "Birthday, notable dates, and calendar behavior.",
+        "birthday": "Birthday",
+        "month": "Month",
+        "month_placeholder": "MM",
+        "day": "Day",
+        "day_placeholder": "DD",
+        "year": "Year",
+        "year_placeholder": "YYYY",
+        "calendar_behavior": "Calendar Behavior",
+        "exclude_from_milestone_calendars": "Exclude From Milestone Calendars",
+        "exclude_from_milestone_calendars_description": "Skip Birthday and Anniversary events for this contact in generated milestone calendars."
+      }
+    },
+    "communication_section": {
+      "label": "Communication",
+      "description": "Contact methods and addresses.",
+      "field": {
+        "phone": {
+          "title": "Phone",
+          "placeholder": "Phone number",
+          "add_label": "Add phone"
+        },
+        "email": {
+          "title": "Email",
+          "placeholder": "Email address",
+          "add_label": "Add email"
+        },
+        "address": {
+          "title": "Address"
+        },
+        "url": {
+          "title": "URL",
+          "placeholder": "https://example.com",
+          "add_label": "Add URL"
+        },
+        "instant_message": {
+          "title": "Instant Message",
+          "placeholder": "im:username@example.com",
+          "add_label": "Add IM"
+        }
+      }
+    },
+    "optional_field_section": {
+      "label": "Add Optional Field",
+      "description": "Customize this form as needed",
+      "all_added": "All optional fields added",
+      "search": "Search optional fields...",
+      "no_matching": "No matching optional fields.",
+      "add_field": "Add Field",
+      "hidden_by_default": "Optional fields are hidden by default.",
+      "hide_field": "Hide {{pendingHideFieldLabel}}"
+    },
+    "hide_field_modal": {
+      "title": "Hide {{pendingHideFieldLabel}}?",
+      "description": "This field currently has data. Keep the value hidden or clear it before hiding the field.",
+      "cancel": "Cancel",
+      "keep_hidden_value": "Keep Hidden Value",
+      "clear_and_hide": "Clear and Hide"
+    },
+    "address_books_section": {
+      "label": "Address Books",
+      "description": "Choose where this contact will be stored.",
+      "required": "Required",
+      "total_selected": "{{count}} selected",
+      "hint": "Choose one or more address books for this contact.",
+      "no_address_books": "No writable address books.",
+      "selected": "Selected",
+      "owned": "Owned",
+      "shared": "Shared"
+    },
+    "address_editor": {
+      "title": "Address",
+      "address": "Address",
+      "add_address": "Add address",
+      "no_addresses": "No addresses.",
+      "street_placeholder": "Street",
+      "city_placeholder": "City",
+      "state_placeholder": "State / Region",
+      "zip_placeholder": "Postal code",
+      "country_placeholder": "Country",
+      "custom_label_placeholder": "Custom label"
+    },
+    "date_editor": {
+      "title": "Date",
+      "add_date": "Add date",
+      "no_dates": "No dates.",
+      "month_placeholder": "MM",
+      "day_placeholder": "DD",
+      "year_placeholder": "YYYY",
+      "remove": "Remove",
+      "custom_label_placeholder": "Custom label"
+    },
+    "labeled_value_editor": {
+      "custom_label_placeholder": "Custom label",
+      "no_entries": "No entries."
+    },
+    "related_name_editor": {
+      "title": "Related Name",
+      "add_related_name": "Add related name",
+      "no_related_names": "No related names.",
+      "name_placeholder": "Name",
+      "no_matching_contacts": "No matching contacts. Keep typing to use a custom name.",
+      "linked_to_contact": "Linked to contact #{{contactId}}.",
+      "match_found": "Match found: {{name}}",
+      "link": "Link",
+      "dismiss": "Dismiss",
+      "custom_label_placeholder": "Custom label"
+    },
+    "row_reorder_controls": {
+      "move_up_aria": "Move {{rowLabel}} {{rowNumber}} up",
+      "move_up": "Move up",
+      "move_down_aria": "Move {{rowLabel}} {{rowNumber}} down",
+      "move_down": "Move down",
+      "remove_aria": "Remove {{rowLabel}} {{rowNumber}}",
+      "remove": "Remove",
+      "drag_aria": "Drag to reorder {{rowLabel}} {{rowNumber}}",
+      "drag_title": "Drag to reorder"
+    }
+  }
+}

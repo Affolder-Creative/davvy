@@ -1,15 +1,16 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import AdminFeatureToggleComponent from "../components/admin/AdminFeatureToggle";
 import AdminPageComponent from "../components/admin/AdminPage";
 import {
   BACKUP_DRAWER_ANIMATION_MS,
   BACKUP_RUN_TOAST_AUTO_HIDE_MS,
   MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS,
-  MONTH_OPTIONS,
   RECOMMENDED_BACKUP_RETENTION,
-  WEEKDAY_OPTIONS,
   areBackupConfigSnapshotsEqual,
+  buildMonthOptions,
   buildTimezoneGroups,
+  buildWeekdayOptions,
   formatAdminTimestamp,
   isRecommendedBackupRetention,
   parseBackupScheduleTimes,
@@ -66,6 +67,8 @@ function AdminFeatureToggle({ label, enabled, onClick }) {
 }
 
 export default function AdminPageRoute({ auth, theme }) {
+  useTranslation("admin");
+
   return (
     <AdminPageComponent
       auth={auth}
@@ -87,8 +90,8 @@ export default function AdminPageRoute({ auth, theme }) {
       MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS={MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS}
       BACKUP_RUN_TOAST_AUTO_HIDE_MS={BACKUP_RUN_TOAST_AUTO_HIDE_MS}
       BACKUP_DRAWER_ANIMATION_MS={BACKUP_DRAWER_ANIMATION_MS}
-      WEEKDAY_OPTIONS={WEEKDAY_OPTIONS}
-      MONTH_OPTIONS={MONTH_OPTIONS}
+      WEEKDAY_OPTIONS={buildWeekdayOptions()}
+      MONTH_OPTIONS={buildMonthOptions()}
       RECOMMENDED_BACKUP_RETENTION={RECOMMENDED_BACKUP_RETENTION}
     />
   );

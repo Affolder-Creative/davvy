@@ -1,0 +1,22 @@
+{
+  "loading_app": "Cargando Davvy...",
+  "copy": {
+    "copied": "¡Copiado!",
+    "copy_failed": "Error al copiar",
+    "copied_url": "URL copiada",
+    "click_to_copy": "Haz clic para copiar",
+    "aria_copy": "Copiar {{value}}",
+    "aria_copy_url": "Copiar URL de {{value}}"
+  },
+  "permission": {
+    "admin": "Admin",
+    "editor": "Editor",
+    "general": "General"
+  },
+  "labels": {
+    "never": "Nunca",
+    "invalid_timestamp": "Marca de tiempo no válida",
+    "na": "n/d",
+    "unknown": "Desconocido"
+  }
+}

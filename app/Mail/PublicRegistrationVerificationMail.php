@@ -27,7 +27,7 @@ class PublicRegistrationVerificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verify your email for '.config('app.name', 'Davvy'),
+            subject: __('emails.verify_email_subject', ['app' => config('app.name', 'Davvy')]),
         );
     }
 

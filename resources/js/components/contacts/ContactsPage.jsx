@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import useContactsPageState from "./useContactsPageState";
 
@@ -49,6 +50,7 @@ export default function ContactsPage({
   RelatedNameEditor,
   Field,
 }) {
+  const { t } = useTranslation("contacts");
   const navigate = useNavigate();
   const [mobilePanel, setMobilePanel] = React.useState("contacts");
   const {
@@ -139,7 +141,9 @@ export default function ContactsPage({
     }
   }, [selectedContactId]);
 
-  const editorPanelLabel = form.id ? "Edit" : "New/Edit";
+  const translatedEditorPanelLabel = form.id
+    ? t("mobile.editor_edit")
+    : t("mobile.editor_new_edit");
 
   return (
     <AppShell auth={auth} theme={theme}>
@@ -152,19 +156,19 @@ export default function ContactsPage({
       ) : null}
       <section className="fade-up grid gap-4 md:grid-cols-3">
         <InfoCard
-          title="Contacts"
+          title={t("summary.contacts_title")}
           value={String(contacts.length)}
-          helper="Managed contacts in this web UI."
+          helper={t("summary.contacts_helper")}
         />
         <InfoCard
-          title="Writable Books"
+          title={t("summary.books_title")}
           value={String(addressBooks.length)}
-          helper="Address books where you can add or edit contacts."
+          helper={t("summary.books_helper")}
         />
         <InfoCard
-          title="User"
+          title={t("summary.user_title")}
           value={auth.user.name}
-          helper="Contact ownership is scoped to your account."
+          helper={t("summary.user_helper")}
         />
       </section>
 
@@ -175,13 +179,13 @@ export default function ContactsPage({
       ) : null}
 
       {loading ? (
-        <FullPageState label="Loading contacts..." compact />
+        <FullPageState label={t("loading")} compact />
       ) : (
         <>
           <div
             className="mt-6 grid grid-cols-2 gap-1 rounded-2xl border border-app-edge bg-app-surface p-1 lg:hidden"
             role="tablist"
-            aria-label="Contact mobile view"
+            aria-label={t("mobile.view_aria")}
           >
             <button
               type="button"
@@ -194,7 +198,7 @@ export default function ContactsPage({
               }`}
               onClick={() => setMobilePanel("contacts")}
             >
-              Contacts
+              {t("mobile.contacts")}
             </button>
             <button
               type="button"
@@ -207,7 +211,7 @@ export default function ContactsPage({
               }`}
               onClick={() => setMobilePanel("editor")}
             >
-              {editorPanelLabel}
+              {translatedEditorPanelLabel}
             </button>
           </div>
 

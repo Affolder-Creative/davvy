@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import DashboardAppleCompatPanelComponent from "./DashboardAppleCompatPanel";
 import DashboardOverviewCardsComponent from "./DashboardOverviewCards";
 import DashboardSharingPanelComponent from "./DashboardSharingPanel";
@@ -26,6 +27,7 @@ export default function DashboardPage({
   DashboardSharingPanel = DashboardSharingPanelComponent,
   DashboardAppleCompatPanel = DashboardAppleCompatPanelComponent,
 }) {
+  const { t } = useTranslation("dashboard");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [shareStatusNotice, setShareStatusNotice] = useState("");
@@ -75,7 +77,7 @@ export default function DashboardPage({
         source_ids: payload.apple_compat?.selected_source_ids ?? [],
       });
     } catch (err) {
-      setError(extractError(err, "Unable to load dashboard data."));
+      setError(extractError(err, t("errors.load")));
     } finally {
       if (withLoading) {
         setLoading(false);
@@ -103,12 +105,12 @@ export default function DashboardPage({
       await api.patch(url, { is_sharable: next });
       setShareStatusNotice(
         next
-          ? `${displayName} is now shared.`
-          : `${displayName} is no longer shared.`,
+          ? t("share_status.shared", { name: displayName })
+          : t("share_status.unshared", { name: displayName }),
       );
       await loadDashboard({ withLoading: false });
     } catch (err) {
-      setError(extractError(err, "Unable to update sharing status."));
+      setError(extractError(err, t("errors.update_share_status")));
     }
   };
 
@@ -121,7 +123,7 @@ export default function DashboardPage({
       await api.patch(url, { display_name: displayName });
       await loadDashboard({ withLoading: false });
     } catch (err) {
-      setError(extractError(err, "Unable to rename resource."));
+      setError(extractError(err, t("errors.rename_resource")));
       throw err;
     }
   };
@@ -133,7 +135,7 @@ export default function DashboardPage({
       setCalendarForm({ display_name: "", is_sharable: false });
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, "Unable to create calendar."));
+      setError(extractError(err, t("errors.create_calendar")));
     }
   };
 
@@ -144,7 +146,7 @@ export default function DashboardPage({
       setBookForm({ display_name: "", is_sharable: false });
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, "Unable to create address book."));
+      setError(extractError(err, t("errors.create_address_book")));
     }
   };
 
@@ -163,7 +165,7 @@ export default function DashboardPage({
       }));
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, "Unable to save share assignment."));
+      setError(extractError(err, t("errors.save_share")));
     }
   };
 
@@ -172,7 +174,7 @@ export default function DashboardPage({
       await api.delete(`/api/shares/${shareId}`);
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, "Unable to remove share assignment."));
+      setError(extractError(err, t("errors.remove_share")));
     }
   };
 
@@ -194,9 +196,7 @@ export default function DashboardPage({
       await api.patch("/api/address-books/apple-compat", appleCompatForm);
       await loadDashboard({ withLoading: false });
     } catch (err) {
-      setError(
-        extractError(err, "Unable to update Apple compatibility settings."),
-      );
+      setError(extractError(err, t("errors.apple_compat")));
     }
   };
 
@@ -212,7 +212,7 @@ export default function DashboardPage({
       setError(
         extractError(
           err,
-          "Unable to update birthday/anniversary calendar settings.",
+          t("errors.milestones"),
         ),
       );
       throw err;
@@ -242,14 +242,14 @@ export default function DashboardPage({
           {error}
         </div>
       ) : null}
-      {loading ? <FullPageState label="Loading resources..." compact /> : null}
+      {loading ? <FullPageState label={t("loading_resources")} compact /> : null}
 
       {!loading ? (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <ResourcePanel
-            title="Your Calendars"
-            createLabel="Create Calendar"
-            exportAllLabel="Export All"
+            title={t("resources.your_calendars")}
+            createLabel={t("resources.create_calendar")}
+            exportAllLabel={t("resources.export_all")}
             resourceKind="calendar"
             principalId={auth.user.id}
             items={data.owned.calendars}
@@ -261,14 +261,14 @@ export default function DashboardPage({
               runExport(
                 "/api/exports/calendars",
                 "davvy-calendars.zip",
-                "Unable to export calendars.",
+                t("errors.export_calendars"),
               )
             }
             onExportItem={(item) =>
               runExport(
                 `/api/exports/calendars/${item.id}`,
                 `${fileStem(item.display_name, "calendar")}.ics`,
-                "Unable to export calendar.",
+                t("errors.export_calendar"),
               )
             }
             onToggle={(id, next, displayName) =>
@@ -279,9 +279,9 @@ export default function DashboardPage({
             }
           />
           <ResourcePanel
-            title="Your Address Books"
-            createLabel="Create Address Book"
-            exportAllLabel="Export All"
+            title={t("resources.your_address_books")}
+            createLabel={t("resources.create_address_book")}
+            exportAllLabel={t("resources.export_all")}
             resourceKind="address-book"
             principalId={auth.user.id}
             items={data.owned.address_books}
@@ -293,14 +293,14 @@ export default function DashboardPage({
               runExport(
                 "/api/exports/address-books",
                 "davvy-address-books.zip",
-                "Unable to export address books.",
+                t("errors.export_address_books"),
               )
             }
             onExportItem={(item) =>
               runExport(
                 `/api/exports/address-books/${item.id}`,
                 `${fileStem(item.display_name, "address-book")}.vcf`,
-                "Unable to export address book.",
+                t("errors.export_address_book"),
               )
             }
             onToggle={(id, next, displayName) =>

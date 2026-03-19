@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Contacts List Sidebar component.
@@ -27,30 +28,36 @@ export default function ContactsListSidebar({
   totalContactPages,
   setContactsPage,
 }) {
+  const { t } = useTranslation("contacts");
   return (
     <aside className="surface h-fit rounded-3xl p-4">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          Contacts
+          {t("sidebar.title")}
         </h2>
-        <button className="btn-outline btn-outline-sm" onClick={onStartNewContact}>
-          New
+        <button
+          className="btn-outline btn-outline-sm"
+          onClick={onStartNewContact}
+        >
+          {t("sidebar.new")}
         </button>
       </div>
       <div className="mt-3 space-y-2">
         <input
           className="input"
           type="search"
-          placeholder="Search contacts..."
+          placeholder={t("sidebar.search_placeholder")}
           value={contactSearchTerm}
           onChange={(event) => onContactSearchTermChange(event.target.value)}
         />
         <select
           className="input"
           value={contactAddressBookFilter}
-          onChange={(event) => onContactAddressBookFilterChange(event.target.value)}
+          onChange={(event) =>
+            onContactAddressBookFilterChange(event.target.value)
+          }
         >
-          <option value="all">All address books</option>
+          <option value="all">{t("sidebar.filter_all_option")}</option>
           {addressBooks.map((book) => (
             <option key={book.id} value={String(book.id)}>
               {book.display_name}
@@ -69,15 +76,17 @@ export default function ContactsListSidebar({
             type="button"
             onClick={onClearFilters}
           >
-            Clear
+            {t("sidebar.clear_filters")}
           </button>
         ) : null}
       </div>
       <div className="mt-3 space-y-2">
         {contacts.length === 0 ? (
-          <p className="text-sm text-app-faint">No contacts yet.</p>
+          <p className="text-sm text-app-faint">{t("sidebar.no_contacts")}</p>
         ) : filteredContacts.length === 0 ? (
-          <p className="text-sm text-app-faint">No contacts match this filter.</p>
+          <p className="text-sm text-app-faint">
+            {t("sidebar.no_contacts_match_filter")}
+          </p>
         ) : (
           paginatedContacts.map((contact) => {
             const addressBookCount = Array.isArray(contact.address_books)
@@ -95,9 +104,14 @@ export default function ContactsListSidebar({
                 }`}
                 onClick={() => onSelectContact(contact)}
               >
-                <p className="truncate text-sm font-semibold">{contact.display_name}</p>
+                <p className="truncate text-sm font-semibold">
+                  {contact.display_name}
+                </p>
                 <p className="mt-1 text-xs text-app-faint">
-                  {addressBookCount} address book{addressBookCount === 1 ? "" : "s"}
+                  {t("sidebar.address_book_count", {
+                    count: addressBookCount,
+                    plural: addressBookCount > 1 ? "s" : "",
+                  })}
                 </p>
               </button>
             );
@@ -108,10 +122,14 @@ export default function ContactsListSidebar({
         <div className="mt-3 rounded-xl border border-app-edge px-2 py-2">
           <div className="flex items-center justify-between gap-2 text-[11px] text-app-faint">
             <span>
-              {firstContactIndex + 1}-{lastContactIndex} of {filteredContacts.length}
+              {firstContactIndex + 1}-{lastContactIndex} of{" "}
+              {filteredContacts.length}
             </span>
             <span>
-              Page {currentContactPage} / {totalContactPages}
+              {t("sidebar.page", {
+                current: currentContactPage,
+                total: totalContactPages,
+              })}
             </span>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-2">
@@ -123,7 +141,7 @@ export default function ContactsListSidebar({
               }
               disabled={currentContactPage === 1}
             >
-              Prev
+              {t("sidebar.prev_page")}
             </button>
             <button
               className="btn-outline btn-outline-sm w-full"
@@ -135,7 +153,7 @@ export default function ContactsListSidebar({
               }
               disabled={currentContactPage >= totalContactPages}
             >
-              Next
+              {t("sidebar.next_page")}
             </button>
           </div>
         </div>

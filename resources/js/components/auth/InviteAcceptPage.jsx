@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { buildAuthStateFromPayload } from "./authStateMapper";
 
@@ -10,6 +11,7 @@ export default function InviteAcceptPage({
   AuthShell,
   Field,
 }) {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
@@ -33,7 +35,7 @@ export default function InviteAcceptPage({
 
     if (!token) {
       setSubmitting(false);
-      setError("Invitation token is missing.");
+      setError(t("invite.missing_token"));
       return;
     }
 
@@ -52,14 +54,14 @@ export default function InviteAcceptPage({
       if (data?.registration_pending_approval) {
         setNotice(
           data?.message ||
-            "Invitation accepted. An administrator must approve your account before you can sign in.",
+            t("register.pending_approval_notice"),
         );
         return;
       }
 
-      setError("Unexpected invitation response.");
+      setError(t("invite.error_unexpected"));
     } catch (err) {
-      setError(extractError(err, "Unable to accept invitation."));
+      setError(extractError(err, t("invite.error_accept")));
     } finally {
       setSubmitting(false);
     }
@@ -69,11 +71,11 @@ export default function InviteAcceptPage({
     <AuthShell
       theme={theme}
       themeControlPlacement="window-bottom-right"
-      title="Activate Account"
-      subtitle="Set a password to complete your invitation."
+      title={t("invite.title")}
+      subtitle={t("invite.subtitle")}
     >
       <form className="space-y-4" onSubmit={submit}>
-        <Field label="Password">
+        <Field label={t("invite.password")}>
           <input
             className="input"
             type="password"
@@ -84,7 +86,7 @@ export default function InviteAcceptPage({
             required
           />
         </Field>
-        <Field label="Confirm Password">
+        <Field label={t("invite.password_confirm")}>
           <input
             className="input"
             type="password"
@@ -101,13 +103,13 @@ export default function InviteAcceptPage({
         {error ? <p className="text-sm text-app-danger">{error}</p> : null}
         {notice ? <p className="text-sm text-app-accent">{notice}</p> : null}
         <button className="btn w-full" disabled={submitting}>
-          {submitting ? "Activating account..." : "Set Password & Sign In"}
+          {submitting ? t("invite.submitting") : t("invite.submit")}
         </button>
       </form>
       <p className="mt-5 text-sm text-app-muted">
-        Already activated?{" "}
+        {t("invite.already_activated")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          Sign in
+          {t("invite.sign_in")}
         </Link>
       </p>
     </AuthShell>

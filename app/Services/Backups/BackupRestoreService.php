@@ -56,18 +56,18 @@ class BackupRestoreService
     ): array {
         $normalizedMode = in_array($mode, ['merge', 'replace'], true) ? $mode : null;
         if ($normalizedMode === null) {
-            throw new RuntimeException('Restore mode must be "merge" or "replace".');
+            throw new RuntimeException(__('backups.restore_mode_must_be_merge_or_replace'));
         }
 
         if (! is_file($archivePath)) {
-            throw new RuntimeException('Backup archive file was not found.');
+            throw new RuntimeException(__('backups.backup_archive_file_not_found'));
         }
 
         $fallbackOwner = null;
         if ($fallbackOwnerId !== null) {
             $fallbackOwner = User::query()->find($fallbackOwnerId);
             if (! $fallbackOwner) {
-                throw new RuntimeException('Fallback owner user ID does not exist.');
+                throw new RuntimeException(__('backups.fallback_owner_user_id_does_not_exist'));
             }
         }
 
@@ -78,7 +78,7 @@ class BackupRestoreService
         );
 
         if ($entries === []) {
-            throw new RuntimeException('Backup archive does not contain any restorable resources.');
+            throw new RuntimeException(__('backups.backup_archive_contains_no_restorable_resources'));
         }
 
         /** @var array<int, int> $ownerResolution */
@@ -100,10 +100,7 @@ class BackupRestoreService
             }
 
             $missingOwners[] = $ownerId;
-            $warnings[] = sprintf(
-                'Skipping resources for backup owner ID %d because no matching user exists.',
-                $ownerId,
-            );
+            $warnings[] = __('backups.skipping_resources_for_missing_backup_owner_id', ['owner_id' => $ownerId]);
         }
 
         $processableEntries = collect($entries)
@@ -119,7 +116,7 @@ class BackupRestoreService
             ->all();
 
         if ($processableEntries === []) {
-            throw new RuntimeException('No resources can be restored because all backup owners are unresolved.');
+            throw new RuntimeException(__('backups.no_resources_can_be_restored_all_owners_unresolved'));
         }
 
         $summary = [
@@ -582,20 +579,18 @@ class BackupRestoreService
         }
 
         $reason = $dryRun
-            ? sprintf(
-                'Dry run complete: %d file(s) scanned, %d invalid resource(s) would be skipped.',
-                $summary['files_processed'],
-                $summary['resources_skipped_invalid'],
-            )
-            : sprintf(
-                'Restore complete: %d calendar(s), %d address book(s), %d object/card record(s) changed.',
-                $summary['calendars_created'] + $summary['calendars_updated'],
-                $summary['address_books_created'] + $summary['address_books_updated'],
-                $summary['calendar_objects_created']
+            ? __('backups.dry_run_complete_scanned_files_invalid_skipped', [
+                'files_processed' => $summary['files_processed'],
+                'resources_skipped_invalid' => $summary['resources_skipped_invalid'],
+            ])
+            : __('backups.restore_complete_changed_counts', [
+                'calendar_count' => $summary['calendars_created'] + $summary['calendars_updated'],
+                'address_book_count' => $summary['address_books_created'] + $summary['address_books_updated'],
+                'record_count' => $summary['calendar_objects_created']
                     + $summary['calendar_objects_updated']
                     + $summary['cards_created']
                     + $summary['cards_updated'],
-            );
+            ]);
 
         return [
             'status' => 'success',
@@ -632,7 +627,7 @@ class BackupRestoreService
         $zip = new ZipArchive;
         $opened = $zip->open($archivePath);
         if ($opened !== true) {
-            throw new RuntimeException('Unable to open backup archive.');
+            throw new RuntimeException(__('backups.unable_to_open_backup_archive'));
         }
 
         $entries = [];
@@ -653,7 +648,7 @@ class BackupRestoreService
                         if (is_array($decoded)) {
                             $manifest = $decoded;
                         } else {
-                            $warnings[] = 'manifest.json exists but could not be parsed as JSON.';
+                            $warnings[] = __('backups.manifest_exists_but_invalid_json');
                         }
                     }
 
@@ -1082,7 +1077,7 @@ class BackupRestoreService
     {
         $component = Reader::read($payload);
         if (! $component instanceof VCalendar) {
-            throw new RuntimeException(sprintf('Entry "%s" does not contain a VCALENDAR payload.', $archivePath));
+            throw new RuntimeException(__('backups.entry_missing_vcalendar_payload', ['path' => $archivePath]));
         }
 
         $timezones = [];
@@ -1166,7 +1161,7 @@ class BackupRestoreService
         $cards = is_array($matches[0] ?? null) ? $matches[0] : [];
 
         if ($cards === []) {
-            throw new RuntimeException(sprintf('Entry "%s" does not contain any VCARD payloads.', $archivePath));
+            throw new RuntimeException(__('backups.entry_missing_vcard_payloads', ['path' => $archivePath]));
         }
 
         $index = 1;

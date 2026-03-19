@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureContactChangeModerationEnabled;
 use App\Http\Middleware\EnsureContactManagementEnabled;
 use App\Http\Middleware\EnsureTwoFactorEnrollmentComplete;
+use App\Http\Middleware\SetRequestLocale;
 use App\Http\Middleware\ThrottleDavAuthentication;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->append(SetRequestLocale::class);
+
         $trustedProxies = env('TRUSTED_PROXIES');
 
         if ($trustedProxies !== null && $trustedProxies !== '') {

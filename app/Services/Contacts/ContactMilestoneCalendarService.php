@@ -78,11 +78,11 @@ class ContactMilestoneCalendarService
     public function updateAddressBookSettings(User $actor, AddressBook $addressBook, array $attributes): array
     {
         if (! $this->schemaAvailable()) {
-            abort(422, 'Milestone calendar schema is not available. Run migrations before enabling milestone calendars.');
+            abort(422, __('contacts.milestone_calendar_schema_missing_enable'));
         }
 
         if ($addressBook->owner_id !== $actor->id && ! $actor->isAdmin()) {
-            abort(403, 'You cannot modify milestone calendar settings for this address book.');
+            abort(403, __('contacts.cannot_modify_milestone_calendar_settings'));
         }
 
         $existing = AddressBookContactMilestoneCalendar::query()
@@ -209,7 +209,7 @@ class ContactMilestoneCalendarService
     public function purgeGeneratedCalendarsAndDisableSettings(): array
     {
         if (! Schema::hasTable('address_book_contact_milestone_calendars')) {
-            abort(422, 'Milestone calendar schema is not available. Run migrations before purging milestone calendars.');
+            abort(422, __('contacts.milestone_calendar_schema_missing_purge'));
         }
 
         return DB::transaction(function (): array {

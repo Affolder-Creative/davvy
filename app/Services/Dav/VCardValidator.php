@@ -21,7 +21,7 @@ class VCardValidator
 
         $component = $this->parseVCard($cardData);
         if (! $component instanceof VCard) {
-            throw new BadRequest('Expected VCARD payload.');
+            throw new BadRequest(__('dav.expected_vcard_payload'));
         }
 
         $version = $this->validateVersion($component, $strictModeEnabled);
@@ -30,7 +30,7 @@ class VCardValidator
         $this->validateEmailAddresses($component, $strictModeEnabled);
 
         if ($strictModeEnabled && $fn === '') {
-            throw new BadRequest('vCard must include FN.');
+            throw new BadRequest(__('dav.vcard_must_include_fn'));
         }
 
         return [
@@ -70,11 +70,11 @@ class VCardValidator
         try {
             $component = Reader::read($cardData);
         } catch (ParseException|\Throwable) {
-            throw new BadRequest('Invalid vCard payload.');
+            throw new BadRequest(__('dav.invalid_vcard_payload'));
         }
 
         if (! $component instanceof VCard) {
-            throw new BadRequest('Expected VCARD payload.');
+            throw new BadRequest(__('dav.expected_vcard_payload'));
         }
 
         return $component;
@@ -88,7 +88,7 @@ class VCardValidator
         $versions = $card->select('VERSION');
 
         if ($strictModeEnabled && count($versions) !== 1) {
-            throw new BadRequest('vCard must include exactly one VERSION property.');
+            throw new BadRequest(__('dav.vcard_must_include_exactly_one_version'));
         }
 
         $version = trim((string) ($versions[0] ?? ''));
@@ -98,7 +98,7 @@ class VCardValidator
         }
 
         if ($strictModeEnabled && ! in_array($version, ['3.0', '4.0'], true)) {
-            throw new BadRequest('vCard VERSION must be 3.0 or 4.0.');
+            throw new BadRequest(__('dav.vcard_version_must_be_3_or_4'));
         }
 
         return $version;
@@ -112,13 +112,13 @@ class VCardValidator
         $fnProperties = $card->select('FN');
 
         if ($strictModeEnabled && count($fnProperties) !== 1) {
-            throw new BadRequest('vCard must include exactly one FN property.');
+            throw new BadRequest(__('dav.vcard_must_include_exactly_one_fn'));
         }
 
         $value = trim((string) ($fnProperties[0] ?? ''));
 
         if ($strictModeEnabled && $value === '') {
-            throw new BadRequest('vCard FN must not be empty.');
+            throw new BadRequest(__('dav.vcard_fn_must_not_be_empty'));
         }
 
         if (! $strictModeEnabled && $value === '') {
@@ -142,13 +142,13 @@ class VCardValidator
         $uidProperties = $card->select('UID');
 
         if ($strictModeEnabled && count($uidProperties) !== 1) {
-            throw new BadRequest('vCard must include exactly one UID property.');
+            throw new BadRequest(__('dav.vcard_must_include_exactly_one_uid'));
         }
 
         $uid = trim((string) ($uidProperties[0] ?? ''));
 
         if ($strictModeEnabled && $uid === '') {
-            throw new BadRequest('vCard UID must not be empty.');
+            throw new BadRequest(__('dav.vcard_uid_must_not_be_empty'));
         }
 
         return $uid !== '' ? $uid : null;
@@ -166,7 +166,7 @@ class VCardValidator
                 $strictModeEnabled
                 && ($email === '' || filter_var($email, FILTER_VALIDATE_EMAIL) === false)
             ) {
-                throw new BadRequest('vCard EMAIL values must be valid email addresses.');
+                throw new BadRequest(__('dav.vcard_email_values_must_be_valid'));
             }
         }
     }

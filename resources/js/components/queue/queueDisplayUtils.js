@@ -1,3 +1,10 @@
+import i18n from "../../i18n";
+import { normalizeLocale } from "../../lib/locale";
+
+function activeLocale() {
+  return normalizeLocale(i18n.resolvedLanguage || i18n.language || "en");
+}
+
 /**
  * Formats a queue timestamp for local display.
  *
@@ -6,15 +13,21 @@
  */
 export function formatQueueTimestamp(value) {
   if (!value) {
-    return "n/a";
+    return i18n.t("labels.na", {
+      ns: "common",
+      defaultValue: "n/a",
+    });
   }
 
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
-    return "n/a";
+    return i18n.t("labels.na", {
+      ns: "common",
+      defaultValue: "n/a",
+    });
   }
 
-  return parsed.toLocaleString();
+  return parsed.toLocaleString(activeLocale());
 }
 
 /**
@@ -26,17 +39,26 @@ export function formatQueueTimestamp(value) {
 export function queueStatusLabel(status) {
   switch (status) {
     case "pending":
-      return "Pending";
+      return i18n.t("status.pending", { ns: "queue", defaultValue: "Pending" });
     case "approved":
-      return "Approved (awaiting others)";
+      return i18n.t("status.approved", {
+        ns: "queue",
+        defaultValue: "Approved (awaiting others)",
+      });
     case "manual_merge_needed":
-      return "Manual Merge Needed";
+      return i18n.t("status.manual_merge_needed", {
+        ns: "queue",
+        defaultValue: "Manual Merge Needed",
+      });
     case "applied":
-      return "Applied";
+      return i18n.t("status.applied", { ns: "queue", defaultValue: "Applied" });
     case "denied":
-      return "Denied";
+      return i18n.t("status.denied", { ns: "queue", defaultValue: "Denied" });
     default:
-      return status || "Unknown";
+      return (
+        status ||
+        i18n.t("labels.unknown", { ns: "common", defaultValue: "Unknown" })
+      );
   }
 }
 
@@ -47,5 +69,7 @@ export function queueStatusLabel(status) {
  * @returns {string}
  */
 export function queueOperationLabel(operation) {
-  return operation === "delete" ? "Delete" : "Update";
+  return operation === "delete"
+    ? i18n.t("operation.delete", { ns: "queue", defaultValue: "Delete" })
+    : i18n.t("operation.update", { ns: "queue", defaultValue: "Update" });
 }

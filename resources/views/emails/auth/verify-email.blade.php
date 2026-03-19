@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
   <meta name="supported-color-schemes" content="light dark" />
-  <title>Verify your email</title>
+  <title>{{ __('emails.verify_email_title') }}</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -185,34 +185,35 @@
 @php($baseUrl = rtrim((string) config('app.url', ''), '/'))
 @php($lightLogo = $baseUrl !== '' ? $baseUrl.'/davvy.png' : '/davvy.png')
 @php($darkLogo = $baseUrl !== '' ? $baseUrl.'/davvy_dark.png' : '/davvy_dark.png')
+@php($expiresLabel = $expiresAt->locale(app()->getLocale())->isoFormat('lll'))
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-shell">
   <tr>
     <td align="center">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-card">
         <tr>
           <td class="header">
-            <img class="logo logo-light" src="{{ $lightLogo }}" alt="Davvy logo" />
-            <img class="logo logo-dark" src="{{ $darkLogo }}" alt="Davvy logo" />
-            <h1 class="title">Verify your email</h1>
-            <p class="subtitle">Confirm your address to finish account setup.</p>
+            <img class="logo logo-light" src="{{ $lightLogo }}" alt="{{ __('emails.logo_alt', ['app' => config('app.name', 'Davvy')]) }}" />
+            <img class="logo logo-dark" src="{{ $darkLogo }}" alt="{{ __('emails.logo_alt', ['app' => config('app.name', 'Davvy')]) }}" />
+            <h1 class="title">{{ __('emails.verify_email_title') }}</h1>
+            <p class="subtitle">{{ __('emails.verify_email_subtitle') }}</p>
           </td>
         </tr>
         <tr>
           <td class="content">
-            <p>Hello {{ $user->name }},</p>
-            <p>Thanks for registering for {{ config('app.name', 'Davvy') }}.</p>
-            <p>Confirm your email address to continue:</p>
+            <p>{{ __('emails.greeting_name', ['name' => $user->name]) }}</p>
+            <p>{{ __('emails.verify_email_thanks_for_registering', ['app' => config('app.name', 'Davvy')]) }}</p>
+            <p>{{ __('emails.verify_email_confirm_to_continue') }}</p>
             <p>
-              <a class="btn" href="{{ $verificationUrl }}">Verify Email</a>
+              <a class="btn" href="{{ $verificationUrl }}">{{ __('emails.verify_email_button') }}</a>
             </p>
-            <p class="meta">If the button does not work, copy and paste this link:</p>
+            <p class="meta">{{ __('emails.if_button_fails_copy_link') }}</p>
             <div class="link-wrap">{{ $verificationUrl }}</div>
-            <p class="meta">This one-time link expires at {{ $expiresAt->toDayDateTimeString() }}.</p>
+            <p class="meta">{{ __('emails.one_time_link_expires_at', ['expires_at' => $expiresLabel]) }}</p>
           </td>
         </tr>
         <tr>
           <td class="footer">
-            This message was sent by {{ config('app.name', 'Davvy') }}. If you did not create this account, you can ignore this email.
+            {{ __('emails.verify_email_footer', ['app' => config('app.name', 'Davvy')]) }}
           </td>
         </tr>
       </table>

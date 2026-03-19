@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { buildAuthStateFromPayload } from "./authStateMapper";
 
@@ -16,6 +17,7 @@ export default function RegisterPage({
   AuthShell,
   Field,
 }) {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
@@ -61,7 +63,7 @@ export default function RegisterPage({
         });
         setNotice(
           data?.message ||
-            "Registration submitted. An administrator must approve your account before you can sign in.",
+            t("register.pending_approval_notice"),
         );
         setActionLink(
           typeof data?.verification_url === "string"
@@ -81,7 +83,7 @@ export default function RegisterPage({
         });
         setNotice(
           data?.message ||
-            "Registration submitted. Verify your email address before signing in.",
+            t("register.pending_verification_notice"),
         );
         setActionLink(
           typeof data?.verification_url === "string"
@@ -92,9 +94,9 @@ export default function RegisterPage({
         return;
       }
 
-      setError("Unexpected registration response.");
+      setError(t("register.error_unexpected"));
     } catch (err) {
-      setError(extractError(err, "Unable to register."));
+      setError(extractError(err, t("register.error_register")));
     } finally {
       setSubmitting(false);
     }
@@ -104,11 +106,11 @@ export default function RegisterPage({
     <AuthShell
       theme={theme}
       themeControlPlacement="window-bottom-right"
-      title="Create Account"
-      subtitle="Your default calendar and address book are generated automatically."
+      title={t("register.title")}
+      subtitle={t("register.subtitle")}
     >
       <form className="space-y-4" onSubmit={submit}>
-        <Field label="Name">
+        <Field label={t("register.name")}>
           <input
             className="input"
             value={form.name}
@@ -116,7 +118,7 @@ export default function RegisterPage({
             required
           />
         </Field>
-        <Field label="Email">
+        <Field label={t("register.email")}>
           <input
             className="input"
             type="email"
@@ -125,7 +127,7 @@ export default function RegisterPage({
             required
           />
         </Field>
-        <Field label="Password">
+        <Field label={t("register.password")}>
           <input
             className="input"
             type="password"
@@ -134,7 +136,7 @@ export default function RegisterPage({
             required
           />
         </Field>
-        <Field label="Confirm Password">
+        <Field label={t("register.password_confirm")}>
           <input
             className="input"
             type="password"
@@ -149,23 +151,23 @@ export default function RegisterPage({
         {notice ? <p className="text-sm text-app-accent">{notice}</p> : null}
         {actionLink ? (
           <p className="text-xs text-app-muted">
-            Verification link:{" "}
+            {t("register.verification_link")}{" "}
             <a
               href={actionLink}
               className="font-semibold text-app-accent underline"
             >
-              Open verification
+              {t("register.open_verification")}
             </a>
           </p>
         ) : null}
         <button className="btn w-full" disabled={submitting}>
-          {submitting ? "Creating account..." : "Register"}
+          {submitting ? t("register.submitting") : t("register.submit")}
         </button>
       </form>
       <p className="mt-5 text-sm text-app-muted">
-        Already registered?{" "}
+        {t("register.already_registered")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          Sign in
+          {t("register.sign_in")}
         </Link>
       </p>
     </AuthShell>

@@ -1,57 +1,141 @@
 export const PHONE_LABEL_OPTIONS = [
-  { value: "mobile", label: "Mobile" },
-  { value: "iphone", label: "iPhone" },
-  { value: "apple_watch", label: "Apple Watch" },
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "main", label: "Main" },
-  { value: "home_fax", label: "Home Fax" },
-  { value: "work_fax", label: "Work Fax" },
-  { value: "other_fax", label: "Other Fax" },
-  { value: "pager", label: "Pager" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "mobile",
+    labelKey: "field_labels.phone.mobile",
+    fallback: "Mobile",
+  },
+  {
+    value: "iphone",
+    labelKey: "field_labels.phone.iphone",
+    fallback: "iPhone",
+  },
+  {
+    value: "apple_watch",
+    labelKey: "field_labels.phone.apple_watch",
+    fallback: "Apple Watch",
+  },
+  { value: "home", labelKey: "field_labels.phone.home", fallback: "Home" },
+  { value: "work", labelKey: "field_labels.phone.work", fallback: "Work" },
+  { value: "main", labelKey: "field_labels.phone.main", fallback: "Main" },
+  {
+    value: "home_fax",
+    labelKey: "field_labels.phone.home_fax",
+    fallback: "Home Fax",
+  },
+  {
+    value: "work_fax",
+    labelKey: "field_labels.phone.work_fax",
+    fallback: "Work Fax",
+  },
+  {
+    value: "other_fax",
+    labelKey: "field_labels.phone.other_fax",
+    fallback: "Other Fax",
+  },
+  { value: "pager", labelKey: "field_labels.phone.pager", fallback: "Pager" },
+  { value: "other", labelKey: "field_labels.phone.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "field_labels.phone.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const EMAIL_LABEL_OPTIONS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  { value: "home", labelKey: "field_labels.email.home", fallback: "Home" },
+  { value: "work", labelKey: "field_labels.email.work", fallback: "Work" },
+  { value: "other", labelKey: "field_labels.email.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "field_labels.email.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const URL_LABEL_OPTIONS = [
-  { value: "homepage", label: "Home Page" },
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "homepage",
+    labelKey: "field_labels.url.homepage",
+    fallback: "Home Page",
+  },
+  { value: "home", labelKey: "field_labels.url.home", fallback: "Home" },
+  { value: "work", labelKey: "field_labels.url.work", fallback: "Work" },
+  { value: "other", labelKey: "field_labels.url.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "field_labels.url.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const ADDRESS_LABEL_OPTIONS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "school", label: "School" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  { value: "home", labelKey: "field_labels.address.home", fallback: "Home" },
+  { value: "work", labelKey: "field_labels.address.work", fallback: "Work" },
+  {
+    value: "school",
+    labelKey: "field_labels.address.school",
+    fallback: "School",
+  },
+  { value: "other", labelKey: "field_labels.address.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "field_labels.address.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const DATE_LABEL_OPTIONS = [
-  { value: "anniversary", label: "Anniversary" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "anniversary",
+    labelKey: "field_labels.date.anniversary",
+    fallback: "Anniversary",
+  },
+  { value: "other", labelKey: "field_labels.date.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "field_labels.date.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const RELATED_LABEL_OPTIONS = [
-  { value: "spouse", label: "Spouse" },
-  { value: "partner", label: "Partner" },
-  { value: "parent", label: "Parent" },
-  { value: "child", label: "Child" },
-  { value: "sibling", label: "Sibling" },
-  { value: "assistant", label: "Assistant" },
-  { value: "friend", label: "Friend" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "spouse",
+    labelKey: "field_labels.related.spouse",
+    fallback: "Spouse",
+  },
+  {
+    value: "partner",
+    labelKey: "field_labels.related.partner",
+    fallback: "Partner",
+  },
+  {
+    value: "parent",
+    labelKey: "field_labels.related.parent",
+    fallback: "Parent",
+  },
+  { value: "child", labelKey: "field_labels.related.child", fallback: "Child" },
+  {
+    value: "sibling",
+    labelKey: "field_labels.related.sibling",
+    fallback: "Sibling",
+  },
+  {
+    value: "assistant",
+    labelKey: "field_labels.related.assistant",
+    fallback: "Assistant",
+  },
+  {
+    value: "friend",
+    labelKey: "field_labels.related.friend",
+    fallback: "Friend",
+  },
+  { value: "other", labelKey: "field_labels.related.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "field_labels.related.custom",
+    fallback: "Custom...",
+  },
 ];
 
 const RELATED_LABEL_DERIVED_VALUES = new Set([
@@ -122,10 +206,14 @@ const RELATED_LABEL_DISPLAY_OVERRIDES = {
 };
 
 export const IM_LABEL_OPTIONS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  { value: "home", labelKey: "field_labels.im.home", fallback: "Home" },
+  { value: "work", labelKey: "field_labels.im.work", fallback: "Work" },
+  { value: "other", labelKey: "field_labels.im.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "field_labels.im.custom",
+    fallback: "Custom...",
+  },
 ];
 
 const SAVED_CUSTOM_LABEL_VALUE_PREFIX = "saved-custom:";
@@ -144,7 +232,11 @@ const CONTACT_LABEL_BUILTIN_VALUE_SETS = Object.fromEntries(
     fieldKey,
     new Set(
       CONTACT_LABEL_FIELD_OPTIONS[fieldKey]
-        .map((option) => String(option?.value ?? "").trim().toLowerCase())
+        .map((option) =>
+          String(option?.value ?? "")
+            .trim()
+            .toLowerCase(),
+        )
         .filter((value) => value !== "" && value !== "custom"),
     ),
   ]),
@@ -154,7 +246,9 @@ const EMPTY_CONTACT_CUSTOM_LABELS = Object.fromEntries(
 );
 
 function normalizeLabelValue(value) {
-  return String(value ?? "").trim().toLowerCase();
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
 }
 
 function normalizeCustomLabelText(value) {
@@ -235,7 +329,9 @@ export function buildSavedCustomLabelsByField(contacts) {
  * @returns {Array<{value: string, label: string, saved_custom_label?: string, saved_custom_key?: string}>}
  */
 export function buildLabelOptions(baseOptions, savedCustomLabels = []) {
-  const primaryOptions = baseOptions.filter((option) => option.value !== "custom");
+  const primaryOptions = baseOptions.filter(
+    (option) => option.value !== "custom",
+  );
   const customOption = baseOptions.find((option) => option.value === "custom");
   const customLabelOptions = savedCustomLabels.map((label) => ({
     value: savedCustomOptionValue(label),
@@ -279,11 +375,14 @@ export function buildDerivedRelatedLabelOptions(contacts) {
     return [];
   }
 
-  const builtInValues = CONTACT_LABEL_BUILTIN_VALUE_SETS.related_names ?? new Set();
+  const builtInValues =
+    CONTACT_LABEL_BUILTIN_VALUE_SETS.related_names ?? new Set();
   const derivedValues = new Set();
 
   for (const contact of contacts) {
-    const rows = Array.isArray(contact?.related_names) ? contact.related_names : [];
+    const rows = Array.isArray(contact?.related_names)
+      ? contact.related_names
+      : [];
 
     for (const row of rows) {
       const normalizedLabel = normalizeLabelValue(row?.label);
@@ -320,7 +419,10 @@ export function buildDerivedRelatedLabelOptions(contacts) {
  * @returns {Array<{value: string, label: string, saved_custom_label?: string, saved_custom_key?: string}>}
  */
 export function buildRelatedNameLabelOptions(contacts, savedCustomLabels = []) {
-  const baseOptions = buildLabelOptions(RELATED_LABEL_OPTIONS, savedCustomLabels);
+  const baseOptions = buildLabelOptions(
+    RELATED_LABEL_OPTIONS,
+    savedCustomLabels,
+  );
   const derivedOptions = buildDerivedRelatedLabelOptions(contacts);
   if (derivedOptions.length === 0) {
     return baseOptions;

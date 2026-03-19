@@ -1,0 +1,97 @@
+{
+  "cards": [
+    {
+      "label": "Name",
+      "description": "Displayed to other users when sharing resources."
+    },
+    {
+      "label": "Email",
+      "description": "Used for web sign-in and DAV clients."
+    },
+    {
+      "label": "Role",
+      "description": "Access level for administrative features."
+    }
+  ],
+  "locale": {
+    "title": "Language",
+    "description": "Choose your preferred language for the web app and DAV messages.",
+    "label": "Language",
+    "save": "Save Language",
+    "saving": "Saving...",
+    "saved": "Language updated."
+  },
+  "change_password": {
+    "title": "Change Password",
+    "description": "Change your password for both web access and DAV client connections.",
+    "current_label": "Current password",
+    "new_label": "New password",
+    "new_label_confirm": "Confirm new password",
+    "update": "Update Password",
+    "updating": "Updating password...",
+    "updated": "Password updated."
+  },
+  "security": {
+    "title": "Security",
+    "description": "Configure two-factor authentication and manage DAV app passwords.",
+    "2fa_mandated": "Two-factor enrollment is required by administrators.",
+    "2fa_mandated_with_deadline": " Set up 2FA before {deadline}.",
+    "2fa_deadline_expired": "Your grace period has ended. Complete two-factor setup to continue accessing all app features.",
+    "2fa_recreate": "Recreate Setup Secret",
+    "2fa_start": "Start 2FA Setup",
+    "2fa_setup_step_1": "1. Scan this QR code in Google Authenticator, 1Password, or acompatible authenticator app.",
+    "2fa_setup_step_1_qr_code_title": "Two-factor setup QR code",
+    "2fa_setup_step_2": "2. If needed, enter this key manually:",
+    "2fa_setup_step_3": "3. Verification code",
+    "2fa_enable": "Enable 2FA",
+    "2fa_enabling": "Enabling...",
+    "2fa_enabled": "Two-factor authentication is enabled.",
+    "2fa_code": "Authenticator or backup code for sensitive actions",
+    "2fa_code_placeholder": "Enter code",
+    "regenerate_backup_codes": "Regenerate Backup Codes",
+    "disable_2fa": "Disable 2FA",
+    "save_backup_codes": "Save these backup codes now.",
+    "shown_once": "Shown once",
+    "shown_once_description": "Each backup code can be used once. You will not be able to view these exact codes again.",
+    "backup_codes": "Backup codes",
+    "select_all": "Select All",
+    "copy_all_codes": "Copy All Codes",
+    "copied_all_codes": "Copied all codes.",
+    "copy_failed": "Copy failed. Use Select All, then copy manually.",
+    "app_passwords": "DAV App Passwords",
+    "app_passwords_description": "Use these one-time generated passwords for CalDAV/CardDAV clients that cannot complete interactive two-factor sign-in.",
+    "app_password_name": "Password name",
+    "app_password_name_placeholder": "iPhone",
+    "app_password_code": "Authenticator/backup code",
+    "app_password_code_placeholder": "Required",
+    "app_password_create": "Create App Password",
+    "app_password_code_shown_once": "Shown once",
+    "app_password_loading": "Loading app passwords...",
+    "app_password_no_created": "No app passwords created.",
+    "app_password_revoke": "Revoke",
+    "app_password_prefix": "Prefix: {{prefix}}",
+    "app_password_last_used": "Last used: {{last_used_at}}",
+    "app_password_never_used": "Never"
+  },
+  "api": {
+    "password_success": "Password updated. Use your new password for app login and DAV clients.",
+    "2fa_setup_success": "Setup initialized. Scan the QR code and enter a verification code.",
+    "2fa_enable_success": "Two-factor authentication has been enabled.",
+    "2fa_disable_success": "Two-factor authentication has been disabled and DAV app passwords were revoked.",
+    "backup_codes_regenerated": "Backup codes regenerated.",
+    "app_password_created": "DAV app password created.",
+    "app_password_revoked": "DAV app password revoked."
+  },
+  "errors": {
+    "update_locale": "Unable to update language right now.",
+    "load_app_passwords": "Unable to load DAV app passwords right now.",
+    "update_password": "Unable to update password.",
+    "start_two_factor": "Unable to start two-factor setup.",
+    "enable_two_factor": "Unable to enable two-factor.",
+    "disable_two_factor": "Unable to disable two-factor.",
+    "regenerate_codes": "Unable to regenerate backup codes.",
+    "create_app_password": "Unable to create DAV app password.",
+    "revoke_app_password": "Unable to revoke DAV app password."
+  },
+  "confirm_disable_2fa": "Disable two-factor authentication and revoke all DAV app passwords?"
+}

@@ -27,7 +27,7 @@ class AdminUserInviteMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'You are invited to '.config('app.name', 'Davvy'),
+            subject: __('emails.admin_invite_subject', ['app' => config('app.name', 'Davvy')]),
         );
     }
 

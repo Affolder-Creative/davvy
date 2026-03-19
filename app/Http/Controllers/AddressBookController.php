@@ -80,7 +80,7 @@ class AddressBookController extends Controller
         $this->authorizeOwnership($request, $addressBook);
 
         if ($addressBook->is_default) {
-            abort(422, 'Default address books cannot be deleted.');
+            abort(422, __('contacts.default_address_books_cannot_be_deleted'));
         }
 
         $this->resourceDeletion->deleteAddressBook($addressBook);
@@ -96,7 +96,7 @@ class AddressBookController extends Controller
         $user = $request->user();
 
         if ($addressBook->owner_id !== $user->id && ! $user->isAdmin()) {
-            abort(403, 'You cannot modify this address book.');
+            abort(403, __('contacts.cannot_modify_address_book'));
         }
     }
 }

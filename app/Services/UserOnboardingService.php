@@ -96,7 +96,10 @@ class UserOnboardingService
         }
 
         try {
-            Mail::to($user->email)->send(new AdminUserInviteMail($user, $inviteUrl, $expiresAt));
+            Mail::to($user->email)->send(
+                (new AdminUserInviteMail($user, $inviteUrl, $expiresAt))
+                    ->locale((string) ($user->locale ?: config('app.fallback_locale', 'en')))
+            );
 
             return true;
         } catch (Throwable $throwable) {
@@ -116,7 +119,10 @@ class UserOnboardingService
         }
 
         try {
-            Mail::to($user->email)->send(new PublicRegistrationVerificationMail($user, $verificationUrl, $expiresAt));
+            Mail::to($user->email)->send(
+                (new PublicRegistrationVerificationMail($user, $verificationUrl, $expiresAt))
+                    ->locale((string) ($user->locale ?: config('app.fallback_locale', 'en')))
+            );
 
             return true;
         } catch (Throwable $throwable) {

@@ -1,10 +1,11 @@
-Hello {{ $user->name }},
+@php($expiresLabel = $expiresAt->locale(app()->getLocale())->isoFormat('lll'))
+{{ __('emails.greeting_name', ['name' => $user->name]) }}
 
-Thanks for registering for {{ config('app.name', 'Davvy') }}.
+{{ __('emails.verify_email_thanks_for_registering', ['app' => config('app.name', 'Davvy')]) }}
 
-Use this one-time link to verify your email address:
+{{ __('emails.verify_email_use_one_time_link') }}
 {{ $verificationUrl }}
 
-This link expires at {{ $expiresAt->toDayDateTimeString() }}.
+{{ __('emails.one_time_link_expires_at', ['expires_at' => $expiresLabel]) }}
 
-If you did not create this account, you can ignore this email.
+{{ __('emails.verify_email_footer', ['app' => config('app.name', 'Davvy')]) }}

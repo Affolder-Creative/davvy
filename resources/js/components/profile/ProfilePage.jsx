@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import { useTranslation } from "react-i18next";
+import { buildAuthStateFromPayload } from "../auth/authStateMapper";
+import { setI18nLocale } from "../../i18n";
+import { setApiLocale } from "../../lib/api";
+import { buildLocaleOptions } from "../../lib/locale";
 
 /**
  * Renders the Profile Page.
@@ -17,6 +22,7 @@ export default function ProfilePage({
   Field,
   copyTextToClipboard,
 }) {
+  const { t, i18n } = useTranslation("profile");
   const [passwordSubmitting, setPasswordSubmitting] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
@@ -42,6 +48,12 @@ export default function ProfilePage({
   const [appPasswordName, setAppPasswordName] = useState("");
   const [appPasswordCode, setAppPasswordCode] = useState("");
   const [appPasswordPlaintext, setAppPasswordPlaintext] = useState("");
+  const [localeSubmitting, setLocaleSubmitting] = useState(false);
+  const [localeError, setLocaleError] = useState("");
+  const [localeSuccess, setLocaleSuccess] = useState("");
+  const [localeFormValue, setLocaleFormValue] = useState(
+    auth.locale || auth.fallbackLocale || "en",
+  );
 
   const graceDeadlineLabel = useMemo(() => {
     if (!auth.twoFactorGraceExpiresAt) {
@@ -53,18 +65,80 @@ export default function ProfilePage({
       return null;
     }
 
-    return parsed.toLocaleString();
-  }, [auth.twoFactorGraceExpiresAt]);
+    return parsed.toLocaleString(
+      auth.locale || auth.fallbackLocale || i18n.resolvedLanguage || "en",
+    );
+  }, [
+    auth.twoFactorGraceExpiresAt,
+    auth.locale,
+    auth.fallbackLocale,
+    i18n.resolvedLanguage,
+  ]);
   const backupCodesText = useMemo(() => backupCodes.join("\n"), [backupCodes]);
+  const supportedLocales =
+    Array.isArray(auth.supportedLocales) && auth.supportedLocales.length > 0
+      ? auth.supportedLocales
+      : [auth.fallbackLocale || "en"];
+  const localeOptions = useMemo(
+    () =>
+      buildLocaleOptions(supportedLocales, {
+        fallbackLocale: auth.fallbackLocale || "en",
+      }),
+    [supportedLocales, auth.fallbackLocale],
+  );
 
   useEffect(() => {
     if (backupCodesCopyState === "idle") {
       return undefined;
     }
 
-    const timer = window.setTimeout(() => setBackupCodesCopyState("idle"), 1800);
+    const timer = window.setTimeout(
+      () => setBackupCodesCopyState("idle"),
+      1800,
+    );
     return () => window.clearTimeout(timer);
   }, [backupCodesCopyState]);
+
+  useEffect(() => {
+    setLocaleFormValue(auth.locale || auth.fallbackLocale || "en");
+  }, [auth.locale, auth.fallbackLocale]);
+
+  useEffect(() => {
+    if (!localeSuccess) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setLocaleSuccess(""), 2200);
+    return () => window.clearTimeout(timer);
+  }, [localeSuccess]);
+
+  const updateLocale = async (event) => {
+    event.preventDefault();
+    setLocaleSubmitting(true);
+    setLocaleError("");
+    setLocaleSuccess("");
+
+    try {
+      const { data } = await api.patch("/api/auth/locale", {
+        locale: localeFormValue,
+      });
+
+      auth.setAuth(buildAuthStateFromPayload(data, { user: data.user }));
+      setApiLocale(data.locale, {
+        supportedLocales: data.supported_locales,
+        fallbackLocale: data.fallback_locale,
+      });
+      setI18nLocale(data.locale, {
+        supportedLocales: data.supported_locales,
+        fallbackLocale: data.fallback_locale,
+      });
+      setLocaleSuccess(t("locale.saved"));
+    } catch (err) {
+      setLocaleError(extractError(err, t("errors.update_locale")));
+    } finally {
+      setLocaleSubmitting(false);
+    }
+  };
 
   const selectAllBackupCodes = () => {
     if (!backupCodesFieldRef.current) {
@@ -100,9 +174,7 @@ export default function ProfilePage({
       const { data } = await api.get("/api/auth/app-passwords");
       setAppPasswords(Array.isArray(data?.data) ? data.data : []);
     } catch (err) {
-      setSecurityError(
-        extractError(err, "Unable to load DAV app passwords right now."),
-      );
+      setSecurityError(extractError(err, t("errors.load_app_passwords")));
     } finally {
       setAppPasswordLoading(false);
     }
@@ -126,7 +198,8 @@ export default function ProfilePage({
     try {
       await api.patch("/api/auth/password", passwordForm);
       setPasswordSuccess(
-        "Password updated. Use your new password for app login and DAV clients.",
+        // "Password updated. Use your new password for app login and DAV clients.",
+        t("api.password_success"),
       );
       setPasswordForm({
         current_password: "",
@@ -134,7 +207,7 @@ export default function ProfilePage({
         password_confirmation: "",
       });
     } catch (err) {
-      setPasswordError(extractError(err, "Unable to update password."));
+      setPasswordError(extractError(err, t("errors.update_password")));
     } finally {
       setPasswordSubmitting(false);
     }
@@ -150,10 +223,11 @@ export default function ProfilePage({
       setTwoFactorSetup(data);
       setBackupCodes([]);
       setSecuritySuccess(
-        "Setup initialized. Scan the QR code and enter a verification code.",
+        // "Setup initialized. Scan the QR code and enter a verification code.",
+        t("api.2fa_setup_success"),
       );
     } catch (err) {
-      setSecurityError(extractError(err, "Unable to start two-factor setup."));
+      setSecurityError(extractError(err, t("errors.start_two_factor")));
     } finally {
       setSecurityBusy(false);
     }
@@ -169,24 +243,23 @@ export default function ProfilePage({
       const { data } = await api.post("/api/auth/2fa/enable", {
         code: twoFactorCode,
       });
-      setBackupCodes(Array.isArray(data?.backup_codes) ? data.backup_codes : []);
+      setBackupCodes(
+        Array.isArray(data?.backup_codes) ? data.backup_codes : [],
+      );
       setTwoFactorCode("");
       setTwoFactorSetup(null);
       await auth.refreshAuth?.();
-      setSecuritySuccess("Two-factor authentication has been enabled.");
+      // setSecuritySuccess("Two-factor authentication has been enabled.");
+      setSecuritySuccess(t("api.2fa_enable_success"));
     } catch (err) {
-      setSecurityError(extractError(err, "Unable to enable two-factor."));
+      setSecurityError(extractError(err, t("errors.enable_two_factor")));
     } finally {
       setSecurityBusy(false);
     }
   };
 
   const disableTwoFactor = async () => {
-    if (
-      !window.confirm(
-        "Disable two-factor authentication and revoke all DAV app passwords?",
-      )
-    ) {
+    if (!window.confirm(t("confirm_disable_2fa"))) {
       return;
     }
 
@@ -204,10 +277,11 @@ export default function ProfilePage({
       setAppPasswords([]);
       await auth.refreshAuth?.();
       setSecuritySuccess(
-        "Two-factor authentication has been disabled and DAV app passwords were revoked.",
+        // "Two-factor authentication has been disabled and DAV app passwords were revoked.",
+        t("api.2fa_disable_success"),
       );
     } catch (err) {
-      setSecurityError(extractError(err, "Unable to disable two-factor."));
+      setSecurityError(extractError(err, t("errors.disable_two_factor")));
     } finally {
       setSecurityBusy(false);
     }
@@ -222,11 +296,14 @@ export default function ProfilePage({
       const { data } = await api.post("/api/auth/2fa/backup-codes/regenerate", {
         code: twoFactorActionCode,
       });
-      setBackupCodes(Array.isArray(data?.backup_codes) ? data.backup_codes : []);
+      setBackupCodes(
+        Array.isArray(data?.backup_codes) ? data.backup_codes : [],
+      );
       setTwoFactorActionCode("");
-      setSecuritySuccess("Backup codes regenerated.");
+      // setSecuritySuccess("Backup codes regenerated.");
+      setSecuritySuccess(t("api.backup_codes_regenerated"));
     } catch (err) {
-      setSecurityError(extractError(err, "Unable to regenerate backup codes."));
+      setSecurityError(extractError(err, t("errors.regenerate_codes")));
     } finally {
       setSecurityBusy(false);
     }
@@ -247,9 +324,10 @@ export default function ProfilePage({
       setAppPasswordName("");
       setAppPasswordCode("");
       await loadAppPasswords();
-      setSecuritySuccess("DAV app password created.");
+      // setSecuritySuccess("DAV app password created.");
+      setSecuritySuccess(t("api.app_password_created"));
     } catch (err) {
-      setSecurityError(extractError(err, "Unable to create DAV app password."));
+      setSecurityError(extractError(err, t("errors.create_app_password")));
     } finally {
       setSecurityBusy(false);
     }
@@ -267,9 +345,10 @@ export default function ProfilePage({
         },
       });
       await loadAppPasswords();
-      setSecuritySuccess("DAV app password revoked.");
+      // setSecuritySuccess("DAV app password revoked.");
+      setSecuritySuccess(t("api.app_password_revoked"));
     } catch (err) {
-      setSecurityError(extractError(err, "Unable to revoke DAV app password."));
+      setSecurityError(extractError(err, t("errors.revoke_app_password")));
     } finally {
       setSecurityBusy(false);
     }
@@ -279,32 +358,74 @@ export default function ProfilePage({
     <AppShell auth={auth} theme={theme}>
       <section className="fade-up grid gap-4 md:grid-cols-3">
         <InfoCard
-          title="Name"
+          title={t("cards.0.label")}
           value={auth.user.name}
-          helper="Displayed to other users when sharing resources."
+          helper={t("cards.0.description")}
         />
         <InfoCard
-          title="Email"
+          title={t("cards.1.label")}
           value={auth.user.email}
-          helper="Used for web sign-in and DAV clients."
+          helper={t("cards.1.description")}
         />
         <InfoCard
-          title="Role"
+          title={t("cards.2.label")}
           value={auth.user.role.toUpperCase()}
-          helper="Access level for administrative features."
+          helper={t("cards.2.description")}
         />
       </section>
 
       <section className="surface mt-6 rounded-3xl p-6">
-        <h2 className="text-xl font-semibold text-app-strong">Change Password</h2>
+        <h2 className="text-xl font-semibold text-app-strong">
+          {t("locale.title")}
+        </h2>
+        <p className="mt-1 text-sm text-app-muted">{t("locale.description")}</p>
+        <form
+          className="mt-4 flex flex-wrap items-end gap-3"
+          onSubmit={updateLocale}
+        >
+          <Field label={t("locale.label")}>
+            <select
+              className="input min-w-40"
+              value={localeFormValue}
+              onChange={(event) => setLocaleFormValue(event.target.value)}
+              disabled={localeSubmitting}
+            >
+              {localeOptions.map((option) => (
+                <option
+                  key={option.value}
+                  value={option.value}
+                  lang={option.value}
+                  dir={option.dir}
+                >
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <button className="btn" disabled={localeSubmitting} type="submit">
+            {localeSubmitting ? t("locale.saving") : t("locale.save")}
+          </button>
+        </form>
+        {localeError ? (
+          <p className="mt-3 text-sm text-app-danger">{localeError}</p>
+        ) : null}
+        {localeSuccess ? (
+          <p className="mt-3 text-sm text-app-accent">{localeSuccess}</p>
+        ) : null}
+      </section>
+
+      <section className="surface mt-6 rounded-3xl p-6">
+        <h2 className="text-xl font-semibold text-app-strong">
+          {t("change_password.title")}
+        </h2>
         <p className="mt-1 text-sm text-app-muted">
-          Change your password for both web access and DAV client connections.
+          {t("change_password.description")}
         </p>
         <form
           className="mt-4 grid gap-3 md:grid-cols-3"
           onSubmit={changePassword}
         >
-          <Field label="Current password">
+          <Field label={t("change_password.current_label")}>
             <input
               className="input"
               type="password"
@@ -318,7 +439,7 @@ export default function ProfilePage({
               required
             />
           </Field>
-          <Field label="New password">
+          <Field label={t("change_password.new_label")}>
             <input
               className="input"
               type="password"
@@ -332,7 +453,7 @@ export default function ProfilePage({
               required
             />
           </Field>
-          <Field label="Confirm new password">
+          <Field label={t("change_password.new_label_confirm")}>
             <input
               className="input"
               type="password"
@@ -348,39 +469,51 @@ export default function ProfilePage({
           </Field>
 
           {passwordError ? (
-            <p className="md:col-span-3 text-sm text-app-danger">{passwordError}</p>
+            <p className="md:col-span-3 text-sm text-app-danger">
+              {passwordError}
+            </p>
           ) : null}
           {passwordSuccess ? (
-            <p className="md:col-span-3 text-sm text-app-accent">{passwordSuccess}</p>
+            <p className="md:col-span-3 text-sm text-app-accent">
+              {passwordSuccess}
+            </p>
           ) : null}
 
           <div className="md:col-span-3 flex flex-wrap items-center gap-2">
             <button className="btn" disabled={passwordSubmitting} type="submit">
-              {passwordSubmitting ? "Updating password..." : "Update Password"}
+              {passwordSubmitting
+                ? t("change_password.updating")
+                : t("change_password.update")}
             </button>
           </div>
         </form>
       </section>
 
       <section className="surface mt-6 rounded-3xl p-6">
-        <h2 className="text-xl font-semibold text-app-strong">Security</h2>
+        <h2 className="text-xl font-semibold text-app-strong">
+          {t("security.title")}
+        </h2>
         <p className="mt-1 text-sm text-app-muted">
-          Configure two-factor authentication and manage DAV app passwords.
+          {t("security.description")}
         </p>
 
         {auth.twoFactorMandated && !auth.twoFactorEnabled ? (
           <p className="mt-3 rounded-xl border border-app-warning-edge bg-app-warning/10 px-3 py-2 text-sm text-app-warning-text">
-            Two-factor enrollment is required by administrators.
-            {graceDeadlineLabel
+            {t("security.2fa_mandated")}
+            {/* {graceDeadlineLabel
               ? ` Set up 2FA before ${graceDeadlineLabel}.`
+              : ""}*/}
+            {graceDeadlineLabel
+              ? t("security.2fa_mandated_with_deadline", {
+                  deadline: graceDeadlineLabel,
+                })
               : ""}
           </p>
         ) : null}
 
         {auth.twoFactorSetupRequired ? (
           <p className="mt-3 rounded-xl border border-app-danger-edge bg-app-danger/10 px-3 py-2 text-sm text-app-danger">
-            Your grace period has ended. Complete two-factor setup to continue
-            accessing all app features.
+            {t("security.2fa_deadline_expired")}
           </p>
         ) : null}
 
@@ -392,33 +525,37 @@ export default function ProfilePage({
               onClick={startTwoFactorSetup}
               disabled={securityBusy}
             >
-              {twoFactorSetup ? "Recreate Setup Secret" : "Start 2FA Setup"}
+              {twoFactorSetup
+                ? t("security.2fa_recreate")
+                : t("security.2fa_start")}
             </button>
 
             {twoFactorSetup ? (
               <div className="rounded-2xl border border-app-edge bg-app-surface p-4">
                 <p className="text-sm text-app-muted">
-                  1. Scan this QR code in Google Authenticator, 1Password, or a
-                  compatible authenticator app.
+                  {t("security.2fa_setup_step_1")}
                 </p>
                 {twoFactorSetup?.otpauth_uri ? (
                   <div className="mt-3 inline-flex rounded-lg border border-app-edge bg-white p-2">
                     <QRCodeSVG
                       value={twoFactorSetup.otpauth_uri}
                       size={176}
-                      title="Two-factor setup QR code"
+                      title={t("security.2fa_setup_step_1_qr_code_title")}
                     />
                   </div>
                 ) : null}
                 <p className="mt-3 text-sm text-app-muted">
-                  2. If needed, enter this key manually:
+                  {t("security.2fa_setup_step_2")}
                 </p>
                 <code className="mt-1 block break-all rounded-lg border border-app-edge bg-app-panel px-2 py-1 text-sm text-app-strong">
                   {twoFactorSetup.manual_key}
                 </code>
 
-                <form className="mt-4 flex flex-wrap items-end gap-2" onSubmit={enableTwoFactor}>
-                  <Field label="3. Verification code">
+                <form
+                  className="mt-4 flex flex-wrap items-end gap-2"
+                  onSubmit={enableTwoFactor}
+                >
+                  <Field label={t("security.2fa_setup_step_3")}>
                     <input
                       className="input w-44"
                       value={twoFactorCode}
@@ -428,7 +565,9 @@ export default function ProfilePage({
                     />
                   </Field>
                   <button className="btn" disabled={securityBusy} type="submit">
-                    {securityBusy ? "Enabling..." : "Enable 2FA"}
+                    {securityBusy
+                      ? t("security.2fa_enabling")
+                      : t("security.2fa_enable")}
                   </button>
                 </form>
               </div>
@@ -437,15 +576,15 @@ export default function ProfilePage({
         ) : (
           <div className="mt-4 space-y-4">
             <p className="text-sm text-app-accent">
-              Two-factor authentication is enabled.
+              {t("security.2fa_enabled")}
             </p>
-            <Field label="Authenticator or backup code for sensitive actions">
+            <Field label={t("security.2fa_code")}>
               <input
                 className="input max-w-xs"
                 value={twoFactorActionCode}
                 onChange={(event) => setTwoFactorActionCode(event.target.value)}
                 autoComplete="one-time-code"
-                placeholder="Enter code"
+                placeholder={t("security.2fa_code_placeholder")}
               />
             </Field>
             <div className="flex flex-wrap items-center gap-2">
@@ -455,7 +594,7 @@ export default function ProfilePage({
                 onClick={regenerateBackupCodes}
                 disabled={securityBusy || !twoFactorActionCode}
               >
-                Regenerate Backup Codes
+                {t("security.regenerate_backup_codes")}
               </button>
               <button
                 className="btn-outline btn-outline-sm text-app-danger"
@@ -463,7 +602,7 @@ export default function ProfilePage({
                 onClick={disableTwoFactor}
                 disabled={securityBusy || !twoFactorActionCode}
               >
-                Disable 2FA
+                {t("security.disable_2fa")}
               </button>
             </div>
           </div>
@@ -473,13 +612,14 @@ export default function ProfilePage({
           <div className="backup-codes-ticket mt-4 rounded-2xl p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-semibold text-app-strong">
-                Save these backup codes now.
+                {t("security.save_backup_codes")}
               </p>
-              <span className="backup-codes-ticket-label">Shown once</span>
+              <span className="backup-codes-ticket-label">
+                {t("security.shown_once")}
+              </span>
             </div>
             <p className="mt-1 text-xs text-app-muted">
-              Each backup code can be used once. You will not be able to view
-              these exact codes again.
+              {t("security.shown_once_description")}
             </p>
             <div className="mt-3">
               <textarea
@@ -487,7 +627,7 @@ export default function ProfilePage({
                 className="input backup-codes-ticket-field min-h-36 resize-y font-mono leading-6"
                 value={backupCodesText}
                 rows={Math.max(4, backupCodes.length)}
-                aria-label="Backup codes"
+                aria-label={t("security.backup_codes")}
                 readOnly
                 onFocus={selectAllBackupCodes}
                 onClick={selectAllBackupCodes}
@@ -499,23 +639,23 @@ export default function ProfilePage({
                 type="button"
                 onClick={selectAllBackupCodes}
               >
-                Select All
+                {t("security.select_all")}
               </button>
               <button
                 className="btn-outline btn-outline-sm"
                 type="button"
                 onClick={() => void selectAndCopyBackupCodes()}
               >
-                Copy All Codes
+                {t("security.copy_all_codes")}
               </button>
               {backupCodesCopyState === "copied" ? (
                 <span className="text-xs font-semibold text-app-accent">
-                  Copied all codes.
+                  {t("security.copied_all_codes")}
                 </span>
               ) : null}
               {backupCodesCopyState === "failed" ? (
                 <span className="text-xs font-semibold text-app-danger">
-                  Copy failed. Use Select All, then copy manually.
+                  {t("security.copy_failed")}
                 </span>
               ) : null}
             </div>
@@ -525,35 +665,37 @@ export default function ProfilePage({
         {auth.twoFactorEnabled ? (
           <div className="mt-6 rounded-2xl border border-app-edge bg-app-surface p-4">
             <h3 className="text-lg font-semibold text-app-strong">
-              DAV App Passwords
+              {t("security.app_passwords")}
             </h3>
             <p className="mt-1 text-sm text-app-muted">
-              Use these one-time generated passwords for CalDAV/CardDAV clients
-              that cannot complete interactive two-factor sign-in.
+              {t("security.app_passwords_description")}
             </p>
 
-            <form className="mt-4 grid gap-3 md:grid-cols-3" onSubmit={createAppPassword}>
-              <Field label="Password name">
+            <form
+              className="mt-4 grid gap-3 md:grid-cols-3"
+              onSubmit={createAppPassword}
+            >
+              <Field label={t("security.app_password_name")}>
                 <input
                   className="input"
                   value={appPasswordName}
                   onChange={(event) => setAppPasswordName(event.target.value)}
-                  placeholder="iPhone"
+                  placeholder={t("security.app_password_name_placeholder")}
                   required
                 />
               </Field>
-              <Field label="Authenticator/backup code">
+              <Field label={t("security.app_password_code")}>
                 <input
                   className="input"
                   value={appPasswordCode}
                   onChange={(event) => setAppPasswordCode(event.target.value)}
-                  placeholder="Required"
+                  placeholder={t("security.app_password_code_placeholder")}
                   required
                 />
               </Field>
               <div className="flex items-end">
                 <button className="btn" disabled={securityBusy} type="submit">
-                  Create App Password
+                  {t("security.app_password_create")}
                 </button>
               </div>
             </form>
@@ -561,7 +703,7 @@ export default function ProfilePage({
             {appPasswordPlaintext ? (
               <div className="mt-3 rounded-xl border border-app-warning-edge bg-app-warning/10 p-3">
                 <p className="text-xs uppercase tracking-wide text-app-faint">
-                  Shown once
+                  {t("security.app_password_code_shown_once")}
                 </p>
                 <code className="mt-1 block break-all text-sm text-app-strong">
                   {appPasswordPlaintext}
@@ -571,9 +713,13 @@ export default function ProfilePage({
 
             <div className="mt-4 space-y-2">
               {appPasswordLoading ? (
-                <p className="text-sm text-app-muted">Loading app passwords...</p>
+                <p className="text-sm text-app-muted">
+                  {t("security.app_password_loading")}
+                </p>
               ) : appPasswords.length === 0 ? (
-                <p className="text-sm text-app-muted">No app passwords created.</p>
+                <p className="text-sm text-app-muted">
+                  {t("security.app_password_no_created")}
+                </p>
               ) : (
                 appPasswords.map((appPassword) => (
                   <div
@@ -590,14 +736,22 @@ export default function ProfilePage({
                         disabled={securityBusy || !appPasswordCode}
                         onClick={() => revokeAppPassword(appPassword.id)}
                       >
-                        Revoke
+                        {t("security.app_password_revoke")}
                       </button>
                     </div>
                     <p className="mt-1 text-xs text-app-faint">
-                      Prefix: {appPassword.token_prefix}
+                      {/* Prefix: {appPassword.token_prefix}*/}
+                      {t("security.app_password_prefix", {
+                        prefix: appPassword.token_prefix,
+                      })}
                     </p>
                     <p className="mt-1 text-xs text-app-faint">
-                      Last used: {appPassword.last_used_at || "Never"}
+                      {/* Last used: {appPassword.last_used_at || "Never"}*/}
+                      {t("security.app_password_last_used", {
+                        last_used_at:
+                          appPassword.last_used_at ||
+                          t("security.app_password_never_used"),
+                      })}
                     </p>
                   </div>
                 ))

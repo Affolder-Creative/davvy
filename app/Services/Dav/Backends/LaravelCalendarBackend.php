@@ -81,7 +81,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
         $user = $this->principalUriService->userFromPrincipalUri($principalUri);
 
         if (! $user) {
-            throw new NotFound('Principal does not exist.');
+            throw new NotFound(__('dav.principal_does_not_exist'));
         }
 
         $uri = $this->resourceUriService->nextCalendarUri(
@@ -102,7 +102,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
             ]);
         } catch (QueryException $exception) {
             if ($this->isOwnerUriUniqueConstraintViolation($exception)) {
-                throw new Conflict('Calendar already exists for the requested URI.');
+                throw new Conflict(__('dav.calendar_already_exists_for_requested_uri'));
             }
 
             throw $exception;
@@ -121,7 +121,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
         $calendar = Calendar::query()->find($calendarId);
 
         if (! $calendar) {
-            throw new NotFound('Calendar not found.');
+            throw new NotFound(__('dav.calendar_not_found'));
         }
 
         $this->assertWritableCalendar($calendar);
@@ -240,7 +240,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
         $calendar = Calendar::query()->find($calendarId);
 
         if (! $calendar) {
-            throw new NotFound('Calendar not found.');
+            throw new NotFound(__('dav.calendar_not_found'));
         }
 
         $this->assertWritableCalendar($calendar);
@@ -251,14 +251,14 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
             ->exists();
 
         if ($existing) {
-            throw new BadRequest('Calendar object already exists for the requested URI.');
+            throw new BadRequest(__('dav.calendar_object_already_exists_for_requested_uri'));
         }
 
         $normalized = $this->icsValidator->validateAndNormalize((string) $calendarData);
         $resourceUid = $normalized['uid'] ?? $this->fallbackUidForLegacyPayload((string) $objectUri);
 
         if ($this->uidConflictExists($calendar->id, $resourceUid)) {
-            throw new Conflict('A calendar object with the same UID already exists in this calendar.');
+            throw new Conflict(__('dav.calendar_object_with_same_uid_exists'));
         }
 
         $etag = md5($normalized['data']);
@@ -277,7 +277,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
             ]);
         } catch (QueryException $exception) {
             if ($this->isUidUniqueConstraintViolation($exception)) {
-                throw new Conflict('A calendar object with the same UID already exists in this calendar.');
+                throw new Conflict(__('dav.calendar_object_with_same_uid_exists'));
             }
 
             throw $exception;
@@ -300,7 +300,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
         $calendar = Calendar::query()->find($calendarId);
 
         if (! $calendar) {
-            throw new NotFound('Calendar not found.');
+            throw new NotFound(__('dav.calendar_not_found'));
         }
 
         $this->assertWritableCalendar($calendar);
@@ -311,14 +311,14 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
             ->first();
 
         if (! $object) {
-            throw new NotFound('Calendar object not found.');
+            throw new NotFound(__('dav.calendar_object_not_found'));
         }
 
         $normalized = $this->icsValidator->validateAndNormalize((string) $calendarData);
         $resourceUid = $normalized['uid'] ?? $this->fallbackUidForLegacyPayload((string) $objectUri);
 
         if ($this->uidConflictExists($calendar->id, $resourceUid, exceptObjectId: $object->id)) {
-            throw new Conflict('A calendar object with the same UID already exists in this calendar.');
+            throw new Conflict(__('dav.calendar_object_with_same_uid_exists'));
         }
 
         $etag = md5($normalized['data']);
@@ -335,7 +335,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
             ]);
         } catch (QueryException $exception) {
             if ($this->isUidUniqueConstraintViolation($exception)) {
-                throw new Conflict('A calendar object with the same UID already exists in this calendar.');
+                throw new Conflict(__('dav.calendar_object_with_same_uid_exists'));
             }
 
             throw $exception;
@@ -491,13 +491,13 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
         $calendar = Calendar::query()->find($calendarId);
 
         if (! $calendar) {
-            throw new NotFound('Calendar not found.');
+            throw new NotFound(__('dav.calendar_not_found'));
         }
 
         $user = $this->davContext->getAuthenticatedUser();
 
         if (! $user || ! $this->accessService->userCanReadCalendar($user, $calendar)) {
-            throw new Forbidden('Read access denied for calendar.');
+            throw new Forbidden(__('dav.read_access_denied_for_calendar'));
         }
 
         return $calendar;
@@ -511,7 +511,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
         $user = $this->davContext->getAuthenticatedUser();
 
         if (! $user || ! $this->accessService->userCanWriteCalendar($user, $calendar)) {
-            throw new Forbidden('Write access denied for calendar.');
+            throw new Forbidden(__('dav.write_access_denied_for_calendar'));
         }
     }
 
@@ -523,7 +523,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
         $user = $this->davContext->getAuthenticatedUser();
 
         if (! $user || ! $this->accessService->userCanDeleteCalendar($user, $calendar)) {
-            throw new Forbidden('Delete access denied for calendar.');
+            throw new Forbidden(__('dav.delete_access_denied_for_calendar'));
         }
     }
 
@@ -544,7 +544,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
             }
         }
 
-        throw new InvalidSyncToken('Sync token format is invalid.');
+        throw new InvalidSyncToken(__('dav.sync_token_format_invalid'));
     }
 
     /**

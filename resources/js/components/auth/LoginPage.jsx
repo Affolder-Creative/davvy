@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { buildAuthStateFromPayload } from "./authStateMapper";
 
@@ -16,6 +17,7 @@ export default function LoginPage({
   AuthShell,
   Field,
 }) {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
@@ -39,7 +41,7 @@ export default function LoginPage({
       auth.setAuth(buildAuthStateFromPayload(data, { user: data.user }));
       navigate("/");
     } catch (err) {
-      setError(extractError(err, "Unable to sign in."));
+      setError(extractError(err, t("login.error_sign_in")));
     } finally {
       setSubmitting(false);
     }
@@ -49,11 +51,11 @@ export default function LoginPage({
     <AuthShell
       theme={theme}
       themeControlPlacement="window-bottom-right"
-      title="Welcome Back"
-      subtitle="Sign in to manage your CalDAV and CardDAV resources."
+      title={t("login.title")}
+      subtitle={t("login.subtitle")}
     >
       <form className="space-y-4" onSubmit={submit}>
-        <Field label="Email">
+        <Field label={t("login.email")}>
           <input
             className="input"
             type="email"
@@ -62,7 +64,7 @@ export default function LoginPage({
             required
           />
         </Field>
-        <Field label="Password">
+        <Field label={t("login.password")}>
           <input
             className="input"
             type="password"
@@ -73,17 +75,17 @@ export default function LoginPage({
         </Field>
         {error ? <p className="text-sm text-app-danger">{error}</p> : null}
         <button className="btn w-full" disabled={submitting}>
-          {submitting ? "Signing in..." : "Sign In"}
+          {submitting ? t("login.submitting") : t("login.submit")}
         </button>
       </form>
       <p className="mt-5 text-sm text-app-muted">
-        Need an account?{" "}
+        {t("login.register_prompt")}{" "}
         {auth.registrationEnabled ? (
           <Link to="/register" className="font-semibold text-app-accent">
-            Register here
+            {t("login.register_link")}
           </Link>
         ) : (
-          "Public sign-up is disabled by administrators."
+          t("login.register_disabled")
         )}
       </p>
     </AuthShell>

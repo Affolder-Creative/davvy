@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Info Card component.
@@ -13,6 +14,7 @@ export default function InfoCard({
   copyable = false,
   copyTextToClipboard,
 }) {
+  const { t } = useTranslation("common");
   const [copyState, setCopyState] = useState("idle");
 
   useEffect(() => {
@@ -39,9 +41,9 @@ export default function InfoCard({
 
   const copyTooltipLabel =
     copyState === "copied"
-      ? "Copied!"
+      ? t("copy.copied")
       : copyState === "failed"
-        ? "Copy failed"
+        ? t("copy.copy_failed")
         : "";
   const copyTooltipTone = copyState === "failed" ? "bg-red-700" : "bg-teal-700";
 
@@ -56,8 +58,8 @@ export default function InfoCard({
             type="button"
             onClick={() => void copyValue()}
             className="w-full rounded-md text-left text-base font-bold text-app-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-            aria-label={`Copy ${title}`}
-            title="Click to copy"
+            aria-label={t("copy.aria_copy", { value: title })}
+            title={t("copy.click_to_copy")}
           >
             <span className="break-all">{value}</span>
           </button>

@@ -9,6 +9,7 @@ on:
       - "bootstrap/**"
       - "config/**"
       - "database/**"
+      - "lang/**"
       - "resources/**"
       - "routes/**"
       - "tests/**"

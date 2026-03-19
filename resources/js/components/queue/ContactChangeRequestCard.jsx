@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   formatQueueTimestamp,
   queueOperationLabel,
@@ -18,6 +19,7 @@ export default function ContactChangeRequestCard({
   onApprove,
   onDeny,
 }) {
+  const { t } = useTranslation("queue");
   const isActionable =
     row.status === "pending" || row.status === "manual_merge_needed";
 
@@ -32,14 +34,14 @@ export default function ContactChangeRequestCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-app-faint">
-            #{row.id} • Group {row.group_uuid}
+            #{row.id} • {t("card.group")} {row.group_uuid}
           </p>
           <h3 className="text-lg font-semibold text-app-strong">
-            {row.contact?.display_name || "Unnamed Contact"} (
+            {row.contact?.display_name || t("card.unnamed_contact")} (
             {queueOperationLabel(row.operation)})
           </h3>
           <p className="mt-1 text-xs text-app-muted">
-            Status: {queueStatusLabel(row.status)} • Requested{" "}
+            {t("card.status")}: {queueStatusLabel(row.status)} • {t("card.requested")}{" "}
             {formatQueueTimestamp(row.created_at)}
           </p>
         </div>
@@ -53,7 +55,7 @@ export default function ContactChangeRequestCard({
                   disabled={submitting}
                   onClick={() => onOpenEdit(row)}
                 >
-                  Edit & Approve
+                  {t("card.edit_approve")}
                 </button>
               ) : null}
               <button
@@ -62,7 +64,7 @@ export default function ContactChangeRequestCard({
                 disabled={submitting}
                 onClick={() => onApprove(row)}
               >
-                Approve
+                {t("card.approve")}
               </button>
               <button
                 className="btn-outline btn-outline-sm text-app-danger"
@@ -70,7 +72,7 @@ export default function ContactChangeRequestCard({
                 disabled={submitting}
                 onClick={() => onDeny(row)}
               >
-                Deny
+                {t("card.deny")}
               </button>
             </>
           ) : null}
@@ -79,24 +81,23 @@ export default function ContactChangeRequestCard({
 
       <div className="mt-3 grid gap-2 text-sm text-app-base md:grid-cols-2">
         <p>
-          Requester: {row.requester?.name} ({row.requester?.email})
+          {t("card.requester")}: {row.requester?.name} ({row.requester?.email})
         </p>
         <p>
-          Approval Owner: {row.approval_owner?.name} ({row.approval_owner?.email}
-          )
+          {t("card.approval_owner")}: {row.approval_owner?.name} ({row.approval_owner?.email})
         </p>
-        <p>Source: {row.source}</p>
+        <p>{t("card.source")}: {row.source}</p>
         <p>
-          Reviewer:{" "}
+          {t("card.reviewer")}:{" "}
           {row.reviewer
             ? `${row.reviewer.name} (${row.reviewer.email})`
-            : "Not reviewed yet"}
+            : t("card.not_reviewed")}
         </p>
       </div>
 
       {Array.isArray(row.changed_fields) && row.changed_fields.length > 0 ? (
         <p className="mt-2 text-xs text-app-muted">
-          Changed fields: {row.changed_fields.join(", ")}
+          {t("card.changed_fields")}: {row.changed_fields.join(", ")}
         </p>
       ) : null}
 

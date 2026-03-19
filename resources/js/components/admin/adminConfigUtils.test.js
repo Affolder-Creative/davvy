@@ -3,11 +3,11 @@ import {
   BACKUP_DRAWER_ANIMATION_MS,
   BACKUP_RUN_TOAST_AUTO_HIDE_MS,
   MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS,
-  MONTH_OPTIONS,
   RECOMMENDED_BACKUP_RETENTION,
-  WEEKDAY_OPTIONS,
   areBackupConfigSnapshotsEqual,
+  buildMonthOptions,
   buildTimezoneGroups,
+  buildWeekdayOptions,
   formatAdminTimestamp,
   isRecommendedBackupRetention,
   parseBackupScheduleTimes,
@@ -22,8 +22,8 @@ describe("adminConfigUtils", () => {
     expect(MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS).toBe(6000);
     expect(BACKUP_RUN_TOAST_AUTO_HIDE_MS).toBe(3200);
     expect(BACKUP_DRAWER_ANIMATION_MS).toBe(220);
-    expect(WEEKDAY_OPTIONS).toHaveLength(7);
-    expect(MONTH_OPTIONS).toHaveLength(12);
+    expect(buildWeekdayOptions()).toHaveLength(7);
+    expect(buildMonthOptions()).toHaveLength(12);
     expect(RECOMMENDED_BACKUP_RETENTION).toEqual({
       daily: 7,
       weekly: 4,
@@ -108,7 +108,7 @@ describe("adminConfigUtils", () => {
     expect(formatAdminTimestamp("not-a-date")).toBe("Invalid timestamp");
 
     const value = "2026-03-01T12:30:00Z";
-    expect(formatAdminTimestamp(value)).toBe(new Date(value).toLocaleString());
+    expect(formatAdminTimestamp(value)).toBe(new Date(value).toLocaleString("en"));
   });
 
   it("builds timezone groups from supported values", () => {

@@ -1,0 +1,97 @@
+{
+  "errors": {
+    "load": "Unable to load dashboard data.",
+    "update_share_status": "Unable to update sharing status.",
+    "rename_resource": "Unable to rename resource.",
+    "create_calendar": "Unable to create calendar.",
+    "create_address_book": "Unable to create address book.",
+    "save_share": "Unable to save share assignment.",
+    "remove_share": "Unable to remove share assignment.",
+    "export_calendars": "Unable to export calendars.",
+    "export_calendar": "Unable to export calendar.",
+    "export_address_books": "Unable to export address books.",
+    "export_address_book": "Unable to export address book.",
+    "apple_compat": "Unable to update Apple compatibility settings.",
+    "milestones": "Unable to update birthday/anniversary calendar settings."
+  },
+  "loading_resources": "Loading resources...",
+  "share_status": {
+    "shared": "{{name}} is now shared.",
+    "unshared": "{{name}} is no longer shared."
+  },
+  "overview": {
+    "endpoint_title": "DAV Endpoint",
+    "endpoint_helper": "Use this URL in client connection settings.",
+    "principal_title": "Principal",
+    "principal_helper": "Autodiscovery may resolve this automatically.",
+    "role_title": "Role",
+    "role_helper": "Admins can manage users and cross-user sharing."
+  },
+  "resources": {
+    "your_calendars": "Your Calendars",
+    "create_calendar": "Create Calendar",
+    "your_address_books": "Your Address Books",
+    "create_address_book": "Create Address Book",
+    "export_all": "Export All"
+  },
+  "resource_panel": {
+    "display_name": "Display name",
+    "sharable": "Sharable",
+    "no_owned": "No owned resources yet.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit_name_for": "Edit name for {{name}}",
+    "export_item": "Export {{name}}",
+    "default": "(default)",
+    "shared_with_you": "Shared with you",
+    "no_shared": "No shared resources.",
+    "owner": "Owner: {{name}} ({{email}})",
+    "scope": {
+      "owned": "Owned",
+      "shared": "Shared"
+    },
+    "cancel_editing_calendar_name": "Cancel editing {{label}} calendar name",
+    "save_calendar_name": "Save {{label}} calendar name",
+    "reset_calendar_name": "Reset {{label}} calendar name to default",
+    "rename_calendar": "Rename {{label}} calendar",
+    "saving": "Saving..."
+  },
+  "milestone_calendars": {
+    "expand": "Expand milestone calendars",
+    "collapse": "Collapse milestone calendars",
+    "title": "Milestone Calendars",
+    "off": "Off",
+    "enabled": "{{count}}/2 enabled",
+    "configure": "Configure",
+    "hide": "Hide",
+    "birthdays": "Birthdays",
+    "birthdays_fallback": "{{name}} Birthdays",
+    "anniversaries": "Anniversaries",
+    "anniversaries_fallback": "{{name}} Anniversaries"
+  },
+  "sharing": {
+    "title": "Share Your Resources",
+    "subtitle": "Grant read-only, editor, or admin access for resources you own and marked as sharable. Admin access includes collection delete rights.",
+    "resource_calendar": "Calendar",
+    "resource_address_book": "Address Book",
+    "select_sharable_resource": "Select sharable resource",
+    "select_user": "Select user",
+    "perm_read_only": "General (read-only)",
+    "perm_editor": "Full edit (no delete)",
+    "perm_admin": "Admin (full edit + delete)",
+    "share": "Share",
+    "no_outgoing": "No outgoing shares yet.",
+    "shared_with": "Shared with: {{name}} ({{email}})",
+    "revoke": "Revoke"
+  },
+  "apple_compat": {
+    "title": "Apple Contacts Compatibility",
+    "subtitle": "Off by default. Mirror selected address books into your main address book so macOS and iOS clients can see them.",
+    "target": "Mirror target: {{name}} (/{{uri}})",
+    "missing_target": "No default Contacts address book found for your account.",
+    "enable": "Enable Apple compatibility mirroring",
+    "sources_title": "Source address books to mirror",
+    "no_sources": "No eligible owned/shared address books available.",
+    "save": "Save Apple Compatibility Settings"
+  }
+}

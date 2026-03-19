@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
@@ -45,7 +46,7 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         if (! $this->registrationSettings->isPublicRegistrationEnabled()) {
-            abort(403, 'Public registration is currently disabled.');
+            abort(403, __('auth.public_registration_disabled'));
         }
 
         $email = Str::lower(trim((string) $request->input('email', '')));
@@ -67,6 +68,7 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => $data['password'],
             'role' => Role::Regular,
+            'locale' => app()->getLocale(),
             'email_verified_at' => $verificationRequired ? null : now(),
             'is_approved' => ! $approvalRequired,
             'approved_at' => $approvalRequired ? null : now(),
@@ -85,8 +87,8 @@ class AuthController extends Controller
                 'registration_pending_verification' => true,
                 'registration_pending_approval' => $approvalRequired,
                 'message' => $approvalRequired
-                    ? 'Registration submitted. Verify your email address and wait for administrator approval before signing in.'
-                    : 'Registration submitted. Verify your email address before signing in.',
+                    ? __('auth.registration_submitted_verify_and_wait_approval')
+                    : __('auth.registration_submitted_verify_before_signin'),
                 'verification_email_sent' => $verificationSent,
             ], $this->publicSettingsPayload());
 
@@ -104,7 +106,7 @@ class AuthController extends Controller
             return response()->json(
                 array_merge([
                     'registration_pending_approval' => true,
-                    'message' => 'Registration submitted. An administrator must approve your account before you can sign in.',
+                    'message' => __('auth.registration_submitted_pending_approval'),
                 ], $this->publicSettingsPayload()),
                 202
             );
@@ -130,7 +132,7 @@ class AuthController extends Controller
 
         $record = $this->onboarding->consumeEmailVerification($data['token']);
         if (! $record || ! $record->user) {
-            abort(422, 'Verification link is invalid or expired.');
+            abort(422, __('auth.verification_link_invalid_or_expired'));
         }
 
         $user = $record->user;
@@ -144,7 +146,7 @@ class AuthController extends Controller
             return response()->json(array_merge([
                 'registration_pending_approval' => true,
                 'email_verified' => true,
-                'message' => 'Email verified. Your account is pending administrator approval.',
+                'message' => __('auth.email_verified_pending_approval'),
             ], $this->publicSettingsPayload()), 202);
         }
 
@@ -173,7 +175,7 @@ class AuthController extends Controller
 
         $record = $this->onboarding->consumeInvite($data['token']);
         if (! $record || ! $record->user) {
-            abort(422, 'Invitation link is invalid or expired.');
+            abort(422, __('auth.invitation_link_invalid_or_expired'));
         }
 
         $user = $record->user;
@@ -184,7 +186,7 @@ class AuthController extends Controller
         if (! $user->is_approved) {
             return response()->json(array_merge([
                 'registration_pending_approval' => true,
-                'message' => 'Invitation accepted. Your account is pending administrator approval.',
+                'message' => __('auth.invitation_accepted_pending_approval'),
             ], $this->publicSettingsPayload()), 202);
         }
 
@@ -226,13 +228,13 @@ class AuthController extends Controller
 
         if (! $user || ! Hash::check((string) $data['password'], $user->password)) {
             return response()->json([
-                'message' => 'The provided credentials are invalid.',
+                'message' => __('auth.credentials_invalid'),
             ], 422);
         }
 
         if (! $user->is_approved) {
             return response()->json([
-                'message' => 'Your account is pending administrator approval.',
+                'message' => __('auth.account_pending_approval'),
             ], 403);
         }
 
@@ -241,7 +243,7 @@ class AuthController extends Controller
             && $user->email_verified_at === null
         ) {
             return response()->json([
-                'message' => 'Verify your email address before signing in.',
+                'message' => __('auth.verify_email_before_signin'),
             ], 403);
         }
 
@@ -254,7 +256,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'two_factor_required' => true,
-                'message' => 'Two-factor code required to complete sign in.',
+                'message' => __('auth.two_factor_code_required'),
                 'challenge_expires_at' => now()->addMinutes(10)->toISOString(),
             ], 202);
         }
@@ -287,7 +289,7 @@ class AuthController extends Controller
         $user = $this->pendingTwoFactorLogin->pendingUser($request);
         if (! $user) {
             return response()->json([
-                'message' => 'No pending two-factor challenge. Start a new sign in attempt.',
+                'message' => __('auth.no_pending_two_factor_challenge'),
             ], 422);
         }
 
@@ -296,7 +298,7 @@ class AuthController extends Controller
             $this->pendingTwoFactorLogin->registerFailedAttempt($request);
 
             return response()->json([
-                'message' => 'Invalid authentication code.',
+                'message' => __('auth.invalid_authentication_code'),
             ], 422);
         }
 
@@ -357,6 +359,30 @@ class AuthController extends Controller
     }
 
     /**
+     * Update the authenticated user's preferred locale.
+     */
+    public function updateLocale(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'locale' => ['required', 'string', Rule::in($this->supportedLocales())],
+        ]);
+
+        $user = $request->user();
+        $user->locale = (string) $data['locale'];
+        $user->save();
+        $user->refresh();
+
+        app()->setLocale((string) $user->locale);
+
+        return response()->json(
+            array_merge([
+                'ok' => true,
+                'user' => $user,
+            ], $this->authenticatedSettingsPayload($user)),
+        );
+    }
+
+    /**
      * Return current two-factor enrollment status for the user.
      */
     public function twoFactorStatus(Request $request): JsonResponse
@@ -383,7 +409,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         if ($user->hasTwoFactorEnabled()) {
-            abort(409, 'Two-factor authentication is already enabled.');
+            abort(409, __('auth.two_factor_already_enabled'));
         }
 
         $setup = $this->twoFactor->beginSetup($user);
@@ -408,16 +434,16 @@ class AuthController extends Controller
         $user = $request->user();
 
         if ($user->hasTwoFactorEnabled()) {
-            abort(409, 'Two-factor authentication is already enabled.');
+            abort(409, __('auth.two_factor_already_enabled'));
         }
 
         $secret = (string) $request->session()->get(self::TWO_FACTOR_PENDING_SETUP_SESSION_KEY, '');
         if ($secret === '') {
-            abort(422, 'Two-factor setup has expired. Start setup again.');
+            abort(422, __('auth.two_factor_setup_expired'));
         }
 
         if (! $this->twoFactor->verifyEnrollmentCode($secret, $data['code'])) {
-            abort(422, 'The two-factor code is invalid.');
+            abort(422, __('auth.two_factor_code_invalid'));
         }
 
         $backupCodes = $this->twoFactor->enable($user, $secret);
@@ -444,11 +470,11 @@ class AuthController extends Controller
         $user = $request->user()->fresh();
 
         if (! $user->hasTwoFactorEnabled()) {
-            abort(422, 'Two-factor authentication is not enabled.');
+            abort(422, __('auth.two_factor_not_enabled'));
         }
 
         if (! $this->twoFactor->verifyTotpOrBackupCode($user, $data['code'])) {
-            abort(422, 'Invalid authentication code.');
+            abort(422, __('auth.invalid_authentication_code'));
         }
 
         $this->twoFactor->disable($user, revokeAppPasswords: true);
@@ -471,11 +497,11 @@ class AuthController extends Controller
         $user = $request->user()->fresh();
 
         if (! $user->hasTwoFactorEnabled()) {
-            abort(422, 'Two-factor authentication is not enabled.');
+            abort(422, __('auth.two_factor_not_enabled'));
         }
 
         if (! $this->twoFactor->verifyTotpOrBackupCode($user, $data['code'])) {
-            abort(422, 'Invalid authentication code.');
+            abort(422, __('auth.invalid_authentication_code'));
         }
 
         $backupCodes = $this->twoFactor->regenerateBackupCodes($user);
@@ -493,7 +519,7 @@ class AuthController extends Controller
         $user = $request->user()->fresh();
 
         if (! $user->hasTwoFactorEnabled()) {
-            abort(422, 'Enable two-factor authentication before managing app passwords.');
+            abort(422, __('auth.enable_two_factor_before_managing_app_passwords'));
         }
 
         $data = $this->appPasswords->activeFor($user)
@@ -525,11 +551,11 @@ class AuthController extends Controller
         $user = $request->user()->fresh();
 
         if (! $user->hasTwoFactorEnabled()) {
-            abort(422, 'Enable two-factor authentication before creating app passwords.');
+            abort(422, __('auth.enable_two_factor_before_creating_app_passwords'));
         }
 
         if (! $this->twoFactor->verifyTotpOrBackupCode($user, $data['code'])) {
-            abort(422, 'Invalid authentication code.');
+            abort(422, __('auth.invalid_authentication_code'));
         }
 
         $created = $this->appPasswords->create($user, $data['name']);
@@ -558,7 +584,7 @@ class AuthController extends Controller
         $user = $request->user()->fresh();
 
         if (! $user->hasTwoFactorEnabled()) {
-            abort(422, 'Enable two-factor authentication before managing app passwords.');
+            abort(422, __('auth.enable_two_factor_before_managing_app_passwords'));
         }
 
         if ((int) $appPassword->user_id !== (int) $user->id) {
@@ -566,7 +592,7 @@ class AuthController extends Controller
         }
 
         if (! $this->twoFactor->verifyTotpOrBackupCode($user, $data['code'])) {
-            abort(422, 'Invalid authentication code.');
+            abort(422, __('auth.invalid_authentication_code'));
         }
 
         $revoked = $this->appPasswords->revoke($user, (int) $appPassword->id);
@@ -585,7 +611,7 @@ class AuthController extends Controller
      */
     private function publicSettingsPayload(): array
     {
-        return [
+        return array_merge([
             'registration_enabled' => $this->registrationSettings->isPublicRegistrationEnabled(),
             'registration_approval_required' => $this->registrationSettings->isPublicRegistrationApprovalRequired(),
             'email_verification_required' => $this->onboarding->shouldRequirePublicEmailVerification(),
@@ -596,7 +622,7 @@ class AuthController extends Controller
             'two_factor_enforcement_enabled' => $this->twoFactorSettings->isEnforced(),
             'two_factor_grace_period_days' => $this->twoFactorSettings->gracePeriodDays(),
             'sponsorship' => $this->sponsorshipLinks->publicConfig(),
-        ];
+        ], $this->localePayload());
     }
 
     /**
@@ -614,5 +640,46 @@ class AuthController extends Controller
             'two_factor_mandated' => $this->twoFactorSettings->isEnforced(),
             'two_factor_grace_expires_at' => $graceDeadline?->toISOString(),
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function localePayload(): array
+    {
+        $supportedLocales = $this->supportedLocales();
+        $fallbackLocale = strtolower(trim((string) config('app.fallback_locale', 'en')));
+
+        if (! in_array($fallbackLocale, $supportedLocales, true)) {
+            $supportedLocales[] = $fallbackLocale;
+        }
+
+        $locale = strtolower(trim((string) app()->getLocale()));
+        if (! in_array($locale, $supportedLocales, true)) {
+            $locale = $fallbackLocale;
+        }
+
+        return [
+            'locale' => $locale,
+            'supported_locales' => $supportedLocales,
+            'fallback_locale' => $fallbackLocale,
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function supportedLocales(): array
+    {
+        $locales = config('app.supported_locales', ['en']);
+
+        $normalized = collect(is_array($locales) ? $locales : [])
+            ->map(fn (mixed $locale): string => strtolower(trim((string) $locale)))
+            ->filter(fn (string $locale): bool => $locale !== '')
+            ->unique()
+            ->values()
+            ->all();
+
+        return $normalized === [] ? ['en'] : $normalized;
     }
 }

@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="color-scheme" content="light dark" />
   <meta name="supported-color-schemes" content="light dark" />
-  <title>You are invited</title>
+  <title>{{ __('emails.admin_invite_title') }}</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -185,34 +185,35 @@
 @php($baseUrl = rtrim((string) config('app.url', ''), '/'))
 @php($lightLogo = $baseUrl !== '' ? $baseUrl.'/davvy.png' : '/davvy.png')
 @php($darkLogo = $baseUrl !== '' ? $baseUrl.'/davvy_dark.png' : '/davvy_dark.png')
+@php($expiresLabel = $expiresAt->locale(app()->getLocale())->isoFormat('lll'))
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-shell">
   <tr>
     <td align="center">
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="email-card">
         <tr>
           <td class="header">
-            <img class="logo logo-light" src="{{ $lightLogo }}" alt="Davvy logo" />
-            <img class="logo logo-dark" src="{{ $darkLogo }}" alt="Davvy logo" />
-            <h1 class="title">You're invited to {{ config('app.name', 'Davvy') }}</h1>
-            <p class="subtitle">A one-time activation link was created for your account.</p>
+            <img class="logo logo-light" src="{{ $lightLogo }}" alt="{{ __('emails.logo_alt', ['app' => config('app.name', 'Davvy')]) }}" />
+            <img class="logo logo-dark" src="{{ $darkLogo }}" alt="{{ __('emails.logo_alt', ['app' => config('app.name', 'Davvy')]) }}" />
+            <h1 class="title">{{ __('emails.admin_invite_title_with_app', ['app' => config('app.name', 'Davvy')]) }}</h1>
+            <p class="subtitle">{{ __('emails.admin_invite_subtitle') }}</p>
           </td>
         </tr>
         <tr>
           <td class="content">
-            <p>Hello {{ $user->name }},</p>
-            <p>An administrator created an account for you on {{ config('app.name', 'Davvy') }}.</p>
-            <p>Set your password and activate your account:</p>
+            <p>{{ __('emails.greeting_name', ['name' => $user->name]) }}</p>
+            <p>{{ __('emails.admin_invite_account_created', ['app' => config('app.name', 'Davvy')]) }}</p>
+            <p>{{ __('emails.admin_invite_set_password_and_activate') }}</p>
             <p>
-              <a class="btn" href="{{ $inviteUrl }}">Activate Account</a>
+              <a class="btn" href="{{ $inviteUrl }}">{{ __('emails.admin_invite_activate_button') }}</a>
             </p>
-            <p class="meta">If the button does not work, copy and paste this link:</p>
+            <p class="meta">{{ __('emails.if_button_fails_copy_link') }}</p>
             <div class="link-wrap">{{ $inviteUrl }}</div>
-            <p class="meta">This one-time link expires at {{ $expiresAt->toDayDateTimeString() }}.</p>
+            <p class="meta">{{ __('emails.one_time_link_expires_at', ['expires_at' => $expiresLabel]) }}</p>
           </td>
         </tr>
         <tr>
           <td class="footer">
-            This message was sent by {{ config('app.name', 'Davvy') }}. If you did not expect this invitation, you can ignore this email.
+            {{ __('emails.admin_invite_footer', ['app' => config('app.name', 'Davvy')]) }}
           </td>
         </tr>
       </table>

@@ -1,4 +1,6 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import { setI18nLocale } from "../../i18n";
 
 /**
  * Renders the Admin Feature Toggle component.
@@ -7,6 +9,7 @@ import React from "react";
  * @returns {JSX.Element}
  */
 export default function AdminFeatureToggle({ label, enabled, onClick }) {
+  const { t } = useTranslation("admin");
   return (
     <button
       className={`btn-outline inline-flex items-center gap-1.5 rounded-lg !px-2.5 !py-1.5 !text-sm ${
@@ -34,7 +37,7 @@ export default function AdminFeatureToggle({ label, enabled, onClick }) {
             : "border-app-edge text-app-faint"
         }`}
       >
-        {enabled ? "On" : "Off"}
+        {enabled ? t("toggle_on") : t("toggle_off")}
       </span>
     </button>
   );

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Date Editor component.
@@ -15,11 +16,25 @@ export default function DateEditor({
   createEmptyDate,
   normalizeDatePartInput,
 }) {
+  const { t } = useTranslation("contacts");
   const safeRows = Array.isArray(rows) ? rows : [];
   const safeLabelOptions =
     Array.isArray(labelOptions) && labelOptions.length > 0
       ? labelOptions
       : defaultLabelOptions;
+  const optionLabel = (option) => {
+    if (typeof option?.label === "string" && option.label.trim() !== "") {
+      return option.label;
+    }
+
+    if (typeof option?.labelKey === "string" && option.labelKey.trim() !== "") {
+      return t(option.labelKey, {
+        defaultValue: option?.fallback ?? option?.value ?? "",
+      });
+    }
+
+    return option?.fallback ?? option?.value ?? "";
+  };
 
   const updateRow = (index, field, value) => {
     if (field === "label" || field === "custom_label") {
@@ -99,19 +114,21 @@ export default function DateEditor({
     <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          Date
+          {t("editor.date_editor.title")}
         </h3>
         <button
           className="btn-outline btn-outline-sm"
           type="button"
           onClick={addRow}
         >
-          Add date
+          {t("editor.date_editor.add_date")}
         </button>
       </div>
       <div className="mt-3 space-y-3">
         {safeRows.length === 0 ? (
-          <p className="text-sm text-app-faint">No dates.</p>
+          <p className="text-sm text-app-faint">
+            {t("editor.date_editor.no_dates")}
+          </p>
         ) : (
           safeRows.map((row, index) => (
             <div
@@ -121,12 +138,16 @@ export default function DateEditor({
               <div className="grid gap-3 md:grid-cols-[12rem_1fr_auto]">
                 <select
                   className="input"
-                  value={resolveLabelSelectValue(row, safeLabelOptions, "other")}
+                  value={resolveLabelSelectValue(
+                    row,
+                    safeLabelOptions,
+                    "other",
+                  )}
                   onChange={(event) => updateLabel(index, event.target.value)}
                 >
                   {safeLabelOptions.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {optionLabel(option)}
                     </option>
                   ))}
                 </select>
@@ -138,7 +159,7 @@ export default function DateEditor({
                     pattern="[0-9]*"
                     maxLength={2}
                     value={row.month ?? ""}
-                    placeholder="MM"
+                    placeholder={t("editor.date_editor.month_placeholder")}
                     onChange={(event) =>
                       updateRow(index, "month", event.target.value)
                     }
@@ -150,7 +171,7 @@ export default function DateEditor({
                     pattern="[0-9]*"
                     maxLength={2}
                     value={row.day ?? ""}
-                    placeholder="DD"
+                    placeholder={t("editor.date_editor.day_placeholder")}
                     onChange={(event) =>
                       updateRow(index, "day", event.target.value)
                     }
@@ -162,7 +183,7 @@ export default function DateEditor({
                     pattern="[0-9]*"
                     maxLength={4}
                     value={row.year ?? ""}
-                    placeholder="YYYY"
+                    placeholder={t("editor.date_editor.year_placeholder")}
                     onChange={(event) =>
                       updateRow(index, "year", event.target.value)
                     }
@@ -173,7 +194,7 @@ export default function DateEditor({
                   type="button"
                   onClick={() => removeRow(index)}
                 >
-                  Remove
+                  {t("editor.date_editor.remove")}
                 </button>
               </div>
               {row.label === "custom" ? (
@@ -183,7 +204,7 @@ export default function DateEditor({
                   onChange={(event) =>
                     updateRow(index, "custom_label", event.target.value)
                   }
-                  placeholder="Custom label"
+                  placeholder={t("editor.date_editor.custom_label_placeholder")}
                 />
               ) : null}
             </div>

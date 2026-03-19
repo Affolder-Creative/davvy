@@ -1,10 +1,30 @@
 export const PRONOUN_OPTIONS = [
-  { value: "", label: "Not set" },
-  { value: "she/her", label: "she/her" },
-  { value: "he/him", label: "he/him" },
-  { value: "they/them", label: "they/them" },
-  { value: "xe/xem", label: "xe/xem" },
-  { value: "custom", label: "Custom..." },
+  { value: "", labelKey: "field_labels.pronouns.not_set", fallback: "Not set" },
+  {
+    value: "she/her",
+    labelKey: "field_labels.pronouns.she_her",
+    fallback: "she/her",
+  },
+  {
+    value: "he/him",
+    labelKey: "field_labels.pronouns.he_him",
+    fallback: "he/him",
+  },
+  {
+    value: "they/them",
+    labelKey: "field_labels.pronouns.they_them",
+    fallback: "they/them",
+  },
+  {
+    value: "xe/xem",
+    labelKey: "field_labels.pronouns.xe_xem",
+    fallback: "xe/xem",
+  },
+  {
+    value: "custom",
+    labelKey: "field_labels.pronouns.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const CONTACTS_PAGE_SIZE = 8;

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Contact Editor Name Section component.
@@ -14,6 +15,7 @@ export default function ContactEditorNameSection({
   isOptionalFieldVisible,
   updateFormField,
 }) {
+  const { t } = useTranslation("contacts");
   return (
     <section className="rounded-2xl border border-app-edge bg-app-surface p-3">
       <button
@@ -24,10 +26,10 @@ export default function ContactEditorNameSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            Name
+            {t("editor.name_section.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            Basic identity and phonetic naming fields.
+            {t("editor.name_section.description")}
           </span>
         </span>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
@@ -39,23 +41,27 @@ export default function ContactEditorNameSection({
         <div className="mt-3 px-1 pb-1">
           <div className="grid gap-3 md:grid-cols-3">
             {isOptionalFieldVisible("prefix") ? (
-              <Field label="Prefix">
+              <Field label={t("editor.name_section.field.prefix")}>
                 <input
                   className="input"
                   value={form.prefix}
-                  onChange={(event) => updateFormField("prefix", event.target.value)}
+                  onChange={(event) =>
+                    updateFormField("prefix", event.target.value)
+                  }
                 />
               </Field>
             ) : null}
-            <Field label="First Name">
+            <Field label={t("editor.name_section.field.first")}>
               <input
                 className="input"
                 value={form.first_name}
-                onChange={(event) => updateFormField("first_name", event.target.value)}
+                onChange={(event) =>
+                  updateFormField("first_name", event.target.value)
+                }
               />
             </Field>
             {isOptionalFieldVisible("middle_name") ? (
-              <Field label="Middle Name">
+              <Field label={t("editor.name_section.field.middle")}>
                 <input
                   className="input"
                   value={form.middle_name}
@@ -65,33 +71,39 @@ export default function ContactEditorNameSection({
                 />
               </Field>
             ) : null}
-            <Field label="Last Name">
+            <Field label={t("editor.name_section.field.last")}>
               <input
                 className="input"
                 value={form.last_name}
-                onChange={(event) => updateFormField("last_name", event.target.value)}
+                onChange={(event) =>
+                  updateFormField("last_name", event.target.value)
+                }
               />
             </Field>
             {isOptionalFieldVisible("suffix") ? (
-              <Field label="Suffix">
+              <Field label={t("editor.name_section.field.suffix")}>
                 <input
                   className="input"
                   value={form.suffix}
-                  onChange={(event) => updateFormField("suffix", event.target.value)}
+                  onChange={(event) =>
+                    updateFormField("suffix", event.target.value)
+                  }
                 />
               </Field>
             ) : null}
             {isOptionalFieldVisible("nickname") ? (
-              <Field label="Nickname">
+              <Field label={t("editor.name_section.field.nickname")}>
                 <input
                   className="input"
                   value={form.nickname}
-                  onChange={(event) => updateFormField("nickname", event.target.value)}
+                  onChange={(event) =>
+                    updateFormField("nickname", event.target.value)
+                  }
                 />
               </Field>
             ) : null}
             {isOptionalFieldVisible("maiden_name") ? (
-              <Field label="Maiden Name">
+              <Field label={t("editor.name_section.field.maiden_name")}>
                 <input
                   className="input"
                   value={form.maiden_name}
@@ -102,7 +114,7 @@ export default function ContactEditorNameSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("phonetic_first_name") ? (
-              <Field label="Phonetic First Name">
+              <Field label={t("editor.name_section.field.phonetic_first_name")}>
                 <input
                   className="input"
                   value={form.phonetic_first_name}
@@ -113,7 +125,7 @@ export default function ContactEditorNameSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("phonetic_last_name") ? (
-              <Field label="Phonetic Last Name">
+              <Field label={t("editor.name_section.field.phonetic_last_name")}>
                 <input
                   className="input"
                   value={form.phonetic_last_name}

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Contact Editor Hide Field Modal.
@@ -12,6 +13,7 @@ export default function ContactEditorHideFieldModal({
   onCancel,
   onResolve,
 }) {
+  const { t } = useTranslation("contacts");
   if (!pendingHideFieldId) {
     return null;
   }
@@ -20,11 +22,10 @@ export default function ContactEditorHideFieldModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="surface w-full max-w-md rounded-2xl p-5">
         <h3 className="text-base font-semibold text-app-strong">
-          Hide {pendingHideFieldLabel}?
+          {t("editor.hide_field_modal.title", { pendingHideFieldLabel })}
         </h3>
         <p className="mt-2 text-sm text-app-muted">
-          This field currently has data. Keep the value hidden or clear it
-          before hiding the field.
+          {t("editor.hide_field_modal.description")}
         </p>
         <div className="mt-4 flex flex-wrap justify-end gap-2">
           <button
@@ -32,17 +33,17 @@ export default function ContactEditorHideFieldModal({
             type="button"
             onClick={onCancel}
           >
-            Cancel
+            {t("editor.hide_field_modal.cancel")}
           </button>
           <button
             className="btn-outline btn-outline-sm"
             type="button"
             onClick={() => onResolve(false)}
           >
-            Keep Hidden Value
+            {t("editor.hide_field_modal.keep_hidden_value")}
           </button>
           <button className="btn" type="button" onClick={() => onResolve(true)}>
-            Clear and Hide
+            {t("editor.hide_field_modal.clear_and_hide")}
           </button>
         </div>
       </div>

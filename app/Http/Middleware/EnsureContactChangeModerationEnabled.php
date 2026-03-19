@@ -19,7 +19,7 @@ class EnsureContactChangeModerationEnabled
     public function handle(Request $request, Closure $next): Response
     {
         if (! $this->settings->isContactChangeModerationEnabled()) {
-            abort(403, 'Review queue is currently disabled by admins.');
+            abort(403, __('contacts.review_queue_disabled_by_admins'));
         }
 
         return $next($request);

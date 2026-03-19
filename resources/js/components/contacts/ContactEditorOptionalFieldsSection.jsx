@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Contact Editor Optional Fields Section component.
@@ -20,13 +21,16 @@ export default function ContactEditorOptionalFieldsSection({
   hideOptionalField,
   OPTIONAL_CONTACT_FIELDS,
 }) {
+  const { t } = useTranslation("contacts");
   return (
     <section className="rounded-2xl border border-dashed border-app-accent-edge bg-app-surface p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-accent">
-          Add Optional Field
+          {t("editor.optional_field_section.label")}
         </h3>
-        <span className="text-xs text-app-faint">Customize this form as needed</span>
+        <span className="text-xs text-app-faint">
+          {t("editor.optional_field_section.description")}
+        </span>
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <div className="relative w-full max-w-xs">
@@ -57,8 +61,8 @@ export default function ContactEditorOptionalFieldsSection({
             }}
             placeholder={
               hiddenOptionalFields.length === 0
-                ? "All optional fields added"
-                : "Search optional fields..."
+                ? t("editor.optional_field_section.all_added")
+                : t("editor.optional_field_section.search")
             }
             disabled={hiddenOptionalFields.length === 0}
             role="combobox"
@@ -73,7 +77,7 @@ export default function ContactEditorOptionalFieldsSection({
             >
               {filteredHiddenOptionalFields.length === 0 ? (
                 <p className="px-2 py-2 text-sm text-app-faint">
-                  No matching optional fields.
+                  {t("editor.optional_field_section.no_matching")}
                 </p>
               ) : (
                 filteredHiddenOptionalFields.map((field) => {
@@ -109,12 +113,14 @@ export default function ContactEditorOptionalFieldsSection({
           onClick={addSelectedOptionalField}
           disabled={!fieldToAdd}
         >
-          Add Field
+          {t("editor.optional_field_section.add_field")}
         </button>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {visibleOptionalFields.length === 0 ? (
-          <p className="text-sm text-app-faint">Optional fields are hidden by default.</p>
+          <p className="text-sm text-app-faint">
+            {t("editor.optional_field_section.hidden_by_default")}
+          </p>
         ) : (
           visibleOptionalFields.map((fieldId) => {
             const fieldMeta = OPTIONAL_CONTACT_FIELDS.find(
@@ -128,7 +134,9 @@ export default function ContactEditorOptionalFieldsSection({
                 type="button"
                 onClick={() => hideOptionalField(fieldId)}
               >
-                Hide {fieldMeta?.label ?? fieldId}
+                {t("editor.optional_field_section.hide_field", {
+                  pendingHideFieldLabel: fieldMeta?.label ?? fieldId,
+                })}
               </button>
             );
           })

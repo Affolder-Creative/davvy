@@ -7,6 +7,7 @@ use App\Services\DavRequestContext;
 use App\Services\PrincipalUriService;
 use App\Services\Security\AppPasswordService;
 use App\Services\Security\TwoFactorSettingsService;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
@@ -32,13 +33,13 @@ class LaravelAuthBackend extends AbstractBasic
         $userpass = $auth->getCredentials();
 
         if (! $userpass) {
-            return [false, "No 'Authorization: Basic' header found. Either the client didn't send one, or the server is misconfigured"];
+            return [false, __('dav.no_basic_authorization_header_found')];
         }
 
         $user = $this->resolveUser($userpass[0], $userpass[1]);
 
         if (! $user) {
-            return [false, 'Username or password was incorrect'];
+            return [false, __('dav.username_or_password_incorrect')];
         }
 
         return [true, $this->principalUriService->uriForUser($user)];
@@ -69,6 +70,7 @@ class LaravelAuthBackend extends AbstractBasic
 
         if ($this->appPasswords->verifyAndTouch($user, $password)) {
             $this->context->setAuthenticatedUser($user);
+            $this->applyUserLocale($user);
 
             return $user;
         }
@@ -82,6 +84,7 @@ class LaravelAuthBackend extends AbstractBasic
         }
 
         $this->context->setAuthenticatedUser($user);
+        $this->applyUserLocale($user);
 
         return $user;
     }
@@ -92,5 +95,18 @@ class LaravelAuthBackend extends AbstractBasic
     private function shouldRequireAppPassword(User $user): bool
     {
         return $user->hasTwoFactorEnabled() || $this->twoFactorSettings->isSetupRequired($user);
+    }
+
+    /**
+     * Apply the authenticated user's locale for DAV request messaging.
+     */
+    private function applyUserLocale(User $user): void
+    {
+        $locale = strtolower(trim((string) ($user->locale ?? '')));
+        if ($locale === '') {
+            return;
+        }
+
+        App::setLocale($locale);
     }
 }

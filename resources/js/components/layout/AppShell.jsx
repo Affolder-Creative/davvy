@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 /**
@@ -15,6 +16,7 @@ export default function AppShell({
   ThemeControl,
   SponsorshipLinkIcon,
 }) {
+  const { t } = useTranslation("shell");
   const navigate = useNavigate();
   const location = useLocation();
   const onAdminPage = location.pathname === "/admin";
@@ -114,17 +116,17 @@ export default function AppShell({
           <div>
             <Link className="block" to="/">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-app-accent">
-                Davvy
+                {t("brand")}
               </p>
             </Link>
             <Link className="block" to="/">
               <h1 className="text-2xl font-bold text-app-strong">
-                CalDAV + CardDAV Manager
+                {t("subtitle")}
               </h1>
             </Link>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
               <p className="text-sm text-app-muted">
-                Signed in as {auth.user.email}
+                {t("signed_in_as", { email: auth.user.email })}
               </p>
             </div>
           </div>
@@ -134,14 +136,14 @@ export default function AppShell({
                 className={`${location.pathname === "/" ? "tab tab-active" : "tab"} shrink-0`}
                 to="/"
               >
-                Dashboard
+                {t("tabs.dashboard")}
               </Link>
               {auth.contactManagementEnabled ? (
                 <Link
                   className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} shrink-0`}
                   to="/contacts"
                 >
-                  Contacts
+                  {t("tabs.contacts")}
                 </Link>
               ) : null}
               {auth.contactChangeModerationEnabled ? (
@@ -149,7 +151,7 @@ export default function AppShell({
                   className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex shrink-0 items-center gap-1.5`}
                   to="/review-queue"
                 >
-                  <span>Review Queue</span>
+                  <span>{t("tabs.review_queue")}</span>
                   {reviewQueueCount > 0 ? (
                     <span className="rounded-full border border-app-accent-edge bg-app-surface px-2 py-0.5 text-[10px] font-semibold leading-none text-app-accent">
                       {reviewQueueCountLabel}
@@ -164,9 +166,9 @@ export default function AppShell({
                 type="button"
                 onClick={() => setMobileAccountMenuOpen((current) => !current)}
                 aria-expanded={mobileAccountMenuOpen}
-                aria-label="Toggle account menu"
+                aria-label={t("account.toggle_menu")}
               >
-                <span>Account</span>
+                <span>{t("account.label")}</span>
                 <svg
                   aria-hidden="true"
                   className={`h-4 w-4 transition-transform ${
@@ -213,8 +215,8 @@ export default function AppShell({
                       }
                       to="/admin"
                       onClick={() => setMobileAccountMenuOpen(false)}
-                      aria-label="Open Admin Control Center"
-                      title="Open Admin Control Center"
+                      aria-label={t("admin.open_control_center")}
+                      title={t("admin.open_control_center")}
                     >
                       <svg
                         aria-hidden="true"
@@ -229,7 +231,7 @@ export default function AppShell({
                         <path d="M12 3l7 3v6c0 4.4-2.8 8.2-7 9-4.2-.8-7-4.6-7-9V6l7-3z" />
                         <path d="M9.5 12.5l1.7 1.7 3.3-3.6" />
                       </svg>
-                      <span>Admin Control Center</span>
+                      <span>{t("admin.control_center")}</span>
                     </Link>
                   ) : null}
                   <button
@@ -237,7 +239,7 @@ export default function AppShell({
                     type="button"
                     onClick={logout}
                   >
-                    Sign Out
+                    {t("actions.sign_out")}
                   </button>
                 </div>
               ) : null}
@@ -251,8 +253,8 @@ export default function AppShell({
                       : "btn-outline btn-outline-sm admin-cta group"
                   }
                   to="/admin"
-                  aria-label="Open Admin Control Center"
-                  title="Open Admin Control Center"
+                  aria-label={t("admin.open_control_center")}
+                  title={t("admin.open_control_center")}
                 >
                   <svg
                     aria-hidden="true"
@@ -267,7 +269,7 @@ export default function AppShell({
                     <path d="M12 3l7 3v6c0 4.4-2.8 8.2-7 9-4.2-.8-7-4.6-7-9V6l7-3z" />
                     <path d="M9.5 12.5l1.7 1.7 3.3-3.6" />
                   </svg>
-                  <span>Admin Control Center</span>
+                  <span>{t("admin.control_center")}</span>
                   {onAdminPage ? null : (
                     <svg
                       aria-hidden="true"
@@ -288,8 +290,8 @@ export default function AppShell({
               <Link
                 className={`${location.pathname === "/profile" ? "tab tab-active" : "tab"} min-w-0 inline-flex items-center gap-1.5`}
                 to="/profile"
-                aria-label="Profile"
-                title="Profile"
+                aria-label={t("tabs.profile")}
+                title={t("tabs.profile")}
               >
                 <span className="max-w-24 truncate sm:max-w-36">
                   {auth.user.name}
@@ -309,7 +311,7 @@ export default function AppShell({
                 </svg>
               </Link>
               <button className="btn-outline" onClick={logout}>
-                Sign Out
+                {t("actions.sign_out")}
               </button>
             </div>
           </nav>
@@ -342,7 +344,7 @@ export default function AppShell({
             >
               <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
             </svg>
-            <span>Sponsor</span>
+            <span>{t("sponsor.button")}</span>
           </button>
         ) : null}
         <ThemeControl
@@ -363,7 +365,7 @@ export default function AppShell({
           <button
             type="button"
             className="absolute inset-0 bg-black/50"
-            aria-label="Close sponsor links"
+            aria-label={t("sponsor.close_links")}
             onClick={() => setSponsorModalOpen(false)}
           />
           <div className="surface relative mx-auto mt-[10vh] w-full max-w-md rounded-2xl p-5 shadow-2xl">
@@ -373,10 +375,10 @@ export default function AppShell({
                   id="sponsor-modal-title"
                   className="text-lg font-semibold text-app-strong"
                 >
-                  Support Davvy
+                  {t("sponsor.title")}
                 </h3>
                 <p className="mt-1 text-sm text-app-muted">
-                  Pick a link below to sponsor the project.
+                  {t("sponsor.subtitle")}
                 </p>
               </div>
               <button
@@ -384,7 +386,7 @@ export default function AppShell({
                 className="btn-outline btn-outline-sm"
                 onClick={() => setSponsorModalOpen(false)}
               >
-                Close
+                {t("sponsor.close")}
               </button>
             </div>
             <div className="mt-4 grid gap-2">
