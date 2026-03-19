@@ -18,6 +18,9 @@
     "na": "n/a",
     "unknown": "Unknown"
   },
+  "meta": {
+    "appTitle": "Davvy - CalDAV + CardDAV Manager"
+  },
   "states": {
     "loadingApp": "Loading Davvy..."
   }

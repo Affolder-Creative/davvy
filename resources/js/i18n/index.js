@@ -27,6 +27,9 @@ import esQueue from "./locales/es/queue.json";
 import esAdmin from "./locales/es/admin.json";
 import esProfile from "./locales/es/profile.json";
 
+const APP_TITLE_KEY = "meta.appTitle";
+let titleSyncBound = false;
+
 export const I18N_NAMESPACES = [
   "common",
   "auth",
@@ -61,6 +64,20 @@ const resources = {
   },
 };
 
+function setDocumentTitle(locale) {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  const nextTitle = i18n.t(APP_TITLE_KEY, {
+    ns: "common",
+    lng: locale,
+    defaultValue: document.title || "Davvy",
+  });
+
+  document.title = String(nextTitle || document.title || "Davvy");
+}
+
 function resolveInitialLocale() {
   for (const candidate of currentLocaleFallbackChain()) {
     const locale = normalizeLocale(candidate, {
@@ -93,6 +110,13 @@ if (!i18n.isInitialized) {
   });
 }
 
+if (!titleSyncBound) {
+  i18n.on("languageChanged", (language) => {
+    setDocumentTitle(language);
+  });
+  titleSyncBound = true;
+}
+
 export function setI18nLocale(locale, {
   supportedLocales = SUPPORTED_LOCALES,
   fallbackLocale = FALLBACK_LOCALE,
@@ -103,6 +127,7 @@ export function setI18nLocale(locale, {
   });
 
   setDocumentLocale(normalized);
+  setDocumentTitle(normalized);
   persistLocale(normalized);
 
   if (i18n.resolvedLanguage === normalized) {

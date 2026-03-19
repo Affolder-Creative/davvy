@@ -6,6 +6,7 @@ describe("i18n locale synchronization", () => {
     window.localStorage.clear();
     await i18n.changeLanguage("en");
     document.documentElement.lang = "en";
+    document.title = "";
   });
 
   it("normalizes and applies locale to i18n, document, and storage", async () => {
@@ -18,6 +19,7 @@ describe("i18n locale synchronization", () => {
 
     expect(i18n.resolvedLanguage).toBe("es");
     expect(document.documentElement.lang).toBe("es");
+    expect(document.title).toBe("Davvy - Administrador de CalDAV + CardDAV");
     expect(window.localStorage.getItem("davvy.locale")).toBe("es");
   });
 
@@ -31,6 +33,7 @@ describe("i18n locale synchronization", () => {
 
     expect(i18n.resolvedLanguage).toBe("en");
     expect(document.documentElement.lang).toBe("en");
+    expect(document.title).toBe("Davvy - CalDAV + CardDAV Manager");
     expect(window.localStorage.getItem("davvy.locale")).toBe("en");
   });
 });
