@@ -138,6 +138,11 @@ export const RELATED_LABEL_OPTIONS = [
   },
 ];
 
+/**
+ * Canonical relationship tokens used for matching/sync logic across frontend
+ * and backend/vCard services. These are not user-facing strings and should
+ * remain stable English-like identifiers (not localized).
+ */
 const RELATED_LABEL_DERIVED_VALUES = new Set([
   "spouse",
   "husband",
@@ -190,19 +195,58 @@ const RELATED_LABEL_DERIVED_VALUES = new Set([
 ]);
 
 const RELATED_LABEL_DISPLAY_OVERRIDES = {
-  parent_in_law: "Parent-in-Law",
-  father_in_law: "Father-in-Law",
-  mother_in_law: "Mother-in-Law",
-  child_in_law: "Child-in-Law",
-  son_in_law: "Son-in-Law",
-  daughter_in_law: "Daughter-in-Law",
-  sibling_in_law: "Sibling-in-Law",
-  brother_in_law: "Brother-in-Law",
-  sister_in_law: "Sister-in-Law",
-  aunt_uncle: "Aunt/Uncle",
-  niece_nephew: "Niece/Nephew",
-  grandpa: "Grandpa",
-  grandma: "Grandma",
+  parent_in_law: {
+    labelKey: "field_labels.related_derived.parent_in_law",
+    fallback: "Parent-in-Law",
+  },
+  father_in_law: {
+    labelKey: "field_labels.related_derived.father_in_law",
+    fallback: "Father-in-Law",
+  },
+  mother_in_law: {
+    labelKey: "field_labels.related_derived.mother_in_law",
+    fallback: "Mother-in-Law",
+  },
+  child_in_law: {
+    labelKey: "field_labels.related_derived.child_in_law",
+    fallback: "Child-in-Law",
+  },
+  son_in_law: {
+    labelKey: "field_labels.related_derived.son_in_law",
+    fallback: "Son-in-Law",
+  },
+  daughter_in_law: {
+    labelKey: "field_labels.related_derived.daughter_in_law",
+    fallback: "Daughter-in-Law",
+  },
+  sibling_in_law: {
+    labelKey: "field_labels.related_derived.sibling_in_law",
+    fallback: "Sibling-in-Law",
+  },
+  brother_in_law: {
+    labelKey: "field_labels.related_derived.brother_in_law",
+    fallback: "Brother-in-Law",
+  },
+  sister_in_law: {
+    labelKey: "field_labels.related_derived.sister_in_law",
+    fallback: "Sister-in-Law",
+  },
+  aunt_uncle: {
+    labelKey: "field_labels.related_derived.aunt_uncle",
+    fallback: "Aunt/Uncle",
+  },
+  niece_nephew: {
+    labelKey: "field_labels.related_derived.niece_nephew",
+    fallback: "Niece/Nephew",
+  },
+  grandpa: {
+    labelKey: "field_labels.related_derived.grandpa",
+    fallback: "Grandpa",
+  },
+  grandma: {
+    labelKey: "field_labels.related_derived.grandma",
+    fallback: "Grandma",
+  },
 };
 
 export const IM_LABEL_OPTIONS = [
@@ -350,25 +394,31 @@ export function buildLabelOptions(baseOptions, savedCustomLabels = []) {
 function formatRelatedLabelOptionLabel(value) {
   const normalized = normalizeLabelValue(value);
   if (!normalized) {
-    return "";
+    return { label: "" };
   }
 
   if (RELATED_LABEL_DISPLAY_OVERRIDES[normalized]) {
-    return RELATED_LABEL_DISPLAY_OVERRIDES[normalized];
+    const displayOverride = RELATED_LABEL_DISPLAY_OVERRIDES[normalized];
+    return {
+      ...displayOverride,
+      label: displayOverride.fallback,
+    };
   }
 
-  return normalized
-    .split(/[\s_-]+/)
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  return {
+    label: normalized
+      .split(/[\s_-]+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
+  };
 }
 
 /**
  * Derives additional related-name label options from existing contact data.
  *
  * @param {unknown} contacts
- * @returns {Array<{value: string, label: string}>}
+ * @returns {Array<{value: string, label?: string, labelKey?: string, fallback?: string}>}
  */
 export function buildDerivedRelatedLabelOptions(contacts) {
   if (!Array.isArray(contacts) || contacts.length === 0) {
@@ -407,7 +457,7 @@ export function buildDerivedRelatedLabelOptions(contacts) {
     )
     .map((value) => ({
       value,
-      label: formatRelatedLabelOptionLabel(value),
+      ...formatRelatedLabelOptionLabel(value),
     }));
 }
 

@@ -91,6 +91,21 @@
       "other": "Other",
       "custom": "Custom..."
     },
+    "related_derived": {
+      "parent_in_law": "Parent-in-Law",
+      "father_in_law": "Father-in-Law",
+      "mother_in_law": "Mother-in-Law",
+      "child_in_law": "Child-in-Law",
+      "son_in_law": "Son-in-Law",
+      "daughter_in_law": "Daughter-in-Law",
+      "sibling_in_law": "Sibling-in-Law",
+      "brother_in_law": "Brother-in-Law",
+      "sister_in_law": "Sister-in-Law",
+      "aunt_uncle": "Aunt/Uncle",
+      "niece_nephew": "Niece/Nephew",
+      "grandpa": "Grandpa",
+      "grandma": "Grandma"
+    },
     "im": {
       "home": "Home",
       "work": "Work",

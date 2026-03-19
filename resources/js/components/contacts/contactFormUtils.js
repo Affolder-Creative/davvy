@@ -1,20 +1,84 @@
 export const OPTIONAL_CONTACT_FIELDS = [
-  { id: "prefix", label: "Prefix" },
-  { id: "middle_name", label: "Middle Name" },
-  { id: "suffix", label: "Suffix" },
-  { id: "nickname", label: "Nickname" },
-  { id: "maiden_name", label: "Maiden Name" },
-  { id: "phonetic_first_name", label: "Phonetic First Name" },
-  { id: "phonetic_last_name", label: "Phonetic Last Name" },
-  { id: "phonetic_company", label: "Phonetic Company" },
-  { id: "department", label: "Department" },
-  { id: "pronouns_custom", label: "Custom Pronouns" },
-  { id: "ringtone", label: "Ringtone" },
-  { id: "text_tone", label: "Text Tone" },
-  { id: "verification_code", label: "Verification Code" },
-  { id: "profile", label: "Profile" },
-  { id: "instant_messages", label: "Instant Message" },
-  { id: "dates", label: "Date" },
+  {
+    id: "prefix",
+    labelKey: "editor.name_section.field.prefix",
+    fallback: "Prefix",
+  },
+  {
+    id: "middle_name",
+    labelKey: "editor.name_section.field.middle",
+    fallback: "Middle Name",
+  },
+  {
+    id: "suffix",
+    labelKey: "editor.name_section.field.suffix",
+    fallback: "Suffix",
+  },
+  {
+    id: "nickname",
+    labelKey: "editor.name_section.field.nickname",
+    fallback: "Nickname",
+  },
+  {
+    id: "maiden_name",
+    labelKey: "editor.name_section.field.maiden_name",
+    fallback: "Maiden Name",
+  },
+  {
+    id: "phonetic_first_name",
+    labelKey: "editor.name_section.field.phonetic_first_name",
+    fallback: "Phonetic First Name",
+  },
+  {
+    id: "phonetic_last_name",
+    labelKey: "editor.name_section.field.phonetic_last_name",
+    fallback: "Phonetic Last Name",
+  },
+  {
+    id: "phonetic_company",
+    labelKey: "editor.work_section.field.phonetic_company",
+    fallback: "Phonetic Company",
+  },
+  {
+    id: "department",
+    labelKey: "editor.work_section.field.department",
+    fallback: "Department",
+  },
+  {
+    id: "pronouns_custom",
+    labelKey: "editor.personal_section.field.pronouns_custom",
+    fallback: "Custom Pronouns",
+  },
+  {
+    id: "ringtone",
+    labelKey: "editor.personal_section.field.ringtone",
+    fallback: "Ringtone",
+  },
+  {
+    id: "text_tone",
+    labelKey: "editor.personal_section.field.text_tone",
+    fallback: "Text Tone",
+  },
+  {
+    id: "verification_code",
+    labelKey: "editor.personal_section.field.verification_code",
+    fallback: "Verification Code",
+  },
+  {
+    id: "profile",
+    labelKey: "editor.personal_section.field.profile",
+    fallback: "Profile",
+  },
+  {
+    id: "instant_messages",
+    labelKey: "editor.communication_section.field.instant_message.title",
+    fallback: "Instant Message",
+  },
+  {
+    id: "dates",
+    labelKey: "editor.date_editor.title",
+    fallback: "Date",
+  },
 ];
 
 /**

@@ -22,6 +22,19 @@ export default function ContactEditorOptionalFieldsSection({
   OPTIONAL_CONTACT_FIELDS,
 }) {
   const { t } = useTranslation("contacts");
+  const fieldLabel = (field) => {
+    if (typeof field?.resolvedLabel === "string" && field.resolvedLabel !== "") {
+      return field.resolvedLabel;
+    }
+
+    if (typeof field?.labelKey === "string" && field.labelKey.trim() !== "") {
+      return t(field.labelKey, {
+        defaultValue: field?.fallback ?? field?.label ?? field?.id ?? "",
+      });
+    }
+
+    return String(field?.label ?? field?.fallback ?? field?.id ?? "");
+  };
   return (
     <section className="rounded-2xl border border-dashed border-app-accent-edge bg-app-surface p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -95,11 +108,11 @@ export default function ContactEditorOptionalFieldsSection({
                       onMouseDown={(event) => {
                         event.preventDefault();
                         setFieldToAdd(field.id);
-                        setFieldSearchTerm(field.label);
+                        setFieldSearchTerm(fieldLabel(field));
                         setFieldPickerOpen(false);
                       }}
                     >
-                      {field.label}
+                      {fieldLabel(field)}
                     </button>
                   );
                 })
@@ -135,7 +148,7 @@ export default function ContactEditorOptionalFieldsSection({
                 onClick={() => hideOptionalField(fieldId)}
               >
                 {t("editor.optional_field_section.hide_field", {
-                  pendingHideFieldLabel: fieldMeta?.label ?? fieldId,
+                  pendingHideFieldLabel: fieldLabel(fieldMeta) || fieldId,
                 })}
               </button>
             );

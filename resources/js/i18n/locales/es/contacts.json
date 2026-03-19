@@ -91,6 +91,21 @@
       "other": "Otro",
       "custom": "Personalizado..."
     },
+    "related_derived": {
+      "parent_in_law": "Suegro/a",
+      "father_in_law": "Suegro",
+      "mother_in_law": "Suegra",
+      "child_in_law": "Yerno/Nuera",
+      "son_in_law": "Yerno",
+      "daughter_in_law": "Nuera",
+      "sibling_in_law": "Cuñado/a",
+      "brother_in_law": "Cuñado",
+      "sister_in_law": "Cuñada",
+      "aunt_uncle": "Tío/Tía",
+      "niece_nephew": "Sobrino/a",
+      "grandpa": "Abuelo",
+      "grandma": "Abuela"
+    },
     "im": {
       "home": "Casa",
       "work": "Trabajo",

@@ -38,14 +38,14 @@ export default function LabeledValueEditor({
     [title],
   );
   const optionLabel = (option) => {
-    if (typeof option?.label === "string" && option.label.trim() !== "") {
-      return option.label;
-    }
-
     if (typeof option?.labelKey === "string" && option.labelKey.trim() !== "") {
       return t(option.labelKey, {
         defaultValue: option?.fallback ?? option?.value ?? "",
       });
+    }
+
+    if (typeof option?.label === "string" && option.label.trim() !== "") {
+      return option.label;
     }
 
     return option?.fallback ?? option?.value ?? "";

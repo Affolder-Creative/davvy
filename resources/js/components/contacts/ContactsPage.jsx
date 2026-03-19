@@ -52,6 +52,18 @@ export default function ContactsPage({
 }) {
   const { t } = useTranslation("contacts");
   const navigate = useNavigate();
+  const getOptionalFieldLabel = React.useCallback(
+    (field) => {
+      if (typeof field?.labelKey === "string" && field.labelKey.trim() !== "") {
+        return t(field.labelKey, {
+          defaultValue: field?.fallback ?? field?.label ?? field?.id ?? "",
+        });
+      }
+
+      return String(field?.label ?? field?.fallback ?? field?.id ?? "");
+    },
+    [t],
+  );
   const [mobilePanel, setMobilePanel] = React.useState("contacts");
   const {
     loading,
@@ -111,6 +123,7 @@ export default function ContactsPage({
     extractError,
     createEmptyContactForm,
     OPTIONAL_CONTACT_FIELDS,
+    getOptionalFieldLabel,
     createContactSectionOpenState,
     normalizePositiveInt,
     buildSavedCustomLabelsByField,
