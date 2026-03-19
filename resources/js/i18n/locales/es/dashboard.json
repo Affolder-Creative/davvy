@@ -1,62 +1,62 @@
 {
   "errors": {
     "load": "No se pudieron cargar los datos del panel.",
-    "update_share_status": "No se pudo actualizar el estado de compartición.",
-    "rename_resource": "No se pudo renombrar el recurso.",
-    "create_calendar": "No se pudo crear el calendario.",
-    "create_address_book": "No se pudo crear la libreta de direcciones.",
-    "save_share": "No se pudo guardar la asignación de compartición.",
-    "remove_share": "No se pudo quitar la asignación de compartición.",
-    "export_calendars": "No se pudieron exportar los calendarios.",
-    "export_calendar": "No se pudo exportar el calendario.",
-    "export_address_books": "No se pudieron exportar las libretas de direcciones.",
-    "export_address_book": "No se pudo exportar la libreta de direcciones.",
-    "apple_compat": "No se pudieron actualizar los ajustes de compatibilidad de Apple.",
+    "updateShareStatus": "No se pudo actualizar el estado de compartición.",
+    "renameResource": "No se pudo renombrar el recurso.",
+    "createCalendar": "No se pudo crear el calendario.",
+    "createAddressBook": "No se pudo crear la libreta de direcciones.",
+    "saveShare": "No se pudo guardar la asignación de compartición.",
+    "removeShare": "No se pudo quitar la asignación de compartición.",
+    "exportCalendars": "No se pudieron exportar los calendarios.",
+    "exportCalendar": "No se pudo exportar el calendario.",
+    "exportAddressBooks": "No se pudieron exportar las libretas de direcciones.",
+    "exportAddressBook": "No se pudo exportar la libreta de direcciones.",
+    "appleCompat": "No se pudieron actualizar los ajustes de compatibilidad de Apple.",
     "milestones": "No se pudieron actualizar los ajustes de cumpleaños/aniversarios."
   },
-  "loading_resources": "Cargando recursos...",
-  "share_status": {
+  "loadingResources": "Cargando recursos...",
+  "shareStatus": {
     "shared": "{{name}} ahora está compartido.",
     "unshared": "{{name}} ya no está compartido."
   },
   "overview": {
-    "endpoint_title": "Punto de conexión DAV",
-    "endpoint_helper": "Usa esta URL en la configuración de conexión del cliente.",
-    "principal_title": "Principal",
-    "principal_helper": "La autodetección puede resolver esto automáticamente.",
-    "role_title": "Rol",
-    "role_helper": "Los administradores pueden gestionar usuarios y compartir entre usuarios."
+    "endpointTitle": "Punto de conexión DAV",
+    "endpointHelper": "Usa esta URL en la configuración de conexión del cliente.",
+    "principalTitle": "Principal",
+    "principalHelper": "La autodetección puede resolver esto automáticamente.",
+    "roleTitle": "Rol",
+    "roleHelper": "Los administradores pueden gestionar usuarios y compartir entre usuarios."
   },
   "resources": {
-    "your_calendars": "Tus calendarios",
-    "create_calendar": "Crear calendario",
-    "your_address_books": "Tus libretas de direcciones",
-    "create_address_book": "Crear libreta de direcciones",
-    "export_all": "Exportar todo"
+    "yourCalendars": "Tus calendarios",
+    "createCalendar": "Crear calendario",
+    "yourAddressBooks": "Tus libretas de direcciones",
+    "createAddressBook": "Crear libreta de direcciones",
+    "exportAll": "Exportar todo"
   },
-  "resource_panel": {
-    "display_name": "Nombre para mostrar",
+  "resourcePanel": {
+    "displayName": "Nombre para mostrar",
     "sharable": "Compartible",
-    "no_owned": "Todavía no hay recursos propios.",
+    "noOwned": "Todavía no hay recursos propios.",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "edit_name_for": "Editar nombre de {{name}}",
-    "export_item": "Exportar {{name}}",
+    "editNameFor": "Editar nombre de {{name}}",
+    "exportItem": "Exportar {{name}}",
     "default": "(predeterminado)",
-    "shared_with_you": "Compartido contigo",
-    "no_shared": "No hay recursos compartidos.",
+    "sharedWithYou": "Compartido contigo",
+    "noShared": "No hay recursos compartidos.",
     "owner": "Propietario: {{name}} ({{email}})",
     "scope": {
       "owned": "Propio",
       "shared": "Compartido"
     },
-    "cancel_editing_calendar_name": "Cancelar la edición del nombre del calendario {{label}}",
-    "save_calendar_name": "Guardar el nombre del calendario {{label}}",
-    "reset_calendar_name": "Restablecer el nombre del calendario {{label}} al valor predeterminado",
-    "rename_calendar": "Renombrar el calendario {{label}}",
+    "cancelEditingCalendarName": "Cancelar la edición del nombre del calendario {{label}}",
+    "saveCalendarName": "Guardar el nombre del calendario {{label}}",
+    "resetCalendarName": "Restablecer el nombre del calendario {{label}} al valor predeterminado",
+    "renameCalendar": "Renombrar el calendario {{label}}",
     "saving": "Guardando..."
   },
-  "milestone_calendars": {
+  "milestoneCalendars": {
     "expand": "Expandir calendarios de hitos",
     "collapse": "Contraer calendarios de hitos",
     "title": "Calendarios de hitos",
@@ -65,33 +65,33 @@
     "configure": "Configurar",
     "hide": "Ocultar",
     "birthdays": "Cumpleaños",
-    "birthdays_fallback": "Cumpleaños de {{name}}",
+    "birthdaysFallback": "Cumpleaños de {{name}}",
     "anniversaries": "Aniversarios",
-    "anniversaries_fallback": "Aniversarios de {{name}}"
+    "anniversariesFallback": "Aniversarios de {{name}}"
   },
   "sharing": {
     "title": "Comparte tus recursos",
     "subtitle": "Concede acceso de solo lectura, editor o admin para recursos que posees y marcaste como compartibles. El acceso admin incluye derechos de eliminación de la colección.",
-    "resource_calendar": "Calendario",
-    "resource_address_book": "Libreta de direcciones",
-    "select_sharable_resource": "Selecciona recurso compartible",
-    "select_user": "Selecciona usuario",
-    "perm_read_only": "General (solo lectura)",
-    "perm_editor": "Edición completa (sin eliminar)",
-    "perm_admin": "Admin (edición completa + eliminar)",
+    "resourceCalendar": "Calendario",
+    "resourceAddressBook": "Libreta de direcciones",
+    "selectSharableResource": "Selecciona recurso compartible",
+    "selectUser": "Selecciona usuario",
+    "permReadOnly": "General (solo lectura)",
+    "permEditor": "Edición completa (sin eliminar)",
+    "permAdmin": "Admin (edición completa + eliminar)",
     "share": "Compartir",
-    "no_outgoing": "Aún no hay comparticiones salientes.",
-    "shared_with": "Compartido con: {{name}} ({{email}})",
+    "noOutgoing": "Aún no hay comparticiones salientes.",
+    "sharedWith": "Compartido con: {{name}} ({{email}})",
     "revoke": "Revocar"
   },
-  "apple_compat": {
+  "appleCompat": {
     "title": "Compatibilidad con Contactos de Apple",
     "subtitle": "Desactivado por defecto. Refleja libretas seleccionadas en tu libreta principal para que clientes macOS e iOS puedan verlas.",
     "target": "Destino de espejo: {{name}} (/{{uri}})",
-    "missing_target": "No se encontró una libreta predeterminada de Contactos para tu cuenta.",
+    "missingTarget": "No se encontró una libreta predeterminada de Contactos para tu cuenta.",
     "enable": "Habilitar espejo de compatibilidad con Apple",
-    "sources_title": "Libretas de origen para reflejar",
-    "no_sources": "No hay libretas propias/compartidas elegibles disponibles.",
+    "sourcesTitle": "Libretas de origen para reflejar",
+    "noSources": "No hay libretas propias/compartidas elegibles disponibles.",
     "save": "Guardar ajustes de compatibilidad de Apple"
   }
 }

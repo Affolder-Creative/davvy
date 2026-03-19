@@ -4,9 +4,9 @@
     "approve": "No se pudo aprobar la solicitud.",
     "deny": "No se pudo rechazar la solicitud.",
     "bulk": "No se pudo procesar la acción masiva.",
-    "resolved_payload_json": "El payload resuelto debe ser JSON válido.",
-    "resolved_address_ids_json": "Los IDs de libreta resueltos deben ser JSON válido.",
-    "resolved_address_ids_array": "Los IDs de libreta resueltos deben ser un arreglo de enteros positivos."
+    "resolvedPayloadJson": "El payload resuelto debe ser JSON válido.",
+    "resolvedAddressIdsJson": "Los IDs de libreta resueltos deben ser JSON válido.",
+    "resolvedAddressIdsArray": "Los IDs de libreta resueltos deben ser un arreglo de enteros positivos."
   },
   "notice": {
     "approved": "Solicitud aprobada.",
@@ -20,42 +20,42 @@
   },
   "title": "Cola de revisión de cambios de contacto",
   "subtitle": "Revisa cambios en cola antes de aplicarlos a los contactos.",
-  "approve_all": "Aprobar todo ({{count}})",
-  "deny_all": "Rechazar todo ({{count}})",
+  "approveAll": "Aprobar todo ({{count}})",
+  "denyAll": "Rechazar todo ({{count}})",
   "filters": {
     "open": "Abiertas",
     "pending": "Pendientes",
-    "manual_merge_needed": "Fusión manual necesaria",
+    "manualMergeNeeded": "Fusión manual necesaria",
     "history": "Historial",
     "all": "Todas",
-    "all_operations": "Todas las operaciones",
+    "allOperations": "Todas las operaciones",
     "updates": "Actualizaciones",
     "deletes": "Eliminaciones",
-    "search_placeholder": "Buscar por contacto/solicitante...",
+    "searchPlaceholder": "Buscar por contacto/solicitante...",
     "refresh": "Actualizar"
   },
   "loading": "Cargando cola de revisión...",
   "empty": "No hay solicitudes en cola para este filtro.",
   "card": {
     "group": "Grupo",
-    "unnamed_contact": "Contacto sin nombre",
+    "unnamedContact": "Contacto sin nombre",
     "status": "Estado",
     "requested": "Solicitado",
-    "edit_approve": "Editar y aprobar",
+    "editApprove": "Editar y aprobar",
     "approve": "Aprobar",
     "deny": "Rechazar",
     "requester": "Solicitante",
-    "approval_owner": "Propietario de aprobación",
+    "approvalOwner": "Propietario de aprobación",
     "source": "Origen",
     "reviewer": "Revisor",
-    "not_reviewed": "Aún sin revisar",
-    "changed_fields": "Campos cambiados"
+    "notReviewed": "Aún sin revisar",
+    "changedFields": "Campos cambiados"
   },
   "modal": {
     "title": "Editar solicitud #{{id}} antes de aprobar",
     "subtitle": "Ajusta payload/IDs de libreta y luego aprueba esta solicitud en cola.",
-    "resolved_payload": "JSON de payload resuelto",
-    "resolved_address_ids": "Arreglo JSON de IDs de libreta resueltos",
+    "resolvedPayload": "JSON de payload resuelto",
+    "resolvedAddressIds": "Arreglo JSON de IDs de libreta resueltos",
     "cancel": "Cancelar",
     "approve": "Guardar ediciones y aprobar",
     "approving": "Aprobando..."
@@ -63,7 +63,7 @@
   "status": {
     "pending": "Pendiente",
     "approved": "Aprobada (esperando a otros)",
-    "manual_merge_needed": "Fusión manual necesaria",
+    "manualMergeNeeded": "Fusión manual necesaria",
     "applied": "Aplicada",
     "denied": "Rechazada"
   },

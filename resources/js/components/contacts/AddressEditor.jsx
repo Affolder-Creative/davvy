@@ -93,20 +93,20 @@ export default function AddressEditor({
     <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          {t("editor.address_editor.title")}
+          {t("editor.addressEditor.title")}
         </h3>
         <button
           className="btn-outline btn-outline-sm"
           type="button"
           onClick={addRow}
         >
-          {t("editor.address_editor.add_address")}
+          {t("editor.addressEditor.addAddress")}
         </button>
       </div>
       <div className="mt-3 space-y-3">
         {safeRows.length === 0 ? (
           <p className="text-sm text-app-faint">
-            {t("editor.address_editor.no_addresses")}
+            {t("editor.addressEditor.noAddresses")}
           </p>
         ) : (
           safeRows.map((row, index) => {
@@ -130,7 +130,7 @@ export default function AddressEditor({
                     data-row-controls-mobile
                   >
                     <RowReorderControls
-                      rowLabel={t("editor.address_editor.address")}
+                      rowLabel={t("editor.addressEditor.address")}
                       rowGroup={rowGroup}
                       rowIndex={index}
                       rowCount={safeRows.length}
@@ -164,14 +164,14 @@ export default function AddressEditor({
                     onChange={(event) =>
                       updateRow(index, "street", event.target.value)
                     }
-                    placeholder={t("editor.address_editor.street_placeholder")}
+                    placeholder={t("editor.addressEditor.streetPlaceholder")}
                   />
                   <div
                     className="hidden self-center md:block"
                     data-row-controls-desktop
                   >
                     <RowReorderControls
-                      rowLabel={t("editor.address_editor.address")}
+                      rowLabel={t("editor.addressEditor.address")}
                       rowGroup={rowGroup}
                       rowIndex={index}
                       rowCount={safeRows.length}
@@ -193,7 +193,7 @@ export default function AddressEditor({
                       updateRow(index, "custom_label", event.target.value)
                     }
                     placeholder={t(
-                      "editor.address_editor.custom_label_placeholder",
+                      "editor.addressEditor.customLabelPlaceholder",
                     )}
                   />
                 ) : null}
@@ -204,7 +204,7 @@ export default function AddressEditor({
                     onChange={(event) =>
                       updateRow(index, "city", event.target.value)
                     }
-                    placeholder={t("editor.address_editor.city_placeholder")}
+                    placeholder={t("editor.addressEditor.cityPlaceholder")}
                   />
                   <input
                     className="input"
@@ -212,7 +212,7 @@ export default function AddressEditor({
                     onChange={(event) =>
                       updateRow(index, "state", event.target.value)
                     }
-                    placeholder={t("editor.address_editor.state_placeholder")}
+                    placeholder={t("editor.addressEditor.statePlaceholder")}
                   />
                   <input
                     className="input"
@@ -220,7 +220,7 @@ export default function AddressEditor({
                     onChange={(event) =>
                       updateRow(index, "postal_code", event.target.value)
                     }
-                    placeholder={t("editor.address_editor.zip_placeholder")}
+                    placeholder={t("editor.addressEditor.zipPlaceholder")}
                   />
                   <input
                     className="input"
@@ -228,7 +228,7 @@ export default function AddressEditor({
                     onChange={(event) =>
                       updateRow(index, "country", event.target.value)
                     }
-                    placeholder={t("editor.address_editor.country_placeholder")}
+                    placeholder={t("editor.addressEditor.countryPlaceholder")}
                   />
                 </div>
               </div>

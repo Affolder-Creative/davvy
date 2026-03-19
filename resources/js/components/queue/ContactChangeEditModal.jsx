@@ -35,14 +35,14 @@ export default function ContactChangeEditModal({
         </p>
 
         <div className="mt-4 grid gap-3">
-          <Field label={t("modal.resolved_payload")}>
+          <Field label={t("modal.resolvedPayload")}>
             <textarea
               className="input min-h-[14rem] font-mono text-xs"
               value={payloadText}
               onChange={(event) => onPayloadTextChange(event.target.value)}
             />
           </Field>
-          <Field label={t("modal.resolved_address_ids")}>
+          <Field label={t("modal.resolvedAddressIds")}>
             <textarea
               className="input min-h-[6rem] font-mono text-xs"
               value={addressBookIdsText}

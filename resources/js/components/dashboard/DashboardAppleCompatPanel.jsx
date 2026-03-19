@@ -19,10 +19,10 @@ export default function DashboardAppleCompatPanel({
   return (
     <section className="surface mt-6 rounded-3xl p-6">
       <h2 className="text-xl font-semibold text-app-strong">
-        {t("apple_compat.title")}
+        {t("appleCompat.title")}
       </h2>
       <p className="mt-1 text-sm text-app-muted">
-        {t("apple_compat.subtitle", {
+        {t("appleCompat.subtitle", {
           target: appleCompat.target_display_name,
         })}{" "}
         (<code>{appleCompat.target_display_name}</code>)
@@ -30,14 +30,14 @@ export default function DashboardAppleCompatPanel({
 
       {appleCompat.target_address_book_id ? (
         <p className="mt-2 text-xs text-app-faint">
-          {t("apple_compat.target", {
+          {t("appleCompat.target", {
             name: appleCompat.target_display_name,
             uri: appleCompat.target_address_book_uri,
           })}
         </p>
       ) : (
         <p className="mt-2 text-xs text-app-danger">
-          {t("apple_compat.missing_target")}
+          {t("appleCompat.missingTarget")}
         </p>
       )}
 
@@ -54,16 +54,16 @@ export default function DashboardAppleCompatPanel({
             }
             disabled={!appleCompat.target_address_book_id}
           />
-          {t("apple_compat.enable")}
+          {t("appleCompat.enable")}
         </label>
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-app-strong">
-            {t("apple_compat.sources_title")}
+            {t("appleCompat.sourcesTitle")}
           </p>
           {appleCompat.source_options.length === 0 ? (
             <p className="text-sm text-app-faint">
-              {t("apple_compat.no_sources")}
+              {t("appleCompat.noSources")}
             </p>
           ) : (
             appleCompat.source_options.map((option) => {
@@ -107,8 +107,8 @@ export default function DashboardAppleCompatPanel({
                     </span>
                     <span className="block text-xs text-app-faint">
                       {option.scope === "owned"
-                        ? t("resource_panel.scope.owned")
-                        : t("resource_panel.scope.shared")}{" "}
+                        ? t("resourcePanel.scope.owned")
+                        : t("resourcePanel.scope.shared")}{" "}
                       •{" "}
                       {option.owner_name} ({option.owner_email})
                     </span>
@@ -125,7 +125,7 @@ export default function DashboardAppleCompatPanel({
             type="submit"
             disabled={!appleCompat.target_address_book_id}
           >
-            {t("apple_compat.save")}
+            {t("appleCompat.save")}
           </button>
         </div>
       </form>

@@ -43,7 +43,7 @@ export default function InfoCard({
     copyState === "copied"
       ? t("copy.copied")
       : copyState === "failed"
-        ? t("copy.copy_failed")
+        ? t("copy.copyFailed")
         : "";
   const copyTooltipTone = copyState === "failed" ? "bg-red-700" : "bg-teal-700";
 
@@ -58,8 +58,8 @@ export default function InfoCard({
             type="button"
             onClick={() => void copyValue()}
             className="w-full rounded-md text-left text-base font-bold text-app-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-            aria-label={t("copy.aria_copy", { value: title })}
-            title={t("copy.click_to_copy")}
+            aria-label={t("copy.ariaCopy", { value: title })}
+            title={t("copy.clickToCopy")}
           >
             <span className="break-all">{value}</span>
           </button>

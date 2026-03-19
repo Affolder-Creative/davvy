@@ -248,7 +248,7 @@ export function formatAdminTimestamp(value) {
 
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
-    return i18n.t("labels.invalid_timestamp", {
+    return i18n.t("labels.invalidTimestamp", {
       ns: "admin",
       defaultValue: "Invalid timestamp",
     });

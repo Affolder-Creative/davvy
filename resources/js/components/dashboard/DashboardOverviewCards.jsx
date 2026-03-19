@@ -13,20 +13,20 @@ export default function DashboardOverviewCards({ auth, InfoCard }) {
   return (
     <section className="fade-up grid gap-4 md:grid-cols-3">
       <InfoCard
-        title={t("overview.endpoint_title")}
+        title={t("overview.endpointTitle")}
         value={`${window.location.origin}/dav`}
-        helper={t("overview.endpoint_helper")}
+        helper={t("overview.endpointHelper")}
         copyable
       />
       <InfoCard
-        title={t("overview.principal_title")}
+        title={t("overview.principalTitle")}
         value={`principals/${auth.user.id}`}
-        helper={t("overview.principal_helper")}
+        helper={t("overview.principalHelper")}
       />
       <InfoCard
-        title={t("overview.role_title")}
+        title={t("overview.roleTitle")}
         value={auth.user.role.toUpperCase()}
-        helper={t("overview.role_helper")}
+        helper={t("overview.roleHelper")}
       />
     </section>
   );

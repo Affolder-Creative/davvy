@@ -26,10 +26,10 @@ export default function ContactEditorNameSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            {t("editor.name_section.label")}
+            {t("editor.nameSection.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            {t("editor.name_section.description")}
+            {t("editor.nameSection.description")}
           </span>
         </span>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
@@ -41,7 +41,7 @@ export default function ContactEditorNameSection({
         <div className="mt-3 px-1 pb-1">
           <div className="grid gap-3 md:grid-cols-3">
             {isOptionalFieldVisible("prefix") ? (
-              <Field label={t("editor.name_section.field.prefix")}>
+              <Field label={t("editor.nameSection.field.prefix")}>
                 <input
                   className="input"
                   value={form.prefix}
@@ -51,7 +51,7 @@ export default function ContactEditorNameSection({
                 />
               </Field>
             ) : null}
-            <Field label={t("editor.name_section.field.first")}>
+            <Field label={t("editor.nameSection.field.first")}>
               <input
                 className="input"
                 value={form.first_name}
@@ -61,7 +61,7 @@ export default function ContactEditorNameSection({
               />
             </Field>
             {isOptionalFieldVisible("middle_name") ? (
-              <Field label={t("editor.name_section.field.middle")}>
+              <Field label={t("editor.nameSection.field.middle")}>
                 <input
                   className="input"
                   value={form.middle_name}
@@ -71,7 +71,7 @@ export default function ContactEditorNameSection({
                 />
               </Field>
             ) : null}
-            <Field label={t("editor.name_section.field.last")}>
+            <Field label={t("editor.nameSection.field.last")}>
               <input
                 className="input"
                 value={form.last_name}
@@ -81,7 +81,7 @@ export default function ContactEditorNameSection({
               />
             </Field>
             {isOptionalFieldVisible("suffix") ? (
-              <Field label={t("editor.name_section.field.suffix")}>
+              <Field label={t("editor.nameSection.field.suffix")}>
                 <input
                   className="input"
                   value={form.suffix}
@@ -92,7 +92,7 @@ export default function ContactEditorNameSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("nickname") ? (
-              <Field label={t("editor.name_section.field.nickname")}>
+              <Field label={t("editor.nameSection.field.nickname")}>
                 <input
                   className="input"
                   value={form.nickname}
@@ -103,7 +103,7 @@ export default function ContactEditorNameSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("maiden_name") ? (
-              <Field label={t("editor.name_section.field.maiden_name")}>
+              <Field label={t("editor.nameSection.field.maidenName")}>
                 <input
                   className="input"
                   value={form.maiden_name}
@@ -114,7 +114,7 @@ export default function ContactEditorNameSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("phonetic_first_name") ? (
-              <Field label={t("editor.name_section.field.phonetic_first_name")}>
+              <Field label={t("editor.nameSection.field.phoneticFirstName")}>
                 <input
                   className="input"
                   value={form.phonetic_first_name}
@@ -125,7 +125,7 @@ export default function ContactEditorNameSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("phonetic_last_name") ? (
-              <Field label={t("editor.name_section.field.phonetic_last_name")}>
+              <Field label={t("editor.nameSection.field.phoneticLastName")}>
                 <input
                   className="input"
                   value={form.phonetic_last_name}

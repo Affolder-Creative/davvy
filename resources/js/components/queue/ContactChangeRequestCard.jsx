@@ -37,7 +37,7 @@ export default function ContactChangeRequestCard({
             #{row.id} • {t("card.group")} {row.group_uuid}
           </p>
           <h3 className="text-lg font-semibold text-app-strong">
-            {row.contact?.display_name || t("card.unnamed_contact")} (
+            {row.contact?.display_name || t("card.unnamedContact")} (
             {queueOperationLabel(row.operation)})
           </h3>
           <p className="mt-1 text-xs text-app-muted">
@@ -55,7 +55,7 @@ export default function ContactChangeRequestCard({
                   disabled={submitting}
                   onClick={() => onOpenEdit(row)}
                 >
-                  {t("card.edit_approve")}
+                  {t("card.editApprove")}
                 </button>
               ) : null}
               <button
@@ -84,20 +84,20 @@ export default function ContactChangeRequestCard({
           {t("card.requester")}: {row.requester?.name} ({row.requester?.email})
         </p>
         <p>
-          {t("card.approval_owner")}: {row.approval_owner?.name} ({row.approval_owner?.email})
+          {t("card.approvalOwner")}: {row.approval_owner?.name} ({row.approval_owner?.email})
         </p>
         <p>{t("card.source")}: {row.source}</p>
         <p>
           {t("card.reviewer")}:{" "}
           {row.reviewer
             ? `${row.reviewer.name} (${row.reviewer.email})`
-            : t("card.not_reviewed")}
+            : t("card.notReviewed")}
         </p>
       </div>
 
       {Array.isArray(row.changed_fields) && row.changed_fields.length > 0 ? (
         <p className="mt-2 text-xs text-app-muted">
-          {t("card.changed_fields")}: {row.changed_fields.join(", ")}
+          {t("card.changedFields")}: {row.changed_fields.join(", ")}
         </p>
       ) : null}
 

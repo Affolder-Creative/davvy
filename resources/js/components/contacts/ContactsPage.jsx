@@ -155,8 +155,8 @@ export default function ContactsPage({
   }, [selectedContactId]);
 
   const translatedEditorPanelLabel = form.id
-    ? t("mobile.editor_edit")
-    : t("mobile.editor_new_edit");
+    ? t("mobile.editorEdit")
+    : t("mobile.editorNewEdit");
 
   return (
     <AppShell auth={auth} theme={theme}>
@@ -169,19 +169,19 @@ export default function ContactsPage({
       ) : null}
       <section className="fade-up grid gap-4 md:grid-cols-3">
         <InfoCard
-          title={t("summary.contacts_title")}
+          title={t("summary.contactsTitle")}
           value={String(contacts.length)}
-          helper={t("summary.contacts_helper")}
+          helper={t("summary.contactsHelper")}
         />
         <InfoCard
-          title={t("summary.books_title")}
+          title={t("summary.booksTitle")}
           value={String(addressBooks.length)}
-          helper={t("summary.books_helper")}
+          helper={t("summary.booksHelper")}
         />
         <InfoCard
-          title={t("summary.user_title")}
+          title={t("summary.userTitle")}
           value={auth.user.name}
-          helper={t("summary.user_helper")}
+          helper={t("summary.userHelper")}
         />
       </section>
 
@@ -198,7 +198,7 @@ export default function ContactsPage({
           <div
             className="mt-6 grid grid-cols-2 gap-1 rounded-2xl border border-app-edge bg-app-surface p-1 lg:hidden"
             role="tablist"
-            aria-label={t("mobile.view_aria")}
+            aria-label={t("mobile.viewAria")}
           >
             <button
               type="button"

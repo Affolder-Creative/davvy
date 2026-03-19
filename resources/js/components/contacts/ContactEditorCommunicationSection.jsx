@@ -28,10 +28,10 @@ export default function ContactEditorCommunicationSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            {t("editor.communication_section.label")}
+            {t("editor.communicationSection.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            {t("editor.communication_section.description")}
+            {t("editor.communicationSection.description")}
           </span>
         </span>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
@@ -42,24 +42,24 @@ export default function ContactEditorCommunicationSection({
       {isOpen ? (
         <div className="mt-3 space-y-4 px-1 pb-1">
           <LabeledValueEditor
-            title={t("editor.communication_section.field.phone.title")}
+            title={t("editor.communicationSection.field.phone.title")}
             rows={form.phones}
             setRows={(rows) => updateFormField("phones", rows)}
             labelOptions={labelOptions.phones}
             valuePlaceholder={t(
-              "editor.communication_section.field.phone.placeholder",
+              "editor.communicationSection.field.phone.placeholder",
             )}
-            addLabel={t("editor.communication_section.field.phone.add_label")}
+            addLabel={t("editor.communicationSection.field.phone.addLabel")}
           />
           <LabeledValueEditor
-            title={t("editor.communication_section.field.email.title")}
+            title={t("editor.communicationSection.field.email.title")}
             rows={form.emails}
             setRows={(rows) => updateFormField("emails", rows)}
             labelOptions={labelOptions.emails}
             valuePlaceholder={t(
-              "editor.communication_section.field.email.placeholder",
+              "editor.communicationSection.field.email.placeholder",
             )}
-            addLabel={t("editor.communication_section.field.email.add_label")}
+            addLabel={t("editor.communicationSection.field.email.addLabel")}
           />
           <AddressEditor
             rows={form.addresses}
@@ -67,28 +67,28 @@ export default function ContactEditorCommunicationSection({
             labelOptions={labelOptions.addresses}
           />
           <LabeledValueEditor
-            title={t("editor.communication_section.field.url.title")}
+            title={t("editor.communicationSection.field.url.title")}
             rows={form.urls}
             setRows={(rows) => updateFormField("urls", rows)}
             labelOptions={labelOptions.urls}
             valuePlaceholder={t(
-              "editor.communication_section.field.url.placeholder",
+              "editor.communicationSection.field.url.placeholder",
             )}
-            addLabel={t("editor.communication_section.field.url.add_label")}
+            addLabel={t("editor.communicationSection.field.url.addLabel")}
           />
           {isOptionalFieldVisible("instant_messages") ? (
             <LabeledValueEditor
               title={t(
-                "editor.communication_section.field.instant_message.title",
+                "editor.communicationSection.field.instantMessage.title",
               )}
               rows={form.instant_messages}
               setRows={(rows) => updateFormField("instant_messages", rows)}
               labelOptions={labelOptions.instant_messages}
               valuePlaceholder={t(
-                "editor.communication_section.field.instant_message.placeholder",
+                "editor.communicationSection.field.instantMessage.placeholder",
               )}
               addLabel={t(
-                "editor.communication_section.field.instant_message.add_label",
+                "editor.communicationSection.field.instantMessage.addLabel",
               )}
             />
           ) : null}

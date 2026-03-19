@@ -181,20 +181,20 @@ export default function RelatedNameEditor({
     <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          {t("editor.related_name_editor.title")}
+          {t("editor.relatedNameEditor.title")}
         </h3>
         <button
           className="btn-outline btn-outline-sm"
           type="button"
           onClick={addRow}
         >
-          {t("editor.related_name_editor.add_related_name")}
+          {t("editor.relatedNameEditor.addRelatedName")}
         </button>
       </div>
       <div className="mt-3 space-y-3">
         {safeRows.length === 0 ? (
           <p className="text-sm text-app-faint">
-            {t("editor.related_name_editor.no_related_names")}
+            {t("editor.relatedNameEditor.noRelatedNames")}
           </p>
         ) : (
           safeRows.map((row, index) => {
@@ -234,7 +234,7 @@ export default function RelatedNameEditor({
                     data-row-controls-mobile
                   >
                     <RowReorderControls
-                      rowLabel={t("editor.related_name_editor.title")}
+                      rowLabel={t("editor.relatedNameEditor.title")}
                       rowGroup={rowGroup}
                       rowIndex={index}
                       rowCount={safeRows.length}
@@ -297,7 +297,7 @@ export default function RelatedNameEditor({
                         }
                       }}
                       placeholder={t(
-                        "editor.related_name_editor.name_placeholder",
+                        "editor.relatedNameEditor.namePlaceholder",
                       )}
                       role="combobox"
                       aria-autocomplete="list"
@@ -312,7 +312,7 @@ export default function RelatedNameEditor({
                         {options.length === 0 ? (
                           <p className="px-2 py-2 text-sm text-app-faint">
                             {t(
-                              "editor.related_name_editor.no_matching_contacts",
+                              "editor.relatedNameEditor.noMatchingContacts",
                             )}
                           </p>
                         ) : (
@@ -345,7 +345,7 @@ export default function RelatedNameEditor({
                     data-row-controls-desktop
                   >
                     <RowReorderControls
-                      rowLabel={t("editor.related_name_editor.title")}
+                      rowLabel={t("editor.relatedNameEditor.title")}
                       rowGroup={rowGroup}
                       rowIndex={index}
                       rowCount={safeRows.length}
@@ -361,7 +361,7 @@ export default function RelatedNameEditor({
                 </div>
                 {selectedContact ? (
                   <p className="mt-1.5 text-[11px] text-app-faint">
-                    {t("editor.related_name_editor.linked_to_contact", {
+                    {t("editor.relatedNameEditor.linkedToContact", {
                       contactId: selectedContact.id,
                     })}
                   </p>
@@ -371,7 +371,7 @@ export default function RelatedNameEditor({
                 !suggestionDismissed ? (
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <p className="text-[11px] text-app-faint">
-                      {t("editor.related_name_editor.match_found", {
+                      {t("editor.relatedNameEditor.matchFound", {
                         name: suggestedContact.display_name,
                       })}
                     </p>
@@ -382,7 +382,7 @@ export default function RelatedNameEditor({
                         selectContactOption(index, suggestedContact)
                       }
                     >
-                      {t("editor.related_name_editor.link")}
+                      {t("editor.relatedNameEditor.link")}
                     </button>
                     <button
                       className="btn-outline btn-outline-sm"
@@ -395,7 +395,7 @@ export default function RelatedNameEditor({
                         )
                       }
                     >
-                      {t("editor.related_name_editor.dismiss")}
+                      {t("editor.relatedNameEditor.dismiss")}
                     </button>
                   </div>
                 ) : null}
@@ -407,7 +407,7 @@ export default function RelatedNameEditor({
                       updateRow(index, { custom_label: event.target.value })
                     }
                     placeholder={t(
-                      "editor.related_name_editor.custom_label_placeholder",
+                      "editor.relatedNameEditor.customLabelPlaceholder",
                     )}
                   />
                 ) : null}

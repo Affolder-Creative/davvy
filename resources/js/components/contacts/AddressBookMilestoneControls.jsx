@@ -150,10 +150,10 @@ export default function AddressBookMilestoneControls({
               <button
                 className="inline-flex h-7 w-7 items-center justify-center rounded text-app-faint transition hover:text-app-base focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                 type="button"
-                aria-label={t("resource_panel.cancel_editing_calendar_name", {
+                aria-label={t("resourcePanel.cancelEditingCalendarName", {
                   label,
                 })}
-                title={t("resource_panel.cancel_editing_calendar_name", {
+                title={t("resourcePanel.cancelEditingCalendarName", {
                   label,
                 })}
                 onClick={() => {
@@ -170,10 +170,10 @@ export default function AddressBookMilestoneControls({
               <button
                 className="inline-flex h-7 w-7 items-center justify-center rounded text-app-accent transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                 type="button"
-                aria-label={t("resource_panel.save_calendar_name", {
+                aria-label={t("resourcePanel.saveCalendarName", {
                   label,
                 })}
-                title={t("resource_panel.save_calendar_name", {
+                title={t("resourcePanel.saveCalendarName", {
                   label,
                 })}
                 onClick={() => saveName(type)}
@@ -195,10 +195,10 @@ export default function AddressBookMilestoneControls({
                   <button
                     type="button"
                     className="inline-flex h-6 w-6 -mr-[0.25rem] items-center justify-center rounded text-app-dim transition hover:text-app-base focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                    aria-label={t("resource_panel.reset_calendar_name", {
+                    aria-label={t("resourcePanel.resetCalendarName", {
                       label,
                     })}
-                    title={t("resource_panel.reset_calendar_name", {
+                    title={t("resourcePanel.resetCalendarName", {
                       label,
                     })}
                     onClick={() => resetName(type)}
@@ -211,10 +211,10 @@ export default function AddressBookMilestoneControls({
               <button
                 type="button"
                 className="inline-flex h-6 w-6 items-center justify-center rounded text-app-dim transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                aria-label={t("resource_panel.rename_calendar", {
+                aria-label={t("resourcePanel.renameCalendar", {
                   label,
                 })}
-                title={t("resource_panel.rename_calendar", {
+                title={t("resourcePanel.renameCalendar", {
                   label,
                 })}
                 onClick={() => setEditingKey(type)}
@@ -226,7 +226,7 @@ export default function AddressBookMilestoneControls({
           )}
           {isSaving ? (
             <span className="shrink-0 text-[11px] text-app-faint">
-              {t("resource_panel.saving")}
+              {t("resourcePanel.saving")}
             </span>
           ) : null}
         </div>
@@ -241,13 +241,13 @@ export default function AddressBookMilestoneControls({
         className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1 text-left transition hover:bg-app-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
         aria-label={
           collapsed
-            ? t("milestone_calendars.expand")
-            : t("milestone_calendars.collapse")
+            ? t("milestoneCalendars.expand")
+            : t("milestoneCalendars.collapse")
         }
         title={
           collapsed
-            ? t("milestone_calendars.expand")
-            : t("milestone_calendars.collapse")
+            ? t("milestoneCalendars.expand")
+            : t("milestoneCalendars.collapse")
         }
         aria-expanded={!collapsed}
         onClick={() => {
@@ -259,20 +259,20 @@ export default function AddressBookMilestoneControls({
       >
         <span>
           <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] leading-tight text-app-base">
-            {t("milestone_calendars.title")}
+            {t("milestoneCalendars.title")}
           </span>
           <span className="block text-[11px] leading-tight text-app-faint">
             {enabledCount === 0
-              ? t("milestone_calendars.off")
-              : t("milestone_calendars.enabled", {
+              ? t("milestoneCalendars.off")
+              : t("milestoneCalendars.enabled", {
                   count: enabledCount,
                 })}
           </span>
         </span>
         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-app-accent">
           {collapsed
-            ? t("milestone_calendars.configure")
-            : t("milestone_calendars.hide")}
+            ? t("milestoneCalendars.configure")
+            : t("milestoneCalendars.hide")}
           <ChevronRightIcon
             className={`h-3.5 w-3.5 transition-transform ${collapsed ? "" : "rotate-90"}`}
           />
@@ -282,17 +282,17 @@ export default function AddressBookMilestoneControls({
         <div className="mt-1 pl-2 divide-y divide-app-edge">
           {renderRow(
             "birthdays",
-            t("milestone_calendars.birthdays"),
+            t("milestoneCalendars.birthdays"),
             birthdaySettings,
-            t("milestone_calendars.birthdays_fallback", {
+            t("milestoneCalendars.birthdaysFallback", {
               name: item.display_name,
             }),
           )}
           {renderRow(
             "anniversaries",
-            t("milestone_calendars.anniversaries"),
+            t("milestoneCalendars.anniversaries"),
             anniversarySettings,
-            t("milestone_calendars.anniversaries_fallback", {
+            t("milestoneCalendars.anniversariesFallback", {
               name: item.display_name,
             }),
           )}

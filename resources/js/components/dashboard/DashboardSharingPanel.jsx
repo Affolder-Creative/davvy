@@ -39,8 +39,8 @@ export default function DashboardSharingPanel({
             })
           }
         >
-          <option value="calendar">{t("sharing.resource_calendar")}</option>
-          <option value="address_book">{t("sharing.resource_address_book")}</option>
+          <option value="calendar">{t("sharing.resourceCalendar")}</option>
+          <option value="address_book">{t("sharing.resourceAddressBook")}</option>
         </select>
         <select
           className="input"
@@ -50,7 +50,7 @@ export default function DashboardSharingPanel({
           }
           required
         >
-          <option value="">{t("sharing.select_sharable_resource")}</option>
+          <option value="">{t("sharing.selectSharableResource")}</option>
           {shareableResourceOptions.map((resource) => (
             <option key={resource.id} value={resource.id}>
               {resource.display_name}
@@ -68,7 +68,7 @@ export default function DashboardSharingPanel({
           }
           required
         >
-          <option value="">{t("sharing.select_user")}</option>
+          <option value="">{t("sharing.selectUser")}</option>
           {targets.map((target) => (
             <option key={target.id} value={target.id}>
               {target.name} ({target.email})
@@ -83,9 +83,9 @@ export default function DashboardSharingPanel({
               setShareForm({ ...shareForm, permission: event.target.value })
             }
           >
-            <option value="read_only">{t("sharing.perm_read_only")}</option>
-            <option value="editor">{t("sharing.perm_editor")}</option>
-            <option value="admin">{t("sharing.perm_admin")}</option>
+            <option value="read_only">{t("sharing.permReadOnly")}</option>
+            <option value="editor">{t("sharing.permEditor")}</option>
+            <option value="admin">{t("sharing.permAdmin")}</option>
           </select>
           <button className="btn" type="submit">
             {t("sharing.share")}
@@ -95,7 +95,7 @@ export default function DashboardSharingPanel({
 
       <div className="mt-5 space-y-2">
         {outgoing.length === 0 ? (
-          <p className="text-sm text-app-faint">{t("sharing.no_outgoing")}</p>
+          <p className="text-sm text-app-faint">{t("sharing.noOutgoing")}</p>
         ) : (
           outgoing.map((share) => (
             <div
@@ -109,7 +109,7 @@ export default function DashboardSharingPanel({
                 <PermissionBadge permission={share.permission} />
               </div>
               <p className="text-app-muted">
-                {t("sharing.shared_with", {
+                {t("sharing.sharedWith", {
                   name: share.shared_with?.name,
                   email: share.shared_with?.email,
                 })}

@@ -1,28 +1,28 @@
 export const PRONOUN_OPTIONS = [
-  { value: "", labelKey: "field_labels.pronouns.not_set", fallback: "Not set" },
+  { value: "", labelKey: "fieldLabels.pronouns.notSet", fallback: "Not set" },
   {
     value: "she/her",
-    labelKey: "field_labels.pronouns.she_her",
+    labelKey: "fieldLabels.pronouns.sheHer",
     fallback: "she/her",
   },
   {
     value: "he/him",
-    labelKey: "field_labels.pronouns.he_him",
+    labelKey: "fieldLabels.pronouns.heHim",
     fallback: "he/him",
   },
   {
     value: "they/them",
-    labelKey: "field_labels.pronouns.they_them",
+    labelKey: "fieldLabels.pronouns.theyThem",
     fallback: "they/them",
   },
   {
     value: "xe/xem",
-    labelKey: "field_labels.pronouns.xe_xem",
+    labelKey: "fieldLabels.pronouns.xeXem",
     fallback: "xe/xem",
   },
   {
     value: "custom",
-    labelKey: "field_labels.pronouns.custom",
+    labelKey: "fieldLabels.pronouns.custom",
     fallback: "Custom...",
   },
 ];

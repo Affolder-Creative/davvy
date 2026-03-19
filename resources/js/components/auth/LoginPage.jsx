@@ -41,7 +41,7 @@ export default function LoginPage({
       auth.setAuth(buildAuthStateFromPayload(data, { user: data.user }));
       navigate("/");
     } catch (err) {
-      setError(extractError(err, t("login.error_sign_in")));
+      setError(extractError(err, t("login.errorSignIn")));
     } finally {
       setSubmitting(false);
     }
@@ -79,13 +79,13 @@ export default function LoginPage({
         </button>
       </form>
       <p className="mt-5 text-sm text-app-muted">
-        {t("login.register_prompt")}{" "}
+        {t("login.registerPrompt")}{" "}
         {auth.registrationEnabled ? (
           <Link to="/register" className="font-semibold text-app-accent">
-            {t("login.register_link")}
+            {t("login.registerLink")}
           </Link>
         ) : (
-          t("login.register_disabled")
+          t("login.registerDisabled")
         )}
       </p>
     </AuthShell>

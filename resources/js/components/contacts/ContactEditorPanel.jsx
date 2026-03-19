@@ -92,7 +92,7 @@ export default function ContactEditorPanel({
 
       {addressBooks.length === 0 ? (
         <p className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          {t("editor.no_address_books")}
+          {t("editor.noAddressBooks")}
         </p>
       ) : null}
 

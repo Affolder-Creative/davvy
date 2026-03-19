@@ -1,82 +1,82 @@
 export const OPTIONAL_CONTACT_FIELDS = [
   {
     id: "prefix",
-    labelKey: "editor.name_section.field.prefix",
+    labelKey: "editor.nameSection.field.prefix",
     fallback: "Prefix",
   },
   {
     id: "middle_name",
-    labelKey: "editor.name_section.field.middle",
+    labelKey: "editor.nameSection.field.middle",
     fallback: "Middle Name",
   },
   {
     id: "suffix",
-    labelKey: "editor.name_section.field.suffix",
+    labelKey: "editor.nameSection.field.suffix",
     fallback: "Suffix",
   },
   {
     id: "nickname",
-    labelKey: "editor.name_section.field.nickname",
+    labelKey: "editor.nameSection.field.nickname",
     fallback: "Nickname",
   },
   {
     id: "maiden_name",
-    labelKey: "editor.name_section.field.maiden_name",
+    labelKey: "editor.nameSection.field.maidenName",
     fallback: "Maiden Name",
   },
   {
     id: "phonetic_first_name",
-    labelKey: "editor.name_section.field.phonetic_first_name",
+    labelKey: "editor.nameSection.field.phoneticFirstName",
     fallback: "Phonetic First Name",
   },
   {
     id: "phonetic_last_name",
-    labelKey: "editor.name_section.field.phonetic_last_name",
+    labelKey: "editor.nameSection.field.phoneticLastName",
     fallback: "Phonetic Last Name",
   },
   {
     id: "phonetic_company",
-    labelKey: "editor.work_section.field.phonetic_company",
+    labelKey: "editor.workSection.field.phoneticCompany",
     fallback: "Phonetic Company",
   },
   {
     id: "department",
-    labelKey: "editor.work_section.field.department",
+    labelKey: "editor.workSection.field.department",
     fallback: "Department",
   },
   {
     id: "pronouns_custom",
-    labelKey: "editor.personal_section.field.pronouns_custom",
+    labelKey: "editor.personalSection.field.pronounsCustom",
     fallback: "Custom Pronouns",
   },
   {
     id: "ringtone",
-    labelKey: "editor.personal_section.field.ringtone",
+    labelKey: "editor.personalSection.field.ringtone",
     fallback: "Ringtone",
   },
   {
     id: "text_tone",
-    labelKey: "editor.personal_section.field.text_tone",
+    labelKey: "editor.personalSection.field.textTone",
     fallback: "Text Tone",
   },
   {
     id: "verification_code",
-    labelKey: "editor.personal_section.field.verification_code",
+    labelKey: "editor.personalSection.field.verificationCode",
     fallback: "Verification Code",
   },
   {
     id: "profile",
-    labelKey: "editor.personal_section.field.profile",
+    labelKey: "editor.personalSection.field.profile",
     fallback: "Profile",
   },
   {
     id: "instant_messages",
-    labelKey: "editor.communication_section.field.instant_message.title",
+    labelKey: "editor.communicationSection.field.instantMessage.title",
     fallback: "Instant Message",
   },
   {
     id: "dates",
-    labelKey: "editor.date_editor.title",
+    labelKey: "editor.dateEditor.title",
     fallback: "Date",
   },
 ];

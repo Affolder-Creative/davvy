@@ -51,7 +51,7 @@ function RouteLoader({ children }) {
   const { t } = useTranslation("common");
 
   return (
-    <Suspense fallback={<FullPageState label={t("loading_app")} />}>
+    <Suspense fallback={<FullPageState label={t("loadingApp")} />}>
       {children}
     </Suspense>
   );
@@ -77,7 +77,7 @@ function App() {
   }, [auth.locale, auth.supportedLocales, auth.fallbackLocale]);
 
   if (auth.loading) {
-    return <FullPageState label={t("loading_app")} />;
+    return <FullPageState label={t("loadingApp")} />;
   }
 
   return (

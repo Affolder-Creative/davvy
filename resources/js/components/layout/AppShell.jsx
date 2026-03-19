@@ -126,7 +126,7 @@ export default function AppShell({
             </Link>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-2">
               <p className="text-sm text-app-muted">
-                {t("signed_in_as", { email: auth.user.email })}
+                {t("signedInAs", { email: auth.user.email })}
               </p>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default function AppShell({
                   className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex shrink-0 items-center gap-1.5`}
                   to="/review-queue"
                 >
-                  <span>{t("tabs.review_queue")}</span>
+                  <span>{t("tabs.reviewQueue")}</span>
                   {reviewQueueCount > 0 ? (
                     <span className="rounded-full border border-app-accent-edge bg-app-surface px-2 py-0.5 text-[10px] font-semibold leading-none text-app-accent">
                       {reviewQueueCountLabel}
@@ -166,7 +166,7 @@ export default function AppShell({
                 type="button"
                 onClick={() => setMobileAccountMenuOpen((current) => !current)}
                 aria-expanded={mobileAccountMenuOpen}
-                aria-label={t("account.toggle_menu")}
+                aria-label={t("account.toggleMenu")}
               >
                 <span>{t("account.label")}</span>
                 <svg
@@ -215,8 +215,8 @@ export default function AppShell({
                       }
                       to="/admin"
                       onClick={() => setMobileAccountMenuOpen(false)}
-                      aria-label={t("admin.open_control_center")}
-                      title={t("admin.open_control_center")}
+                      aria-label={t("admin.openControlCenter")}
+                      title={t("admin.openControlCenter")}
                     >
                       <svg
                         aria-hidden="true"
@@ -231,7 +231,7 @@ export default function AppShell({
                         <path d="M12 3l7 3v6c0 4.4-2.8 8.2-7 9-4.2-.8-7-4.6-7-9V6l7-3z" />
                         <path d="M9.5 12.5l1.7 1.7 3.3-3.6" />
                       </svg>
-                      <span>{t("admin.control_center")}</span>
+                      <span>{t("admin.controlCenter")}</span>
                     </Link>
                   ) : null}
                   <button
@@ -239,7 +239,7 @@ export default function AppShell({
                     type="button"
                     onClick={logout}
                   >
-                    {t("actions.sign_out")}
+                    {t("actions.signOut")}
                   </button>
                 </div>
               ) : null}
@@ -253,8 +253,8 @@ export default function AppShell({
                       : "btn-outline btn-outline-sm admin-cta group"
                   }
                   to="/admin"
-                  aria-label={t("admin.open_control_center")}
-                  title={t("admin.open_control_center")}
+                  aria-label={t("admin.openControlCenter")}
+                  title={t("admin.openControlCenter")}
                 >
                   <svg
                     aria-hidden="true"
@@ -269,7 +269,7 @@ export default function AppShell({
                     <path d="M12 3l7 3v6c0 4.4-2.8 8.2-7 9-4.2-.8-7-4.6-7-9V6l7-3z" />
                     <path d="M9.5 12.5l1.7 1.7 3.3-3.6" />
                   </svg>
-                  <span>{t("admin.control_center")}</span>
+                  <span>{t("admin.controlCenter")}</span>
                   {onAdminPage ? null : (
                     <svg
                       aria-hidden="true"
@@ -311,7 +311,7 @@ export default function AppShell({
                 </svg>
               </Link>
               <button className="btn-outline" onClick={logout}>
-                {t("actions.sign_out")}
+                {t("actions.signOut")}
               </button>
             </div>
           </nav>
@@ -365,7 +365,7 @@ export default function AppShell({
           <button
             type="button"
             className="absolute inset-0 bg-black/50"
-            aria-label={t("sponsor.close_links")}
+            aria-label={t("sponsor.closeLinks")}
             onClick={() => setSponsorModalOpen(false)}
           />
           <div className="surface relative mx-auto mt-[10vh] w-full max-w-md rounded-2xl p-5 shadow-2xl">

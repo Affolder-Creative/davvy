@@ -87,7 +87,7 @@ export default function ResourcePanel({
         <input
           className="input flex-1"
           value={form.display_name}
-          placeholder={t("resource_panel.display_name")}
+          placeholder={t("resourcePanel.displayName")}
           onChange={(event) =>
             setForm({ ...form, display_name: event.target.value })
           }
@@ -101,7 +101,7 @@ export default function ResourcePanel({
               setForm({ ...form, is_sharable: event.target.checked })
             }
           />
-          {t("resource_panel.sharable")}
+          {t("resourcePanel.sharable")}
         </label>
         <button className="btn" type="submit">
           {createLabel}
@@ -110,7 +110,7 @@ export default function ResourcePanel({
 
       <div className="mt-5 space-y-3">
         {items.length === 0 ? (
-          <p className="text-sm text-app-faint">{t("resource_panel.no_owned")}</p>
+          <p className="text-sm text-app-faint">{t("resourcePanel.noOwned")}</p>
         ) : (
           items.map((item) => (
             <div
@@ -130,7 +130,7 @@ export default function ResourcePanel({
                         className="input h-8 flex-1 px-2 py-1 text-sm"
                         value={nameDraft}
                         onChange={(event) => setNameDraft(event.target.value)}
-                        aria-label={t("resource_panel.edit_name_for", {
+                        aria-label={t("resourcePanel.editNameFor", {
                           name: item.display_name,
                         })}
                         required
@@ -141,7 +141,7 @@ export default function ResourcePanel({
                         type="submit"
                         disabled={renamingItemId === item.id}
                       >
-                        {t("resource_panel.save")}
+                        {t("resourcePanel.save")}
                       </button>
                       <button
                         className="btn-outline btn-outline-sm rounded-xl"
@@ -149,7 +149,7 @@ export default function ResourcePanel({
                         onClick={cancelEditing}
                         disabled={renamingItemId === item.id}
                       >
-                        {t("resource_panel.cancel")}
+                        {t("resourcePanel.cancel")}
                       </button>
                     </form>
                   ) : (
@@ -159,17 +159,17 @@ export default function ResourcePanel({
                       </p>
                         {item.is_default ? (
                           <span className="shrink-0 text-xs font-semibold text-app-faint">
-                            {t("resource_panel.default")}
+                            {t("resourcePanel.default")}
                           </span>
                         ) : null}
                       <button
                         className="inline-flex h-5 w-5 items-center justify-center rounded text-app-dim transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                         type="button"
                         onClick={() => startEditing(item)}
-                        aria-label={t("resource_panel.edit_name_for", {
+                        aria-label={t("resourcePanel.editNameFor", {
                           name: item.display_name,
                         })}
-                        title={t("resource_panel.edit_name_for", {
+                        title={t("resourcePanel.editNameFor", {
                           name: item.display_name,
                         })}
                       >
@@ -188,10 +188,10 @@ export default function ResourcePanel({
                     className="btn-outline btn-outline-sm rounded-xl"
                     type="button"
                     onClick={() => void onExportItem(item)}
-                    aria-label={t("resource_panel.export_item", {
+                    aria-label={t("resourcePanel.exportItem", {
                       name: item.display_name,
                     })}
-                    title={t("resource_panel.export_item", {
+                    title={t("resourcePanel.exportItem", {
                       name: item.display_name,
                     })}
                   >
@@ -209,7 +209,7 @@ export default function ResourcePanel({
                         )
                       }
                     />
-                    {t("resource_panel.sharable")}
+                    {t("resourcePanel.sharable")}
                   </label>
                 </div>
               </div>
@@ -225,11 +225,11 @@ export default function ResourcePanel({
 
       <div className="mt-6 border-t border-app-edge pt-4">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          {t("resource_panel.shared_with_you")}
+          {t("resourcePanel.sharedWithYou")}
         </h3>
         <div className="mt-3 space-y-2">
           {sharedItems.length === 0 ? (
-            <p className="text-sm text-app-faint">{t("resource_panel.no_shared")}</p>
+            <p className="text-sm text-app-faint">{t("resourcePanel.noShared")}</p>
           ) : (
             sharedItems.map((item) => (
               <div
@@ -242,7 +242,7 @@ export default function ResourcePanel({
                       {item.display_name}
                     </p>
                     <p className="text-xs text-app-muted">
-                      {t("resource_panel.owner", {
+                      {t("resourcePanel.owner", {
                         name: item.owner_name,
                         email: item.owner_email,
                       })}
@@ -258,10 +258,10 @@ export default function ResourcePanel({
                       className="btn-outline btn-outline-sm rounded-xl"
                       type="button"
                       onClick={() => void onExportItem(item)}
-                      aria-label={t("resource_panel.export_item", {
+                      aria-label={t("resourcePanel.exportItem", {
                         name: item.display_name,
                       })}
-                      title={t("resource_panel.export_item", {
+                      title={t("resourcePanel.exportItem", {
                         name: item.display_name,
                       })}
                     >

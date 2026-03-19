@@ -16,7 +16,7 @@ export default function VerifyEmailPage({
   const token = searchParams.get("token") || "";
   const [status, setStatus] = useState(token ? "verifying" : "error");
   const [message, setMessage] = useState(
-    token ? t("verify_email.verifying") : t("verify_email.missing_token"),
+    token ? t("verifyEmail.verifying") : t("verifyEmail.missingToken"),
   );
 
   if (auth.user) {
@@ -48,7 +48,7 @@ export default function VerifyEmailPage({
 
         setStatus("success");
         setMessage(
-          data?.message || t("verify_email.success"),
+          data?.message || t("verifyEmail.success"),
         );
       } catch (err) {
         if (!active) {
@@ -57,7 +57,7 @@ export default function VerifyEmailPage({
 
         setStatus("error");
         setMessage(
-          extractError(err, t("verify_email.error")),
+          extractError(err, t("verifyEmail.error")),
         );
       }
     };
@@ -73,8 +73,8 @@ export default function VerifyEmailPage({
     <AuthShell
       theme={theme}
       themeControlPlacement="window-bottom-right"
-      title={t("verify_email.title")}
-      subtitle={t("verify_email.subtitle")}
+      title={t("verifyEmail.title")}
+      subtitle={t("verifyEmail.subtitle")}
     >
       <p
         className={
@@ -86,9 +86,9 @@ export default function VerifyEmailPage({
         {message}
       </p>
       <p className="mt-5 text-sm text-app-muted">
-        {t("verify_email.return_to")}{" "}
+        {t("verifyEmail.returnTo")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          {t("verify_email.sign_in")}
+          {t("verifyEmail.signIn")}
         </Link>
       </p>
     </AuthShell>

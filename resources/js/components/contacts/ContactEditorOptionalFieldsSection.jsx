@@ -39,10 +39,10 @@ export default function ContactEditorOptionalFieldsSection({
     <section className="rounded-2xl border border-dashed border-app-accent-edge bg-app-surface p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-accent">
-          {t("editor.optional_field_section.label")}
+          {t("editor.optionalFieldSection.label")}
         </h3>
         <span className="text-xs text-app-faint">
-          {t("editor.optional_field_section.description")}
+          {t("editor.optionalFieldSection.description")}
         </span>
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -74,8 +74,8 @@ export default function ContactEditorOptionalFieldsSection({
             }}
             placeholder={
               hiddenOptionalFields.length === 0
-                ? t("editor.optional_field_section.all_added")
-                : t("editor.optional_field_section.search")
+                ? t("editor.optionalFieldSection.allAdded")
+                : t("editor.optionalFieldSection.search")
             }
             disabled={hiddenOptionalFields.length === 0}
             role="combobox"
@@ -90,7 +90,7 @@ export default function ContactEditorOptionalFieldsSection({
             >
               {filteredHiddenOptionalFields.length === 0 ? (
                 <p className="px-2 py-2 text-sm text-app-faint">
-                  {t("editor.optional_field_section.no_matching")}
+                  {t("editor.optionalFieldSection.noMatching")}
                 </p>
               ) : (
                 filteredHiddenOptionalFields.map((field) => {
@@ -126,13 +126,13 @@ export default function ContactEditorOptionalFieldsSection({
           onClick={addSelectedOptionalField}
           disabled={!fieldToAdd}
         >
-          {t("editor.optional_field_section.add_field")}
+          {t("editor.optionalFieldSection.addField")}
         </button>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {visibleOptionalFields.length === 0 ? (
           <p className="text-sm text-app-faint">
-            {t("editor.optional_field_section.hidden_by_default")}
+            {t("editor.optionalFieldSection.hiddenByDefault")}
           </p>
         ) : (
           visibleOptionalFields.map((fieldId) => {
@@ -147,7 +147,7 @@ export default function ContactEditorOptionalFieldsSection({
                 type="button"
                 onClick={() => hideOptionalField(fieldId)}
               >
-                {t("editor.optional_field_section.hide_field", {
+                {t("editor.optionalFieldSection.hideField", {
                   pendingHideFieldLabel: fieldLabel(fieldMeta) || fieldId,
                 })}
               </button>

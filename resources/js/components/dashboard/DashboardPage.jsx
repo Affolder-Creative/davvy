@@ -105,12 +105,12 @@ export default function DashboardPage({
       await api.patch(url, { is_sharable: next });
       setShareStatusNotice(
         next
-          ? t("share_status.shared", { name: displayName })
-          : t("share_status.unshared", { name: displayName }),
+          ? t("shareStatus.shared", { name: displayName })
+          : t("shareStatus.unshared", { name: displayName }),
       );
       await loadDashboard({ withLoading: false });
     } catch (err) {
-      setError(extractError(err, t("errors.update_share_status")));
+      setError(extractError(err, t("errors.updateShareStatus")));
     }
   };
 
@@ -123,7 +123,7 @@ export default function DashboardPage({
       await api.patch(url, { display_name: displayName });
       await loadDashboard({ withLoading: false });
     } catch (err) {
-      setError(extractError(err, t("errors.rename_resource")));
+      setError(extractError(err, t("errors.renameResource")));
       throw err;
     }
   };
@@ -135,7 +135,7 @@ export default function DashboardPage({
       setCalendarForm({ display_name: "", is_sharable: false });
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, t("errors.create_calendar")));
+      setError(extractError(err, t("errors.createCalendar")));
     }
   };
 
@@ -146,7 +146,7 @@ export default function DashboardPage({
       setBookForm({ display_name: "", is_sharable: false });
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, t("errors.create_address_book")));
+      setError(extractError(err, t("errors.createAddressBook")));
     }
   };
 
@@ -165,7 +165,7 @@ export default function DashboardPage({
       }));
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, t("errors.save_share")));
+      setError(extractError(err, t("errors.saveShare")));
     }
   };
 
@@ -174,7 +174,7 @@ export default function DashboardPage({
       await api.delete(`/api/shares/${shareId}`);
       await loadDashboard();
     } catch (err) {
-      setError(extractError(err, t("errors.remove_share")));
+      setError(extractError(err, t("errors.removeShare")));
     }
   };
 
@@ -196,7 +196,7 @@ export default function DashboardPage({
       await api.patch("/api/address-books/apple-compat", appleCompatForm);
       await loadDashboard({ withLoading: false });
     } catch (err) {
-      setError(extractError(err, t("errors.apple_compat")));
+      setError(extractError(err, t("errors.appleCompat")));
     }
   };
 
@@ -242,14 +242,14 @@ export default function DashboardPage({
           {error}
         </div>
       ) : null}
-      {loading ? <FullPageState label={t("loading_resources")} compact /> : null}
+      {loading ? <FullPageState label={t("loadingResources")} compact /> : null}
 
       {!loading ? (
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <ResourcePanel
-            title={t("resources.your_calendars")}
-            createLabel={t("resources.create_calendar")}
-            exportAllLabel={t("resources.export_all")}
+            title={t("resources.yourCalendars")}
+            createLabel={t("resources.createCalendar")}
+            exportAllLabel={t("resources.exportAll")}
             resourceKind="calendar"
             principalId={auth.user.id}
             items={data.owned.calendars}
@@ -261,14 +261,14 @@ export default function DashboardPage({
               runExport(
                 "/api/exports/calendars",
                 "davvy-calendars.zip",
-                t("errors.export_calendars"),
+                t("errors.exportCalendars"),
               )
             }
             onExportItem={(item) =>
               runExport(
                 `/api/exports/calendars/${item.id}`,
                 `${fileStem(item.display_name, "calendar")}.ics`,
-                t("errors.export_calendar"),
+                t("errors.exportCalendar"),
               )
             }
             onToggle={(id, next, displayName) =>
@@ -279,9 +279,9 @@ export default function DashboardPage({
             }
           />
           <ResourcePanel
-            title={t("resources.your_address_books")}
-            createLabel={t("resources.create_address_book")}
-            exportAllLabel={t("resources.export_all")}
+            title={t("resources.yourAddressBooks")}
+            createLabel={t("resources.createAddressBook")}
+            exportAllLabel={t("resources.exportAll")}
             resourceKind="address-book"
             principalId={auth.user.id}
             items={data.owned.address_books}
@@ -293,14 +293,14 @@ export default function DashboardPage({
               runExport(
                 "/api/exports/address-books",
                 "davvy-address-books.zip",
-                t("errors.export_address_books"),
+                t("errors.exportAddressBooks"),
               )
             }
             onExportItem={(item) =>
               runExport(
                 `/api/exports/address-books/${item.id}`,
                 `${fileStem(item.display_name, "address-book")}.vcf`,
-                t("errors.export_address_book"),
+                t("errors.exportAddressBook"),
               )
             }
             onToggle={(id, next, displayName) =>

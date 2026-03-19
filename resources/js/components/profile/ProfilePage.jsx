@@ -134,7 +134,7 @@ export default function ProfilePage({
       });
       setLocaleSuccess(t("locale.saved"));
     } catch (err) {
-      setLocaleError(extractError(err, t("errors.update_locale")));
+      setLocaleError(extractError(err, t("errors.updateLocale")));
     } finally {
       setLocaleSubmitting(false);
     }
@@ -174,7 +174,7 @@ export default function ProfilePage({
       const { data } = await api.get("/api/auth/app-passwords");
       setAppPasswords(Array.isArray(data?.data) ? data.data : []);
     } catch (err) {
-      setSecurityError(extractError(err, t("errors.load_app_passwords")));
+      setSecurityError(extractError(err, t("errors.loadAppPasswords")));
     } finally {
       setAppPasswordLoading(false);
     }
@@ -199,7 +199,7 @@ export default function ProfilePage({
       await api.patch("/api/auth/password", passwordForm);
       setPasswordSuccess(
         // "Password updated. Use your new password for app login and DAV clients.",
-        t("api.password_success"),
+        t("api.passwordSuccess"),
       );
       setPasswordForm({
         current_password: "",
@@ -207,7 +207,7 @@ export default function ProfilePage({
         password_confirmation: "",
       });
     } catch (err) {
-      setPasswordError(extractError(err, t("errors.update_password")));
+      setPasswordError(extractError(err, t("errors.updatePassword")));
     } finally {
       setPasswordSubmitting(false);
     }
@@ -224,10 +224,10 @@ export default function ProfilePage({
       setBackupCodes([]);
       setSecuritySuccess(
         // "Setup initialized. Scan the QR code and enter a verification code.",
-        t("api.2fa_setup_success"),
+        t("api.2faSetupSuccess"),
       );
     } catch (err) {
-      setSecurityError(extractError(err, t("errors.start_two_factor")));
+      setSecurityError(extractError(err, t("errors.startTwoFactor")));
     } finally {
       setSecurityBusy(false);
     }
@@ -250,16 +250,16 @@ export default function ProfilePage({
       setTwoFactorSetup(null);
       await auth.refreshAuth?.();
       // setSecuritySuccess("Two-factor authentication has been enabled.");
-      setSecuritySuccess(t("api.2fa_enable_success"));
+      setSecuritySuccess(t("api.2faEnableSuccess"));
     } catch (err) {
-      setSecurityError(extractError(err, t("errors.enable_two_factor")));
+      setSecurityError(extractError(err, t("errors.enableTwoFactor")));
     } finally {
       setSecurityBusy(false);
     }
   };
 
   const disableTwoFactor = async () => {
-    if (!window.confirm(t("confirm_disable_2fa"))) {
+    if (!window.confirm(t("confirmDisable2fa"))) {
       return;
     }
 
@@ -278,10 +278,10 @@ export default function ProfilePage({
       await auth.refreshAuth?.();
       setSecuritySuccess(
         // "Two-factor authentication has been disabled and DAV app passwords were revoked.",
-        t("api.2fa_disable_success"),
+        t("api.2faDisableSuccess"),
       );
     } catch (err) {
-      setSecurityError(extractError(err, t("errors.disable_two_factor")));
+      setSecurityError(extractError(err, t("errors.disableTwoFactor")));
     } finally {
       setSecurityBusy(false);
     }
@@ -301,9 +301,9 @@ export default function ProfilePage({
       );
       setTwoFactorActionCode("");
       // setSecuritySuccess("Backup codes regenerated.");
-      setSecuritySuccess(t("api.backup_codes_regenerated"));
+      setSecuritySuccess(t("api.backupCodesRegenerated"));
     } catch (err) {
-      setSecurityError(extractError(err, t("errors.regenerate_codes")));
+      setSecurityError(extractError(err, t("errors.regenerateCodes")));
     } finally {
       setSecurityBusy(false);
     }
@@ -325,9 +325,9 @@ export default function ProfilePage({
       setAppPasswordCode("");
       await loadAppPasswords();
       // setSecuritySuccess("DAV app password created.");
-      setSecuritySuccess(t("api.app_password_created"));
+      setSecuritySuccess(t("api.appPasswordCreated"));
     } catch (err) {
-      setSecurityError(extractError(err, t("errors.create_app_password")));
+      setSecurityError(extractError(err, t("errors.createAppPassword")));
     } finally {
       setSecurityBusy(false);
     }
@@ -346,9 +346,9 @@ export default function ProfilePage({
       });
       await loadAppPasswords();
       // setSecuritySuccess("DAV app password revoked.");
-      setSecuritySuccess(t("api.app_password_revoked"));
+      setSecuritySuccess(t("api.appPasswordRevoked"));
     } catch (err) {
-      setSecurityError(extractError(err, t("errors.revoke_app_password")));
+      setSecurityError(extractError(err, t("errors.revokeAppPassword")));
     } finally {
       setSecurityBusy(false);
     }
@@ -416,16 +416,16 @@ export default function ProfilePage({
 
       <section className="surface mt-6 rounded-3xl p-6">
         <h2 className="text-xl font-semibold text-app-strong">
-          {t("change_password.title")}
+          {t("changePassword.title")}
         </h2>
         <p className="mt-1 text-sm text-app-muted">
-          {t("change_password.description")}
+          {t("changePassword.description")}
         </p>
         <form
           className="mt-4 grid gap-3 md:grid-cols-3"
           onSubmit={changePassword}
         >
-          <Field label={t("change_password.current_label")}>
+          <Field label={t("changePassword.currentLabel")}>
             <input
               className="input"
               type="password"
@@ -439,7 +439,7 @@ export default function ProfilePage({
               required
             />
           </Field>
-          <Field label={t("change_password.new_label")}>
+          <Field label={t("changePassword.newLabel")}>
             <input
               className="input"
               type="password"
@@ -453,7 +453,7 @@ export default function ProfilePage({
               required
             />
           </Field>
-          <Field label={t("change_password.new_label_confirm")}>
+          <Field label={t("changePassword.newLabelConfirm")}>
             <input
               className="input"
               type="password"
@@ -482,8 +482,8 @@ export default function ProfilePage({
           <div className="md:col-span-3 flex flex-wrap items-center gap-2">
             <button className="btn" disabled={passwordSubmitting} type="submit">
               {passwordSubmitting
-                ? t("change_password.updating")
-                : t("change_password.update")}
+                ? t("changePassword.updating")
+                : t("changePassword.update")}
             </button>
           </div>
         </form>
@@ -499,12 +499,12 @@ export default function ProfilePage({
 
         {auth.twoFactorMandated && !auth.twoFactorEnabled ? (
           <p className="mt-3 rounded-xl border border-app-warning-edge bg-app-warning/10 px-3 py-2 text-sm text-app-warning-text">
-            {t("security.2fa_mandated")}
+            {t("security.2faMandated")}
             {/* {graceDeadlineLabel
               ? ` Set up 2FA before ${graceDeadlineLabel}.`
               : ""}*/}
             {graceDeadlineLabel
-              ? t("security.2fa_mandated_with_deadline", {
+              ? t("security.2faMandatedWithDeadline", {
                   deadline: graceDeadlineLabel,
                 })
               : ""}
@@ -513,7 +513,7 @@ export default function ProfilePage({
 
         {auth.twoFactorSetupRequired ? (
           <p className="mt-3 rounded-xl border border-app-danger-edge bg-app-danger/10 px-3 py-2 text-sm text-app-danger">
-            {t("security.2fa_deadline_expired")}
+            {t("security.2faDeadlineExpired")}
           </p>
         ) : null}
 
@@ -526,26 +526,26 @@ export default function ProfilePage({
               disabled={securityBusy}
             >
               {twoFactorSetup
-                ? t("security.2fa_recreate")
-                : t("security.2fa_start")}
+                ? t("security.2faRecreate")
+                : t("security.2faStart")}
             </button>
 
             {twoFactorSetup ? (
               <div className="rounded-2xl border border-app-edge bg-app-surface p-4">
                 <p className="text-sm text-app-muted">
-                  {t("security.2fa_setup_step_1")}
+                  {t("security.2faSetupStep1")}
                 </p>
                 {twoFactorSetup?.otpauth_uri ? (
                   <div className="mt-3 inline-flex rounded-lg border border-app-edge bg-white p-2">
                     <QRCodeSVG
                       value={twoFactorSetup.otpauth_uri}
                       size={176}
-                      title={t("security.2fa_setup_step_1_qr_code_title")}
+                      title={t("security.2faSetupStep1QrCodeTitle")}
                     />
                   </div>
                 ) : null}
                 <p className="mt-3 text-sm text-app-muted">
-                  {t("security.2fa_setup_step_2")}
+                  {t("security.2faSetupStep2")}
                 </p>
                 <code className="mt-1 block break-all rounded-lg border border-app-edge bg-app-panel px-2 py-1 text-sm text-app-strong">
                   {twoFactorSetup.manual_key}
@@ -555,7 +555,7 @@ export default function ProfilePage({
                   className="mt-4 flex flex-wrap items-end gap-2"
                   onSubmit={enableTwoFactor}
                 >
-                  <Field label={t("security.2fa_setup_step_3")}>
+                  <Field label={t("security.2faSetupStep3")}>
                     <input
                       className="input w-44"
                       value={twoFactorCode}
@@ -566,8 +566,8 @@ export default function ProfilePage({
                   </Field>
                   <button className="btn" disabled={securityBusy} type="submit">
                     {securityBusy
-                      ? t("security.2fa_enabling")
-                      : t("security.2fa_enable")}
+                      ? t("security.2faEnabling")
+                      : t("security.2faEnable")}
                   </button>
                 </form>
               </div>
@@ -576,15 +576,15 @@ export default function ProfilePage({
         ) : (
           <div className="mt-4 space-y-4">
             <p className="text-sm text-app-accent">
-              {t("security.2fa_enabled")}
+              {t("security.2faEnabled")}
             </p>
-            <Field label={t("security.2fa_code")}>
+            <Field label={t("security.2faCode")}>
               <input
                 className="input max-w-xs"
                 value={twoFactorActionCode}
                 onChange={(event) => setTwoFactorActionCode(event.target.value)}
                 autoComplete="one-time-code"
-                placeholder={t("security.2fa_code_placeholder")}
+                placeholder={t("security.2faCodePlaceholder")}
               />
             </Field>
             <div className="flex flex-wrap items-center gap-2">
@@ -594,7 +594,7 @@ export default function ProfilePage({
                 onClick={regenerateBackupCodes}
                 disabled={securityBusy || !twoFactorActionCode}
               >
-                {t("security.regenerate_backup_codes")}
+                {t("security.regenerateBackupCodes")}
               </button>
               <button
                 className="btn-outline btn-outline-sm text-app-danger"
@@ -602,7 +602,7 @@ export default function ProfilePage({
                 onClick={disableTwoFactor}
                 disabled={securityBusy || !twoFactorActionCode}
               >
-                {t("security.disable_2fa")}
+                {t("security.disable2fa")}
               </button>
             </div>
           </div>
@@ -612,14 +612,14 @@ export default function ProfilePage({
           <div className="backup-codes-ticket mt-4 rounded-2xl p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-sm font-semibold text-app-strong">
-                {t("security.save_backup_codes")}
+                {t("security.saveBackupCodes")}
               </p>
               <span className="backup-codes-ticket-label">
-                {t("security.shown_once")}
+                {t("security.shownOnce")}
               </span>
             </div>
             <p className="mt-1 text-xs text-app-muted">
-              {t("security.shown_once_description")}
+              {t("security.shownOnceDescription")}
             </p>
             <div className="mt-3">
               <textarea
@@ -627,7 +627,7 @@ export default function ProfilePage({
                 className="input backup-codes-ticket-field min-h-36 resize-y font-mono leading-6"
                 value={backupCodesText}
                 rows={Math.max(4, backupCodes.length)}
-                aria-label={t("security.backup_codes")}
+                aria-label={t("security.backupCodes")}
                 readOnly
                 onFocus={selectAllBackupCodes}
                 onClick={selectAllBackupCodes}
@@ -639,23 +639,23 @@ export default function ProfilePage({
                 type="button"
                 onClick={selectAllBackupCodes}
               >
-                {t("security.select_all")}
+                {t("security.selectAll")}
               </button>
               <button
                 className="btn-outline btn-outline-sm"
                 type="button"
                 onClick={() => void selectAndCopyBackupCodes()}
               >
-                {t("security.copy_all_codes")}
+                {t("security.copyAllCodes")}
               </button>
               {backupCodesCopyState === "copied" ? (
                 <span className="text-xs font-semibold text-app-accent">
-                  {t("security.copied_all_codes")}
+                  {t("security.copiedAllCodes")}
                 </span>
               ) : null}
               {backupCodesCopyState === "failed" ? (
                 <span className="text-xs font-semibold text-app-danger">
-                  {t("security.copy_failed")}
+                  {t("security.copyFailed")}
                 </span>
               ) : null}
             </div>
@@ -665,37 +665,37 @@ export default function ProfilePage({
         {auth.twoFactorEnabled ? (
           <div className="mt-6 rounded-2xl border border-app-edge bg-app-surface p-4">
             <h3 className="text-lg font-semibold text-app-strong">
-              {t("security.app_passwords")}
+              {t("security.appPasswords")}
             </h3>
             <p className="mt-1 text-sm text-app-muted">
-              {t("security.app_passwords_description")}
+              {t("security.appPasswordsDescription")}
             </p>
 
             <form
               className="mt-4 grid gap-3 md:grid-cols-3"
               onSubmit={createAppPassword}
             >
-              <Field label={t("security.app_password_name")}>
+              <Field label={t("security.appPasswordName")}>
                 <input
                   className="input"
                   value={appPasswordName}
                   onChange={(event) => setAppPasswordName(event.target.value)}
-                  placeholder={t("security.app_password_name_placeholder")}
+                  placeholder={t("security.appPasswordNamePlaceholder")}
                   required
                 />
               </Field>
-              <Field label={t("security.app_password_code")}>
+              <Field label={t("security.appPasswordCode")}>
                 <input
                   className="input"
                   value={appPasswordCode}
                   onChange={(event) => setAppPasswordCode(event.target.value)}
-                  placeholder={t("security.app_password_code_placeholder")}
+                  placeholder={t("security.appPasswordCodePlaceholder")}
                   required
                 />
               </Field>
               <div className="flex items-end">
                 <button className="btn" disabled={securityBusy} type="submit">
-                  {t("security.app_password_create")}
+                  {t("security.appPasswordCreate")}
                 </button>
               </div>
             </form>
@@ -703,7 +703,7 @@ export default function ProfilePage({
             {appPasswordPlaintext ? (
               <div className="mt-3 rounded-xl border border-app-warning-edge bg-app-warning/10 p-3">
                 <p className="text-xs uppercase tracking-wide text-app-faint">
-                  {t("security.app_password_code_shown_once")}
+                  {t("security.appPasswordCodeShownOnce")}
                 </p>
                 <code className="mt-1 block break-all text-sm text-app-strong">
                   {appPasswordPlaintext}
@@ -714,11 +714,11 @@ export default function ProfilePage({
             <div className="mt-4 space-y-2">
               {appPasswordLoading ? (
                 <p className="text-sm text-app-muted">
-                  {t("security.app_password_loading")}
+                  {t("security.appPasswordLoading")}
                 </p>
               ) : appPasswords.length === 0 ? (
                 <p className="text-sm text-app-muted">
-                  {t("security.app_password_no_created")}
+                  {t("security.appPasswordNoCreated")}
                 </p>
               ) : (
                 appPasswords.map((appPassword) => (
@@ -736,21 +736,21 @@ export default function ProfilePage({
                         disabled={securityBusy || !appPasswordCode}
                         onClick={() => revokeAppPassword(appPassword.id)}
                       >
-                        {t("security.app_password_revoke")}
+                        {t("security.appPasswordRevoke")}
                       </button>
                     </div>
                     <p className="mt-1 text-xs text-app-faint">
                       {/* Prefix: {appPassword.token_prefix}*/}
-                      {t("security.app_password_prefix", {
+                      {t("security.appPasswordPrefix", {
                         prefix: appPassword.token_prefix,
                       })}
                     </p>
                     <p className="mt-1 text-xs text-app-faint">
                       {/* Last used: {appPassword.last_used_at || "Never"}*/}
-                      {t("security.app_password_last_used", {
+                      {t("security.appPasswordLastUsed", {
                         last_used_at:
                           appPassword.last_used_at ||
-                          t("security.app_password_never_used"),
+                          t("security.appPasswordNeverUsed"),
                       })}
                     </p>
                   </div>

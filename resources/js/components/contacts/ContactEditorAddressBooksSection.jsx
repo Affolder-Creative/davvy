@@ -26,18 +26,18 @@ export default function ContactEditorAddressBooksSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            {t("editor.address_books_section.label")}
+            {t("editor.addressBooksSection.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            {t("editor.address_books_section.description")}
+            {t("editor.addressBooksSection.description")}
           </span>
         </span>
         <span className="flex items-center gap-2">
           <span className="rounded-full border border-app-warn-edge bg-app-warn-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-base">
-            {t("editor.address_books_section.required")}
+            {t("editor.addressBooksSection.required")}
           </span>
           <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-faint">
-            {t("editor.address_books_section.total_selected", {
+            {t("editor.addressBooksSection.totalSelected", {
               count: selectedAddressBookCount,
             })}
           </span>
@@ -50,12 +50,12 @@ export default function ContactEditorAddressBooksSection({
       {isOpen ? (
         <div className="mt-3 space-y-3 px-1 pb-1">
           <p className="text-xs text-app-faint">
-            {t("editor.address_books_section.hint")}
+            {t("editor.addressBooksSection.hint")}
           </p>
           <div className="space-y-2">
             {addressBooks.length === 0 ? (
               <p className="text-sm text-app-faint">
-                {t("editor.address_books_section.no_address_books")}
+                {t("editor.addressBooksSection.noAddressBooks")}
               </p>
             ) : (
               addressBooks.map((book) => {
@@ -89,14 +89,14 @@ export default function ContactEditorAddressBooksSection({
                           }`}
                           aria-hidden={!isAssigned}
                         >
-                          {t("editor.address_books_section.selected")}
+                          {t("editor.addressBooksSection.selected")}
                         </span>
                       </span>
                       <span className="block text-xs text-app-faint">
                         /{book.uri} •{" "}
                         {book.scope === "owned"
-                          ? t("editor.address_books_section.owned")
-                          : t("editor.address_books_section.shared")}
+                          ? t("editor.addressBooksSection.owned")
+                          : t("editor.addressBooksSection.shared")}
                         {book.owner_name ? ` • ${book.owner_name}` : ""}
                       </span>
                     </span>

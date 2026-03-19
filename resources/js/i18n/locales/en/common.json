@@ -1,12 +1,12 @@
 {
-  "loading_app": "Loading Davvy...",
+  "loadingApp": "Loading Davvy...",
   "copy": {
     "copied": "Copied!",
-    "copy_failed": "Copy failed",
-    "copied_url": "Copied URL",
-    "click_to_copy": "Click to copy",
-    "aria_copy": "Copy {{value}}",
-    "aria_copy_url": "Copy {{value}} URL"
+    "copyFailed": "Copy failed",
+    "copiedUrl": "Copied URL",
+    "clickToCopy": "Click to copy",
+    "ariaCopy": "Copy {{value}}",
+    "ariaCopyUrl": "Copy {{value}} URL"
   },
   "permission": {
     "admin": "Admin",
@@ -15,7 +15,7 @@
   },
   "labels": {
     "never": "Never",
-    "invalid_timestamp": "Invalid timestamp",
+    "invalidTimestamp": "Invalid timestamp",
     "na": "n/a",
     "unknown": "Unknown"
   }

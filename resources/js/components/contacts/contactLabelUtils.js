@@ -1,53 +1,53 @@
 export const PHONE_LABEL_OPTIONS = [
   {
     value: "mobile",
-    labelKey: "field_labels.phone.mobile",
+    labelKey: "fieldLabels.phone.mobile",
     fallback: "Mobile",
   },
   {
     value: "iphone",
-    labelKey: "field_labels.phone.iphone",
+    labelKey: "fieldLabels.phone.iphone",
     fallback: "iPhone",
   },
   {
     value: "apple_watch",
-    labelKey: "field_labels.phone.apple_watch",
+    labelKey: "fieldLabels.phone.appleWatch",
     fallback: "Apple Watch",
   },
-  { value: "home", labelKey: "field_labels.phone.home", fallback: "Home" },
-  { value: "work", labelKey: "field_labels.phone.work", fallback: "Work" },
-  { value: "main", labelKey: "field_labels.phone.main", fallback: "Main" },
+  { value: "home", labelKey: "fieldLabels.phone.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.phone.work", fallback: "Work" },
+  { value: "main", labelKey: "fieldLabels.phone.main", fallback: "Main" },
   {
     value: "home_fax",
-    labelKey: "field_labels.phone.home_fax",
+    labelKey: "fieldLabels.phone.homeFax",
     fallback: "Home Fax",
   },
   {
     value: "work_fax",
-    labelKey: "field_labels.phone.work_fax",
+    labelKey: "fieldLabels.phone.workFax",
     fallback: "Work Fax",
   },
   {
     value: "other_fax",
-    labelKey: "field_labels.phone.other_fax",
+    labelKey: "fieldLabels.phone.otherFax",
     fallback: "Other Fax",
   },
-  { value: "pager", labelKey: "field_labels.phone.pager", fallback: "Pager" },
-  { value: "other", labelKey: "field_labels.phone.other", fallback: "Other" },
+  { value: "pager", labelKey: "fieldLabels.phone.pager", fallback: "Pager" },
+  { value: "other", labelKey: "fieldLabels.phone.other", fallback: "Other" },
   {
     value: "custom",
-    labelKey: "field_labels.phone.custom",
+    labelKey: "fieldLabels.phone.custom",
     fallback: "Custom...",
   },
 ];
 
 export const EMAIL_LABEL_OPTIONS = [
-  { value: "home", labelKey: "field_labels.email.home", fallback: "Home" },
-  { value: "work", labelKey: "field_labels.email.work", fallback: "Work" },
-  { value: "other", labelKey: "field_labels.email.other", fallback: "Other" },
+  { value: "home", labelKey: "fieldLabels.email.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.email.work", fallback: "Work" },
+  { value: "other", labelKey: "fieldLabels.email.other", fallback: "Other" },
   {
     value: "custom",
-    labelKey: "field_labels.email.custom",
+    labelKey: "fieldLabels.email.custom",
     fallback: "Custom...",
   },
 ];
@@ -55,31 +55,31 @@ export const EMAIL_LABEL_OPTIONS = [
 export const URL_LABEL_OPTIONS = [
   {
     value: "homepage",
-    labelKey: "field_labels.url.homepage",
+    labelKey: "fieldLabels.url.homepage",
     fallback: "Home Page",
   },
-  { value: "home", labelKey: "field_labels.url.home", fallback: "Home" },
-  { value: "work", labelKey: "field_labels.url.work", fallback: "Work" },
-  { value: "other", labelKey: "field_labels.url.other", fallback: "Other" },
+  { value: "home", labelKey: "fieldLabels.url.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.url.work", fallback: "Work" },
+  { value: "other", labelKey: "fieldLabels.url.other", fallback: "Other" },
   {
     value: "custom",
-    labelKey: "field_labels.url.custom",
+    labelKey: "fieldLabels.url.custom",
     fallback: "Custom...",
   },
 ];
 
 export const ADDRESS_LABEL_OPTIONS = [
-  { value: "home", labelKey: "field_labels.address.home", fallback: "Home" },
-  { value: "work", labelKey: "field_labels.address.work", fallback: "Work" },
+  { value: "home", labelKey: "fieldLabels.address.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.address.work", fallback: "Work" },
   {
     value: "school",
-    labelKey: "field_labels.address.school",
+    labelKey: "fieldLabels.address.school",
     fallback: "School",
   },
-  { value: "other", labelKey: "field_labels.address.other", fallback: "Other" },
+  { value: "other", labelKey: "fieldLabels.address.other", fallback: "Other" },
   {
     value: "custom",
-    labelKey: "field_labels.address.custom",
+    labelKey: "fieldLabels.address.custom",
     fallback: "Custom...",
   },
 ];
@@ -87,13 +87,13 @@ export const ADDRESS_LABEL_OPTIONS = [
 export const DATE_LABEL_OPTIONS = [
   {
     value: "anniversary",
-    labelKey: "field_labels.date.anniversary",
+    labelKey: "fieldLabels.date.anniversary",
     fallback: "Anniversary",
   },
-  { value: "other", labelKey: "field_labels.date.other", fallback: "Other" },
+  { value: "other", labelKey: "fieldLabels.date.other", fallback: "Other" },
   {
     value: "custom",
-    labelKey: "field_labels.date.custom",
+    labelKey: "fieldLabels.date.custom",
     fallback: "Custom...",
   },
 ];
@@ -101,39 +101,39 @@ export const DATE_LABEL_OPTIONS = [
 export const RELATED_LABEL_OPTIONS = [
   {
     value: "spouse",
-    labelKey: "field_labels.related.spouse",
+    labelKey: "fieldLabels.related.spouse",
     fallback: "Spouse",
   },
   {
     value: "partner",
-    labelKey: "field_labels.related.partner",
+    labelKey: "fieldLabels.related.partner",
     fallback: "Partner",
   },
   {
     value: "parent",
-    labelKey: "field_labels.related.parent",
+    labelKey: "fieldLabels.related.parent",
     fallback: "Parent",
   },
-  { value: "child", labelKey: "field_labels.related.child", fallback: "Child" },
+  { value: "child", labelKey: "fieldLabels.related.child", fallback: "Child" },
   {
     value: "sibling",
-    labelKey: "field_labels.related.sibling",
+    labelKey: "fieldLabels.related.sibling",
     fallback: "Sibling",
   },
   {
     value: "assistant",
-    labelKey: "field_labels.related.assistant",
+    labelKey: "fieldLabels.related.assistant",
     fallback: "Assistant",
   },
   {
     value: "friend",
-    labelKey: "field_labels.related.friend",
+    labelKey: "fieldLabels.related.friend",
     fallback: "Friend",
   },
-  { value: "other", labelKey: "field_labels.related.other", fallback: "Other" },
+  { value: "other", labelKey: "fieldLabels.related.other", fallback: "Other" },
   {
     value: "custom",
-    labelKey: "field_labels.related.custom",
+    labelKey: "fieldLabels.related.custom",
     fallback: "Custom...",
   },
 ];
@@ -196,66 +196,66 @@ const RELATED_LABEL_DERIVED_VALUES = new Set([
 
 const RELATED_LABEL_DISPLAY_OVERRIDES = {
   parent_in_law: {
-    labelKey: "field_labels.related_derived.parent_in_law",
+    labelKey: "fieldLabels.relatedDerived.parentInLaw",
     fallback: "Parent-in-Law",
   },
   father_in_law: {
-    labelKey: "field_labels.related_derived.father_in_law",
+    labelKey: "fieldLabels.relatedDerived.fatherInLaw",
     fallback: "Father-in-Law",
   },
   mother_in_law: {
-    labelKey: "field_labels.related_derived.mother_in_law",
+    labelKey: "fieldLabels.relatedDerived.motherInLaw",
     fallback: "Mother-in-Law",
   },
   child_in_law: {
-    labelKey: "field_labels.related_derived.child_in_law",
+    labelKey: "fieldLabels.relatedDerived.childInLaw",
     fallback: "Child-in-Law",
   },
   son_in_law: {
-    labelKey: "field_labels.related_derived.son_in_law",
+    labelKey: "fieldLabels.relatedDerived.sonInLaw",
     fallback: "Son-in-Law",
   },
   daughter_in_law: {
-    labelKey: "field_labels.related_derived.daughter_in_law",
+    labelKey: "fieldLabels.relatedDerived.daughterInLaw",
     fallback: "Daughter-in-Law",
   },
   sibling_in_law: {
-    labelKey: "field_labels.related_derived.sibling_in_law",
+    labelKey: "fieldLabels.relatedDerived.siblingInLaw",
     fallback: "Sibling-in-Law",
   },
   brother_in_law: {
-    labelKey: "field_labels.related_derived.brother_in_law",
+    labelKey: "fieldLabels.relatedDerived.brotherInLaw",
     fallback: "Brother-in-Law",
   },
   sister_in_law: {
-    labelKey: "field_labels.related_derived.sister_in_law",
+    labelKey: "fieldLabels.relatedDerived.sisterInLaw",
     fallback: "Sister-in-Law",
   },
   aunt_uncle: {
-    labelKey: "field_labels.related_derived.aunt_uncle",
+    labelKey: "fieldLabels.relatedDerived.auntUncle",
     fallback: "Aunt/Uncle",
   },
   niece_nephew: {
-    labelKey: "field_labels.related_derived.niece_nephew",
+    labelKey: "fieldLabels.relatedDerived.nieceNephew",
     fallback: "Niece/Nephew",
   },
   grandpa: {
-    labelKey: "field_labels.related_derived.grandpa",
+    labelKey: "fieldLabels.relatedDerived.grandpa",
     fallback: "Grandpa",
   },
   grandma: {
-    labelKey: "field_labels.related_derived.grandma",
+    labelKey: "fieldLabels.relatedDerived.grandma",
     fallback: "Grandma",
   },
 };
 
 export const IM_LABEL_OPTIONS = [
-  { value: "home", labelKey: "field_labels.im.home", fallback: "Home" },
-  { value: "work", labelKey: "field_labels.im.work", fallback: "Work" },
-  { value: "other", labelKey: "field_labels.im.other", fallback: "Other" },
+  { value: "home", labelKey: "fieldLabels.im.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.im.work", fallback: "Work" },
+  { value: "other", labelKey: "fieldLabels.im.other", fallback: "Other" },
   {
     value: "custom",
-    labelKey: "field_labels.im.custom",
+    labelKey: "fieldLabels.im.custom",
     fallback: "Custom...",
   },
 ];

@@ -38,11 +38,11 @@ export default function RowReorderControls({
             type="button"
             onClick={() => onMoveUp(rowIndex)}
             disabled={!canMoveUp}
-            aria-label={t("editor.row_reorder_controls.move_up_aria", {
+            aria-label={t("editor.rowReorderControls.moveUpAria", {
               rowLabel,
               rowNumber,
             })}
-            title={t("editor.row_reorder_controls.move_up")}
+            title={t("editor.rowReorderControls.moveUp")}
           >
             <svg
               className="h-3.5 w-3.5"
@@ -62,11 +62,11 @@ export default function RowReorderControls({
             type="button"
             onClick={() => onMoveDown(rowIndex)}
             disabled={!canMoveDown}
-            aria-label={t("editor.row_reorder_controls.move_down_aria", {
+            aria-label={t("editor.rowReorderControls.moveDownAria", {
               rowLabel,
               rowNumber,
             })}
-            title={t("editor.row_reorder_controls.move_down")}
+            title={t("editor.rowReorderControls.moveDown")}
           >
             <svg
               className="h-3.5 w-3.5"
@@ -85,12 +85,12 @@ export default function RowReorderControls({
             className="btn-outline btn-outline-sm"
             type="button"
             onClick={() => onRemove(rowIndex)}
-            aria-label={t("editor.row_reorder_controls.remove_aria", {
+            aria-label={t("editor.rowReorderControls.removeAria", {
               rowLabel,
               rowNumber,
             })}
           >
-            {t("editor.row_reorder_controls.remove")}
+            {t("editor.rowReorderControls.remove")}
           </button>
         </>
       ) : null}
@@ -98,11 +98,11 @@ export default function RowReorderControls({
         <button
           className="inline-flex h-7 w-7 cursor-grab touch-none items-center justify-center rounded-lg bg-transparent text-app-faint transition hover:text-app-accent active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"
           type="button"
-          aria-label={t("editor.row_reorder_controls.drag_aria", {
+          aria-label={t("editor.rowReorderControls.dragAria", {
             rowLabel,
             rowNumber,
           })}
-          title={t("editor.row_reorder_controls.drag_title")}
+          title={t("editor.rowReorderControls.dragTitle")}
           data-reorder-group={rowGroup}
           onPointerDown={(event) => onDragStart(rowIndex, event)}
           onPointerMove={onDragMove}

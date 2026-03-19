@@ -1,18 +1,18 @@
 {
   "summary": {
-    "contacts_title": "Contacts",
-    "contacts_helper": "Managed contacts in this web UI.",
-    "books_title": "Writable Books",
-    "books_helper": "Address books where you can add or edit contacts.",
-    "user_title": "User",
-    "user_helper": "Contact ownership is scoped to your account."
+    "contactsTitle": "Contacts",
+    "contactsHelper": "Managed contacts in this web UI.",
+    "booksTitle": "Writable Books",
+    "booksHelper": "Address books where you can add or edit contacts.",
+    "userTitle": "User",
+    "userHelper": "Contact ownership is scoped to your account."
   },
   "loading": "Loading contacts...",
   "mobile": {
-    "view_aria": "Contact mobile view",
+    "viewAria": "Contact mobile view",
     "contacts": "Contacts",
-    "editor_edit": "Edit",
-    "editor_new_edit": "New/Edit"
+    "editorEdit": "Edit",
+    "editorNewEdit": "New/Edit"
   },
   "filters": {
     "clear": "Clear filters"
@@ -20,37 +20,37 @@
   "sidebar": {
     "title": "Contacts",
     "new": "New",
-    "search_placeholder": "Search contacts...",
-    "filter_all_option": "All address books",
-    "clear_filters": "Clear",
-    "no_contacts": "No contacts yet.",
-    "no_contacts_match_filter": "No contacts match this filter.",
-    "match_count_one": "{{count}} match",
-    "match_count_other": "{{count}} matches",
-    "address_book_count": "{{count}} address book{{plural}}",
+    "searchPlaceholder": "Search contacts...",
+    "filterAllOption": "All address books",
+    "clearFilters": "Clear",
+    "noContacts": "No contacts yet.",
+    "noContactsMatchFilter": "No contacts match this filter.",
+    "matchCount_one": "{{count}} match",
+    "matchCount_other": "{{count}} matches",
+    "addressBookCount": "{{count}} address book{{plural}}",
     "page": "Page {{current}} / {{total}}",
-    "prev_page": "Prev",
-    "next_page": "Next"
+    "prevPage": "Prev",
+    "nextPage": "Next"
   },
-  "field_labels": {
+  "fieldLabels": {
     "pronouns": {
-      "not_set": "Not set",
-      "she_her": "she/her",
-      "he_him": "he/him",
-      "they_them": "they/them",
-      "xe_xem": "xe/xem",
+      "notSet": "Not set",
+      "sheHer": "she/her",
+      "heHim": "he/him",
+      "theyThem": "they/them",
+      "xeXem": "xe/xem",
       "custom": "Custom..."
     },
     "phone": {
       "mobile": "Mobile",
       "iphone": "iPhone",
-      "apple_watch": "Apple Watch",
+      "appleWatch": "Apple Watch",
       "home": "Home",
       "work": "Work",
       "main": "Main",
-      "home_fax": "Home Fax",
-      "work_fax": "Work Fax",
-      "other_fax": "Other Fax",
+      "homeFax": "Home Fax",
+      "workFax": "Work Fax",
+      "otherFax": "Other Fax",
       "pager": "Pager",
       "other": "Other",
       "custom": "Custom..."
@@ -91,18 +91,18 @@
       "other": "Other",
       "custom": "Custom..."
     },
-    "related_derived": {
-      "parent_in_law": "Parent-in-Law",
-      "father_in_law": "Father-in-Law",
-      "mother_in_law": "Mother-in-Law",
-      "child_in_law": "Child-in-Law",
-      "son_in_law": "Son-in-Law",
-      "daughter_in_law": "Daughter-in-Law",
-      "sibling_in_law": "Sibling-in-Law",
-      "brother_in_law": "Brother-in-Law",
-      "sister_in_law": "Sister-in-Law",
-      "aunt_uncle": "Aunt/Uncle",
-      "niece_nephew": "Niece/Nephew",
+    "relatedDerived": {
+      "parentInLaw": "Parent-in-Law",
+      "fatherInLaw": "Father-in-Law",
+      "motherInLaw": "Mother-in-Law",
+      "childInLaw": "Child-in-Law",
+      "sonInLaw": "Son-in-Law",
+      "daughterInLaw": "Daughter-in-Law",
+      "siblingInLaw": "Sibling-in-Law",
+      "brotherInLaw": "Brother-in-Law",
+      "sisterInLaw": "Sister-in-Law",
+      "auntUncle": "Aunt/Uncle",
+      "nieceNephew": "Niece/Nephew",
       "grandpa": "Grandpa",
       "grandma": "Grandma"
     },
@@ -120,8 +120,8 @@
     "delete": "Delete",
     "save": "Save Contact",
     "saving": "Saving...",
-    "no_address_books": "You do not currently have write access to any address books.",
-    "name_section": {
+    "noAddressBooks": "You do not currently have write access to any address books.",
+    "nameSection": {
       "label": "Name",
       "description": "Basic identity and phonetic naming fields.",
       "field": {
@@ -131,63 +131,63 @@
         "last": "Last Name",
         "suffix": "Suffix",
         "nickname": "Nickname",
-        "maiden_name": "Maiden Name",
-        "phonetic_first_name": "Phonetic First Name",
-        "phonetic_last_name": "Phonetic Last Name"
+        "maidenName": "Maiden Name",
+        "phoneticFirstName": "Phonetic First Name",
+        "phoneticLastName": "Phonetic Last Name"
       }
     },
-    "work_section": {
+    "workSection": {
       "label": "Work",
       "description": "Company and role details.",
       "field": {
         "company": "Company",
-        "phonetic_company": "Phonetic Company",
-        "job_title": "Job Title",
+        "phoneticCompany": "Phonetic Company",
+        "jobTitle": "Job Title",
         "department": "Department"
       }
     },
-    "personal_section": {
+    "personalSection": {
       "label": "Personal",
       "description": "Personal details.",
       "field": {
         "pronouns": "Pronouns",
-        "pronouns_custom": "Custom Pronouns",
-        "pronouns_custom_placeholder": "Optional custom value",
+        "pronounsCustom": "Custom Pronouns",
+        "pronounsCustomPlaceholder": "Optional custom value",
         "ringtone": "Ringtone",
-        "text_tone": "Text Tone",
-        "verification_code": "Verification Code",
+        "textTone": "Text Tone",
+        "verificationCode": "Verification Code",
         "profile": "Profile",
-        "household_label": "Household",
-        "head_of_household": "Head of Household"
+        "householdLabel": "Household",
+        "headOfHousehold": "Head of Household"
       },
-      "milestones_dates": {
+      "milestonesDates": {
         "label": "Milestones & Dates",
         "description": "Birthday, notable dates, and calendar behavior.",
         "birthday": "Birthday",
         "month": "Month",
-        "month_placeholder": "MM",
+        "monthPlaceholder": "MM",
         "day": "Day",
-        "day_placeholder": "DD",
+        "dayPlaceholder": "DD",
         "year": "Year",
-        "year_placeholder": "YYYY",
-        "calendar_behavior": "Calendar Behavior",
-        "exclude_from_milestone_calendars": "Exclude From Milestone Calendars",
-        "exclude_from_milestone_calendars_description": "Skip Birthday and Anniversary events for this contact in generated milestone calendars."
+        "yearPlaceholder": "YYYY",
+        "calendarBehavior": "Calendar Behavior",
+        "excludeFromMilestoneCalendars": "Exclude From Milestone Calendars",
+        "excludeFromMilestoneCalendarsDescription": "Skip Birthday and Anniversary events for this contact in generated milestone calendars."
       }
     },
-    "communication_section": {
+    "communicationSection": {
       "label": "Communication",
       "description": "Contact methods and addresses.",
       "field": {
         "phone": {
           "title": "Phone",
           "placeholder": "Phone number",
-          "add_label": "Add phone"
+          "addLabel": "Add phone"
         },
         "email": {
           "title": "Email",
           "placeholder": "Email address",
-          "add_label": "Add email"
+          "addLabel": "Add email"
         },
         "address": {
           "title": "Address"
@@ -195,90 +195,90 @@
         "url": {
           "title": "URL",
           "placeholder": "https://example.com",
-          "add_label": "Add URL"
+          "addLabel": "Add URL"
         },
-        "instant_message": {
+        "instantMessage": {
           "title": "Instant Message",
           "placeholder": "im:username@example.com",
-          "add_label": "Add IM"
+          "addLabel": "Add IM"
         }
       }
     },
-    "optional_field_section": {
+    "optionalFieldSection": {
       "label": "Add Optional Field",
       "description": "Customize this form as needed",
-      "all_added": "All optional fields added",
+      "allAdded": "All optional fields added",
       "search": "Search optional fields...",
-      "no_matching": "No matching optional fields.",
-      "add_field": "Add Field",
-      "hidden_by_default": "Optional fields are hidden by default.",
-      "hide_field": "Hide {{pendingHideFieldLabel}}"
+      "noMatching": "No matching optional fields.",
+      "addField": "Add Field",
+      "hiddenByDefault": "Optional fields are hidden by default.",
+      "hideField": "Hide {{pendingHideFieldLabel}}"
     },
-    "hide_field_modal": {
+    "hideFieldModal": {
       "title": "Hide {{pendingHideFieldLabel}}?",
       "description": "This field currently has data. Keep the value hidden or clear it before hiding the field.",
       "cancel": "Cancel",
-      "keep_hidden_value": "Keep Hidden Value",
-      "clear_and_hide": "Clear and Hide"
+      "keepHiddenValue": "Keep Hidden Value",
+      "clearAndHide": "Clear and Hide"
     },
-    "address_books_section": {
+    "addressBooksSection": {
       "label": "Address Books",
       "description": "Choose where this contact will be stored.",
       "required": "Required",
-      "total_selected": "{{count}} selected",
+      "totalSelected": "{{count}} selected",
       "hint": "Choose one or more address books for this contact.",
-      "no_address_books": "No writable address books.",
+      "noAddressBooks": "No writable address books.",
       "selected": "Selected",
       "owned": "Owned",
       "shared": "Shared"
     },
-    "address_editor": {
+    "addressEditor": {
       "title": "Address",
       "address": "Address",
-      "add_address": "Add address",
-      "no_addresses": "No addresses.",
-      "street_placeholder": "Street",
-      "city_placeholder": "City",
-      "state_placeholder": "State / Region",
-      "zip_placeholder": "Postal code",
-      "country_placeholder": "Country",
-      "custom_label_placeholder": "Custom label"
+      "addAddress": "Add address",
+      "noAddresses": "No addresses.",
+      "streetPlaceholder": "Street",
+      "cityPlaceholder": "City",
+      "statePlaceholder": "State / Region",
+      "zipPlaceholder": "Postal code",
+      "countryPlaceholder": "Country",
+      "customLabelPlaceholder": "Custom label"
     },
-    "date_editor": {
+    "dateEditor": {
       "title": "Date",
-      "add_date": "Add date",
-      "no_dates": "No dates.",
-      "month_placeholder": "MM",
-      "day_placeholder": "DD",
-      "year_placeholder": "YYYY",
+      "addDate": "Add date",
+      "noDates": "No dates.",
+      "monthPlaceholder": "MM",
+      "dayPlaceholder": "DD",
+      "yearPlaceholder": "YYYY",
       "remove": "Remove",
-      "custom_label_placeholder": "Custom label"
+      "customLabelPlaceholder": "Custom label"
     },
-    "labeled_value_editor": {
-      "custom_label_placeholder": "Custom label",
-      "no_entries": "No entries."
+    "labeledValueEditor": {
+      "customLabelPlaceholder": "Custom label",
+      "noEntries": "No entries."
     },
-    "related_name_editor": {
+    "relatedNameEditor": {
       "title": "Related Name",
-      "add_related_name": "Add related name",
-      "no_related_names": "No related names.",
-      "name_placeholder": "Name",
-      "no_matching_contacts": "No matching contacts. Keep typing to use a custom name.",
-      "linked_to_contact": "Linked to contact #{{contactId}}.",
-      "match_found": "Match found: {{name}}",
+      "addRelatedName": "Add related name",
+      "noRelatedNames": "No related names.",
+      "namePlaceholder": "Name",
+      "noMatchingContacts": "No matching contacts. Keep typing to use a custom name.",
+      "linkedToContact": "Linked to contact #{{contactId}}.",
+      "matchFound": "Match found: {{name}}",
       "link": "Link",
       "dismiss": "Dismiss",
-      "custom_label_placeholder": "Custom label"
+      "customLabelPlaceholder": "Custom label"
     },
-    "row_reorder_controls": {
-      "move_up_aria": "Move {{rowLabel}} {{rowNumber}} up",
-      "move_up": "Move up",
-      "move_down_aria": "Move {{rowLabel}} {{rowNumber}} down",
-      "move_down": "Move down",
-      "remove_aria": "Remove {{rowLabel}} {{rowNumber}}",
+    "rowReorderControls": {
+      "moveUpAria": "Move {{rowLabel}} {{rowNumber}} up",
+      "moveUp": "Move up",
+      "moveDownAria": "Move {{rowLabel}} {{rowNumber}} down",
+      "moveDown": "Move down",
+      "removeAria": "Remove {{rowLabel}} {{rowNumber}}",
       "remove": "Remove",
-      "drag_aria": "Drag to reorder {{rowLabel}} {{rowNumber}}",
-      "drag_title": "Drag to reorder"
+      "dragAria": "Drag to reorder {{rowLabel}} {{rowNumber}}",
+      "dragTitle": "Drag to reorder"
     }
   }
 }

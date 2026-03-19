@@ -26,10 +26,10 @@ export default function ContactEditorWorkSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            {t("editor.work_section.label")}
+            {t("editor.workSection.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            {t("editor.work_section.description")}
+            {t("editor.workSection.description")}
           </span>
         </span>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
@@ -40,7 +40,7 @@ export default function ContactEditorWorkSection({
       {isOpen ? (
         <div className="mt-3 px-1 pb-1">
           <div className="grid gap-3 md:grid-cols-2">
-            <Field label={t("editor.work_section.field.company")}>
+            <Field label={t("editor.workSection.field.company")}>
               <input
                 className="input"
                 value={form.company}
@@ -50,7 +50,7 @@ export default function ContactEditorWorkSection({
               />
             </Field>
             {isOptionalFieldVisible("phonetic_company") ? (
-              <Field label={t("editor.work_section.field.phonetic_company")}>
+              <Field label={t("editor.workSection.field.phoneticCompany")}>
                 <input
                   className="input"
                   value={form.phonetic_company}
@@ -60,7 +60,7 @@ export default function ContactEditorWorkSection({
                 />
               </Field>
             ) : null}
-            <Field label={t("editor.work_section.field.job_title")}>
+            <Field label={t("editor.workSection.field.jobTitle")}>
               <input
                 className="input"
                 value={form.job_title}
@@ -70,7 +70,7 @@ export default function ContactEditorWorkSection({
               />
             </Field>
             {isOptionalFieldVisible("department") ? (
-              <Field label={t("editor.work_section.field.department")}>
+              <Field label={t("editor.workSection.field.department")}>
                 <input
                   className="input"
                   value={form.department}

@@ -209,14 +209,14 @@ export default function ContactChangeQueuePage({
     try {
       resolvedPayload = JSON.parse(editPayloadText || "{}");
     } catch {
-      setError(t("errors.resolved_payload_json"));
+      setError(t("errors.resolvedPayloadJson"));
       return;
     }
 
     try {
       resolvedAddressBookIds = JSON.parse(editAddressBookIdsText || "[]");
     } catch {
-      setError(t("errors.resolved_address_ids_json"));
+      setError(t("errors.resolvedAddressIdsJson"));
       return;
     }
 
@@ -224,7 +224,7 @@ export default function ContactChangeQueuePage({
       !Array.isArray(resolvedAddressBookIds) ||
       resolvedAddressBookIds.some((value) => Number(value) <= 0)
     ) {
-      setError(t("errors.resolved_address_ids_array"));
+      setError(t("errors.resolvedAddressIdsArray"));
       return;
     }
 
@@ -264,7 +264,7 @@ export default function ContactChangeQueuePage({
               disabled={submitting || actionableRows.length === 0}
               onClick={() => runBulkAction("approve")}
             >
-              {t("approve_all", { count: actionableRows.length })}
+              {t("approveAll", { count: actionableRows.length })}
             </button>
             <button
               className="btn-outline btn-outline-sm text-app-danger"
@@ -272,7 +272,7 @@ export default function ContactChangeQueuePage({
               disabled={submitting || actionableRows.length === 0}
               onClick={() => runBulkAction("deny")}
             >
-              {t("deny_all", { count: actionableRows.length })}
+              {t("denyAll", { count: actionableRows.length })}
             </button>
           </div>
         </div>
@@ -285,7 +285,7 @@ export default function ContactChangeQueuePage({
           >
             <option value="open">{t("filters.open")}</option>
             <option value="pending">{t("filters.pending")}</option>
-            <option value="manual_merge_needed">{t("filters.manual_merge_needed")}</option>
+            <option value="manual_merge_needed">{t("filters.manualMergeNeeded")}</option>
             <option value="history">{t("filters.history")}</option>
             <option value="all">{t("filters.all")}</option>
           </select>
@@ -294,14 +294,14 @@ export default function ContactChangeQueuePage({
             value={operationFilter}
             onChange={(event) => setOperationFilter(event.target.value)}
           >
-            <option value="all">{t("filters.all_operations")}</option>
+            <option value="all">{t("filters.allOperations")}</option>
             <option value="update">{t("filters.updates")}</option>
             <option value="delete">{t("filters.deletes")}</option>
           </select>
           <input
             className="input"
             type="search"
-            placeholder={t("filters.search_placeholder")}
+            placeholder={t("filters.searchPlaceholder")}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             onKeyDown={(event) => {

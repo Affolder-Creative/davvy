@@ -34,10 +34,10 @@ export default function ContactEditorPersonalSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            {t("editor.personal_section.label")}
+            {t("editor.personalSection.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            {t("editor.personal_section.description")}
+            {t("editor.personalSection.description")}
           </span>
         </span>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
@@ -48,7 +48,7 @@ export default function ContactEditorPersonalSection({
       {isOpen ? (
         <div className="mt-3 space-y-4 px-1 pb-1">
           <div className="grid gap-3 md:grid-cols-2">
-            <Field label={t("editor.personal_section.field.pronouns")}>
+            <Field label={t("editor.personalSection.field.pronouns")}>
               <select
                 className="input"
                 value={form.pronouns}
@@ -69,7 +69,7 @@ export default function ContactEditorPersonalSection({
               </select>
             </Field>
             {isOptionalFieldVisible("pronouns_custom") ? (
-              <Field label={t("editor.personal_section.field.pronouns_custom")}>
+              <Field label={t("editor.personalSection.field.pronounsCustom")}>
                 <input
                   className="input"
                   value={form.pronouns_custom}
@@ -77,14 +77,14 @@ export default function ContactEditorPersonalSection({
                     updateFormField("pronouns_custom", event.target.value)
                   }
                   placeholder={t(
-                    "editor.personal_section.field.pronouns_custom_placeholder",
+                    "editor.personalSection.field.pronounsCustomPlaceholder",
                   )}
                   disabled={form.pronouns !== "custom" && !form.pronouns_custom}
                 />
               </Field>
             ) : null}
             {isOptionalFieldVisible("ringtone") ? (
-              <Field label={t("editor.personal_section.field.ringtone")}>
+              <Field label={t("editor.personalSection.field.ringtone")}>
                 <input
                   className="input"
                   value={form.ringtone}
@@ -95,7 +95,7 @@ export default function ContactEditorPersonalSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("text_tone") ? (
-              <Field label={t("editor.personal_section.field.text_tone")}>
+              <Field label={t("editor.personalSection.field.textTone")}>
                 <input
                   className="input"
                   value={form.text_tone}
@@ -107,7 +107,7 @@ export default function ContactEditorPersonalSection({
             ) : null}
             {isOptionalFieldVisible("verification_code") ? (
               <Field
-                label={t("editor.personal_section.field.verification_code")}
+                label={t("editor.personalSection.field.verificationCode")}
               >
                 <input
                   className="input"
@@ -119,7 +119,7 @@ export default function ContactEditorPersonalSection({
               </Field>
             ) : null}
             {isOptionalFieldVisible("profile") ? (
-              <Field label={t("editor.personal_section.field.profile")}>
+              <Field label={t("editor.personalSection.field.profile")}>
                 <input
                   className="input"
                   value={form.profile}
@@ -133,7 +133,7 @@ export default function ContactEditorPersonalSection({
 
           <section className="rounded-2xl border border-app-accent-edge bg-app-surface p-3 ring-1 ring-teal-500/10">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-app-accent">
-              {t("editor.personal_section.field.household_label")}
+              {t("editor.personalSection.field.householdLabel")}
             </p>
             <label className="inline-flex items-center gap-2 text-[13px] font-semibold leading-5 text-app-base">
               <input
@@ -143,27 +143,27 @@ export default function ContactEditorPersonalSection({
                   updateFormField("head_of_household", event.target.checked)
                 }
               />
-              {t("editor.personal_section.field.head_of_household")}
+              {t("editor.personalSection.field.headOfHousehold")}
             </label>
           </section>
 
           <section className="rounded-2xl border border-app-accent-edge bg-app-surface p-4 ring-1 ring-teal-500/10">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-app-accent">
-                {t("editor.personal_section.milestones_dates.label")}
+                {t("editor.personalSection.milestonesDates.label")}
               </h3>
               <span className="text-xs text-app-faint">
-                {t("editor.personal_section.milestones_dates.description")}
+                {t("editor.personalSection.milestonesDates.description")}
               </span>
             </div>
             <div className="mt-3 space-y-3">
               <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
                 <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-                  {t("editor.personal_section.milestones_dates.birthday")}
+                  {t("editor.personalSection.milestonesDates.birthday")}
                 </h3>
                 <div className="mt-3 grid gap-3 md:grid-cols-3">
                   <Field
-                    label={t("editor.personal_section.milestones_dates.month")}
+                    label={t("editor.personalSection.milestonesDates.month")}
                   >
                     <input
                       className="input"
@@ -172,7 +172,7 @@ export default function ContactEditorPersonalSection({
                       pattern="[0-9]*"
                       maxLength={2}
                       placeholder={t(
-                        "editor.personal_section.milestones_dates.month_placeholder",
+                        "editor.personalSection.milestonesDates.monthPlaceholder",
                       )}
                       value={form.birthday.month}
                       onChange={(event) =>
@@ -181,7 +181,7 @@ export default function ContactEditorPersonalSection({
                     />
                   </Field>
                   <Field
-                    label={t("editor.personal_section.milestones_dates.day")}
+                    label={t("editor.personalSection.milestonesDates.day")}
                   >
                     <input
                       className="input"
@@ -190,7 +190,7 @@ export default function ContactEditorPersonalSection({
                       pattern="[0-9]*"
                       maxLength={2}
                       placeholder={t(
-                        "editor.personal_section.milestones_dates.day_placeholder",
+                        "editor.personalSection.milestonesDates.dayPlaceholder",
                       )}
                       value={form.birthday.day}
                       onChange={(event) =>
@@ -199,7 +199,7 @@ export default function ContactEditorPersonalSection({
                     />
                   </Field>
                   <Field
-                    label={t("editor.personal_section.milestones_dates.year")}
+                    label={t("editor.personalSection.milestonesDates.year")}
                   >
                     <input
                       className="input"
@@ -208,7 +208,7 @@ export default function ContactEditorPersonalSection({
                       pattern="[0-9]*"
                       maxLength={4}
                       placeholder={t(
-                        "editor.personal_section.milestones_dates.year_placeholder",
+                        "editor.personalSection.milestonesDates.yearPlaceholder",
                       )}
                       value={form.birthday.year}
                       onChange={(event) =>
@@ -230,7 +230,7 @@ export default function ContactEditorPersonalSection({
               <section className="rounded-2xl bg-app-surface pt-2 px-3">
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-app-base">
                   {t(
-                    "editor.personal_section.milestones_dates.calendar_behavior",
+                    "editor.personalSection.milestonesDates.calendarBehavior",
                   )}
                 </p>
                 <label className="inline-flex items-center gap-2 text-[13px] font-semibold leading-5 text-app-base">
@@ -245,12 +245,12 @@ export default function ContactEditorPersonalSection({
                     }
                   />
                   {t(
-                    "editor.personal_section.milestones_dates.exclude_from_milestone_calendars",
+                    "editor.personalSection.milestonesDates.excludeFromMilestoneCalendars",
                   )}
                 </label>
                 <p className="mt-1.5 text-[11px] text-app-faint">
                   {t(
-                    "editor.personal_section.milestones_dates.exclude_from_milestone_calendars_description",
+                    "editor.personalSection.milestonesDates.excludeFromMilestoneCalendarsDescription",
                   )}
                 </p>
               </section>

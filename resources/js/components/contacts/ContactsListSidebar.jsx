@@ -46,7 +46,7 @@ export default function ContactsListSidebar({
         <input
           className="input"
           type="search"
-          placeholder={t("sidebar.search_placeholder")}
+          placeholder={t("sidebar.searchPlaceholder")}
           value={contactSearchTerm}
           onChange={(event) => onContactSearchTermChange(event.target.value)}
         />
@@ -57,7 +57,7 @@ export default function ContactsListSidebar({
             onContactAddressBookFilterChange(event.target.value)
           }
         >
-          <option value="all">{t("sidebar.filter_all_option")}</option>
+          <option value="all">{t("sidebar.filterAllOption")}</option>
           {addressBooks.map((book) => (
             <option key={book.id} value={String(book.id)}>
               {book.display_name}
@@ -67,7 +67,7 @@ export default function ContactsListSidebar({
       </div>
       <div className="mt-2 flex items-center justify-between gap-2 text-xs text-app-faint">
         <span>
-          {t("sidebar.match_count", {
+          {t("sidebar.matchCount", {
             count: filteredContacts.length,
           })}
         </span>
@@ -77,16 +77,16 @@ export default function ContactsListSidebar({
             type="button"
             onClick={onClearFilters}
           >
-            {t("sidebar.clear_filters")}
+            {t("sidebar.clearFilters")}
           </button>
         ) : null}
       </div>
       <div className="mt-3 space-y-2">
         {contacts.length === 0 ? (
-          <p className="text-sm text-app-faint">{t("sidebar.no_contacts")}</p>
+          <p className="text-sm text-app-faint">{t("sidebar.noContacts")}</p>
         ) : filteredContacts.length === 0 ? (
           <p className="text-sm text-app-faint">
-            {t("sidebar.no_contacts_match_filter")}
+            {t("sidebar.noContactsMatchFilter")}
           </p>
         ) : (
           paginatedContacts.map((contact) => {
@@ -109,7 +109,7 @@ export default function ContactsListSidebar({
                   {contact.display_name}
                 </p>
                 <p className="mt-1 text-xs text-app-faint">
-                  {t("sidebar.address_book_count", {
+                  {t("sidebar.addressBookCount", {
                     count: addressBookCount,
                     plural: addressBookCount > 1 ? "s" : "",
                   })}
@@ -142,7 +142,7 @@ export default function ContactsListSidebar({
               }
               disabled={currentContactPage === 1}
             >
-              {t("sidebar.prev_page")}
+              {t("sidebar.prevPage")}
             </button>
             <button
               className="btn-outline btn-outline-sm w-full"
@@ -154,7 +154,7 @@ export default function ContactsListSidebar({
               }
               disabled={currentContactPage >= totalContactPages}
             >
-              {t("sidebar.next_page")}
+              {t("sidebar.nextPage")}
             </button>
           </div>
         </div>

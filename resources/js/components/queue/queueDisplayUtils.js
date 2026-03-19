@@ -46,7 +46,7 @@ export function queueStatusLabel(status) {
         defaultValue: "Approved (awaiting others)",
       });
     case "manual_merge_needed":
-      return i18n.t("status.manual_merge_needed", {
+      return i18n.t("status.manualMergeNeeded", {
         ns: "queue",
         defaultValue: "Manual Merge Needed",
       });

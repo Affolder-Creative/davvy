@@ -117,7 +117,7 @@ export default function LabeledValueEditor({
       <div className="mt-3 space-y-3">
         {safeRows.length === 0 ? (
           <p className="text-sm text-app-faint">
-            {t("editor.labeled_value_editor.no_entries")}
+            {t("editor.labeledValueEditor.noEntries")}
           </p>
         ) : (
           safeRows.map((row, index) => {
@@ -204,7 +204,7 @@ export default function LabeledValueEditor({
                       updateRow(index, "custom_label", event.target.value)
                     }
                     placeholder={t(
-                      "editor.labeled_value_editor.custom_label_placeholder",
+                      "editor.labeledValueEditor.customLabelPlaceholder",
                     )}
                   />
                 ) : null}

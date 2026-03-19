@@ -1,27 +1,27 @@
 {
   "brand": "Davvy",
   "subtitle": "Administrador CalDAV + CardDAV",
-  "signed_in_as": "Sesión iniciada como {{email}}",
+  "signedInAs": "Sesión iniciada como {{email}}",
   "tabs": {
     "dashboard": "Panel",
     "contacts": "Contactos",
-    "review_queue": "Cola de revisión",
+    "reviewQueue": "Cola de revisión",
     "profile": "Perfil"
   },
   "account": {
     "label": "Cuenta",
-    "toggle_menu": "Alternar menú de cuenta"
+    "toggleMenu": "Alternar menú de cuenta"
   },
   "admin": {
-    "control_center": "Centro de control de admin",
-    "open_control_center": "Abrir centro de control de admin"
+    "controlCenter": "Centro de control de admin",
+    "openControlCenter": "Abrir centro de control de admin"
   },
   "actions": {
-    "sign_out": "Cerrar sesión"
+    "signOut": "Cerrar sesión"
   },
   "sponsor": {
     "button": "Patrocinar",
-    "close_links": "Cerrar enlaces de patrocinio",
+    "closeLinks": "Cerrar enlaces de patrocinio",
     "title": "Apoya a Davvy",
     "subtitle": "Elige un enlace para patrocinar el proyecto.",
     "close": "Cerrar"

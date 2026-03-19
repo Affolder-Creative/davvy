@@ -35,7 +35,7 @@ export default function InviteAcceptPage({
 
     if (!token) {
       setSubmitting(false);
-      setError(t("invite.missing_token"));
+      setError(t("invite.missingToken"));
       return;
     }
 
@@ -54,14 +54,14 @@ export default function InviteAcceptPage({
       if (data?.registration_pending_approval) {
         setNotice(
           data?.message ||
-            t("register.pending_approval_notice"),
+            t("register.pendingApprovalNotice"),
         );
         return;
       }
 
-      setError(t("invite.error_unexpected"));
+      setError(t("invite.errorUnexpected"));
     } catch (err) {
-      setError(extractError(err, t("invite.error_accept")));
+      setError(extractError(err, t("invite.errorAccept")));
     } finally {
       setSubmitting(false);
     }
@@ -86,7 +86,7 @@ export default function InviteAcceptPage({
             required
           />
         </Field>
-        <Field label={t("invite.password_confirm")}>
+        <Field label={t("invite.passwordConfirm")}>
           <input
             className="input"
             type="password"
@@ -107,9 +107,9 @@ export default function InviteAcceptPage({
         </button>
       </form>
       <p className="mt-5 text-sm text-app-muted">
-        {t("invite.already_activated")}{" "}
+        {t("invite.alreadyActivated")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          {t("invite.sign_in")}
+          {t("invite.signIn")}
         </Link>
       </p>
     </AuthShell>

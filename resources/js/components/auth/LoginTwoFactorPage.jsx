@@ -70,7 +70,7 @@ export default function LoginTwoFactorPage({
       auth.setAuth(buildAuthStateFromPayload(data, { user: data.user }));
       navigate("/", { replace: true });
     } catch (err) {
-      setError(extractError(err, t("two_factor.error_verify")));
+      setError(extractError(err, t("twoFactor.errorVerify")));
     } finally {
       setSubmitting(false);
     }
@@ -80,14 +80,14 @@ export default function LoginTwoFactorPage({
     <AuthShell
       theme={theme}
       themeControlPlacement="window-bottom-right"
-      title={t("two_factor.title")}
-      subtitle={t("two_factor.subtitle")}
+      title={t("twoFactor.title")}
+      subtitle={t("twoFactor.subtitle")}
     >
       {loading ? (
-        <p className="text-sm text-app-muted">{t("two_factor.checking")}</p>
+        <p className="text-sm text-app-muted">{t("twoFactor.checking")}</p>
       ) : (
         <form className="space-y-4" onSubmit={submit}>
-          <Field label={t("two_factor.code_label")}>
+          <Field label={t("twoFactor.codeLabel")}>
             <input
               className="input"
               value={code}
@@ -99,15 +99,15 @@ export default function LoginTwoFactorPage({
           </Field>
           {error ? <p className="text-sm text-app-danger">{error}</p> : null}
           <button className="btn w-full" disabled={submitting}>
-            {submitting ? t("two_factor.submitting") : t("two_factor.submit")}
+            {submitting ? t("twoFactor.submitting") : t("twoFactor.submit")}
           </button>
         </form>
       )}
 
       <p className="mt-5 text-sm text-app-muted">
-        {t("two_factor.return_prompt")}{" "}
+        {t("twoFactor.returnPrompt")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          {t("two_factor.return_link")}
+          {t("twoFactor.returnLink")}
         </Link>
       </p>
     </AuthShell>

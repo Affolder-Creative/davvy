@@ -63,7 +63,7 @@ export default function RegisterPage({
         });
         setNotice(
           data?.message ||
-            t("register.pending_approval_notice"),
+            t("register.pendingApprovalNotice"),
         );
         setActionLink(
           typeof data?.verification_url === "string"
@@ -83,7 +83,7 @@ export default function RegisterPage({
         });
         setNotice(
           data?.message ||
-            t("register.pending_verification_notice"),
+            t("register.pendingVerificationNotice"),
         );
         setActionLink(
           typeof data?.verification_url === "string"
@@ -94,9 +94,9 @@ export default function RegisterPage({
         return;
       }
 
-      setError(t("register.error_unexpected"));
+      setError(t("register.errorUnexpected"));
     } catch (err) {
-      setError(extractError(err, t("register.error_register")));
+      setError(extractError(err, t("register.errorRegister")));
     } finally {
       setSubmitting(false);
     }
@@ -136,7 +136,7 @@ export default function RegisterPage({
             required
           />
         </Field>
-        <Field label={t("register.password_confirm")}>
+        <Field label={t("register.passwordConfirm")}>
           <input
             className="input"
             type="password"
@@ -151,12 +151,12 @@ export default function RegisterPage({
         {notice ? <p className="text-sm text-app-accent">{notice}</p> : null}
         {actionLink ? (
           <p className="text-xs text-app-muted">
-            {t("register.verification_link")}{" "}
+            {t("register.verificationLink")}{" "}
             <a
               href={actionLink}
               className="font-semibold text-app-accent underline"
             >
-              {t("register.open_verification")}
+              {t("register.openVerification")}
             </a>
           </p>
         ) : null}
@@ -165,9 +165,9 @@ export default function RegisterPage({
         </button>
       </form>
       <p className="mt-5 text-sm text-app-muted">
-        {t("register.already_registered")}{" "}
+        {t("register.alreadyRegistered")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          {t("register.sign_in")}
+          {t("register.signIn")}
         </Link>
       </p>
     </AuthShell>

@@ -114,20 +114,20 @@ export default function DateEditor({
     <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          {t("editor.date_editor.title")}
+          {t("editor.dateEditor.title")}
         </h3>
         <button
           className="btn-outline btn-outline-sm"
           type="button"
           onClick={addRow}
         >
-          {t("editor.date_editor.add_date")}
+          {t("editor.dateEditor.addDate")}
         </button>
       </div>
       <div className="mt-3 space-y-3">
         {safeRows.length === 0 ? (
           <p className="text-sm text-app-faint">
-            {t("editor.date_editor.no_dates")}
+            {t("editor.dateEditor.noDates")}
           </p>
         ) : (
           safeRows.map((row, index) => (
@@ -159,7 +159,7 @@ export default function DateEditor({
                     pattern="[0-9]*"
                     maxLength={2}
                     value={row.month ?? ""}
-                    placeholder={t("editor.date_editor.month_placeholder")}
+                    placeholder={t("editor.dateEditor.monthPlaceholder")}
                     onChange={(event) =>
                       updateRow(index, "month", event.target.value)
                     }
@@ -171,7 +171,7 @@ export default function DateEditor({
                     pattern="[0-9]*"
                     maxLength={2}
                     value={row.day ?? ""}
-                    placeholder={t("editor.date_editor.day_placeholder")}
+                    placeholder={t("editor.dateEditor.dayPlaceholder")}
                     onChange={(event) =>
                       updateRow(index, "day", event.target.value)
                     }
@@ -183,7 +183,7 @@ export default function DateEditor({
                     pattern="[0-9]*"
                     maxLength={4}
                     value={row.year ?? ""}
-                    placeholder={t("editor.date_editor.year_placeholder")}
+                    placeholder={t("editor.dateEditor.yearPlaceholder")}
                     onChange={(event) =>
                       updateRow(index, "year", event.target.value)
                     }
@@ -194,7 +194,7 @@ export default function DateEditor({
                   type="button"
                   onClick={() => removeRow(index)}
                 >
-                  {t("editor.date_editor.remove")}
+                  {t("editor.dateEditor.remove")}
                 </button>
               </div>
               {row.label === "custom" ? (
@@ -204,7 +204,7 @@ export default function DateEditor({
                   onChange={(event) =>
                     updateRow(index, "custom_label", event.target.value)
                   }
-                  placeholder={t("editor.date_editor.custom_label_placeholder")}
+                  placeholder={t("editor.dateEditor.customLabelPlaceholder")}
                 />
               ) : null}
             </div>

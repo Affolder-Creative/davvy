@@ -42,9 +42,9 @@ export default function CopyableResourceUri({
 
   const copyLabel =
     copyState === "copied"
-      ? t("copy.copied_url")
+      ? t("copy.copiedUrl")
       : copyState === "failed"
-        ? t("copy.copy_failed")
+        ? t("copy.copyFailed")
         : "";
   const copyTone = copyState === "failed" ? "bg-red-700" : "bg-teal-700";
 
@@ -55,7 +55,7 @@ export default function CopyableResourceUri({
         onClick={() => void copyUrl()}
         className="break-all bg-transparent p-0 text-left text-xs font-normal text-app-faint focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-teal-500"
         title={fullUrl}
-        aria-label={t("copy.aria_copy_url", {
+        aria-label={t("copy.ariaCopyUrl", {
           value: normalizedUri || "resource",
         })}
       >
