@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'public_registration_disabled' => 'La registrazione pubblica è attualmente disabilitata.',
+    'registration_submitted_verify_and_wait_approval' => 'Registrazione inviata. Verifica il tuo indirizzo email e attendi l\'approvazione dell\'amministratore prima di accedere.',
+    'registration_submitted_verify_before_signin' => 'Registrazione inviata. Verifica il tuo indirizzo email prima di accedere.',
+    'registration_submitted_pending_approval' => 'Registrazione inviata. Un amministratore deve approvare il tuo account prima che tu possa accedere.',
+    'verification_link_invalid_or_expired' => 'Il collegamento di verifica non è valido o è scaduto.',
+    'email_verified_pending_approval' => 'E-mail verificata. Il tuo account è in attesa di approvazione da parte dell\'amministratore.',
+    'invitation_link_invalid_or_expired' => 'Il collegamento dell\'invito non è valido o è scaduto.',
+    'invitation_accepted_pending_approval' => 'Invito accettato. Il tuo account è in attesa di approvazione da parte dell\'amministratore.',
+    'credentials_invalid' => 'Le credenziali fornite non sono valide.',
+    'account_pending_approval' => 'Il tuo account è in attesa di approvazione da parte dell\'amministratore.',
+    'verify_email_before_signin' => 'Verifica il tuo indirizzo email prima di accedere.',
+    'two_factor_code_required' => 'Codice a due fattori richiesto per completare l\'accesso.',
+    'no_pending_two_factor_challenge' => 'Nessuna sfida a due fattori in sospeso. Avvia un nuovo tentativo di accesso.',
+    'invalid_authentication_code' => 'Codice di autenticazione non valido.',
+    'two_factor_already_enabled' => 'L\'autenticazione a due fattori è già abilitata.',
+    'two_factor_setup_expired' => 'La configurazione a due fattori è scaduta. Inizia di nuovo la configurazione.',
+    'two_factor_code_invalid' => 'Il codice a due fattori non è valido.',
+    'two_factor_not_enabled' => 'L\'autenticazione a due fattori non è abilitata.',
+    'enable_two_factor_before_managing_app_passwords' => 'Abilita l\'autenticazione a due fattori prima di gestire le password delle app.',
+    'enable_two_factor_before_creating_app_passwords' => 'Abilita l\'autenticazione a due fattori prima di creare password per l\'app.',
+    'two_factor_setup_required_before_accessing_resource' => 'Prima di accedere a questa risorsa è necessaria la configurazione dell\'autenticazione a due fattori.',
+];

@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "Impossibile caricare le richieste di modifica.",
+    "approve": "Impossibile approvare la richiesta.",
+    "deny": "Impossibile rifiutare la richiesta.",
+    "bulk": "Impossibile elaborare l'azione collettiva.",
+    "resolvedPayloadJson": "Il payload risolto deve essere un JSON valido.",
+    "resolvedAddressIdsJson": "Gli ID della rubrica risolti devono essere JSON validi.",
+    "resolvedAddressIdsArray": "Gli ID della rubrica risolti devono essere un array di numeri interi positivi."
+  },
+  "bulk": {
+    "confirm": "Ciò {{verb}} {{count}} richieste in coda nella visualizzazione filtrata corrente. Continuare?",
+    "approve": "approvare",
+    "deny": "negare"
+  },
+  "filters": {
+    "open": "Aperto",
+    "pending": "In sospeso",
+    "manualMergeNeeded": "Unione manuale necessaria",
+    "history": "Storia",
+    "all": "Tutto",
+    "allOperations": "Tutte le operazioni",
+    "updates": "Aggiornamenti",
+    "deletes": "Elimina",
+    "searchPlaceholder": "Cerca per contatto/richiedente...",
+    "refresh": "Aggiorna"
+  },
+  "card": {
+    "group": "Gruppo",
+    "unnamedContact": "Contatto senza nome",
+    "status": "Stato",
+    "requested": "Richiesto",
+    "editApprove": "Modifica e approva",
+    "approve": "Approvare",
+    "deny": "Negare",
+    "requester": "Richiedente",
+    "approvalOwner": "Titolare dell'approvazione",
+    "source": "Fonte",
+    "reviewer": "Revisore",
+    "notReviewed": "Non ancora recensito",
+    "changedFields": "Campi modificati"
+  },
+  "modal": {
+    "title": "Modifica richiesta n.{{id}} Prima di approvare",
+    "subtitle": "Modifica gli ID del payload/della rubrica, quindi approva questa richiesta in coda.",
+    "resolvedPayload": "Risolto il problema con il JSON del payload",
+    "resolvedAddressIds": "Array JSON degli ID della rubrica risolti",
+    "cancel": "Annulla",
+    "approve": "Salva modifiche e approva",
+    "approving": "Approvazione..."
+  },
+  "status": {
+    "pending": "In sospeso",
+    "approved": "Approvato (in attesa di altri)",
+    "manualMergeNeeded": "Unione manuale necessaria",
+    "applied": "Applicato",
+    "denied": "Negato"
+  },
+  "notices": {
+    "approved": "Richiesta approvata.",
+    "denied": "Richiesta respinta.",
+    "bulk": "{{processed}} gruppi di richieste elaborati. {{skipped}} saltato."
+  },
+  "page": {
+    "title": "Contattare la coda di revisione delle modifiche",
+    "subtitle": "Esamina le modifiche dell'editor in coda per i contatti prima che vengano applicate."
+  },
+  "actions": {
+    "approveAll": "Approva tutto ({{count}})",
+    "denyAll": "Nega tutto ({{count}})"
+  },
+  "states": {
+    "loading": "Caricamento coda di revisione...",
+    "empty": "Nessuna richiesta in coda per questo filtro."
+  },
+  "operations": {
+    "delete": "Elimina",
+    "update": "Aggiorna"
+  }
+}
