@@ -37,7 +37,7 @@ function buildProps(overrides = {}) {
       },
       twoFactorEnabled: false,
       locale: "en",
-      supportedLocales: ["de", "en", "es", "fr"],
+      supportedLocales: ["de", "en", "es", "fr", "ja"],
       fallbackLocale: "en",
       setAuth: vi.fn(),
       refreshAuth: vi.fn().mockResolvedValue(undefined),
@@ -225,7 +225,7 @@ describe("ProfilePage", () => {
         },
         twoFactorEnabled: false,
         locale: "en",
-        supportedLocales: ["de", "en", "es", "fr"],
+        supportedLocales: ["de", "en", "es", "fr", "ja"],
         fallbackLocale: "en",
         setAuth,
         refreshAuth: vi.fn().mockResolvedValue(undefined),
@@ -240,7 +240,7 @@ describe("ProfilePage", () => {
               role: "admin",
             },
             locale: "fr",
-            supported_locales: ["de", "en", "es", "fr"],
+            supported_locales: ["de", "en", "es", "fr", "ja"],
             fallback_locale: "en",
           },
         }),
@@ -252,6 +252,7 @@ describe("ProfilePage", () => {
 
     expect(screen.getByRole("option", { name: "Deutsch" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Français" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "日本語" })).toBeInTheDocument();
 
     await user.selectOptions(screen.getByLabelText("Language"), "fr");
     await user.click(screen.getByRole("button", { name: "Save Language" }));

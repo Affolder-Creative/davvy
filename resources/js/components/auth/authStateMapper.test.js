@@ -25,7 +25,7 @@ describe("authStateMapper", () => {
       twoFactorMandated: false,
       twoFactorGraceExpiresAt: null,
       locale: "en",
-      supportedLocales: ["de", "en", "es", "fr"],
+      supportedLocales: ["de", "en", "es", "fr", "ja"],
       fallbackLocale: "en",
       sponsorship: {
         enabled: false,
@@ -50,7 +50,7 @@ describe("authStateMapper", () => {
       twoFactorMandated: false,
       twoFactorGraceExpiresAt: null,
       locale: "en",
-      supportedLocales: ["de", "en", "es", "fr"],
+      supportedLocales: ["de", "en", "es", "fr", "ja"],
       fallbackLocale: "en",
       sponsorship: {
         enabled: false,

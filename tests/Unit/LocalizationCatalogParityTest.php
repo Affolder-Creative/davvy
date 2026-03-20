@@ -6,41 +6,49 @@ use Tests\TestCase;
 
 class LocalizationCatalogParityTest extends TestCase
 {
-    public function test_spanish_php_translation_catalogs_match_english_keys(): void
+    public function test_php_translation_catalogs_match_english_keys_for_all_supported_locale_directories(): void
     {
         $baseDir = base_path('lang/en');
-        $compareDir = base_path('lang/es');
+        $localeDirectories = glob(base_path('lang/*'), GLOB_ONLYDIR) ?: [];
+        sort($localeDirectories);
 
         $baseFiles = glob($baseDir.'/*.php') ?: [];
         sort($baseFiles);
 
-        foreach ($baseFiles as $baseFile) {
-            $fileName = basename($baseFile);
-            $compareFile = $compareDir.'/'.$fileName;
+        foreach ($localeDirectories as $localeDirectory) {
+            $locale = basename($localeDirectory);
+            if ($locale === 'en') {
+                continue;
+            }
 
-            $this->assertFileExists(
-                $compareFile,
-                "Missing translation file: lang/es/{$fileName}"
-            );
+            foreach ($baseFiles as $baseFile) {
+                $fileName = basename($baseFile);
+                $compareFile = $localeDirectory.'/'.$fileName;
 
-            $baseKeys = $this->flattenTranslationKeys(require $baseFile);
-            $compareKeys = $this->flattenTranslationKeys(require $compareFile);
-            sort($baseKeys);
-            sort($compareKeys);
+                $this->assertFileExists(
+                    $compareFile,
+                    "Missing translation file: lang/{$locale}/{$fileName}"
+                );
 
-            $missingInSpanish = array_values(array_diff($baseKeys, $compareKeys));
-            $extraInSpanish = array_values(array_diff($compareKeys, $baseKeys));
+                $baseKeys = $this->flattenTranslationKeys(require $baseFile);
+                $compareKeys = $this->flattenTranslationKeys(require $compareFile);
+                sort($baseKeys);
+                sort($compareKeys);
 
-            $this->assertSame(
-                [],
-                $missingInSpanish,
-                "Missing keys in lang/es/{$fileName}: ".implode(', ', $missingInSpanish)
-            );
-            $this->assertSame(
-                [],
-                $extraInSpanish,
-                "Extra keys in lang/es/{$fileName}: ".implode(', ', $extraInSpanish)
-            );
+                $missingKeys = array_values(array_diff($baseKeys, $compareKeys));
+                $extraKeys = array_values(array_diff($compareKeys, $baseKeys));
+
+                $this->assertSame(
+                    [],
+                    $missingKeys,
+                    "Missing keys in lang/{$locale}/{$fileName}: ".implode(', ', $missingKeys)
+                );
+                $this->assertSame(
+                    [],
+                    $extraKeys,
+                    "Extra keys in lang/{$locale}/{$fileName}: ".implode(', ', $extraKeys)
+                );
+            }
         }
     }
 

@@ -1,0 +1,33 @@
+{
+  "tabs": {
+    "dashboard": "ダッシュボード",
+    "contacts": "連絡先",
+    "reviewQueue": "レビューキュー",
+    "profile": "プロフィール"
+  },
+  "account": {
+    "label": "アカウント",
+    "toggleMenu": "アカウントメニューの切り替え"
+  },
+  "admin": {
+    "controlCenter": "管理者コントロールセンター",
+    "openControlCenter": "管理者コントロールセンターを開く"
+  },
+  "actions": {
+    "signOut": "サインアウト"
+  },
+  "sponsor": {
+    "button": "スポンサー",
+    "closeLinks": "スポンサーリンクを閉じる",
+    "title": "Davvy をサポート",
+    "subtitle": "プロジェクトのスポンサーになるには、以下のリンクを選択してください。",
+    "close": "閉じる"
+  },
+  "app": {
+    "brand": "Davvy",
+    "subtitle": "CalDAV + CardDAV マネージャー"
+  },
+  "session": {
+    "signedInAs": "{{email}} としてサインインしています"
+  }
+}

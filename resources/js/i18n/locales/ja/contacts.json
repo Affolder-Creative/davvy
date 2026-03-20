@@ -1,0 +1,286 @@
+{
+  "summary": {
+    "contactsTitle": "連絡先",
+    "contactsHelper": "この Web UI で管理される連絡先。",
+    "booksTitle": "書き込み可能な書籍",
+    "booksHelper": "連絡先を追加または編集できるアドレス帳。",
+    "userTitle": "ユーザー",
+    "userHelper": "連絡先の所有権は自分のアカウントに限定されます。"
+  },
+  "mobile": {
+    "viewAria": "モバイルビューに問い合わせる",
+    "contacts": "連絡先",
+    "editorEdit": "編集",
+    "editorNewEdit": "新規/編集"
+  },
+  "filters": {
+    "clear": "フィルターをクリアする"
+  },
+  "sidebar": {
+    "title": "連絡先",
+    "new": "新しい",
+    "searchPlaceholder": "連絡先を検索...",
+    "filterAllOption": "すべてのアドレス帳",
+    "clearFilters": "クリア",
+    "noContacts": "まだ連絡先がありません。",
+    "noContactsMatchFilter": "このフィルターに一致する連絡先はありません。",
+    "matchCount_one": "{{count}} 一致",
+    "matchCount_other": "{{count}} が一致",
+    "addressBookCount": "{{count}} アドレス帳{{plural}}",
+    "page": "ページ {{current}} / {{total}}",
+    "prevPage": "前へ",
+    "nextPage": "次へ"
+  },
+  "fieldLabels": {
+    "pronouns": {
+      "notSet": "未設定",
+      "sheHer": "彼女/彼女",
+      "heHim": "彼/彼",
+      "theyThem": "彼ら/彼ら",
+      "xeXem": "xe/xem",
+      "custom": "カスタム..."
+    },
+    "phone": {
+      "mobile": "モバイル",
+      "iphone": "iPhone",
+      "appleWatch": "アップルウォッチ",
+      "home": "家",
+      "work": "仕事",
+      "main": "メイン",
+      "homeFax": "ホームファクス",
+      "workFax": "仕事用ファックス",
+      "otherFax": "その他のファクス",
+      "pager": "ポケベル",
+      "other": "その他",
+      "custom": "カスタム..."
+    },
+    "email": {
+      "home": "家",
+      "work": "仕事",
+      "other": "その他",
+      "custom": "カスタム..."
+    },
+    "url": {
+      "homepage": "ホームページ",
+      "home": "家",
+      "work": "仕事",
+      "other": "その他",
+      "custom": "カスタム..."
+    },
+    "address": {
+      "home": "家",
+      "work": "仕事",
+      "school": "学校",
+      "other": "その他",
+      "custom": "カスタム..."
+    },
+    "date": {
+      "anniversary": "記念日",
+      "other": "その他",
+      "custom": "カスタム..."
+    },
+    "related": {
+      "spouse": "配偶者",
+      "partner": "パートナー",
+      "parent": "親",
+      "child": "子供",
+      "sibling": "兄弟",
+      "assistant": "アシスタント",
+      "friend": "友達",
+      "other": "その他",
+      "custom": "カスタム..."
+    },
+    "relatedDerived": {
+      "parentInLaw": "義父母",
+      "fatherInLaw": "義父",
+      "motherInLaw": "義母",
+      "childInLaw": "義理の子",
+      "sonInLaw": "義理の息子",
+      "daughterInLaw": "義理の娘",
+      "siblingInLaw": "義理の兄弟",
+      "brotherInLaw": "義理の兄",
+      "sisterInLaw": "義理の妹",
+      "auntUncle": "叔父/叔母",
+      "nieceNephew": "姪/甥",
+      "grandpa": "おじいちゃん",
+      "grandma": "おばあちゃん"
+    },
+    "im": {
+      "home": "家",
+      "work": "仕事",
+      "other": "その他",
+      "custom": "カスタム..."
+    }
+  },
+  "editor": {
+    "new": "新しい連絡先",
+    "edit": "連絡先の編集",
+    "description": "少なくとも名、姓、または会社名を入力します。アドレス帳の割り当てでは、1 つ以上の選択がサポートされます。",
+    "delete": "削除",
+    "save": "連絡先の保存",
+    "saving": "保存中...",
+    "noAddressBooks": "現在、アドレス帳への書き込みアクセス権がありません。",
+    "nameSection": {
+      "label": "名前",
+      "description": "基本的な ID と音声命名フィールド。",
+      "field": {
+        "prefix": "プレフィックス",
+        "first": "名",
+        "middle": "ミドルネーム",
+        "last": "姓",
+        "suffix": "サフィックス",
+        "nickname": "ニックネーム",
+        "maidenName": "旧姓",
+        "phoneticFirstName": "名読み",
+        "phoneticLastName": "姓の読み仮名"
+      }
+    },
+    "workSection": {
+      "label": "仕事",
+      "description": "会社と役割の詳細。",
+      "field": {
+        "company": "会社名",
+        "phoneticCompany": "音声会社",
+        "jobTitle": "役職",
+        "department": "部門"
+      }
+    },
+    "personalSection": {
+      "label": "個人的な",
+      "description": "個人の詳細。",
+      "field": {
+        "pronouns": "代名詞",
+        "pronounsCustom": "カスタム代名詞",
+        "pronounsCustomPlaceholder": "オプションのカスタム値",
+        "ringtone": "着信音",
+        "textTone": "テキストトーン",
+        "verificationCode": "検証コード",
+        "profile": "プロフィール",
+        "householdLabel": "家庭用",
+        "headOfHousehold": "世帯主"
+      },
+      "milestonesDates": {
+        "label": "マイルストーンと日付",
+        "description": "誕生日、注目すべき日付、カレンダーの動作。",
+        "birthday": "誕生日",
+        "month": "月",
+        "monthPlaceholder": "MM",
+        "day": "日",
+        "dayPlaceholder": "DD",
+        "year": "年",
+        "yearPlaceholder": "YYYY",
+        "calendarBehavior": "カレンダーの動作",
+        "excludeFromMilestoneCalendars": "マイルストーンカレンダーから除外",
+        "excludeFromMilestoneCalendarsDescription": "生成されたマイルストーン カレンダーで、この連絡先の誕生日イベントと記念日イベントをスキップします。"
+      }
+    },
+    "communicationSection": {
+      "label": "コミュニケーション",
+      "description": "連絡方法と連絡先。",
+      "field": {
+        "phone": {
+          "title": "電話",
+          "placeholder": "電話番号",
+          "addLabel": "電話を追加"
+        },
+        "email": {
+          "title": "電子メール",
+          "placeholder": "メールアドレス",
+          "addLabel": "メールアドレスを追加"
+        },
+        "address": {
+          "title": "住所"
+        },
+        "url": {
+          "title": "URL",
+          "placeholder": "https://example.com",
+          "addLabel": "URLを追加"
+        },
+        "instantMessage": {
+          "title": "インスタントメッセージ",
+          "placeholder": "im:username@example.com",
+          "addLabel": "IMを追加"
+        }
+      }
+    },
+    "optionalFieldSection": {
+      "label": "オプションのフィールドを追加",
+      "description": "必要に応じてこのフォームをカスタマイズします",
+      "allAdded": "すべてのオプションフィールドが追加されました",
+      "search": "オプションのフィールドを検索...",
+      "noMatching": "一致するオプションのフィールドはありません。",
+      "addField": "フィールドの追加",
+      "hiddenByDefault": "オプションのフィールドはデフォルトでは非表示になっています。",
+      "hideField": "非表示 {{pendingHideFieldLabel}}"
+    },
+    "hideFieldModal": {
+      "title": "{{pendingHideFieldLabel}}を非表示にしますか?",
+      "description": "このフィールドには現在データがあります。値を非表示のままにするか、フィールドを非表示にする前に値をクリアします。",
+      "cancel": "キャンセル",
+      "keepHiddenValue": "隠し値を保持する",
+      "clearAndHide": "クリアして非表示にする"
+    },
+    "addressBooksSection": {
+      "label": "アドレス帳",
+      "description": "この連絡先を保存する場所を選択します。",
+      "required": "必須",
+      "totalSelected": "{{count}} が選択されました",
+      "hint": "この連絡先のアドレス帳を 1 つ以上選択します。",
+      "noAddressBooks": "書き込み可能なアドレス帳はありません。",
+      "selected": "選択済み",
+      "owned": "所有",
+      "shared": "共有"
+    },
+    "addressEditor": {
+      "title": "住所",
+      "address": "住所",
+      "addAddress": "アドレスを追加",
+      "noAddresses": "住所がありません。",
+      "streetPlaceholder": "通り",
+      "cityPlaceholder": "市",
+      "statePlaceholder": "州/地域",
+      "zipPlaceholder": "郵便番号",
+      "countryPlaceholder": "国",
+      "customLabelPlaceholder": "カスタムラベル"
+    },
+    "dateEditor": {
+      "title": "日付",
+      "addDate": "日付を追加",
+      "noDates": "日付はありません。",
+      "monthPlaceholder": "MM",
+      "dayPlaceholder": "DD",
+      "yearPlaceholder": "YYYY",
+      "remove": "削除する",
+      "customLabelPlaceholder": "カスタムラベル"
+    },
+    "labeledValueEditor": {
+      "customLabelPlaceholder": "カスタムラベル",
+      "noEntries": "エントリーはありません。"
+    },
+    "relatedNameEditor": {
+      "title": "関連する名前",
+      "addRelatedName": "関連する名前を追加",
+      "noRelatedNames": "関連する名前はありません。",
+      "namePlaceholder": "名前",
+      "noMatchingContacts": "一致する連絡先がありません。カスタム名を使用するには、入力を続けます。",
+      "linkedToContact": "連絡先 #{{contactId}} にリンクされています。",
+      "matchFound": "一致するものが見つかりました: {{name}}",
+      "link": "リンク",
+      "dismiss": "解雇する",
+      "customLabelPlaceholder": "カスタムラベル"
+    },
+    "rowReorderControls": {
+      "moveUpAria": "{{rowLabel}} {{rowNumber}} を上に移動",
+      "moveUp": "上に移動",
+      "moveDownAria": "{{rowLabel}} {{rowNumber}} を下に移動",
+      "moveDown": "下に移動",
+      "removeAria": "{{rowLabel}} {{rowNumber}} を削除します",
+      "remove": "削除する",
+      "dragAria": "ドラッグして並べ替えます {{rowLabel}} {{rowNumber}}",
+      "dragTitle": "ドラッグして並べ替えます"
+    }
+  },
+  "states": {
+    "loading": "連絡先を読み込んでいます..."
+  }
+}

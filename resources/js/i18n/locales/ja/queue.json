@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "変更リクエストをロードできません。",
+    "approve": "リクエストを承認できません。",
+    "deny": "リクエストを拒否できません。",
+    "bulk": "一括アクションを処理できません。",
+    "resolvedPayloadJson": "解決されたペイロードは有効な JSON である必要があります。",
+    "resolvedAddressIdsJson": "解決されたアドレス帳 ID は有効な JSON である必要があります。",
+    "resolvedAddressIdsArray": "解決されたアドレス帳 ID は、正の整数の配列である必要があります。"
+  },
+  "bulk": {
+    "confirm": "これにより、現在のフィルタリングされたビューで {{verb}} {{count}} キューにリクエストが追加されます。続く？",
+    "approve": "承認する",
+    "deny": "否定する"
+  },
+  "filters": {
+    "open": "開く",
+    "pending": "保留中",
+    "manualMergeNeeded": "手動マージが必要です",
+    "history": "歴史",
+    "all": "すべて",
+    "allOperations": "すべての操作",
+    "updates": "アップデート",
+    "deletes": "削除",
+    "searchPlaceholder": "連絡先/依頼者で検索...",
+    "refresh": "リフレッシュ"
+  },
+  "card": {
+    "group": "グループ",
+    "unnamedContact": "匿名の連絡先",
+    "status": "ステータス",
+    "requested": "リクエスト済み",
+    "editApprove": "編集と承認",
+    "approve": "承認する",
+    "deny": "拒否する",
+    "requester": "依頼者",
+    "approvalOwner": "承認所有者",
+    "source": "ソース",
+    "reviewer": "査読者",
+    "notReviewed": "まだレビューされていません",
+    "changedFields": "変更されたフィールド"
+  },
+  "modal": {
+    "title": "承認する前にリクエスト #{{id}} を編集してください",
+    "subtitle": "ペイロード/アドレス帳 ID を調整し、キューに入れられたこのリクエストを承認します。",
+    "resolvedPayload": "解決されたペイロード JSON",
+    "resolvedAddressIds": "解決されたアドレス帳 ID の JSON 配列",
+    "cancel": "キャンセル",
+    "approve": "編集を保存して承認する",
+    "approving": "承認中..."
+  },
+  "status": {
+    "pending": "保留中",
+    "approved": "承認されました（他を待っています）",
+    "manualMergeNeeded": "手動マージが必要です",
+    "applied": "適用済み",
+    "denied": "拒否されました"
+  },
+  "notices": {
+    "approved": "リクエストは承認されました。",
+    "denied": "リクエストは拒否されました。",
+    "bulk": "{{processed}} リクエスト グループが処理されました。 {{skipped}} はスキップされました。"
+  },
+  "page": {
+    "title": "連絡先変更レビューキュー",
+    "subtitle": "連絡先に対するキュー内の編集者の変更を適用する前に確認します。"
+  },
+  "actions": {
+    "approveAll": "全員承認 ({{count}})",
+    "denyAll": "すべて拒否 ({{count}})"
+  },
+  "states": {
+    "loading": "レビューキューを読み込み中...",
+    "empty": "このフィルタのキューにリクエストはありません。"
+  },
+  "operations": {
+    "delete": "削除",
+    "update": "アップデート"
+  }
+}

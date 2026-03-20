@@ -1,0 +1,101 @@
+{
+  "errors": {
+    "load": "ダッシュボード データをロードできません。",
+    "updateShareStatus": "共有ステータスを更新できません。",
+    "renameResource": "リソースの名前を変更できません。",
+    "createCalendar": "カレンダーを作成できません。",
+    "createAddressBook": "アドレス帳を作成できません。",
+    "saveShare": "共有割り当てを保存できません。",
+    "removeShare": "共有の割り当てを削除できません。",
+    "exportCalendars": "カレンダーをエクスポートできません。",
+    "exportCalendar": "カレンダーをエクスポートできません。",
+    "exportAddressBooks": "アドレス帳をエクスポートできません。",
+    "exportAddressBook": "アドレス帳をエクスポートできません。",
+    "appleCompat": "Apple 互換性設定を更新できません。",
+    "milestones": "誕生日/記念日のカレンダー設定を更新できません。"
+  },
+  "overview": {
+    "endpointTitle": "DAV エンドポイント",
+    "endpointHelper": "この URL をクライアント接続設定で使用します。",
+    "principalTitle": "校長",
+    "principalHelper": "自動検出により、この問題が自動的に解決される場合があります。",
+    "roleTitle": "役割",
+    "roleHelper": "管理者はユーザーとユーザー間共有を管理できます。"
+  },
+  "resources": {
+    "yourCalendars": "あなたのカレンダー",
+    "createCalendar": "カレンダーの作成",
+    "yourAddressBooks": "あなたのアドレス帳",
+    "createAddressBook": "アドレス帳の作成",
+    "exportAll": "すべてエクスポート"
+  },
+  "resourcePanel": {
+    "displayName": "表示名",
+    "sharable": "共有可能",
+    "noOwned": "所有されているリソースはまだありません。",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "editNameFor": "{{name}} の名前を編集",
+    "exportItem": "エクスポート {{name}}",
+    "default": "(デフォルト)",
+    "sharedWithYou": "あなたと共有されました",
+    "noShared": "共有リソースはありません。",
+    "owner": "所有者: {{name}} ({{email}})",
+    "scope": {
+      "owned": "所有",
+      "shared": "共有"
+    },
+    "cancelEditingCalendarName": "編集をキャンセル {{label}} カレンダー名",
+    "saveCalendarName": "{{label}} カレンダー名を保存",
+    "resetCalendarName": "{{label}} カレンダー名をデフォルトにリセット",
+    "renameCalendar": "{{label}} カレンダーの名前を変更",
+    "saving": "保存中..."
+  },
+  "milestoneCalendars": {
+    "expand": "マイルストーンカレンダーを展開する",
+    "collapse": "マイルストーンカレンダーを折りたたむ",
+    "title": "マイルストーンカレンダー",
+    "off": "オフ",
+    "enabled": "{{count}}/2 が有効になりました",
+    "configure": "設定する",
+    "hide": "隠す",
+    "birthdays": "誕生日",
+    "birthdaysFallback": "{{name}} 誕生日",
+    "anniversaries": "記念日",
+    "anniversariesFallback": "{{name}} 記念日"
+  },
+  "sharing": {
+    "title": "リソースを共有する",
+    "subtitle": "自分が所有し、共有可能としてマークされているリソースに対して、読み取り専用、編集者、または管理者アクセス権を付与します。管理者アクセスには、コレクションの削除権限が含まれます。",
+    "resourceCalendar": "カレンダー",
+    "resourceAddressBook": "アドレス帳",
+    "selectSharableResource": "共有可能なリソースを選択してください",
+    "selectUser": "ユーザーの選択",
+    "permReadOnly": "一般 (読み取り専用)",
+    "permEditor": "完全編集（削除なし）",
+    "permAdmin": "管理者 (完全編集 + 削除)",
+    "share": "シェアする",
+    "noOutgoing": "まだ発行株式はありません。",
+    "sharedWith": "共有者: {{name}} ({{email}})",
+    "revoke": "取り消し"
+  },
+  "appleCompat": {
+    "title": "Apple の連絡先の互換性",
+    "subtitle": "デフォルトではオフです。選択したアドレス帳をメインのアドレス帳にミラーリングして、macOS および iOS クライアントがそれらを参照できるようにします。",
+    "target": "ミラーターゲット: {{name}} (/{{uri}})",
+    "missingTarget": "アカウントのデフォルトの連絡先アドレス帳が見つかりません。",
+    "enable": "Apple 互換性ミラーリングを有効にする",
+    "sourcesTitle": "ミラーリングするソースアドレス帳",
+    "noSources": "利用可能な所有/共有アドレス帳がありません。",
+    "save": "Apple 互換性設定を保存する"
+  },
+  "states": {
+    "loadingResources": "リソースを読み込んでいます..."
+  },
+  "notices": {
+    "shareStatus": {
+      "shared": "{{name}} が共有されました。",
+      "unshared": "{{name}} は共有されなくなりました。"
+    }
+  }
+}
