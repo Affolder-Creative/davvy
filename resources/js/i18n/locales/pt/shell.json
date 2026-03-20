@@ -1,0 +1,33 @@
+{
+  "tabs": {
+    "dashboard": "Painel",
+    "contacts": "Contatos",
+    "reviewQueue": "Fila de revisão",
+    "profile": "Perfil"
+  },
+  "account": {
+    "label": "Conta",
+    "toggleMenu": "Alternar menu da conta"
+  },
+  "admin": {
+    "controlCenter": "Centro de controle administrativo",
+    "openControlCenter": "Abra o Centro de Controle Administrativo"
+  },
+  "actions": {
+    "signOut": "Sair"
+  },
+  "sponsor": {
+    "button": "Patrocinar",
+    "closeLinks": "Fechar links de patrocinadores",
+    "title": "Apoie o Davvy",
+    "subtitle": "Escolha um link abaixo para patrocinar o projeto.",
+    "close": "Fechar"
+  },
+  "app": {
+    "brand": "Davvy",
+    "subtitle": "Gerenciador CalDAV + CardDAV"
+  },
+  "session": {
+    "signedInAs": "Conectado como {{email}}"
+  }
+}

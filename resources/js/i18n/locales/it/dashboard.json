@@ -1,0 +1,101 @@
+{
+  "errors": {
+    "load": "Impossibile caricare i dati del dashboard.",
+    "updateShareStatus": "Impossibile aggiornare lo stato di condivisione.",
+    "renameResource": "Impossibile rinominare la risorsa.",
+    "createCalendar": "Impossibile creare il calendario.",
+    "createAddressBook": "Impossibile creare la rubrica.",
+    "saveShare": "Impossibile salvare l'assegnazione della condivisione.",
+    "removeShare": "Impossibile rimuovere l'assegnazione della condivisione.",
+    "exportCalendars": "Impossibile esportare i calendari.",
+    "exportCalendar": "Impossibile esportare il calendario.",
+    "exportAddressBooks": "Impossibile esportare le rubriche.",
+    "exportAddressBook": "Impossibile esportare la rubrica.",
+    "appleCompat": "Impossibile aggiornare le impostazioni di compatibilità Apple.",
+    "milestones": "Impossibile aggiornare le impostazioni del calendario compleanno/anniversario."
+  },
+  "overview": {
+    "endpointTitle": "Punto finale DAV",
+    "endpointHelper": "Utilizza questo URL nelle impostazioni di connessione del client.",
+    "principalTitle": "Principale",
+    "principalHelper": "L'individuazione automatica potrebbe risolvere il problema automaticamente.",
+    "roleTitle": "Ruolo",
+    "roleHelper": "Gli amministratori possono gestire gli utenti e la condivisione tra utenti."
+  },
+  "resources": {
+    "yourCalendars": "I tuoi calendari",
+    "createCalendar": "Crea calendario",
+    "yourAddressBooks": "Le tue rubriche",
+    "createAddressBook": "Crea rubrica",
+    "exportAll": "Esporta tutto"
+  },
+  "resourcePanel": {
+    "displayName": "Nome visualizzato",
+    "sharable": "Condivisibile",
+    "noOwned": "Nessuna risorsa posseduta ancora.",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "editNameFor": "Modifica nome per {{name}}",
+    "exportItem": "Esporta {{name}}",
+    "default": "(predefinito)",
+    "sharedWithYou": "Condiviso con te",
+    "noShared": "Nessuna risorsa condivisa.",
+    "owner": "Proprietario: {{name}} ({{email}})",
+    "scope": {
+      "owned": "Di proprietà",
+      "shared": "Condiviso"
+    },
+    "cancelEditingCalendarName": "Annulla la modifica del nome del calendario {{label}}",
+    "saveCalendarName": "Salva {{label}} nome del calendario",
+    "resetCalendarName": "Ripristina il nome del calendario {{label}} predefinito",
+    "renameCalendar": "Rinominare il calendario {{label}}",
+    "saving": "Salvataggio..."
+  },
+  "milestoneCalendars": {
+    "expand": "Espandi i calendari delle tappe fondamentali",
+    "collapse": "Comprimi i calendari delle tappe fondamentali",
+    "title": "Calendari delle tappe fondamentali",
+    "off": "Spento",
+    "enabled": "{{count}}/2 abilitato",
+    "configure": "Configura",
+    "hide": "Nasconditi",
+    "birthdays": "Compleanni",
+    "birthdaysFallback": "{{name}} Compleanni",
+    "anniversaries": "Anniversari",
+    "anniversariesFallback": "{{name}} Anniversari"
+  },
+  "sharing": {
+    "title": "Condividi le tue risorse",
+    "subtitle": "Concedi l'accesso di sola lettura, editor o amministratore per le risorse di tua proprietà e contrassegnate come condivisibili. L'accesso amministrativo include i diritti di eliminazione delle raccolte.",
+    "resourceCalendar": "Calendario",
+    "resourceAddressBook": "Rubrica",
+    "selectSharableResource": "Seleziona risorsa condivisibile",
+    "selectUser": "Seleziona utente",
+    "permReadOnly": "Generale (sola lettura)",
+    "permEditor": "Modifica completa (nessuna eliminazione)",
+    "permAdmin": "Amministratore (modifica completa + eliminazione)",
+    "share": "Condividi",
+    "noOutgoing": "Nessuna condivisione in uscita ancora.",
+    "sharedWith": "Condiviso con: {{name}} ({{email}})",
+    "revoke": "Revoca"
+  },
+  "appleCompat": {
+    "title": "Compatibilità dei contatti Apple",
+    "subtitle": "Disattivato per impostazione predefinita. Specchia le rubriche selezionate nella tua rubrica principale in modo che i client macOS e iOS possano vederle.",
+    "target": "Destinazione specchio: {{name}} (/{{uri}})",
+    "missingTarget": "Nessuna rubrica predefinita dei contatti trovata per il tuo account.",
+    "enable": "Abilita il mirroring della compatibilità Apple",
+    "sourcesTitle": "Rubriche di origine da mirrorare",
+    "noSources": "Nessuna rubrica posseduta/condivisa idonea disponibile.",
+    "save": "Salva le impostazioni di compatibilità Apple"
+  },
+  "states": {
+    "loadingResources": "Caricamento risorse..."
+  },
+  "notices": {
+    "shareStatus": {
+      "shared": "{{name}} è ora condiviso.",
+      "unshared": "{{name}} non è più condiviso."
+    }
+  }
+}

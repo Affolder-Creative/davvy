@@ -45,6 +45,24 @@ import frQueue from "./locales/fr/queue.json";
 import frAdmin from "./locales/fr/admin.json";
 import frProfile from "./locales/fr/profile.json";
 
+import itCommon from "./locales/it/common.json";
+import itAuth from "./locales/it/auth.json";
+import itShell from "./locales/it/shell.json";
+import itDashboard from "./locales/it/dashboard.json";
+import itContacts from "./locales/it/contacts.json";
+import itQueue from "./locales/it/queue.json";
+import itAdmin from "./locales/it/admin.json";
+import itProfile from "./locales/it/profile.json";
+
+import ptCommon from "./locales/pt/common.json";
+import ptAuth from "./locales/pt/auth.json";
+import ptShell from "./locales/pt/shell.json";
+import ptDashboard from "./locales/pt/dashboard.json";
+import ptContacts from "./locales/pt/contacts.json";
+import ptQueue from "./locales/pt/queue.json";
+import ptAdmin from "./locales/pt/admin.json";
+import ptProfile from "./locales/pt/profile.json";
+
 import zhCommon from "./locales/zh/common.json";
 import zhAuth from "./locales/zh/auth.json";
 import zhShell from "./locales/zh/shell.json";
@@ -108,6 +126,26 @@ const resources = {
     queue: frQueue,
     admin: frAdmin,
     profile: frProfile,
+  },
+  it: {
+    common: itCommon,
+    auth: itAuth,
+    shell: itShell,
+    dashboard: itDashboard,
+    contacts: itContacts,
+    queue: itQueue,
+    admin: itAdmin,
+    profile: itProfile,
+  },
+  pt: {
+    common: ptCommon,
+    auth: ptAuth,
+    shell: ptShell,
+    dashboard: ptDashboard,
+    contacts: ptContacts,
+    queue: ptQueue,
+    admin: ptAdmin,
+    profile: ptProfile,
   },
   zh: {
     common: zhCommon,

@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'verify_email_subject' => 'Verifica la tua email per :app',
+    'verify_email_title' => 'Verifica la tua email',
+    'verify_email_subtitle' => 'Conferma il tuo indirizzo per completare la configurazione dell\'account.',
+    'verify_email_thanks_for_registering' => 'Grazie per esserti registrato a :app.',
+    'verify_email_confirm_to_continue' => 'Conferma il tuo indirizzo email per continuare:',
+    'verify_email_button' => 'Verifica e-mail',
+    'verify_email_use_one_time_link' => 'Utilizza questo collegamento una tantum per verificare il tuo indirizzo email:',
+    'verify_email_footer' => 'Questo messaggio è stato inviato da :app. Se non hai creato tu questo account, puoi ignorare questa email.',
+    'admin_invite_subject' => 'Sei invitato a :app',
+    'admin_invite_title' => 'Sei invitato',
+    'admin_invite_title_with_app' => 'Sei invitato a :app',
+    'admin_invite_subtitle' => 'È stato creato un collegamento di attivazione una tantum per il tuo account.',
+    'admin_invite_account_created' => 'Un amministratore ha creato un account per te su :app.',
+    'admin_invite_set_password_and_activate' => 'Imposta la tua password e attiva il tuo account:',
+    'admin_invite_activate_button' => 'Attiva Conto',
+    'admin_invite_use_one_time_link' => 'Utilizza questo collegamento unico per impostare la password e attivare il tuo account:',
+    'admin_invite_footer' => 'Questo messaggio è stato inviato da :app. Se non ti aspettavi questo invito, puoi ignorare questa email.',
+    'greeting_name' => 'Ciao :name,',
+    'if_button_fails_copy_link' => 'Se il pulsante non funziona, copia e incolla questo link:',
+    'one_time_link_expires_at' => 'Questo collegamento una tantum scade alle :expires_at.',
+    'logo_alt' => ':app logo',
+];
