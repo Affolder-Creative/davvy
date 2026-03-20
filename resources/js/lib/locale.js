@@ -1,4 +1,4 @@
-export const SUPPORTED_LOCALES = ["de", "en", "es", "fr", "it", "pt"];
+export const SUPPORTED_LOCALES = ["de", "en", "es", "fr", "it", "pt", "zh"];
 export const FALLBACK_LOCALE = "en";
 const LOCALE_STORAGE_KEY = "davvy.locale";
 const RTL_PRIMARY_LOCALES = new Set(["ar", "fa", "he", "ur"]);
@@ -9,6 +9,7 @@ const LOCALE_LABEL_OVERRIDES = Object.freeze({
   fr: "Français",
   it: "Italiano",
   pt: "Português",
+  zh: "中文",
 });
 
 function canonicalizeLocaleCode(value) {

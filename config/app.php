@@ -11,7 +11,7 @@ return [
     'supported_locales' => array_values(array_filter(
         array_map(
             static fn (string $locale): string => strtolower(trim($locale)),
-            explode(',', (string) env('APP_SUPPORTED_LOCALES', 'de,en,es,fr,it,pt')),
+            explode(',', (string) env('APP_SUPPORTED_LOCALES', 'de,en,es,fr,it,pt,zh')),
         ),
         static fn (string $locale): bool => $locale !== '',
     )),

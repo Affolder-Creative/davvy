@@ -63,6 +63,15 @@ import ptQueue from "./locales/pt/queue.json";
 import ptAdmin from "./locales/pt/admin.json";
 import ptProfile from "./locales/pt/profile.json";
 
+import zhCommon from "./locales/zh/common.json";
+import zhAuth from "./locales/zh/auth.json";
+import zhShell from "./locales/zh/shell.json";
+import zhDashboard from "./locales/zh/dashboard.json";
+import zhContacts from "./locales/zh/contacts.json";
+import zhQueue from "./locales/zh/queue.json";
+import zhAdmin from "./locales/zh/admin.json";
+import zhProfile from "./locales/zh/profile.json";
+
 const APP_TITLE_KEY = "meta.appTitle";
 let titleSyncBound = false;
 
@@ -137,6 +146,16 @@ const resources = {
     queue: ptQueue,
     admin: ptAdmin,
     profile: ptProfile,
+  },
+  zh: {
+    common: zhCommon,
+    auth: zhAuth,
+    shell: zhShell,
+    dashboard: zhDashboard,
+    contacts: zhContacts,
+    queue: zhQueue,
+    admin: zhAdmin,
+    profile: zhProfile,
   },
 };
 
