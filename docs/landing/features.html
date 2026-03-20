@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="avvy feature overview: identity and access, sharing, managed contacts, interoperability, automated backup rotation with restore tooling, and deployment controls."
+      content="Davvy feature overview: identity and access, built-in localization and multi-language support, sharing, managed contacts, interoperability, automated backup rotation with restore tooling, and deployment controls."
     />
     <title>Features | Davvy</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -145,16 +145,53 @@
                 Unified account model for web dashboard and DAV clients.
                 Session-based web auth supports TOTP 2FA with backup codes.
                 DAV uses HTTP Basic auth and supports app passwords for
-                non-interactive clients when 2FA is enabled. Two roles: admin
-                and regular.
+                non-interactive clients when 2FA is enabled. Locale-aware
+                request handling supports per-user language preferences and
+                negotiated API/DAV messaging. Two roles: admin and regular.
               </p>
               <div class="feature-details">
                 <span class="feature-tag">Session Auth</span>
                 <span class="feature-tag">Basic Auth</span>
                 <span class="feature-tag">TOTP 2FA</span>
                 <span class="feature-tag">DAV App Passwords</span>
+                <span class="feature-tag">Locale Negotiation</span>
                 <span class="feature-tag">Rate Limiting</span>
                 <span class="feature-tag">CSRF Protection</span>
+              </div>
+            </article>
+
+            <!-- Localization -->
+            <article class="feature-card-large reveal">
+              <div class="feature-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 8l6 6" />
+                  <path d="M4 14l6-6 2-3" />
+                  <path d="M2 5h12" />
+                  <path d="M7 2h1" />
+                  <path d="M22 22l-5-10-5 10" />
+                  <path d="M14 18h6" />
+                </svg>
+              </div>
+              <h3>Localization</h3>
+              <p>
+                Localized web UI with per-user language preferences, including
+                English, Spanish, French, and German. Locale negotiation honors
+                explicit request hints and browser language headers, with
+                fallback behavior for unsupported locales.
+              </p>
+              <div class="feature-details">
+                <span class="feature-tag">Per-user Language</span>
+                <span class="feature-tag">EN / ES / FR / DE</span>
+                <span class="feature-tag">Accept-Language</span>
+                <span class="feature-tag">API + DAV Aware</span>
               </div>
             </article>
 
@@ -424,7 +461,14 @@
               <p>
                 Davvy runs as one Laravel application serving web UI, API, and
                 DAV endpoints. Start with the Docker quick-start, then move to
-                your preferred host.
+                your preferred host. For language and locale behavior details,
+                see the
+                <a
+                  href="https://github.com/kaffolder7/davvy/blob/main/docs/localization.md"
+                  target="_blank"
+                  rel="noreferrer"
+                  >localization guide</a
+                >.
               </p>
             </div>
             <a

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Davvy is a self-hosted CalDAV and CardDAV server with a modern web dashboard, TOTP 2FA with backup codes, DAV app passwords, sharing, and automated backup rotation with restore tooling."
+      content="Davvy is a self-hosted CalDAV and CardDAV server with a modern web dashboard, per-user language preferences, localized web UI (English, Spanish, French, German), sharing controls, and automated backup rotation with restore tooling."
     />
     <title>Davvy | Self-hosted CalDAV + CardDAV</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -128,8 +128,9 @@
               <p class="hero-subtitle">
                 A self-hosted CalDAV and CardDAV server with a modern web
                 dashboard. Manage calendars, contacts, sharing, and client
-                compatibility, then protect everything with automated backup
-                rotation and one-click restore imports.
+                compatibility. Choose your language per user, then protect
+                everything with automated backup rotation and one-click restore
+                imports.
               </p>
               <div class="hero-actions">
                 <a
@@ -359,6 +360,33 @@
                 TOTP two-factor authentication with backup codes, while DAV
                 clients use HTTP Basic auth with app passwords when 2FA is
                 enabled.
+              </p>
+            </article>
+
+            <article class="feature-card reveal">
+              <div class="feature-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 8l6 6" />
+                  <path d="M4 14l6-6 2-3" />
+                  <path d="M2 5h12" />
+                  <path d="M7 2h1" />
+                  <path d="M22 22l-5-10-5 10" />
+                  <path d="M14 18h6" />
+                </svg>
+              </div>
+              <h3>Built-in localization</h3>
+              <p>
+                Localized web UI with per-user language preferences (English,
+                Spanish, French, and German), plus locale-aware API and DAV
+                messaging with fallback behavior.
               </p>
             </article>
 
