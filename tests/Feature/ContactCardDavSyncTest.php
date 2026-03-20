@@ -12,11 +12,14 @@ use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\Contacts\ContactMilestoneCalendarService;
 use App\Services\Contacts\ManagedContactSyncService;
+use App\Services\Dav\Backends\LaravelAuthBackend;
 use App\Services\Dav\Backends\LaravelCardDavBackend;
 use App\Services\DavRequestContext;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery\MockInterface;
+use Sabre\HTTP\Request as SabreRequest;
+use Sabre\HTTP\Response as SabreResponse;
 use Tests\TestCase;
 
 class ContactCardDavSyncTest extends TestCase
@@ -315,6 +318,86 @@ class ContactCardDavSyncTest extends TestCase
         $payload = Contact::query()->findOrFail($contactId)->payload;
         $this->assertSame($partnerId, $payload['related_names'][0]['related_contact_id'] ?? null);
         $this->assertSame($partnerName, $payload['related_names'][0]['value'] ?? null);
+    }
+
+    public function test_carddav_round_trip_keeps_canonical_tokens_under_spanish_locale(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'canonical-es@example.test',
+            'password' => 'password1234',
+            'locale' => 'es',
+        ]);
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'uri' => 'canonical-es-roundtrip',
+        ]);
+
+        $created = $this->actingAs($user)->postJson('/api/contacts', [
+            'first_name' => 'Alex',
+            'last_name' => 'Rivera',
+            'company' => null,
+            'address_book_ids' => [$addressBook->id],
+            'phones' => [],
+            'emails' => [],
+            'urls' => [],
+            'addresses' => [],
+            'dates' => [],
+            'related_names' => [
+                [
+                    'label' => 'son',
+                    'custom_label' => null,
+                    'value' => 'Gavin Rivera',
+                    'related_contact_id' => null,
+                ],
+                [
+                    'label' => 'custom',
+                    'custom_label' => 'Daughter-in-Law',
+                    'value' => 'Talia Rivera',
+                    'related_contact_id' => null,
+                ],
+            ],
+            'instant_messages' => [],
+        ]);
+        $created->assertCreated();
+
+        $uid = (string) $created->json('uid');
+        $contactId = (int) $created->json('id');
+
+        $assignment = ContactAddressBookAssignment::query()
+            ->where('contact_id', $contactId)
+            ->where('address_book_id', $addressBook->id)
+            ->firstOrFail();
+
+        $card = Card::query()->findOrFail($assignment->card_id);
+        $initialCardData = (string) $card->data;
+
+        $authBackend = app(LaravelAuthBackend::class);
+        $request = new SabreRequest('PROPFIND', '/dav/', [
+            'Authorization' => 'Basic '.base64_encode($user->email.':password1234'),
+        ]);
+        $response = new SabreResponse;
+
+        [$ok] = $authBackend->check($request, $response);
+
+        $this->assertTrue($ok);
+        $this->assertSame('es', app()->getLocale());
+        $this->assertStringContainsString('UID:'.$uid, $initialCardData);
+        $this->assertStringContainsString('RELATED;TYPE=CHILD', $initialCardData);
+        $this->assertStringContainsString('X-ABLABEL=Son', $initialCardData);
+        $this->assertStringContainsString('X-ABLABEL=Daughter-in-Law', $initialCardData);
+
+        app(LaravelCardDavBackend::class)->updateCard(
+            $addressBook->id,
+            (string) $assignment->card_uri,
+            $initialCardData,
+        );
+
+        $roundTrippedCardData = (string) Card::query()->findOrFail($assignment->card_id)->fresh()->data;
+
+        $this->assertStringContainsString('UID:'.$uid, $roundTrippedCardData);
+        $this->assertStringContainsString('RELATED;TYPE=CHILD', $roundTrippedCardData);
+        $this->assertStringContainsString('X-ABLABEL=Son', $roundTrippedCardData);
+        $this->assertStringContainsString('X-ABLABEL=Daughter-in-Law', $roundTrippedCardData);
     }
 
     public function test_related_name_synonym_label_round_trips_through_carddav(): void
