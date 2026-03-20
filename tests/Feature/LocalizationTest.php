@@ -7,6 +7,7 @@ use App\Mail\PublicRegistrationVerificationMail;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class LocalizationTest extends TestCase
@@ -191,6 +192,24 @@ class LocalizationTest extends TestCase
         );
     }
 
+    public function test_login_validation_error_message_localizes_to_german_and_french(): void
+    {
+        foreach (['de', 'fr'] as $locale) {
+            $response = $this->withHeaders([
+                'X-Davvy-Locale' => $locale,
+            ])->postJson('/api/auth/login', [
+                'email' => 'missing@example.com',
+                'password' => 'incorrect-password',
+            ]);
+
+            $response->assertStatus(422);
+            $response->assertJsonPath(
+                'message',
+                trans('auth.credentials_invalid', locale: $locale),
+            );
+        }
+    }
+
     public function test_admin_backup_validation_error_localizes_to_authenticated_user_locale(): void
     {
         $admin = User::factory()->admin()->create([
@@ -256,6 +275,91 @@ class LocalizationTest extends TestCase
         $this->assertStringContainsString('lang="es"', $inviteHtml);
     }
 
+    public function test_onboarding_mails_render_german_and_french_subject_and_body(): void
+    {
+        $cases = [
+            'de' => [
+                'name' => 'Eingeladen',
+                'verify_heading' => 'Bestätige deine E-Mail-Adresse',
+                'invite_heading' => 'Du wurdest zu',
+            ],
+            'fr' => [
+                'name' => 'Invité',
+                'verify_heading' => 'Vérifiez votre adresse e-mail',
+                'invite_heading' => 'Vous êtes invité à rejoindre',
+            ],
+        ];
+
+        foreach ($cases as $locale => $case) {
+            $user = User::factory()->create([
+                'name' => $case['name'],
+                'locale' => $locale,
+            ]);
+
+            $expiresAt = CarbonImmutable::parse('2026-03-21 10:30:00', 'UTC');
+            $verifyMail = (new PublicRegistrationVerificationMail(
+                user: $user,
+                verificationUrl: 'https://example.test/verify-email?token=abc',
+                expiresAt: $expiresAt,
+            ))->locale($locale);
+
+            $inviteMail = (new AdminUserInviteMail(
+                user: $user,
+                inviteUrl: 'https://example.test/invite?token=abc',
+                expiresAt: $expiresAt,
+            ))->locale($locale);
+
+            $verifySubject = $this->withAppLocale($locale, fn (): string => $verifyMail->envelope()->subject);
+            $inviteSubject = $this->withAppLocale($locale, fn (): string => $inviteMail->envelope()->subject);
+
+            $this->assertSame(
+                trans('emails.verify_email_subject', ['app' => config('app.name', 'Davvy')], $locale),
+                $verifySubject,
+            );
+            $this->assertSame(
+                trans('emails.admin_invite_subject', ['app' => config('app.name', 'Davvy')], $locale),
+                $inviteSubject,
+            );
+
+            $verifyHtml = $this->withAppLocale($locale, fn (): string => $verifyMail->render());
+            $inviteHtml = $this->withAppLocale($locale, fn (): string => $inviteMail->render());
+
+            $this->assertStringContainsString($case['verify_heading'], $verifyHtml);
+            $this->assertStringContainsString($case['invite_heading'], $inviteHtml);
+            $this->assertStringContainsString('lang="'.$locale.'"', $verifyHtml);
+            $this->assertStringContainsString('lang="'.$locale.'"', $inviteHtml);
+        }
+    }
+
+    public function test_german_and_french_catalogs_match_english_translation_keys(): void
+    {
+        $englishFiles = glob((string) lang_path('en/*.php'));
+
+        $this->assertIsArray($englishFiles);
+        $this->assertNotEmpty($englishFiles);
+
+        foreach (['de', 'fr'] as $locale) {
+            foreach ($englishFiles as $englishPath) {
+                $filename = basename($englishPath);
+                $localePath = (string) lang_path($locale.'/'.$filename);
+
+                $this->assertFileExists(
+                    $localePath,
+                    sprintf('Missing %s translation file: %s', strtoupper($locale), $filename),
+                );
+
+                $englishKeys = $this->flattenTranslationKeys(require $englishPath);
+                $localeKeys = $this->flattenTranslationKeys(require $localePath);
+
+                $this->assertSame(
+                    $englishKeys,
+                    $localeKeys,
+                    sprintf('Key mismatch for %s/%s', $locale, $filename),
+                );
+            }
+        }
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -297,5 +401,17 @@ class LocalizationTest extends TestCase
         } finally {
             app()->setLocale($originalLocale);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $translations
+     * @return array<int, string>
+     */
+    private function flattenTranslationKeys(array $translations): array
+    {
+        $keys = array_keys(Arr::dot($translations));
+        sort($keys);
+
+        return $keys;
     }
 }

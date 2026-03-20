@@ -50,8 +50,8 @@ Authenticated users can update preference via:
 
 ## DAV and Backend Message Coverage
 
-- Backend PHP translation catalogs currently ship for `en` and `es` in `lang/`.
-- For locales without a PHP catalog (for example `de` or `fr`), backend/DAV/email strings fall back to `APP_FALLBACK_LOCALE` (default: English).
+- Backend PHP translation catalogs currently ship for `de`, `en`, `es`, and `fr` in `lang/`.
+- For locales without a PHP catalog, backend/DAV/email strings fall back to `APP_FALLBACK_LOCALE` (default: English).
 
 ## Adding a New Locale
 
@@ -72,4 +72,3 @@ When locale behavior changes, update or add tests in:
 - `resources/js/i18n/index.test.js`
 - `resources/js/lib/locale.test.js`
 - `resources/js/components/profile/ProfilePage.test.jsx`
-

@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'public_registration_disabled' => 'Die öffentliche Registrierung ist derzeit deaktiviert.',
+    'registration_submitted_verify_and_wait_approval' => 'Registrierung eingereicht. Verifiziere deine E-Mail-Adresse und warte vor der Anmeldung auf die Freigabe durch einen Administrator.',
+    'registration_submitted_verify_before_signin' => 'Registrierung eingereicht. Verifiziere deine E-Mail-Adresse, bevor du dich anmeldest.',
+    'registration_submitted_pending_approval' => 'Registrierung eingereicht. Ein Administrator muss dein Konto freigeben, bevor du dich anmelden kannst.',
+    'verification_link_invalid_or_expired' => 'Der Verifizierungslink ist ungültig oder abgelaufen.',
+    'email_verified_pending_approval' => 'E-Mail-Adresse verifiziert. Dein Konto wartet auf die Freigabe durch einen Administrator.',
+    'invitation_link_invalid_or_expired' => 'Der Einladungslink ist ungültig oder abgelaufen.',
+    'invitation_accepted_pending_approval' => 'Einladung akzeptiert. Dein Konto wartet auf die Freigabe durch einen Administrator.',
+    'credentials_invalid' => 'Die angegebenen Zugangsdaten sind ungültig.',
+    'account_pending_approval' => 'Dein Konto wartet auf die Freigabe durch einen Administrator.',
+    'verify_email_before_signin' => 'Verifiziere deine E-Mail-Adresse, bevor du dich anmeldest.',
+    'two_factor_code_required' => 'Zum Abschließen der Anmeldung ist ein Zwei-Faktor-Code erforderlich.',
+    'no_pending_two_factor_challenge' => 'Keine ausstehende Zwei-Faktor-Abfrage. Starte einen neuen Anmeldeversuch.',
+    'invalid_authentication_code' => 'Ungültiger Authentifizierungscode.',
+    'two_factor_already_enabled' => 'Die Zwei-Faktor-Authentifizierung ist bereits aktiviert.',
+    'two_factor_setup_expired' => 'Die Einrichtung der Zwei-Faktor-Authentifizierung ist abgelaufen. Starte die Einrichtung erneut.',
+    'two_factor_code_invalid' => 'Der Zwei-Faktor-Code ist ungültig.',
+    'two_factor_not_enabled' => 'Die Zwei-Faktor-Authentifizierung ist nicht aktiviert.',
+    'enable_two_factor_before_managing_app_passwords' => 'Aktiviere die Zwei-Faktor-Authentifizierung, bevor du App-Passwörter verwaltest.',
+    'enable_two_factor_before_creating_app_passwords' => 'Aktiviere die Zwei-Faktor-Authentifizierung, bevor du App-Passwörter erstellst.',
+    'two_factor_setup_required_before_accessing_resource' => 'Vor dem Zugriff auf diese Ressource muss die Zwei-Faktor-Authentifizierung eingerichtet werden.',
+];

@@ -61,4 +61,36 @@ class DavLocalizationTest extends TestCase
 
         $validator->validateAndNormalize("BEGIN:VCARD\nVERSION:4.0\nFN:Wrong Payload\nEND:VCARD");
     }
+
+    public function test_authenticated_dav_validation_errors_localize_to_german_and_french(): void
+    {
+        $cases = [
+            'de' => 'VCALENDAR-Nutzlast erwartet.',
+            'fr' => 'Payload VCALENDAR attendu.',
+        ];
+
+        foreach ($cases as $locale => $expectedMessage) {
+            $user = User::factory()->create([
+                'email' => sprintf('dav-locale-errors-%s@example.test', $locale),
+                'password' => 'password1234',
+                'locale' => $locale,
+            ]);
+
+            $authBackend = app(LaravelAuthBackend::class);
+            $request = new Request('PROPFIND', '/dav/', [
+                'Authorization' => 'Basic '.base64_encode($user->email.':password1234'),
+            ]);
+            $response = new Response;
+
+            [$ok] = $authBackend->check($request, $response);
+            $this->assertTrue($ok);
+
+            try {
+                app(IcsValidator::class)->validateAndNormalize("BEGIN:VCARD\nVERSION:4.0\nFN:Wrong Payload\nEND:VCARD");
+                $this->fail('Expected DAV validator to throw for invalid payload.');
+            } catch (BadRequest $exception) {
+                $this->assertSame($expectedMessage, $exception->getMessage());
+            }
+        }
+    }
 }
