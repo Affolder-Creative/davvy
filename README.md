@@ -20,7 +20,7 @@ It is designed for:
   </tr>
   <tr>
     <td><img src="docs/screenshots/contacts.webp" alt="Davvy contacts management page" style="width: 100%"/><small><strong>Contacts</strong></small></td>
-    <td><img src="docs/screenshots/login.webp" alt="Davvy login screen" style="width: 100%"/><small><strong>Login</strong></small></td>
+    <td><img src="docs/screenshots/profile.webp" alt="Davvy profile settings page" style="width: 100%"/><small><strong>Profile</strong></small></td>
   </tr>
 </table>
 
