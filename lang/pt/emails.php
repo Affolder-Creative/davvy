@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'verify_email_subject' => 'Verifique seu e-mail para :app',
+    'verify_email_title' => 'Verifique seu e-mail',
+    'verify_email_subtitle' => 'Confirme seu endereço para concluir a configuração da conta.',
+    'verify_email_thanks_for_registering' => 'Obrigado por se registrar em :app.',
+    'verify_email_confirm_to_continue' => 'Confirme seu endereço de e-mail para continuar:',
+    'verify_email_button' => 'Verificar e-mail',
+    'verify_email_use_one_time_link' => 'Use este link único para verificar seu endereço de e-mail:',
+    'verify_email_footer' => 'Esta mensagem foi enviada por :app. Se você não criou esta conta, poderá ignorar este e-mail.',
+    'admin_invite_subject' => 'Você está convidado para :app',
+    'admin_invite_title' => 'Você está convidado',
+    'admin_invite_title_with_app' => 'Você está convidado para :app',
+    'admin_invite_subtitle' => 'Um link de ativação único foi criado para sua conta.',
+    'admin_invite_account_created' => 'Um administrador criou uma conta para você em :app.',
+    'admin_invite_set_password_and_activate' => 'Defina sua senha e ative sua conta:',
+    'admin_invite_activate_button' => 'Ativar conta',
+    'admin_invite_use_one_time_link' => 'Use este link único para definir sua senha e ativar sua conta:',
+    'admin_invite_footer' => 'Esta mensagem foi enviada por :app. Se você não esperava este convite, pode ignorar este e-mail.',
+    'greeting_name' => 'Olá :name,',
+    'if_button_fails_copy_link' => 'Se o botão não funcionar, copie e cole este link:',
+    'one_time_link_expires_at' => 'Este link único expira em :expires_at.',
+    'logo_alt' => ':app logotipo',
+];

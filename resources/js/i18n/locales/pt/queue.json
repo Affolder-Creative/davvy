@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "Não foi possível carregar solicitações de alteração.",
+    "approve": "Não foi possível aprovar a solicitação.",
+    "deny": "Não foi possível negar a solicitação.",
+    "bulk": "Não foi possível processar a ação em massa.",
+    "resolvedPayloadJson": "A carga resolvida deve ser JSON válida.",
+    "resolvedAddressIdsJson": "Os IDs do catálogo de endereços resolvidos devem ser JSON válidos.",
+    "resolvedAddressIdsArray": "Os IDs do catálogo de endereços resolvidos devem ser uma matriz de números inteiros positivos."
+  },
+  "bulk": {
+    "confirm": "Isso irá {{verb}} {{count}} solicitações enfileiradas na visualização filtrada atual. Continuar?",
+    "approve": "aprovar",
+    "deny": "negar"
+  },
+  "filters": {
+    "open": "Abrir",
+    "pending": "Pendente",
+    "manualMergeNeeded": "Mesclagem manual necessária",
+    "history": "História",
+    "all": "Todos",
+    "allOperations": "Todas as operações",
+    "updates": "Atualizações",
+    "deletes": "Exclui",
+    "searchPlaceholder": "Pesquisar por contato/solicitante...",
+    "refresh": "Atualizar"
+  },
+  "card": {
+    "group": "Grupo",
+    "unnamedContact": "Contato Sem Nome",
+    "status": "Estado",
+    "requested": "Solicitado",
+    "editApprove": "Editar e aprovar",
+    "approve": "Aprovar",
+    "deny": "Negar",
+    "requester": "Solicitante",
+    "approvalOwner": "Proprietário da aprovação",
+    "source": "Fonte",
+    "reviewer": "Revisor",
+    "notReviewed": "Ainda não revisado",
+    "changedFields": "Campos alterados"
+  },
+  "modal": {
+    "title": "Editar solicitação #{{id}} antes de aprovar",
+    "subtitle": "Ajuste os IDs de carga útil/catálogo de endereços e aprove essa solicitação na fila.",
+    "resolvedPayload": "JSON de carga útil resolvida",
+    "resolvedAddressIds": "Matriz JSON de IDs de catálogo de endereços resolvidos",
+    "cancel": "Cancelar",
+    "approve": "Salvar edições e aprovar",
+    "approving": "Aprovando..."
+  },
+  "status": {
+    "pending": "Pendente",
+    "approved": "Aprovado (aguardando outros)",
+    "manualMergeNeeded": "Mesclagem manual necessária",
+    "applied": "Aplicado",
+    "denied": "Negado"
+  },
+  "notices": {
+    "approved": "Solicitação aprovada.",
+    "denied": "Pedido negado.",
+    "bulk": "{{processed}} grupo(s) de solicitação processados. {{skipped}} ignorado."
+  },
+  "page": {
+    "title": "Fila de revisão de alterações de contato",
+    "subtitle": "Revise as alterações do editor na fila para contatos antes de serem aplicadas."
+  },
+  "actions": {
+    "approveAll": "Aprovar tudo ({{count}})",
+    "denyAll": "Negar tudo ({{count}})"
+  },
+  "states": {
+    "loading": "Carregando fila de revisão...",
+    "empty": "Nenhuma solicitação na fila para este filtro."
+  },
+  "operations": {
+    "delete": "Excluir",
+    "update": "Atualizar"
+  }
+}

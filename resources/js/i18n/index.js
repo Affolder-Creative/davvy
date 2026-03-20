@@ -54,6 +54,15 @@ import itQueue from "./locales/it/queue.json";
 import itAdmin from "./locales/it/admin.json";
 import itProfile from "./locales/it/profile.json";
 
+import ptCommon from "./locales/pt/common.json";
+import ptAuth from "./locales/pt/auth.json";
+import ptShell from "./locales/pt/shell.json";
+import ptDashboard from "./locales/pt/dashboard.json";
+import ptContacts from "./locales/pt/contacts.json";
+import ptQueue from "./locales/pt/queue.json";
+import ptAdmin from "./locales/pt/admin.json";
+import ptProfile from "./locales/pt/profile.json";
+
 const APP_TITLE_KEY = "meta.appTitle";
 let titleSyncBound = false;
 
@@ -118,6 +127,16 @@ const resources = {
     queue: itQueue,
     admin: itAdmin,
     profile: itProfile,
+  },
+  pt: {
+    common: ptCommon,
+    auth: ptAuth,
+    shell: ptShell,
+    dashboard: ptDashboard,
+    contacts: ptContacts,
+    queue: ptQueue,
+    admin: ptAdmin,
+    profile: ptProfile,
   },
 };
 

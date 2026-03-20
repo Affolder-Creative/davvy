@@ -10,11 +10,12 @@ Davvy currently ships web-app locale bundles for:
 - `es` (Spanish)
 - `fr` (French)
 - `it` (Italian)
+- `pt` (Portuguese)
 
 Default env examples:
 - `APP_LOCALE=en`
 - `APP_FALLBACK_LOCALE=en`
-- `APP_SUPPORTED_LOCALES=de,en,es,fr,it`
+- `APP_SUPPORTED_LOCALES=de,en,es,fr,it,pt`
 
 ## Runtime Locale Resolution
 
@@ -51,7 +52,7 @@ Authenticated users can update preference via:
 
 ## DAV and Backend Message Coverage
 
-- Backend PHP translation catalogs currently ship for `de`, `en`, `es`, `fr`, and `it` in `lang/`.
+- Backend PHP translation catalogs currently ship for `de`, `en`, `es`, `fr`, `it`, and `pt` in `lang/`.
 - For locales without a PHP catalog, backend/DAV/email strings fall back to `APP_FALLBACK_LOCALE` (default: English).
 
 ## Adding a New Locale
