@@ -12,6 +12,7 @@ describe("locale display helpers", () => {
     expect(localeDisplayName("es")).toBe("Español");
     expect(localeDisplayName("fr")).toBe("Français");
     expect(localeDisplayName("it")).toBe("Italiano");
+    expect(localeDisplayName("ja")).toBe("日本語");
     expect(localeDisplayName("pt")).toBe("Português");
     expect(localeDisplayName("zh")).toBe("中文");
   });
@@ -29,6 +30,7 @@ describe("locale display helpers", () => {
       "es",
       "fr",
       "it",
+      "ja",
       "pt",
       "zh",
       "en",
@@ -40,6 +42,7 @@ describe("locale display helpers", () => {
       { value: "es", label: "Español", dir: "ltr" },
       { value: "fr", label: "Français", dir: "ltr" },
       { value: "it", label: "Italiano", dir: "ltr" },
+      { value: "ja", label: "日本語", dir: "ltr" },
       { value: "pt", label: "Português", dir: "ltr" },
       { value: "zh", label: "中文", dir: "ltr" },
     ]);

@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'verify_email_subject' => ':app のメールアドレスを確認してください',
+    'verify_email_title' => 'メールアドレスを確認してください',
+    'verify_email_subtitle' => '住所を確認してアカウント設定を完了します。',
+    'verify_email_thanks_for_registering' => ':app にご登録いただきありがとうございます。',
+    'verify_email_confirm_to_continue' => '続行するには電子メール アドレスを確認してください:',
+    'verify_email_button' => 'メールの確認',
+    'verify_email_use_one_time_link' => 'この 1 回限りのリンクを使用して、電子メール アドレスを確認します。',
+    'verify_email_footer' => 'このメッセージは :app から送信されました。このアカウントを作成していない場合は、このメールを無視してください。',
+    'admin_invite_subject' => ':app に招待されています',
+    'admin_invite_title' => 'あなたは招待されています',
+    'admin_invite_title_with_app' => ':app に招待されています',
+    'admin_invite_subtitle' => 'アカウント用に 1 回限りのアクティベーション リンクが作成されました。',
+    'admin_invite_account_created' => '管理者が :app にアカウントを作成しました。',
+    'admin_invite_set_password_and_activate' => 'パスワードを設定し、アカウントをアクティブ化します。',
+    'admin_invite_activate_button' => 'アカウントをアクティブ化する',
+    'admin_invite_use_one_time_link' => 'このワンタイム リンクを使用してパスワードを設定し、アカウントをアクティブ化します。',
+    'admin_invite_footer' => 'このメッセージは :app から送信されました。この招待を予期していなかった場合は、このメールを無視してください。',
+    'greeting_name' => 'こんにちは :name さん',
+    'if_button_fails_copy_link' => 'ボタンが機能しない場合は、次のリンクをコピーして貼り付けてください。',
+    'one_time_link_expires_at' => 'この 1 回限りのリンクは :expires_at に期限切れになります。',
+    'logo_alt' => ':app ロゴ',
+];

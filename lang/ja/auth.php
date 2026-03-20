@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'public_registration_disabled' => '現在、一般登録は停止されています。',
+    'registration_submitted_verify_and_wait_approval' => '登録が送信されました。電子メール アドレスを確認し、管理者の承認を待ってからサインインしてください。',
+    'registration_submitted_verify_before_signin' => '登録が送信されました。サインインする前に電子メール アドレスを確認してください。',
+    'registration_submitted_pending_approval' => '登録が送信されました。サインインする前に、管理者がアカウントを承認する必要があります。',
+    'verification_link_invalid_or_expired' => '確認リンクが無効か期限切れです。',
+    'email_verified_pending_approval' => 'メールアドレスが確認されました。あなたのアカウントは管理者の承認待ちです。',
+    'invitation_link_invalid_or_expired' => '招待リンクが無効か期限切れです。',
+    'invitation_accepted_pending_approval' => '招待が受け入れられました。あなたのアカウントは管理者の承認待ちです。',
+    'credentials_invalid' => '指定された資格情報は無効です。',
+    'account_pending_approval' => 'あなたのアカウントは管理者の承認待ちです。',
+    'verify_email_before_signin' => 'サインインする前に電子メール アドレスを確認してください。',
+    'two_factor_code_required' => 'サインインを完了するには 2 要素コードが必要です。',
+    'no_pending_two_factor_challenge' => '保留中の 2 要素チャレンジはありません。新しいサインインを開始します。',
+    'invalid_authentication_code' => '無効な認証コードです。',
+    'two_factor_already_enabled' => '二要素認証はすでに有効になっています。',
+    'two_factor_setup_expired' => '2 要素セットアップの有効期限が切れました。再度セットアップを開始してください。',
+    'two_factor_code_invalid' => '2 要素コードが無効です。',
+    'two_factor_not_enabled' => '二要素認証が有効になっていません。',
+    'enable_two_factor_before_managing_app_passwords' => 'アプリのパスワードを管理する前に、2 要素認証を有効にしてください。',
+    'enable_two_factor_before_creating_app_passwords' => 'アプリのパスワードを作成する前に、2 要素認証を有効にします。',
+    'two_factor_setup_required_before_accessing_resource' => 'このリソースにアクセスする前に、2 要素認証のセットアップが必要です。',
+];

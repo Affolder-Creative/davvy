@@ -1,0 +1,27 @@
+{
+  "copy": {
+    "copied": "コピーしました！",
+    "copyFailed": "コピーに失敗しました",
+    "copiedUrl": "コピーしたURL",
+    "clickToCopy": "クリックしてコピー",
+    "ariaCopy": "{{value}}をコピー",
+    "ariaCopyUrl": "{{value}} URL をコピー"
+  },
+  "permission": {
+    "admin": "管理者",
+    "editor": "編集者",
+    "general": "一般"
+  },
+  "labels": {
+    "never": "なし",
+    "invalidTimestamp": "無効なタイムスタンプ",
+    "na": "該当なし",
+    "unknown": "不明"
+  },
+  "meta": {
+    "appTitle": "Davvy - CalDAV + CardDAV マネージャー"
+  },
+  "states": {
+    "loadingApp": "Davvy を読み込み中..."
+  }
+}

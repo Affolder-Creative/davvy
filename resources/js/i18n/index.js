@@ -54,6 +54,15 @@ import itQueue from "./locales/it/queue.json";
 import itAdmin from "./locales/it/admin.json";
 import itProfile from "./locales/it/profile.json";
 
+import jaCommon from "./locales/ja/common.json";
+import jaAuth from "./locales/ja/auth.json";
+import jaShell from "./locales/ja/shell.json";
+import jaDashboard from "./locales/ja/dashboard.json";
+import jaContacts from "./locales/ja/contacts.json";
+import jaQueue from "./locales/ja/queue.json";
+import jaAdmin from "./locales/ja/admin.json";
+import jaProfile from "./locales/ja/profile.json";
+
 import ptCommon from "./locales/pt/common.json";
 import ptAuth from "./locales/pt/auth.json";
 import ptShell from "./locales/pt/shell.json";
@@ -136,6 +145,16 @@ const resources = {
     queue: itQueue,
     admin: itAdmin,
     profile: itProfile,
+  },
+  ja: {
+    common: jaCommon,
+    auth: jaAuth,
+    shell: jaShell,
+    dashboard: jaDashboard,
+    contacts: jaContacts,
+    queue: jaQueue,
+    admin: jaAdmin,
+    profile: jaProfile,
   },
   pt: {
     common: ptCommon,

@@ -22,7 +22,7 @@ When an `app_settings` key exists, it overrides env defaults.
 | `APP_URL` | `http://localhost` | Must be HTTPS in production |
 | `APP_LOCALE` | `en` | Base app locale used at bootstrap before request negotiation |
 | `APP_FALLBACK_LOCALE` | `en` | Fallback locale when request/user locale cannot be resolved |
-| `APP_SUPPORTED_LOCALES` | `de,en,es,fr,it,pt,zh` | Comma-separated supported locale codes |
+| `APP_SUPPORTED_LOCALES` | `de,en,es,fr,it,ja,pt,zh` | Comma-separated supported locale codes |
 | `TRUSTED_PROXIES` | _(empty)_ | Use `*` or explicit list behind reverse proxy |
 | `CORS_ALLOWED_ORIGINS` | _(empty)_ | Comma-separated allowed browser origins for cross-origin API access; empty means same-origin only |
 | `CORS_ALLOWED_ORIGIN_PATTERNS` | _(empty)_ | Comma-separated regex origin patterns for CORS matching |

@@ -39,7 +39,7 @@ describe("i18n locale synchronization", () => {
 
   it("supports german locale when it is included in supported locales", async () => {
     setI18nLocale("de-DE", {
-      supportedLocales: ["de", "en", "es", "fr", "it", "pt", "zh"],
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
       fallbackLocale: "en",
     });
 
@@ -53,7 +53,7 @@ describe("i18n locale synchronization", () => {
 
   it("supports italian locale when it is included in supported locales", async () => {
     setI18nLocale("it-IT", {
-      supportedLocales: ["de", "en", "es", "fr", "it", "pt", "zh"],
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
       fallbackLocale: "en",
     });
 
@@ -65,9 +65,23 @@ describe("i18n locale synchronization", () => {
     expect(window.localStorage.getItem("davvy.locale")).toBe("it");
   });
 
+  it("supports japanese locale when it is included in supported locales", async () => {
+    setI18nLocale("ja-JP", {
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
+      fallbackLocale: "en",
+    });
+
+    await i18n.changeLanguage(i18n.language);
+
+    expect(i18n.resolvedLanguage).toBe("ja");
+    expect(document.documentElement.lang).toBe("ja");
+    expect(document.title).toBe("Davvy - CalDAV + CardDAV マネージャー");
+    expect(window.localStorage.getItem("davvy.locale")).toBe("ja");
+  });
+
   it("supports portuguese locale when it is included in supported locales", async () => {
     setI18nLocale("pt-BR", {
-      supportedLocales: ["de", "en", "es", "fr", "it", "pt", "zh"],
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
       fallbackLocale: "en",
     });
 
@@ -81,7 +95,7 @@ describe("i18n locale synchronization", () => {
 
   it("supports chinese locale when it is included in supported locales", async () => {
     setI18nLocale("zh-CN", {
-      supportedLocales: ["de", "en", "es", "fr", "it", "pt", "zh"],
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
       fallbackLocale: "en",
     });
 

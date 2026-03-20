@@ -37,7 +37,7 @@ function buildProps(overrides = {}) {
       },
       twoFactorEnabled: false,
       locale: "en",
-      supportedLocales: ["de", "en", "es", "fr", "it", "pt", "zh"],
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
       fallbackLocale: "en",
       setAuth: vi.fn(),
       refreshAuth: vi.fn().mockResolvedValue(undefined),
@@ -225,7 +225,7 @@ describe("ProfilePage", () => {
         },
         twoFactorEnabled: false,
         locale: "en",
-        supportedLocales: ["de", "en", "es", "fr", "it", "pt", "zh"],
+        supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
         fallbackLocale: "en",
         setAuth,
         refreshAuth: vi.fn().mockResolvedValue(undefined),
@@ -240,7 +240,7 @@ describe("ProfilePage", () => {
               role: "admin",
             },
             locale: "fr",
-            supported_locales: ["de", "en", "es", "fr", "it", "pt", "zh"],
+            supported_locales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
             fallback_locale: "en",
           },
         }),
@@ -253,6 +253,7 @@ describe("ProfilePage", () => {
     expect(screen.getByRole("option", { name: "Deutsch" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Français" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Italiano" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "日本語" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Português" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "中文" })).toBeInTheDocument();
 

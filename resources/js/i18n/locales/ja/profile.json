@@ -1,0 +1,99 @@
+{
+  "cards": [
+    {
+      "label": "名前",
+      "description": "リソースを共有するときに他のユーザーに表示されます。"
+    },
+    {
+      "label": "電子メール",
+      "description": "Web サインインおよび DAV クライアントに使用されます。"
+    },
+    {
+      "label": "役割",
+      "description": "管理機能のアクセス レベル。"
+    }
+  ],
+  "locale": {
+    "title": "言語",
+    "description": "Web アプリと DAV メッセージに使用する言語を選択します。",
+    "label": "言語",
+    "save": "言語を保存",
+    "saving": "保存中...",
+    "saved": "言語が更新されました。"
+  },
+  "changePassword": {
+    "title": "パスワードの変更",
+    "description": "Web アクセスと DAV クライアント接続の両方のパスワードを変更します。",
+    "currentLabel": "現在のパスワード",
+    "newLabel": "新しいパスワード",
+    "newLabelConfirm": "新しいパスワードを確認します",
+    "update": "パスワードを更新する",
+    "updating": "パスワードを更新しています...",
+    "updated": "パスワードが更新されました。"
+  },
+  "security": {
+    "title": "セキュリティ",
+    "description": "2 要素認証を構成し、DAV アプリのパスワードを管理します。",
+    "2faMandated": "管理者は 2 要素登録を必要とします。",
+    "2faMandatedWithDeadline": "{deadline} の前に 2FA を設定します。",
+    "2faDeadlineExpired": "猶予期間は終了しました。アプリのすべての機能に引き続きアクセスするには、2 要素セットアップを完了してください。",
+    "2faRecreate": "セットアップ シークレットの再作成",
+    "2faStart": "2FA セットアップの開始",
+    "2faSetupStep1": "1. Google Authenticator、1Password、または互換性のある認証アプリでこの QR コードをスキャンします。",
+    "2faSetupStep1QrCodeTitle": "2要素セットアップQRコード",
+    "2faSetupStep2": "2. 必要に応じて、次のキーを手動で入力します。",
+    "2faSetupStep3": "3. 認証コード",
+    "2faEnable": "2FA を有効にする",
+    "2faEnabling": "有効化中...",
+    "2faEnabled": "二要素認証が有効になっています。",
+    "2faCode": "機密性の高いアクションの認証コードまたはバックアップ コード",
+    "2faCodePlaceholder": "コードを入力してください",
+    "regenerateBackupCodes": "バックアップコードを再生成する",
+    "disable2fa": "2FA を無効にする",
+    "saveBackupCodes": "これらのバックアップ コードを今すぐ保存してください。",
+    "shownOnce": "1 回表示",
+    "shownOnceDescription": "各バックアップ コードは 1 回のみ使用できます。これらの正確なコードを再度表示することはできません。",
+    "backupCodes": "バックアップコード",
+    "selectAll": "すべて選択",
+    "copyAllCodes": "すべてのコードをコピー",
+    "copiedAllCodes": "すべてのコードをコピーしました。",
+    "copyFailed": "コピーに失敗しました。 [すべて選択] を使用してから、手動でコピーします。",
+    "appPasswords": "DAV アプリのパスワード",
+    "appPasswordsDescription": "対話型 2 要素サインインを完了できない CalDAV/CardDAV クライアントには、これらのワンタイム生成パスワードを使用してください。",
+    "appPasswordName": "パスワード名",
+    "appPasswordNamePlaceholder": "iPhone",
+    "appPasswordCode": "認証コード/バックアップコード",
+    "appPasswordCodePlaceholder": "必須",
+    "appPasswordCreate": "アプリパスワードの作成",
+    "appPasswordCodeShownOnce": "1 回表示",
+    "appPasswordLoading": "アプリのパスワードを読み込んでいます...",
+    "appPasswordNoCreated": "アプリパスワードは作成されていません。",
+    "appPasswordRevoke": "取り消し",
+    "appPasswordPrefix": "接頭辞: {{prefix}}",
+    "appPasswordLastUsed": "最後に使用した時間: {{last_used_at}}",
+    "appPasswordNeverUsed": "決してしない"
+  },
+  "errors": {
+    "updateLocale": "現在言語を更新できません。",
+    "loadAppPasswords": "現在、DAV アプリのパスワードをロードできません。",
+    "updatePassword": "パスワードを更新できません。",
+    "startTwoFactor": "2 要素セットアップを開始できません。",
+    "enableTwoFactor": "2 要素を有効にできません。",
+    "disableTwoFactor": "2 要素を無効にできません。",
+    "regenerateCodes": "バックアップ コードを再生成できません。",
+    "createAppPassword": "DAV アプリのパスワードを作成できません。",
+    "revokeAppPassword": "DAV アプリのパスワードを取り消すことができません。"
+  },
+  "notices": {
+    "passwordSuccess": "パスワードが更新されました。アプリのログインと DAV クライアントには新しいパスワードを使用します。",
+    "2faSetupSuccess": "セットアップが初期化されました。 QR コードをスキャンし、確認コードを入力します。",
+    "2faEnableSuccess": "二要素認証が有効になりました。",
+    "2faDisableSuccess": "2 要素認証が無効になり、DAV アプリのパスワードが取り消されました。",
+    "backupCodesRegenerated": "バックアップコードが再生成されました。",
+    "appPasswordCreated": "DAV アプリのパスワードが作成されました。",
+    "appPasswordRevoked": "DAV アプリのパスワードが取り消されました。"
+  },
+  "confirmations": {
+    "disable2fa": "2 要素認証を無効にして、すべての DAV アプリのパスワードを取り消しますか?"
+  }
+}
