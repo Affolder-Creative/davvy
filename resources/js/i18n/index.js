@@ -45,6 +45,15 @@ import frQueue from "./locales/fr/queue.json";
 import frAdmin from "./locales/fr/admin.json";
 import frProfile from "./locales/fr/profile.json";
 
+import itCommon from "./locales/it/common.json";
+import itAuth from "./locales/it/auth.json";
+import itShell from "./locales/it/shell.json";
+import itDashboard from "./locales/it/dashboard.json";
+import itContacts from "./locales/it/contacts.json";
+import itQueue from "./locales/it/queue.json";
+import itAdmin from "./locales/it/admin.json";
+import itProfile from "./locales/it/profile.json";
+
 import ptCommon from "./locales/pt/common.json";
 import ptAuth from "./locales/pt/auth.json";
 import ptShell from "./locales/pt/shell.json";
@@ -108,6 +117,16 @@ const resources = {
     queue: frQueue,
     admin: frAdmin,
     profile: frProfile,
+  },
+  it: {
+    common: itCommon,
+    auth: itAuth,
+    shell: itShell,
+    dashboard: itDashboard,
+    contacts: itContacts,
+    queue: itQueue,
+    admin: itAdmin,
+    profile: itProfile,
   },
   pt: {
     common: ptCommon,

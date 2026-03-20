@@ -11,6 +11,7 @@ describe("locale display helpers", () => {
     expect(localeDisplayName("en")).toBe("English");
     expect(localeDisplayName("es")).toBe("Español");
     expect(localeDisplayName("fr")).toBe("Français");
+    expect(localeDisplayName("it")).toBe("Italiano");
     expect(localeDisplayName("pt")).toBe("Português");
   });
 
@@ -21,12 +22,13 @@ describe("locale display helpers", () => {
   });
 
   it("builds deduplicated locale options with metadata", () => {
-    const options = buildLocaleOptions(["de", "en", "es", "pt", "en"]);
+    const options = buildLocaleOptions(["de", "en", "es", "it", "pt", "en"]);
 
     expect(options).toEqual([
       { value: "de", label: "Deutsch", dir: "ltr" },
       { value: "en", label: "English", dir: "ltr" },
       { value: "es", label: "Español", dir: "ltr" },
+      { value: "it", label: "Italiano", dir: "ltr" },
       { value: "pt", label: "Português", dir: "ltr" },
     ]);
   });

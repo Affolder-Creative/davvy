@@ -1,0 +1,27 @@
+{
+  "copy": {
+    "copied": "Copiato!",
+    "copyFailed": "Copia non riuscita",
+    "copiedUrl": "URL copiato",
+    "clickToCopy": "Fare clic per copiare",
+    "ariaCopy": "Copia {{value}}",
+    "ariaCopyUrl": "Copia l'URL {{value}}"
+  },
+  "permission": {
+    "admin": "Ammin",
+    "editor": "Editore",
+    "general": "Generale"
+  },
+  "labels": {
+    "never": "Mai",
+    "invalidTimestamp": "Timestamp non valido",
+    "na": "n/d",
+    "unknown": "Sconosciuto"
+  },
+  "meta": {
+    "appTitle": "Davvy - Gestore CalDAV + CardDAV"
+  },
+  "states": {
+    "loadingApp": "Caricamento Davvy..."
+  }
+}
