@@ -264,7 +264,7 @@ describe("ProfilePage", () => {
       locale: "fr",
     });
     await waitFor(() => expect(setAuth).toHaveBeenCalledTimes(1));
-    expect(screen.getByText("Language updated.")).toBeInTheDocument();
+    expect(await screen.findByText("Langue mise à jour.")).toBeInTheDocument();
   });
 
   it("renders locale options from auth.supportedLocales", () => {

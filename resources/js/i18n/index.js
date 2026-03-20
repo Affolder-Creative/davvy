@@ -9,15 +9,6 @@ import {
   setDocumentLocale,
 } from "../lib/locale";
 
-import deCommon from "./locales/de/common.json";
-import deAuth from "./locales/de/auth.json";
-import deShell from "./locales/de/shell.json";
-import deDashboard from "./locales/de/dashboard.json";
-import deContacts from "./locales/de/contacts.json";
-import deQueue from "./locales/de/queue.json";
-import deAdmin from "./locales/de/admin.json";
-import deProfile from "./locales/de/profile.json";
-
 import enCommon from "./locales/en/common.json";
 import enAuth from "./locales/en/auth.json";
 import enShell from "./locales/en/shell.json";
@@ -27,62 +18,10 @@ import enQueue from "./locales/en/queue.json";
 import enAdmin from "./locales/en/admin.json";
 import enProfile from "./locales/en/profile.json";
 
-import esCommon from "./locales/es/common.json";
-import esAuth from "./locales/es/auth.json";
-import esShell from "./locales/es/shell.json";
-import esDashboard from "./locales/es/dashboard.json";
-import esContacts from "./locales/es/contacts.json";
-import esQueue from "./locales/es/queue.json";
-import esAdmin from "./locales/es/admin.json";
-import esProfile from "./locales/es/profile.json";
-
-import frCommon from "./locales/fr/common.json";
-import frAuth from "./locales/fr/auth.json";
-import frShell from "./locales/fr/shell.json";
-import frDashboard from "./locales/fr/dashboard.json";
-import frContacts from "./locales/fr/contacts.json";
-import frQueue from "./locales/fr/queue.json";
-import frAdmin from "./locales/fr/admin.json";
-import frProfile from "./locales/fr/profile.json";
-
-import itCommon from "./locales/it/common.json";
-import itAuth from "./locales/it/auth.json";
-import itShell from "./locales/it/shell.json";
-import itDashboard from "./locales/it/dashboard.json";
-import itContacts from "./locales/it/contacts.json";
-import itQueue from "./locales/it/queue.json";
-import itAdmin from "./locales/it/admin.json";
-import itProfile from "./locales/it/profile.json";
-
-import jaCommon from "./locales/ja/common.json";
-import jaAuth from "./locales/ja/auth.json";
-import jaShell from "./locales/ja/shell.json";
-import jaDashboard from "./locales/ja/dashboard.json";
-import jaContacts from "./locales/ja/contacts.json";
-import jaQueue from "./locales/ja/queue.json";
-import jaAdmin from "./locales/ja/admin.json";
-import jaProfile from "./locales/ja/profile.json";
-
-import ptCommon from "./locales/pt/common.json";
-import ptAuth from "./locales/pt/auth.json";
-import ptShell from "./locales/pt/shell.json";
-import ptDashboard from "./locales/pt/dashboard.json";
-import ptContacts from "./locales/pt/contacts.json";
-import ptQueue from "./locales/pt/queue.json";
-import ptAdmin from "./locales/pt/admin.json";
-import ptProfile from "./locales/pt/profile.json";
-
-import zhCommon from "./locales/zh/common.json";
-import zhAuth from "./locales/zh/auth.json";
-import zhShell from "./locales/zh/shell.json";
-import zhDashboard from "./locales/zh/dashboard.json";
-import zhContacts from "./locales/zh/contacts.json";
-import zhQueue from "./locales/zh/queue.json";
-import zhAdmin from "./locales/zh/admin.json";
-import zhProfile from "./locales/zh/profile.json";
-
 const APP_TITLE_KEY = "meta.appTitle";
 let titleSyncBound = false;
+let localeChangeChain = Promise.resolve(FALLBACK_LOCALE);
+const localeResourcePromises = new Map();
 
 export const I18N_NAMESPACES = [
   "common",
@@ -95,88 +34,31 @@ export const I18N_NAMESPACES = [
   "profile",
 ];
 
-const resources = {
-  de: {
-    common: deCommon,
-    auth: deAuth,
-    shell: deShell,
-    dashboard: deDashboard,
-    contacts: deContacts,
-    queue: deQueue,
-    admin: deAdmin,
-    profile: deProfile,
-  },
-  en: {
-    common: enCommon,
-    auth: enAuth,
-    shell: enShell,
-    dashboard: enDashboard,
-    contacts: enContacts,
-    queue: enQueue,
-    admin: enAdmin,
-    profile: enProfile,
-  },
-  es: {
-    common: esCommon,
-    auth: esAuth,
-    shell: esShell,
-    dashboard: esDashboard,
-    contacts: esContacts,
-    queue: esQueue,
-    admin: esAdmin,
-    profile: esProfile,
-  },
-  fr: {
-    common: frCommon,
-    auth: frAuth,
-    shell: frShell,
-    dashboard: frDashboard,
-    contacts: frContacts,
-    queue: frQueue,
-    admin: frAdmin,
-    profile: frProfile,
-  },
-  it: {
-    common: itCommon,
-    auth: itAuth,
-    shell: itShell,
-    dashboard: itDashboard,
-    contacts: itContacts,
-    queue: itQueue,
-    admin: itAdmin,
-    profile: itProfile,
-  },
-  ja: {
-    common: jaCommon,
-    auth: jaAuth,
-    shell: jaShell,
-    dashboard: jaDashboard,
-    contacts: jaContacts,
-    queue: jaQueue,
-    admin: jaAdmin,
-    profile: jaProfile,
-  },
-  pt: {
-    common: ptCommon,
-    auth: ptAuth,
-    shell: ptShell,
-    dashboard: ptDashboard,
-    contacts: ptContacts,
-    queue: ptQueue,
-    admin: ptAdmin,
-    profile: ptProfile,
-  },
-  zh: {
-    common: zhCommon,
-    auth: zhAuth,
-    shell: zhShell,
-    dashboard: zhDashboard,
-    contacts: zhContacts,
-    queue: zhQueue,
-    admin: zhAdmin,
-    profile: zhProfile,
-  },
+const EN_RESOURCES = {
+  common: enCommon,
+  auth: enAuth,
+  shell: enShell,
+  dashboard: enDashboard,
+  contacts: enContacts,
+  queue: enQueue,
+  admin: enAdmin,
+  profile: enProfile,
 };
+
+const localeNamespaceLoaders = import.meta.glob(
+  [
+    "./locales/de/*.json",
+    "./locales/es/*.json",
+    "./locales/fr/*.json",
+    "./locales/it/*.json",
+    "./locales/ja/*.json",
+    "./locales/pt/*.json",
+    "./locales/zh/*.json",
+  ],
+  {
+    import: "default",
+  },
+);
 
 function setDocumentTitle(locale) {
   if (typeof document === "undefined") {
@@ -209,14 +91,92 @@ function resolveInitialLocale() {
 
 const initialLocale = resolveInitialLocale();
 
+function localeNamespaceLoaderKey(locale, namespace) {
+  return `./locales/${locale}/${namespace}.json`;
+}
+
+async function loadLocaleResources(locale) {
+  if (locale === FALLBACK_LOCALE) {
+    return EN_RESOURCES;
+  }
+
+  const cachedPromise = localeResourcePromises.get(locale);
+  if (cachedPromise) {
+    return cachedPromise;
+  }
+
+  const loadPromise = (async () => {
+    const namespaceEntries = await Promise.all(
+      I18N_NAMESPACES.map(async (namespace) => {
+        const loaderKey = localeNamespaceLoaderKey(locale, namespace);
+        const loader = localeNamespaceLoaders[loaderKey];
+        if (!loader) {
+          throw new Error(`Missing locale namespace loader for ${loaderKey}`);
+        }
+
+        const resource = await loader();
+        return [namespace, resource];
+      }),
+    );
+
+    for (const [namespace, resource] of namespaceEntries) {
+      i18n.addResourceBundle(locale, namespace, resource, true, true);
+    }
+
+    return Object.fromEntries(namespaceEntries);
+  })();
+
+  localeResourcePromises.set(locale, loadPromise);
+
+  try {
+    return await loadPromise;
+  } catch (error) {
+    localeResourcePromises.delete(locale);
+    throw error;
+  }
+}
+
+async function resolveLocaleWithResources(
+  locale,
+  {
+    supportedLocales = SUPPORTED_LOCALES,
+    fallbackLocale = FALLBACK_LOCALE,
+  } = {},
+) {
+  try {
+    await loadLocaleResources(locale);
+    return locale;
+  } catch (error) {
+    const fallback = normalizeLocale(fallbackLocale, {
+      supported: supportedLocales,
+      fallback: FALLBACK_LOCALE,
+    });
+
+    if (fallback !== locale) {
+      try {
+        await loadLocaleResources(fallback);
+      } catch {
+        return FALLBACK_LOCALE;
+      }
+
+      return fallback;
+    }
+
+    return FALLBACK_LOCALE;
+  }
+}
+
 if (!i18n.isInitialized) {
   i18n.use(initReactI18next).init({
-    resources,
-    lng: initialLocale,
+    resources: {
+      [FALLBACK_LOCALE]: EN_RESOURCES,
+    },
+    lng: FALLBACK_LOCALE,
     fallbackLng: FALLBACK_LOCALE,
     supportedLngs: SUPPORTED_LOCALES,
     defaultNS: "common",
     ns: I18N_NAMESPACES,
+    partialBundledLanguages: true,
     interpolation: {
       escapeValue: false,
     },
@@ -238,24 +198,33 @@ export function setI18nLocale(
     fallbackLocale = FALLBACK_LOCALE,
   } = {},
 ) {
-  const normalized = normalizeLocale(locale, {
-    supported: supportedLocales,
-    fallback: fallbackLocale,
-  });
+  const applyLocale = async () => {
+    const normalized = normalizeLocale(locale, {
+      supported: supportedLocales,
+      fallback: fallbackLocale,
+    });
 
-  setDocumentLocale(normalized);
-  setDocumentTitle(normalized);
-  persistLocale(normalized);
+    const resolved = await resolveLocaleWithResources(normalized, {
+      supportedLocales,
+      fallbackLocale,
+    });
 
-  if (i18n.resolvedLanguage === normalized) {
-    return normalized;
-  }
+    setDocumentLocale(resolved);
+    persistLocale(resolved);
 
-  void i18n.changeLanguage(normalized);
+    if (i18n.resolvedLanguage !== resolved) {
+      await i18n.changeLanguage(resolved);
+    }
 
-  return normalized;
+    setDocumentTitle(resolved);
+
+    return resolved;
+  };
+
+  localeChangeChain = localeChangeChain.then(applyLocale, applyLocale);
+  return localeChangeChain;
 }
 
-setI18nLocale(initialLocale);
+void setI18nLocale(initialLocale);
 
 export default i18n;

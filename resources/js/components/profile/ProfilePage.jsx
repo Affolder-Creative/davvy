@@ -128,11 +128,11 @@ export default function ProfilePage({
         supportedLocales: data.supported_locales,
         fallbackLocale: data.fallback_locale,
       });
-      setI18nLocale(data.locale, {
+      await setI18nLocale(data.locale, {
         supportedLocales: data.supported_locales,
         fallbackLocale: data.fallback_locale,
       });
-      setLocaleSuccess(t("locale.saved"));
+      setLocaleSuccess(i18n.t("locale.saved", { ns: "profile" }));
     } catch (err) {
       setLocaleError(extractError(err, t("errors.updateLocale")));
     } finally {
