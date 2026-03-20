@@ -70,7 +70,7 @@ function App() {
       fallbackLocale: auth.fallbackLocale,
     });
 
-    setI18nLocale(auth.locale, {
+    void setI18nLocale(auth.locale, {
       supportedLocales: auth.supportedLocales,
       fallbackLocale: auth.fallbackLocale,
     });
