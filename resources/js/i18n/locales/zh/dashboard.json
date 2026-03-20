@@ -1,0 +1,101 @@
+{
+  "errors": {
+    "load": "无法加载仪表板数据。",
+    "updateShareStatus": "无法更新共享状态。",
+    "renameResource": "无法重命名资源。",
+    "createCalendar": "无法创建日历。",
+    "createAddressBook": "无法创建地址簿。",
+    "saveShare": "无法保存共享分配。",
+    "removeShare": "无法删除共享分配。",
+    "exportCalendars": "无法导出日历。",
+    "exportCalendar": "无法导出日历。",
+    "exportAddressBooks": "无法导出地址簿。",
+    "exportAddressBook": "无法导出地址簿。",
+    "appleCompat": "无法更新 Apple 兼容性设置。",
+    "milestones": "无法更新生日/周年纪念日日历设置。"
+  },
+  "overview": {
+    "endpointTitle": "DAV端点",
+    "endpointHelper": "在客户端连接设置中使用此 URL。",
+    "principalTitle": "校长",
+    "principalHelper": "自动发现可能会自动解决此问题。",
+    "roleTitle": "角色",
+    "roleHelper": "管理员可以管理用户和跨用户共享。"
+  },
+  "resources": {
+    "yourCalendars": "你的日历",
+    "createCalendar": "创建日历",
+    "yourAddressBooks": "您的地址簿",
+    "createAddressBook": "创建地址簿",
+    "exportAll": "全部导出"
+  },
+  "resourcePanel": {
+    "displayName": "显示名称",
+    "sharable": "可分享",
+    "noOwned": "还没有拥有的资源。",
+    "save": "保存",
+    "cancel": "取消",
+    "editNameFor": "编辑{{name}} 的名称",
+    "exportItem": "导出{{name}}",
+    "default": "（默认）",
+    "sharedWithYou": "与您分享",
+    "noShared": "没有共享资源。",
+    "owner": "所有者：{{name}} ({{email}})",
+    "scope": {
+      "owned": "拥有",
+      "shared": "共享"
+    },
+    "cancelEditingCalendarName": "取消编辑{{label}}日历名称",
+    "saveCalendarName": "保存{{label}}日历名称",
+    "resetCalendarName": "将 {{label}} 日历名称重置为默认值",
+    "renameCalendar": "重命名{{label}}日历",
+    "saving": "正在保存..."
+  },
+  "milestoneCalendars": {
+    "expand": "展开里程碑日历",
+    "collapse": "折叠里程碑日历",
+    "title": "里程碑日历",
+    "off": "关闭",
+    "enabled": "{{count}}/2 已启用",
+    "configure": "配置",
+    "hide": "隐藏",
+    "birthdays": "生日",
+    "birthdaysFallback": "{{name}} 生日",
+    "anniversaries": "周年纪念日",
+    "anniversariesFallback": "{{name}} 周年纪念日"
+  },
+  "sharing": {
+    "title": "分享您的资源",
+    "subtitle": "授予您拥有并标记为可共享的资源的只读、编辑或管理员访问权限。管理员访问权限包括集合删除权限。",
+    "resourceCalendar": "日历",
+    "resourceAddressBook": "地址簿",
+    "selectSharableResource": "选择可共享资源",
+    "selectUser": "选择用户",
+    "permReadOnly": "常规（只读）",
+    "permEditor": "完整编辑（不删除）",
+    "permAdmin": "管理员（完全编辑+删除）",
+    "share": "分享",
+    "noOutgoing": "还没有流出股票。",
+    "sharedWith": "共享者：{{name}} ({{email}})",
+    "revoke": "撤销"
+  },
+  "appleCompat": {
+    "title": "Apple 通讯录兼容性",
+    "subtitle": "默认关闭。将选定的地址簿镜像到主地址簿中，以便 macOS 和 iOS 客户端可以看到它们。",
+    "target": "镜像目标：{{name}} (/{{uri}})",
+    "missingTarget": "找不到您帐户的默认联系人地址簿。",
+    "enable": "启用 Apple 兼容性镜像",
+    "sourcesTitle": "要镜像的源地址簿",
+    "noSources": "没有符合条件的自有/共享地址簿可用。",
+    "save": "保存 Apple 兼容性设置"
+  },
+  "states": {
+    "loadingResources": "正在加载资源..."
+  },
+  "notices": {
+    "shareStatus": {
+      "shared": "{{name}} 现已共享。",
+      "unshared": "{{name}} 不再共享。"
+    }
+  }
+}

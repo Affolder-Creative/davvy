@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "无法加载更改请求。",
+    "approve": "无法批准请求。",
+    "deny": "无法拒绝请求。",
+    "bulk": "无法处理批量操作。",
+    "resolvedPayloadJson": "解析的有效负载必须是有效的 JSON。",
+    "resolvedAddressIdsJson": "解析的地址簿 ID 必须是有效的 JSON。",
+    "resolvedAddressIdsArray": "解析的地址簿 ID 必须是正整数数组。"
+  },
+  "bulk": {
+    "confirm": "这将 {{verb}} {{count}} 在当前过滤视图中排队请求。继续？",
+    "approve": "批准",
+    "deny": "否认"
+  },
+  "filters": {
+    "open": "打开",
+    "pending": "待定",
+    "manualMergeNeeded": "需要手动合并",
+    "history": "历史",
+    "all": "全部",
+    "allOperations": "所有操作",
+    "updates": "更新",
+    "deletes": "删除",
+    "searchPlaceholder": "按联系人/请求者搜索...",
+    "refresh": "刷新"
+  },
+  "card": {
+    "group": "集团",
+    "unnamedContact": "未透露姓名的联系人",
+    "status": "状态",
+    "requested": "已请求",
+    "editApprove": "编辑并批准",
+    "approve": "批准",
+    "deny": "否认",
+    "requester": "请求者",
+    "approvalOwner": "批准所有者",
+    "source": "来源",
+    "reviewer": "审稿人",
+    "notReviewed": "尚未审核",
+    "changedFields": "更改的字段"
+  },
+  "modal": {
+    "title": "在批准之前编辑请求 #{{id}}",
+    "subtitle": "调整有效负载/地址簿 ID，然后批准此排队请求。",
+    "resolvedPayload": "解析的有效负载 JSON",
+    "resolvedAddressIds": "解析的地址簿 ID JSON 数组",
+    "cancel": "取消",
+    "approve": "保存编辑并批准",
+    "approving": "正在批准..."
+  },
+  "status": {
+    "pending": "待定",
+    "approved": "已批准（等待其他人）",
+    "manualMergeNeeded": "需要手动合并",
+    "applied": "应用",
+    "denied": "被拒绝"
+  },
+  "notices": {
+    "approved": "请求获得批准。",
+    "denied": "请求被拒绝。",
+    "bulk": "{{processed}} 请求组已处理。 {{skipped}} 已跳过。"
+  },
+  "page": {
+    "title": "联系变更审核队列",
+    "subtitle": "在应用联系人之前查看排队的编辑器更改。"
+  },
+  "actions": {
+    "approveAll": "批准全部 ({{count}})",
+    "denyAll": "全部拒绝 ({{count}})"
+  },
+  "states": {
+    "loading": "正在加载审核队列...",
+    "empty": "此过滤器没有排队请求。"
+  },
+  "operations": {
+    "delete": "删除",
+    "update": "更新"
+  }
+}

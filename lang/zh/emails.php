@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'verify_email_subject' => '验证您的电子邮件:app',
+    'verify_email_title' => '验证您的电子邮件',
+    'verify_email_subtitle' => '确认您的地址以完成帐户设置。',
+    'verify_email_thanks_for_registering' => '感谢您注册:app。',
+    'verify_email_confirm_to_continue' => '确认您的电子邮件地址以继续：',
+    'verify_email_button' => '验证邮箱',
+    'verify_email_use_one_time_link' => '使用此一次性链接验证您的电子邮件地址：',
+    'verify_email_footer' => '此消息是:app 发送的。如果您没有创建此帐户，则可以忽略此电子邮件。',
+    'admin_invite_subject' => '邀请您:app',
+    'admin_invite_title' => '您被邀请了',
+    'admin_invite_title_with_app' => '邀请您:app',
+    'admin_invite_subtitle' => '已为您的帐户创建了一次性激活链接。',
+    'admin_invite_account_created' => '管理员在 :app 上为您创建了一个帐户。',
+    'admin_invite_set_password_and_activate' => '设置您的密码并激活您的帐户：',
+    'admin_invite_activate_button' => '激活账户',
+    'admin_invite_use_one_time_link' => '使用此一次性链接设置您的密码并激活您的帐户：',
+    'admin_invite_footer' => '此消息是:app 发送的。如果您没想到会收到此邀请，则可以忽略此电子邮件。',
+    'greeting_name' => '你好:name，',
+    'if_button_fails_copy_link' => '如果该按钮不起作用，请复制并粘贴此链接：',
+    'one_time_link_expires_at' => '此一次性链接将于 :expires_at 到期。',
+    'logo_alt' => ':app标志',
+];

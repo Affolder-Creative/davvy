@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'public_registration_disabled' => '目前已禁用公共注册。',
+    'registration_submitted_verify_and_wait_approval' => '注册已提交。验证您的电子邮件地址并等待管理员批准后再登录。',
+    'registration_submitted_verify_before_signin' => '注册已提交。登录前验证您的电子邮件地址。',
+    'registration_submitted_pending_approval' => '注册已提交。管理员必须先批准您的帐户，然后您才能登录。',
+    'verification_link_invalid_or_expired' => '验证链接无效或已过期。',
+    'email_verified_pending_approval' => '电子邮件已验证。您的帐户正在等待管理员批准。',
+    'invitation_link_invalid_or_expired' => '邀请链接无效或已过期。',
+    'invitation_accepted_pending_approval' => '已接受邀请。您的帐户正在等待管理员批准。',
+    'credentials_invalid' => '提供的凭据无效。',
+    'account_pending_approval' => '您的帐户正在等待管理员批准。',
+    'verify_email_before_signin' => '登录前验证您的电子邮件地址。',
+    'two_factor_code_required' => '完成登录所需的双因素代码。',
+    'no_pending_two_factor_challenge' => '没有悬而未决的二因素挑战。开始新的登录尝试。',
+    'invalid_authentication_code' => '验证码无效。',
+    'two_factor_already_enabled' => '双因素身份验证已启用。',
+    'two_factor_setup_expired' => '双因素设置已过期。再次开始设置。',
+    'two_factor_code_invalid' => '双因素代码无效。',
+    'two_factor_not_enabled' => '未启用双因素身份验证。',
+    'enable_two_factor_before_managing_app_passwords' => '在管理应用程序密码之前启用双因素身份验证。',
+    'enable_two_factor_before_creating_app_passwords' => '在创建应用程序密码之前启用双因素身份验证。',
+    'two_factor_setup_required_before_accessing_resource' => '访问此资源之前需要设置两因素身份验证。',
+];

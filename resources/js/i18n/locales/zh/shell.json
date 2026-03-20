@@ -1,0 +1,33 @@
+{
+  "tabs": {
+    "dashboard": "仪表板",
+    "contacts": "联系人",
+    "reviewQueue": "审核队列",
+    "profile": "个人资料"
+  },
+  "account": {
+    "label": "账户",
+    "toggleMenu": "切换帐户菜单"
+  },
+  "admin": {
+    "controlCenter": "管理控制中心",
+    "openControlCenter": "打开管理控制中心"
+  },
+  "actions": {
+    "signOut": "退出"
+  },
+  "sponsor": {
+    "button": "赞助",
+    "closeLinks": "关闭赞助商链接",
+    "title": "支持 Davvy",
+    "subtitle": "选择下面的链接来赞助该项目。",
+    "close": "关闭"
+  },
+  "app": {
+    "brand": "Davvy",
+    "subtitle": "CalDAV + CardDAV 管理器"
+  },
+  "session": {
+    "signedInAs": "以{{email}} 身份登录"
+  }
+}

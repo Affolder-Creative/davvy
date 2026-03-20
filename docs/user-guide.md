@@ -118,7 +118,7 @@ Important:
 - Password updates affect both web login and DAV clients.
 - Update saved client credentials after password change.
 - You can choose your preferred language in Profile -> Language.
-- Current locale options in the web UI are English, Spanish, French, and German.
+- Current locale options in the web UI are English, Spanish, French, German, and Chinese.
 - You can enable/disable two-factor authentication (TOTP) and regenerate backup codes.
 - You can create/revoke DAV app passwords for clients like iOS Calendar/Contacts, DAVx5, or Thunderbird.
 - App passwords are shown once at creation time and are required for DAV when 2FA is enabled.
