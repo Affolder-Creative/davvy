@@ -57,6 +57,7 @@ class LocalizationCatalogParityTest extends TestCase
 
             if (is_array($value)) {
                 $keys = array_merge($keys, $this->flattenTranslationKeys($value, $next));
+
                 continue;
             }
 

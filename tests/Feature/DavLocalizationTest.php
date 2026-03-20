@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Services\Dav\Backends\LaravelAuthBackend;
 use App\Services\Dav\IcsValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,7 +17,7 @@ class DavLocalizationTest extends TestCase
 
     public function test_authenticated_dav_auth_sets_application_locale_from_user_preference(): void
     {
-        $user = \App\Models\User::factory()->create([
+        $user = User::factory()->create([
             'email' => 'dav-locale@example.test',
             'password' => 'password1234',
             'locale' => 'es',
@@ -38,7 +39,7 @@ class DavLocalizationTest extends TestCase
 
     public function test_authenticated_dav_validation_errors_use_authenticated_user_locale(): void
     {
-        $user = \App\Models\User::factory()->create([
+        $user = User::factory()->create([
             'email' => 'dav-locale-errors@example.test',
             'password' => 'password1234',
             'locale' => 'es',
