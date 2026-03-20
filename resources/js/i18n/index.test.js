@@ -23,6 +23,34 @@ describe("i18n locale synchronization", () => {
     expect(window.localStorage.getItem("davvy.locale")).toBe("es");
   });
 
+  it("supports french locale when it is included in supported locales", async () => {
+    setI18nLocale("fr-CA", {
+      supportedLocales: ["en", "es", "fr"],
+      fallbackLocale: "en",
+    });
+
+    await i18n.changeLanguage(i18n.language);
+
+    expect(i18n.resolvedLanguage).toBe("fr");
+    expect(document.documentElement.lang).toBe("fr");
+    expect(document.title).toBe("Davvy - Gestionnaire CalDAV + CardDAV");
+    expect(window.localStorage.getItem("davvy.locale")).toBe("fr");
+  });
+
+  it("supports german locale when it is included in supported locales", async () => {
+    setI18nLocale("de-DE", {
+      supportedLocales: ["de", "en", "es", "fr"],
+      fallbackLocale: "en",
+    });
+
+    await i18n.changeLanguage(i18n.language);
+
+    expect(i18n.resolvedLanguage).toBe("de");
+    expect(document.documentElement.lang).toBe("de");
+    expect(document.title).toBe("Davvy - CalDAV + CardDAV-Manager");
+    expect(window.localStorage.getItem("davvy.locale")).toBe("de");
+  });
+
   it("falls back to configured fallback locale", async () => {
     setI18nLocale("fr-FR", {
       supportedLocales: ["en", "es"],

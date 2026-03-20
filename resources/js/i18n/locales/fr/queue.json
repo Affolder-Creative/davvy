@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "Impossible de charger les demandes de modification.",
+    "approve": "Impossible d’approuver la demande.",
+    "deny": "Impossible de refuser la demande.",
+    "bulk": "Impossible de traiter l’action groupée.",
+    "resolvedPayloadJson": "La charge utile résolue doit être un JSON valide.",
+    "resolvedAddressIdsJson": "Les identifiants de carnets d’adresses résolus doivent être un JSON valide.",
+    "resolvedAddressIdsArray": "Les identifiants de carnets d’adresses résolus doivent être un tableau d’entiers positifs."
+  },
+  "bulk": {
+    "confirm": "Cela va {{verb}} {{count}} demande(s) en file d’attente dans la vue filtrée actuelle. Continuer ?",
+    "approve": "approuver",
+    "deny": "refuser"
+  },
+  "filters": {
+    "open": "Ouvert",
+    "pending": "En attente",
+    "manualMergeNeeded": "Fusion manuelle nécessaire",
+    "history": "Historique",
+    "all": "Tous",
+    "allOperations": "Toutes les opérations",
+    "updates": "Mises à jour",
+    "deletes": "Suppressions",
+    "searchPlaceholder": "Rechercher par contact/demandeur...",
+    "refresh": "Actualiser"
+  },
+  "card": {
+    "group": "Groupe",
+    "unnamedContact": "Contact sans nom",
+    "status": "Statut",
+    "requested": "Demandé",
+    "editApprove": "Modifier et approuver",
+    "approve": "Approuver",
+    "deny": "Refuser",
+    "requester": "Demandeur",
+    "approvalOwner": "Propriétaire de l’approbation",
+    "source": "Source",
+    "reviewer": "Réviseur",
+    "notReviewed": "Pas encore révisé",
+    "changedFields": "Champs modifiés"
+  },
+  "modal": {
+    "title": "Modifier la demande #{{id}} avant approbation",
+    "subtitle": "Ajustez la charge utile/les identifiants de carnets d’adresses, puis approuvez cette demande en file d’attente.",
+    "resolvedPayload": "JSON de la charge utile résolue",
+    "resolvedAddressIds": "Tableau JSON des identifiants de carnets d’adresses résolus",
+    "cancel": "Annuler",
+    "approve": "Enregistrer les modifications et approuver",
+    "approving": "Approbation..."
+  },
+  "status": {
+    "pending": "En attente",
+    "approved": "Approuvée (en attente des autres)",
+    "manualMergeNeeded": "Fusion manuelle nécessaire",
+    "applied": "Appliquée",
+    "denied": "Refusée"
+  },
+  "notices": {
+    "approved": "Demande approuvée.",
+    "denied": "Demande refusée.",
+    "bulk": "{{processed}} groupe(s) de demandes traité(s). {{skipped}} ignoré(s)."
+  },
+  "page": {
+    "title": "File de révision des modifications de contact",
+    "subtitle": "Examinez les modifications en file d’attente effectuées par les éditeurs sur les contacts avant leur application."
+  },
+  "actions": {
+    "approveAll": "Tout approuver ({{count}})",
+    "denyAll": "Tout refuser ({{count}})"
+  },
+  "states": {
+    "loading": "Chargement de la file de révision...",
+    "empty": "Aucune demande en file d’attente pour ce filtre."
+  },
+  "operations": {
+    "delete": "Supprimer",
+    "update": "Mettre à jour"
+  }
+}

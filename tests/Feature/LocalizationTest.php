@@ -19,7 +19,7 @@ class LocalizationTest extends TestCase
 
         config()->set('app.locale', 'en');
         config()->set('app.fallback_locale', 'en');
-        config()->set('app.supported_locales', ['en', 'es']);
+        config()->set('app.supported_locales', ['de', 'en', 'es', 'fr']);
     }
 
     public function test_public_locale_negotiation_honors_query_then_header_then_accept_language_then_fallback(): void
@@ -41,20 +41,20 @@ class LocalizationTest extends TestCase
         $headerResponse->assertJsonPath('locale', 'es');
 
         $acceptLanguageResponse = $this->json('GET', '/api/public/config', [], [
-            'Accept-Language' => 'es-ES,es;q=0.9,en;q=0.8',
+            'Accept-Language' => 'fr-FR,fr;q=0.9,en;q=0.8',
         ]);
 
         $acceptLanguageResponse->assertOk();
-        $acceptLanguageResponse->assertJsonPath('locale', 'es');
+        $acceptLanguageResponse->assertJsonPath('locale', 'fr');
 
         $fallbackResponse = $this->json('GET', '/api/public/config', [], [
-            'Accept-Language' => 'fr-FR,fr;q=0.9',
+            'Accept-Language' => 'it-IT,it;q=0.9',
         ]);
 
         $fallbackResponse->assertOk();
         $fallbackResponse->assertJsonPath('locale', 'en');
         $fallbackResponse->assertJsonPath('fallback_locale', 'en');
-        $fallbackResponse->assertJsonPath('supported_locales', ['en', 'es']);
+        $fallbackResponse->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr']);
     }
 
     public function test_authenticated_user_locale_takes_precedence_over_request_locale_inputs(): void
@@ -73,7 +73,7 @@ class LocalizationTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('locale', 'es');
         $response->assertJsonPath('fallback_locale', 'en');
-        $response->assertJsonPath('supported_locales', ['en', 'es']);
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr']);
     }
 
     public function test_authenticated_user_can_update_locale_and_receive_updated_payload(): void
@@ -84,19 +84,19 @@ class LocalizationTest extends TestCase
 
         $response = $this->actingAs($user)
             ->patchJson('/api/auth/locale', [
-                'locale' => 'es',
+                'locale' => 'de',
             ]);
 
         $response->assertOk();
         $response->assertJsonPath('ok', true);
-        $response->assertJsonPath('locale', 'es');
-        $response->assertJsonPath('user.locale', 'es');
-        $response->assertJsonPath('supported_locales', ['en', 'es']);
+        $response->assertJsonPath('locale', 'de');
+        $response->assertJsonPath('user.locale', 'de');
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr']);
         $response->assertJsonPath('fallback_locale', 'en');
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
-            'locale' => 'es',
+            'locale' => 'de',
         ]);
     }
 

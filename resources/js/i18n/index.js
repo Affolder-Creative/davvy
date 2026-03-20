@@ -9,6 +9,15 @@ import {
   setDocumentLocale,
 } from "../lib/locale";
 
+import deCommon from "./locales/de/common.json";
+import deAuth from "./locales/de/auth.json";
+import deShell from "./locales/de/shell.json";
+import deDashboard from "./locales/de/dashboard.json";
+import deContacts from "./locales/de/contacts.json";
+import deQueue from "./locales/de/queue.json";
+import deAdmin from "./locales/de/admin.json";
+import deProfile from "./locales/de/profile.json";
+
 import enCommon from "./locales/en/common.json";
 import enAuth from "./locales/en/auth.json";
 import enShell from "./locales/en/shell.json";
@@ -27,6 +36,15 @@ import esQueue from "./locales/es/queue.json";
 import esAdmin from "./locales/es/admin.json";
 import esProfile from "./locales/es/profile.json";
 
+import frCommon from "./locales/fr/common.json";
+import frAuth from "./locales/fr/auth.json";
+import frShell from "./locales/fr/shell.json";
+import frDashboard from "./locales/fr/dashboard.json";
+import frContacts from "./locales/fr/contacts.json";
+import frQueue from "./locales/fr/queue.json";
+import frAdmin from "./locales/fr/admin.json";
+import frProfile from "./locales/fr/profile.json";
+
 const APP_TITLE_KEY = "meta.appTitle";
 let titleSyncBound = false;
 
@@ -42,6 +60,16 @@ export const I18N_NAMESPACES = [
 ];
 
 const resources = {
+  de: {
+    common: deCommon,
+    auth: deAuth,
+    shell: deShell,
+    dashboard: deDashboard,
+    contacts: deContacts,
+    queue: deQueue,
+    admin: deAdmin,
+    profile: deProfile,
+  },
   en: {
     common: enCommon,
     auth: enAuth,
@@ -61,6 +89,16 @@ const resources = {
     queue: esQueue,
     admin: esAdmin,
     profile: esProfile,
+  },
+  fr: {
+    common: frCommon,
+    auth: frAuth,
+    shell: frShell,
+    dashboard: frDashboard,
+    contacts: frContacts,
+    queue: frQueue,
+    admin: frAdmin,
+    profile: frProfile,
   },
 };
 
@@ -117,10 +155,13 @@ if (!titleSyncBound) {
   titleSyncBound = true;
 }
 
-export function setI18nLocale(locale, {
-  supportedLocales = SUPPORTED_LOCALES,
-  fallbackLocale = FALLBACK_LOCALE,
-} = {}) {
+export function setI18nLocale(
+  locale,
+  {
+    supportedLocales = SUPPORTED_LOCALES,
+    fallbackLocale = FALLBACK_LOCALE,
+  } = {},
+) {
   const normalized = normalizeLocale(locale, {
     supported: supportedLocales,
     fallback: fallbackLocale,

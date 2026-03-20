@@ -37,7 +37,7 @@ function buildProps(overrides = {}) {
       },
       twoFactorEnabled: false,
       locale: "en",
-      supportedLocales: ["en", "es"],
+      supportedLocales: ["de", "en", "es", "fr"],
       fallbackLocale: "en",
       setAuth: vi.fn(),
       refreshAuth: vi.fn().mockResolvedValue(undefined),
@@ -225,7 +225,7 @@ describe("ProfilePage", () => {
         },
         twoFactorEnabled: false,
         locale: "en",
-        supportedLocales: ["en", "es"],
+        supportedLocales: ["de", "en", "es", "fr"],
         fallbackLocale: "en",
         setAuth,
         refreshAuth: vi.fn().mockResolvedValue(undefined),
@@ -239,8 +239,8 @@ describe("ProfilePage", () => {
               email: "admin@example.com",
               role: "admin",
             },
-            locale: "es",
-            supported_locales: ["en", "es"],
+            locale: "fr",
+            supported_locales: ["de", "en", "es", "fr"],
             fallback_locale: "en",
           },
         }),
@@ -250,11 +250,14 @@ describe("ProfilePage", () => {
 
     render(<ProfilePage {...props} />);
 
-    await user.selectOptions(screen.getByLabelText("Language"), "es");
+    expect(screen.getByRole("option", { name: "Deutsch" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Français" })).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("Language"), "fr");
     await user.click(screen.getByRole("button", { name: "Save Language" }));
 
     expect(props.api.patch).toHaveBeenCalledWith("/api/auth/locale", {
-      locale: "es",
+      locale: "fr",
     });
     await waitFor(() => expect(setAuth).toHaveBeenCalledTimes(1));
     expect(screen.getByText("Language updated.")).toBeInTheDocument();

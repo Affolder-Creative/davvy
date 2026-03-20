@@ -4,7 +4,6 @@ import path from "node:path";
 const root = process.cwd();
 const localesRoot = path.join(root, "resources", "js", "i18n", "locales");
 const baseLocale = "en";
-const compareLocale = "es";
 
 function flattenKeys(value, prefix = "") {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -37,56 +36,109 @@ function collectLocaleFiles(localeDir) {
     .sort();
 }
 
-const baseDir = path.join(localesRoot, baseLocale);
-const compareDir = path.join(localesRoot, compareLocale);
+function collectLocaleDirectories(rootDir) {
+  return readdirSync(rootDir)
+    .filter((entry) => statSync(path.join(rootDir, entry)).isDirectory())
+    .sort();
+}
 
+const baseDir = path.join(localesRoot, baseLocale);
 const baseFiles = collectLocaleFiles(baseDir);
+const localeDirectories = collectLocaleDirectories(localesRoot).filter(
+  (locale) => locale !== baseLocale,
+);
+
 let hasMismatch = false;
 
-for (const baseFile of baseFiles) {
-  const namespace = path.basename(baseFile);
-  const compareFile = path.join(compareDir, namespace);
+if (localeDirectories.length === 0) {
+  console.error("No additional locale directories found to compare against en.");
+  process.exitCode = 1;
+} else {
+  for (const compareLocale of localeDirectories) {
+    const compareDir = path.join(localesRoot, compareLocale);
+    const compareFiles = collectLocaleFiles(compareDir);
+    const baseNamespaces = new Set(baseFiles.map((filePath) => path.basename(filePath)));
+    const compareNamespaces = new Set(
+      compareFiles.map((filePath) => path.basename(filePath)),
+    );
 
-  let baseJson;
-  let compareJson;
+    const missingNamespaces = [...baseNamespaces].filter(
+      (namespace) => !compareNamespaces.has(namespace),
+    );
+    const extraNamespaces = [...compareNamespaces].filter(
+      (namespace) => !baseNamespaces.has(namespace),
+    );
 
-  try {
-    baseJson = readJson(baseFile);
-  } catch (error) {
-    console.error(`Failed to parse ${baseFile}:`, error.message);
-    process.exitCode = 1;
-    continue;
-  }
+    if (missingNamespaces.length > 0 || extraNamespaces.length > 0) {
+      hasMismatch = true;
+      console.error(`Locale namespace mismatch for ${compareLocale}:`);
 
-  try {
-    compareJson = readJson(compareFile);
-  } catch (error) {
-    console.error(`Missing or invalid locale file ${compareFile}:`, error.message);
-    hasMismatch = true;
-    continue;
-  }
+      if (missingNamespaces.length > 0) {
+        console.error(`  Missing files in ${compareLocale}:`);
+        for (const namespace of missingNamespaces) {
+          console.error(`    - ${namespace}`);
+        }
+      }
 
-  const baseKeys = new Set(flattenKeys(baseJson));
-  const compareKeys = new Set(flattenKeys(compareJson));
-
-  const missingInCompare = [...baseKeys].filter((key) => !compareKeys.has(key));
-  const extraInCompare = [...compareKeys].filter((key) => !baseKeys.has(key));
-
-  if (missingInCompare.length > 0 || extraInCompare.length > 0) {
-    hasMismatch = true;
-    console.error(`Namespace ${namespace} has key mismatch:`);
-
-    if (missingInCompare.length > 0) {
-      console.error(`  Missing in ${compareLocale}:`);
-      for (const key of missingInCompare) {
-        console.error(`    - ${key}`);
+      if (extraNamespaces.length > 0) {
+        console.error(`  Extra files in ${compareLocale}:`);
+        for (const namespace of extraNamespaces) {
+          console.error(`    - ${namespace}`);
+        }
       }
     }
 
-    if (extraInCompare.length > 0) {
-      console.error(`  Extra in ${compareLocale}:`);
-      for (const key of extraInCompare) {
-        console.error(`    - ${key}`);
+    for (const baseFile of baseFiles) {
+      const namespace = path.basename(baseFile);
+      const compareFile = path.join(compareDir, namespace);
+
+      let baseJson;
+      let compareJson;
+
+      try {
+        baseJson = readJson(baseFile);
+      } catch (error) {
+        console.error(`Failed to parse ${baseFile}:`, error.message);
+        process.exitCode = 1;
+        continue;
+      }
+
+      try {
+        compareJson = readJson(compareFile);
+      } catch (error) {
+        console.error(
+          `Missing or invalid locale file ${compareFile}:`,
+          error.message,
+        );
+        hasMismatch = true;
+        continue;
+      }
+
+      const baseKeys = new Set(flattenKeys(baseJson));
+      const compareKeys = new Set(flattenKeys(compareJson));
+
+      const missingInCompare = [...baseKeys].filter(
+        (key) => !compareKeys.has(key),
+      );
+      const extraInCompare = [...compareKeys].filter((key) => !baseKeys.has(key));
+
+      if (missingInCompare.length > 0 || extraInCompare.length > 0) {
+        hasMismatch = true;
+        console.error(`Namespace ${namespace} has key mismatch for ${compareLocale}:`);
+
+        if (missingInCompare.length > 0) {
+          console.error(`  Missing in ${compareLocale}:`);
+          for (const key of missingInCompare) {
+            console.error(`    - ${key}`);
+          }
+        }
+
+        if (extraInCompare.length > 0) {
+          console.error(`  Extra in ${compareLocale}:`);
+          for (const key of extraInCompare) {
+            console.error(`    - ${key}`);
+          }
+        }
       }
     }
   }
@@ -95,5 +147,7 @@ for (const baseFile of baseFiles) {
 if (hasMismatch) {
   process.exitCode = 1;
 } else {
-  console.log(`i18n key parity check passed (${baseLocale} vs ${compareLocale}).`);
+  console.log(
+    `i18n key parity check passed (${baseLocale} vs ${localeDirectories.join(", ")}).`,
+  );
 }

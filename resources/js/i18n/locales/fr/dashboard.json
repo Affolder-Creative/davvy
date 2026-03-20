@@ -1,0 +1,101 @@
+{
+  "errors": {
+    "load": "Impossible de charger les données du tableau de bord.",
+    "updateShareStatus": "Impossible de mettre à jour l’état du partage.",
+    "renameResource": "Impossible de renommer la ressource.",
+    "createCalendar": "Impossible de créer le calendrier.",
+    "createAddressBook": "Impossible de créer le carnet d’adresses.",
+    "saveShare": "Impossible d’enregistrer l’attribution du partage.",
+    "removeShare": "Impossible de supprimer l’attribution du partage.",
+    "exportCalendars": "Impossible d’exporter les calendriers.",
+    "exportCalendar": "Impossible d’exporter le calendrier.",
+    "exportAddressBooks": "Impossible d’exporter les carnets d’adresses.",
+    "exportAddressBook": "Impossible d’exporter le carnet d’adresses.",
+    "appleCompat": "Impossible de mettre à jour les paramètres de compatibilité Apple.",
+    "milestones": "Impossible de mettre à jour les paramètres du calendrier Anniversaires/Commémorations."
+  },
+  "overview": {
+    "endpointTitle": "Point de terminaison DAV",
+    "endpointHelper": "Utilisez cette URL dans les paramètres de connexion du client.",
+    "principalTitle": "Principal",
+    "principalHelper": "La découverte automatique peut le résoudre automatiquement.",
+    "roleTitle": "Rôle",
+    "roleHelper": "Les admins peuvent gérer les utilisateurs et le partage entre utilisateurs."
+  },
+  "resources": {
+    "yourCalendars": "Vos calendriers",
+    "createCalendar": "Créer un calendrier",
+    "yourAddressBooks": "Vos carnets d’adresses",
+    "createAddressBook": "Créer un carnet d’adresses",
+    "exportAll": "Tout exporter"
+  },
+  "resourcePanel": {
+    "displayName": "Nom d’affichage",
+    "sharable": "Partageable",
+    "noOwned": "Aucune ressource détenue pour le moment.",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "editNameFor": "Modifier le nom de {{name}}",
+    "exportItem": "Exporter {{name}}",
+    "default": "(par défaut)",
+    "sharedWithYou": "Partagé avec vous",
+    "noShared": "Aucune ressource partagée.",
+    "owner": "Propriétaire : {{name}} ({{email}})",
+    "scope": {
+      "owned": "Appartient à l’utilisateur",
+      "shared": "Partagé"
+    },
+    "cancelEditingCalendarName": "Annuler la modification du nom du calendrier {{label}}",
+    "saveCalendarName": "Enregistrer le nom du calendrier {{label}}",
+    "resetCalendarName": "Réinitialiser le nom du calendrier {{label}} à la valeur par défaut",
+    "renameCalendar": "Renommer le calendrier {{label}}",
+    "saving": "Enregistrement..."
+  },
+  "milestoneCalendars": {
+    "expand": "Développer les calendriers d’événements marquants",
+    "collapse": "Réduire les calendriers d’événements marquants",
+    "title": "Calendriers d’événements marquants",
+    "off": "Désactivé",
+    "enabled": "{{count}}/2 activés",
+    "configure": "Configurer",
+    "hide": "Masquer",
+    "birthdays": "Anniversaires",
+    "birthdaysFallback": "Anniversaires de {{name}}",
+    "anniversaries": "Commémorations",
+    "anniversariesFallback": "Commémorations de {{name}}"
+  },
+  "sharing": {
+    "title": "Partagez vos ressources",
+    "subtitle": "Accordez un accès en lecture seule, éditeur ou admin aux ressources que vous possédez et que vous avez marquées comme partageables. L’accès admin inclut les droits de suppression de collection.",
+    "resourceCalendar": "Calendrier",
+    "resourceAddressBook": "Carnet d’adresses",
+    "selectSharableResource": "Sélectionner une ressource partageable",
+    "selectUser": "Sélectionner un utilisateur",
+    "permReadOnly": "Général (lecture seule)",
+    "permEditor": "Modification complète (sans suppression)",
+    "permAdmin": "Admin (modification complète + suppression)",
+    "share": "Partager",
+    "noOutgoing": "Aucun partage sortant pour le moment.",
+    "sharedWith": "Partagé avec : {{name}} ({{email}})",
+    "revoke": "Révoquer"
+  },
+  "appleCompat": {
+    "title": "Compatibilité Apple Contacts",
+    "subtitle": "Désactivée par défaut. Reflète les carnets d’adresses sélectionnés dans votre carnet principal afin que les clients macOS et iOS puissent les voir.",
+    "target": "Cible du miroir : {{name}} (/{{uri}})",
+    "missingTarget": "Aucun carnet d’adresses Contacts par défaut trouvé pour votre compte.",
+    "enable": "Activer le miroir de compatibilité Apple",
+    "sourcesTitle": "Carnets d’adresses source à refléter",
+    "noSources": "Aucun carnet d’adresses détenu/partagé admissible disponible.",
+    "save": "Enregistrer les paramètres de compatibilité Apple"
+  },
+  "states": {
+    "loadingResources": "Chargement des ressources..."
+  },
+  "notices": {
+    "shareStatus": {
+      "shared": "{{name}} est maintenant partagé.",
+      "unshared": "{{name}} n’est plus partagé."
+    }
+  }
+}

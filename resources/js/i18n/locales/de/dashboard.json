@@ -1,0 +1,101 @@
+{
+  "errors": {
+    "load": "Dashboard-Daten konnten nicht geladen werden.",
+    "updateShareStatus": "Freigabestatus konnte nicht aktualisiert werden.",
+    "renameResource": "Ressource konnte nicht umbenannt werden.",
+    "createCalendar": "Kalender konnte nicht erstellt werden.",
+    "createAddressBook": "Adressbuch konnte nicht erstellt werden.",
+    "saveShare": "Freigabezuweisung konnte nicht gespeichert werden.",
+    "removeShare": "Freigabezuweisung konnte nicht entfernt werden.",
+    "exportCalendars": "Kalender konnten nicht exportiert werden.",
+    "exportCalendar": "Kalender konnte nicht exportiert werden.",
+    "exportAddressBooks": "Adressbücher konnten nicht exportiert werden.",
+    "exportAddressBook": "Adressbuch konnte nicht exportiert werden.",
+    "appleCompat": "Apple-Kompatibilitätseinstellungen konnten nicht aktualisiert werden.",
+    "milestones": "Einstellungen für Geburtstags-/Jahrestagskalender konnten nicht aktualisiert werden."
+  },
+  "overview": {
+    "endpointTitle": "DAV-Endpunkt",
+    "endpointHelper": "Verwenden Sie diese URL in den Verbindungseinstellungen des Clients.",
+    "principalTitle": "Prinzipal",
+    "principalHelper": "Die automatische Erkennung kann dies möglicherweise automatisch auflösen.",
+    "roleTitle": "Rolle",
+    "roleHelper": "Admins können Benutzer und benutzerübergreifende Freigaben verwalten."
+  },
+  "resources": {
+    "yourCalendars": "Ihre Kalender",
+    "createCalendar": "Kalender erstellen",
+    "yourAddressBooks": "Ihre Adressbücher",
+    "createAddressBook": "Adressbuch erstellen",
+    "exportAll": "Alle exportieren"
+  },
+  "resourcePanel": {
+    "displayName": "Anzeigename",
+    "sharable": "Freigebbar",
+    "noOwned": "Noch keine eigenen Ressourcen.",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "editNameFor": "Namen für {{name}} bearbeiten",
+    "exportItem": "{{name}} exportieren",
+    "default": "(Standard)",
+    "sharedWithYou": "Mit Ihnen geteilt",
+    "noShared": "Keine geteilten Ressourcen.",
+    "owner": "Besitzer: {{name}} ({{email}})",
+    "scope": {
+      "owned": "Eigene",
+      "shared": "Geteilt"
+    },
+    "cancelEditingCalendarName": "Bearbeiten des Kalendernamens {{label}} abbrechen",
+    "saveCalendarName": "Kalendernamen {{label}} speichern",
+    "resetCalendarName": "Kalendernamen {{label}} auf Standard zurücksetzen",
+    "renameCalendar": "Kalender {{label}} umbenennen",
+    "saving": "Speichern..."
+  },
+  "milestoneCalendars": {
+    "expand": "Meilensteinkalender erweitern",
+    "collapse": "Meilensteinkalender einklappen",
+    "title": "Meilensteinkalender",
+    "off": "Aus",
+    "enabled": "{{count}}/2 aktiviert",
+    "configure": "Konfigurieren",
+    "hide": "Ausblenden",
+    "birthdays": "Geburtstage",
+    "birthdaysFallback": "{{name}} Geburtstage",
+    "anniversaries": "Jahrestage",
+    "anniversariesFallback": "{{name}} Jahrestage"
+  },
+  "sharing": {
+    "title": "Ihre Ressourcen freigeben",
+    "subtitle": "Gewähren Sie Nur-Lese-, Bearbeiter- oder Admin-Zugriff auf Ressourcen, die Ihnen gehören und als freigebbar markiert sind. Admin-Zugriff umfasst das Recht, Sammlungen zu löschen.",
+    "resourceCalendar": "Kalender",
+    "resourceAddressBook": "Adressbuch",
+    "selectSharableResource": "Freigebbare Ressource auswählen",
+    "selectUser": "Benutzer auswählen",
+    "permReadOnly": "Allgemein (nur lesen)",
+    "permEditor": "Vollständige Bearbeitung (kein Löschen)",
+    "permAdmin": "Admin (volle Bearbeitung + Löschen)",
+    "share": "Freigeben",
+    "noOutgoing": "Noch keine ausgehenden Freigaben.",
+    "sharedWith": "Geteilt mit: {{name}} ({{email}})",
+    "revoke": "Widerrufen"
+  },
+  "appleCompat": {
+    "title": "Apple-Kontakte-Kompatibilität",
+    "subtitle": "Standardmäßig deaktiviert. Spiegeln Sie ausgewählte Adressbücher in Ihr Hauptadressbuch, damit macOS- und iOS-Clients sie sehen können.",
+    "target": "Spiegelziel: {{name}} (/{{uri}})",
+    "missingTarget": "Für Ihr Konto wurde kein Standard-Adressbuch „Kontakte“ gefunden.",
+    "enable": "Apple-Kompatibilitätsspiegelung aktivieren",
+    "sourcesTitle": "Zu spiegelnde Quelladressbücher",
+    "noSources": "Keine geeigneten eigenen/geteilten Adressbücher verfügbar.",
+    "save": "Apple-Kompatibilitätseinstellungen speichern"
+  },
+  "states": {
+    "loadingResources": "Ressourcen werden geladen..."
+  },
+  "notices": {
+    "shareStatus": {
+      "shared": "{{name}} ist jetzt freigegeben.",
+      "unshared": "{{name}} ist nicht länger freigegeben."
+    }
+  }
+}

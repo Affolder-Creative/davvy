@@ -1,14 +1,19 @@
-export const SUPPORTED_LOCALES = ["en", "es"];
+export const SUPPORTED_LOCALES = ["de", "en", "es", "fr"];
 export const FALLBACK_LOCALE = "en";
 const LOCALE_STORAGE_KEY = "davvy.locale";
 const RTL_PRIMARY_LOCALES = new Set(["ar", "fa", "he", "ur"]);
 const LOCALE_LABEL_OVERRIDES = Object.freeze({
+  de: "Deutsch",
   en: "English",
   es: "Español",
+  fr: "Français",
 });
 
 function canonicalizeLocaleCode(value) {
-  return String(value ?? "").trim().toLowerCase().replace(/_/g, "-");
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, "-");
 }
 
 function primaryLocaleCode(value) {
@@ -20,19 +25,27 @@ function primaryLocaleCode(value) {
   return normalized.split("-")[0] || "";
 }
 
-export function normalizeLocale(candidate, {
-  supported = SUPPORTED_LOCALES,
-  fallback = FALLBACK_LOCALE,
-} = {}) {
-  const normalizedSupported = Array.isArray(supported) && supported.length > 0
-    ? supported.map((locale) => String(locale).trim().toLowerCase()).filter(Boolean)
-    : [fallback];
+export function normalizeLocale(
+  candidate,
+  { supported = SUPPORTED_LOCALES, fallback = FALLBACK_LOCALE } = {},
+) {
+  const normalizedSupported =
+    Array.isArray(supported) && supported.length > 0
+      ? supported
+          .map((locale) => String(locale).trim().toLowerCase())
+          .filter(Boolean)
+      : [fallback];
 
-  const normalizedFallback = normalizedSupported.includes(String(fallback).trim().toLowerCase())
+  const normalizedFallback = normalizedSupported.includes(
+    String(fallback).trim().toLowerCase(),
+  )
     ? String(fallback).trim().toLowerCase()
     : normalizedSupported[0] || FALLBACK_LOCALE;
 
-  const value = String(candidate ?? "").trim().toLowerCase().replace(/_/g, "-");
+  const value = String(candidate ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, "-");
   if (!value) {
     return normalizedFallback;
   }
@@ -75,9 +88,7 @@ export function localeDisplayName(locale, { fallback } = {}) {
       const displayNames = new Intl.DisplayNames([normalized], {
         type: "language",
       });
-      const derived =
-        displayNames.of(normalized) ||
-        displayNames.of(primary);
+      const derived = displayNames.of(normalized) || displayNames.of(primary);
       if (typeof derived === "string" && derived.trim() !== "") {
         return derived;
       }
@@ -107,16 +118,18 @@ export function localeDirection(locale) {
  * @param {{fallbackLocale?: string}} [options]
  * @returns {Array<{value: string, label: string, dir: "ltr"|"rtl"}>}
  */
-export function buildLocaleOptions(locales, { fallbackLocale = FALLBACK_LOCALE } = {}) {
+export function buildLocaleOptions(
+  locales,
+  { fallbackLocale = FALLBACK_LOCALE } = {},
+) {
   const normalized = Array.isArray(locales)
-    ? locales
-        .map((locale) => canonicalizeLocaleCode(locale))
-        .filter(Boolean)
+    ? locales.map((locale) => canonicalizeLocaleCode(locale)).filter(Boolean)
     : [];
 
-  const options = normalized.length > 0
-    ? [...new Set(normalized)]
-    : [normalizeLocale(fallbackLocale)];
+  const options =
+    normalized.length > 0
+      ? [...new Set(normalized)]
+      : [normalizeLocale(fallbackLocale)];
 
   return options.map((value) => ({
     value,

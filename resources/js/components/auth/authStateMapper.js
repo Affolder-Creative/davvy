@@ -1,3 +1,5 @@
+import { SUPPORTED_LOCALES } from "../../lib/locale";
+
 /**
  * @typedef {{name: string, url: string}} SponsorshipLink
  */
@@ -66,7 +68,7 @@ export function createDefaultAuthState() {
     twoFactorMandated: false,
     twoFactorGraceExpiresAt: null,
     locale: "en",
-    supportedLocales: ["en", "es"],
+    supportedLocales: [...SUPPORTED_LOCALES],
     fallbackLocale: "en",
     sponsorship: createDefaultSponsorship(),
   };
