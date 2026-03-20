@@ -39,7 +39,7 @@ describe("i18n locale synchronization", () => {
 
   it("supports german locale when it is included in supported locales", async () => {
     setI18nLocale("de-DE", {
-      supportedLocales: ["de", "en", "es", "fr"],
+      supportedLocales: ["de", "en", "es", "fr", "pt"],
       fallbackLocale: "en",
     });
 
@@ -49,6 +49,20 @@ describe("i18n locale synchronization", () => {
     expect(document.documentElement.lang).toBe("de");
     expect(document.title).toBe("Davvy - CalDAV + CardDAV-Manager");
     expect(window.localStorage.getItem("davvy.locale")).toBe("de");
+  });
+
+  it("supports portuguese locale when it is included in supported locales", async () => {
+    setI18nLocale("pt-BR", {
+      supportedLocales: ["de", "en", "es", "fr", "pt"],
+      fallbackLocale: "en",
+    });
+
+    await i18n.changeLanguage(i18n.language);
+
+    expect(i18n.resolvedLanguage).toBe("pt");
+    expect(document.documentElement.lang).toBe("pt");
+    expect(document.title).toBe("Davvy - Gerente CalDAV + CardDAV");
+    expect(window.localStorage.getItem("davvy.locale")).toBe("pt");
   });
 
   it("falls back to configured fallback locale", async () => {

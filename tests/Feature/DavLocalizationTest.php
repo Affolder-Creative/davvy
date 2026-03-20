@@ -62,11 +62,12 @@ class DavLocalizationTest extends TestCase
         $validator->validateAndNormalize("BEGIN:VCARD\nVERSION:4.0\nFN:Wrong Payload\nEND:VCARD");
     }
 
-    public function test_authenticated_dav_validation_errors_localize_to_german_and_french(): void
+    public function test_authenticated_dav_validation_errors_localize_to_german_french_and_portuguese(): void
     {
         $cases = [
             'de' => 'VCALENDAR-Nutzlast erwartet.',
             'fr' => 'Payload VCALENDAR attendu.',
+            'pt' => 'Carga útil VCALENDAR esperada.',
         ];
 
         foreach ($cases as $locale => $expectedMessage) {
