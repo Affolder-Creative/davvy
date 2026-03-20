@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'public_registration_disabled' => 'L\'inscription publique est actuellement désactivée.',
+    'registration_submitted_verify_and_wait_approval' => 'Inscription envoyée. Vérifiez votre adresse e-mail et attendez l\'approbation d\'un administrateur avant de vous connecter.',
+    'registration_submitted_verify_before_signin' => 'Inscription envoyée. Vérifiez votre adresse e-mail avant de vous connecter.',
+    'registration_submitted_pending_approval' => 'Inscription envoyée. Un administrateur doit approuver votre compte avant que vous puissiez vous connecter.',
+    'verification_link_invalid_or_expired' => 'Le lien de vérification est invalide ou expiré.',
+    'email_verified_pending_approval' => 'Adresse e-mail vérifiée. Votre compte est en attente d\'approbation par un administrateur.',
+    'invitation_link_invalid_or_expired' => 'Le lien d\'invitation est invalide ou expiré.',
+    'invitation_accepted_pending_approval' => 'Invitation acceptée. Votre compte est en attente d\'approbation par un administrateur.',
+    'credentials_invalid' => 'Les identifiants fournis sont invalides.',
+    'account_pending_approval' => 'Votre compte est en attente d\'approbation par un administrateur.',
+    'verify_email_before_signin' => 'Vérifiez votre adresse e-mail avant de vous connecter.',
+    'two_factor_code_required' => 'Un code à deux facteurs est requis pour terminer la connexion.',
+    'no_pending_two_factor_challenge' => 'Aucun défi à deux facteurs en attente. Démarrez une nouvelle tentative de connexion.',
+    'invalid_authentication_code' => 'Code d\'authentification invalide.',
+    'two_factor_already_enabled' => 'L\'authentification à deux facteurs est déjà activée.',
+    'two_factor_setup_expired' => 'La configuration de l\'authentification à deux facteurs a expiré. Relancez la configuration.',
+    'two_factor_code_invalid' => 'Le code à deux facteurs est invalide.',
+    'two_factor_not_enabled' => 'L\'authentification à deux facteurs n\'est pas activée.',
+    'enable_two_factor_before_managing_app_passwords' => 'Activez l\'authentification à deux facteurs avant de gérer les mots de passe applicatifs.',
+    'enable_two_factor_before_creating_app_passwords' => 'Activez l\'authentification à deux facteurs avant de créer des mots de passe applicatifs.',
+    'two_factor_setup_required_before_accessing_resource' => 'La configuration de l\'authentification à deux facteurs est requise avant d\'accéder à cette ressource.',
+];

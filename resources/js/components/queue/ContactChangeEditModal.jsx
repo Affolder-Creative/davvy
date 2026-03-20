@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import Field from "../common/Field";
 
 /**
@@ -17,6 +18,8 @@ export default function ContactChangeEditModal({
   onSubmit,
   submitting,
 }) {
+  const { t } = useTranslation("queue");
+
   if (!row) {
     return null;
   }
@@ -25,21 +28,21 @@ export default function ContactChangeEditModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="surface w-full max-w-3xl rounded-2xl p-5">
         <h3 className="text-lg font-semibold text-app-strong">
-          Edit Request #{row.id} Before Approve
+          {t("modal.title", { id: row.id })}
         </h3>
         <p className="mt-1 text-sm text-app-muted">
-          Adjust payload/address book IDs, then approve this queued request.
+          {t("modal.subtitle")}
         </p>
 
         <div className="mt-4 grid gap-3">
-          <Field label="Resolved Payload JSON">
+          <Field label={t("modal.resolvedPayload")}>
             <textarea
               className="input min-h-[14rem] font-mono text-xs"
               value={payloadText}
               onChange={(event) => onPayloadTextChange(event.target.value)}
             />
           </Field>
-          <Field label="Resolved Address Book IDs JSON Array">
+          <Field label={t("modal.resolvedAddressIds")}>
             <textarea
               className="input min-h-[6rem] font-mono text-xs"
               value={addressBookIdsText}
@@ -55,7 +58,7 @@ export default function ContactChangeEditModal({
             onClick={onCancel}
             disabled={submitting}
           >
-            Cancel
+            {t("modal.cancel")}
           </button>
           <button
             className="btn"
@@ -63,7 +66,7 @@ export default function ContactChangeEditModal({
             onClick={onSubmit}
             disabled={submitting}
           >
-            {submitting ? "Approving..." : "Save Edits & Approve"}
+            {submitting ? t("modal.approving") : t("modal.approve")}
           </button>
         </div>
       </div>

@@ -24,6 +24,6 @@ class EnsureTwoFactorEnrollmentComplete
             return $next($request);
         }
 
-        abort(423, 'Two-factor authentication setup is required before accessing this resource.');
+        abort(423, __('auth.two_factor_setup_required_before_accessing_resource'));
     }
 }

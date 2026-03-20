@@ -49,7 +49,7 @@ class ExportController extends Controller
         $user = $request->user();
 
         if (! $this->accessService->userCanReadCalendar($user, $calendar)) {
-            abort(403, 'You cannot access this calendar.');
+            abort(403, __('contacts.cannot_access_calendar'));
         }
 
         return response(
@@ -91,7 +91,7 @@ class ExportController extends Controller
         $user = $request->user();
 
         if (! $this->accessService->userCanReadAddressBook($user, $addressBook)) {
-            abort(403, 'You cannot access this address book.');
+            abort(403, __('contacts.cannot_access_address_book'));
         }
 
         return response(
@@ -222,7 +222,7 @@ class ExportController extends Controller
         $tmpPath = tempnam(sys_get_temp_dir(), 'davvy-export-');
 
         if ($tmpPath === false) {
-            abort(500, 'Unable to create temporary export file.');
+            abort(500, __('common.unable_to_create_temporary_export_file'));
         }
 
         $zip = new ZipArchive;
@@ -230,7 +230,7 @@ class ExportController extends Controller
 
         if ($opened !== true) {
             @unlink($tmpPath);
-            abort(500, 'Unable to create export archive.');
+            abort(500, __('common.unable_to_create_export_archive'));
         }
 
         $usedNames = [];

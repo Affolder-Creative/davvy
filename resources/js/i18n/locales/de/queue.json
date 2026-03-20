@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "Änderungsanfragen konnten nicht geladen werden.",
+    "approve": "Anfrage konnte nicht genehmigt werden.",
+    "deny": "Anfrage konnte nicht abgelehnt werden.",
+    "bulk": "Sammelaktion konnte nicht verarbeitet werden.",
+    "resolvedPayloadJson": "Aufgelöste Nutzlast muss gültiges JSON sein.",
+    "resolvedAddressIdsJson": "Aufgelöste Adressbuch-IDs müssen gültiges JSON sein.",
+    "resolvedAddressIdsArray": "Aufgelöste Adressbuch-IDs müssen ein Array positiver Ganzzahlen sein."
+  },
+  "bulk": {
+    "confirm": "Dadurch werden {{count}} Warteschlangenanforderung(en) in der aktuell gefilterten Ansicht {{verb}}. Fortfahren?",
+    "approve": "genehmigt",
+    "deny": "abgelehnt"
+  },
+  "filters": {
+    "open": "Offen",
+    "pending": "Ausstehend",
+    "manualMergeNeeded": "Manuelle Zusammenführung erforderlich",
+    "history": "Verlauf",
+    "all": "Alle",
+    "allOperations": "Alle Vorgänge",
+    "updates": "Aktualisierungen",
+    "deletes": "Löschungen",
+    "searchPlaceholder": "Nach Kontakt/Anforderer suchen...",
+    "refresh": "Aktualisieren"
+  },
+  "card": {
+    "group": "Gruppe",
+    "unnamedContact": "Unbenannter Kontakt",
+    "status": "Status",
+    "requested": "Angefordert",
+    "editApprove": "Bearbeiten & genehmigen",
+    "approve": "Genehmigen",
+    "deny": "Ablehnen",
+    "requester": "Anforderer",
+    "approvalOwner": "Genehmigungsinhaber",
+    "source": "Quelle",
+    "reviewer": "Prüfer",
+    "notReviewed": "Noch nicht geprüft",
+    "changedFields": "Geänderte Felder"
+  },
+  "modal": {
+    "title": "Anfrage #{{id}} vor der Genehmigung bearbeiten",
+    "subtitle": "Passen Sie Nutzlast/Adressbuch-IDs an und genehmigen Sie dann diese Warteschlangenanforderung.",
+    "resolvedPayload": "Aufgelöstes Nutzlast-JSON",
+    "resolvedAddressIds": "JSON-Array der aufgelösten Adressbuch-IDs",
+    "cancel": "Abbrechen",
+    "approve": "Änderungen speichern & genehmigen",
+    "approving": "Genehmigung läuft..."
+  },
+  "status": {
+    "pending": "Ausstehend",
+    "approved": "Genehmigt (wartet auf andere)",
+    "manualMergeNeeded": "Manuelle Zusammenführung erforderlich",
+    "applied": "Angewendet",
+    "denied": "Abgelehnt"
+  },
+  "notices": {
+    "approved": "Anfrage genehmigt.",
+    "denied": "Anfrage abgelehnt.",
+    "bulk": "{{processed}} Anfragegruppe(n) verarbeitet. {{skipped}} übersprungen."
+  },
+  "page": {
+    "title": "Prüfwarteschlange für Kontaktänderungen",
+    "subtitle": "Prüfen Sie in die Warteschlange eingereihte Änderungen von Bearbeitern an Kontakten, bevor sie angewendet werden."
+  },
+  "actions": {
+    "approveAll": "Alle genehmigen ({{count}})",
+    "denyAll": "Alle ablehnen ({{count}})"
+  },
+  "states": {
+    "loading": "Prüfwarteschlange wird geladen...",
+    "empty": "Keine Warteschlangenanforderungen für diesen Filter."
+  },
+  "operations": {
+    "delete": "Löschen",
+    "update": "Aktualisieren"
+  }
+}

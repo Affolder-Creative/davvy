@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Related Name Editor component.
@@ -18,12 +19,28 @@ export default function RelatedNameEditor({
   useRowReorder,
   RowReorderControls,
 }) {
+  const { t } = useTranslation("contacts");
   const safeRows = Array.isArray(rows) ? rows : [];
   const safeLabelOptions =
     Array.isArray(labelOptions) && labelOptions.length > 0
       ? labelOptions
       : defaultLabelOptions;
-  const safeContactOptions = Array.isArray(contactOptions) ? contactOptions : [];
+  const optionLabel = (option) => {
+    if (typeof option?.labelKey === "string" && option.labelKey.trim() !== "") {
+      return t(option.labelKey, {
+        defaultValue: option?.fallback ?? option?.value ?? "",
+      });
+    }
+
+    if (typeof option?.label === "string" && option.label.trim() !== "") {
+      return option.label;
+    }
+
+    return option?.fallback ?? option?.value ?? "";
+  };
+  const safeContactOptions = Array.isArray(contactOptions)
+    ? contactOptions
+    : [];
   const reorder = useRowReorder(safeRows, setRows);
   const rowGroup = "reorder-related-name";
   const [pickerRowIndex, setPickerRowIndex] = useState(null);
@@ -38,7 +55,9 @@ export default function RelatedNameEditor({
   }, [pickerRowIndex, safeRows.length]);
 
   const suggestionKeyFor = (index, rowValue, contactId) =>
-    `${index}:${String(rowValue ?? "").trim().toLowerCase()}:${contactId}`;
+    `${index}:${String(rowValue ?? "")
+      .trim()
+      .toLowerCase()}:${contactId}`;
 
   const updateRows = (nextRowsOrUpdater) => {
     if (typeof nextRowsOrUpdater === "function") {
@@ -104,7 +123,9 @@ export default function RelatedNameEditor({
   };
 
   const matchingContactOptions = (value) => {
-    const query = String(value ?? "").trim().toLowerCase();
+    const query = String(value ?? "")
+      .trim()
+      .toLowerCase();
     if (!query) {
       return safeContactOptions;
     }
@@ -160,19 +181,21 @@ export default function RelatedNameEditor({
     <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          Related Name
+          {t("editor.relatedNameEditor.title")}
         </h3>
         <button
           className="btn-outline btn-outline-sm"
           type="button"
           onClick={addRow}
         >
-          Add related name
+          {t("editor.relatedNameEditor.addRelatedName")}
         </button>
       </div>
       <div className="mt-3 space-y-3">
         {safeRows.length === 0 ? (
-          <p className="text-sm text-app-faint">No related names.</p>
+          <p className="text-sm text-app-faint">
+            {t("editor.relatedNameEditor.noRelatedNames")}
+          </p>
         ) : (
           safeRows.map((row, index) => {
             const rowIsDragSource = reorder.isDragSource(index);
@@ -180,7 +203,9 @@ export default function RelatedNameEditor({
             const isPickerOpen = pickerRowIndex === index;
             const optionListId = `related-name-combobox-list-${index}`;
             const options = matchingContactOptions(row?.value);
-            const selectedRelatedId = normalizePositiveInt(row?.related_contact_id);
+            const selectedRelatedId = normalizePositiveInt(
+              row?.related_contact_id,
+            );
             const selectedContact = safeContactOptions.find(
               (option) => option.id === selectedRelatedId,
             );
@@ -204,9 +229,12 @@ export default function RelatedNameEditor({
                 } ${rowIsDragSource ? "opacity-70" : ""}`}
               >
                 <div className="grid items-center gap-2 md:grid-cols-[12rem_1fr_auto]">
-                  <div className="self-center md:hidden" data-row-controls-mobile>
+                  <div
+                    className="self-center md:hidden"
+                    data-row-controls-mobile
+                  >
                     <RowReorderControls
-                      rowLabel="Related Name"
+                      rowLabel={t("editor.relatedNameEditor.title")}
                       rowGroup={rowGroup}
                       rowIndex={index}
                       rowCount={safeRows.length}
@@ -221,12 +249,16 @@ export default function RelatedNameEditor({
                   </div>
                   <select
                     className="input"
-                    value={resolveLabelSelectValue(row, safeLabelOptions, "other")}
+                    value={resolveLabelSelectValue(
+                      row,
+                      safeLabelOptions,
+                      "other",
+                    )}
                     onChange={(event) => updateLabel(index, event.target.value)}
                   >
                     {safeLabelOptions.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {optionLabel(option)}
                       </option>
                     ))}
                   </select>
@@ -264,7 +296,9 @@ export default function RelatedNameEditor({
                           selectContactOption(index, options[0]);
                         }
                       }}
-                      placeholder="Name"
+                      placeholder={t(
+                        "editor.relatedNameEditor.namePlaceholder",
+                      )}
                       role="combobox"
                       aria-autocomplete="list"
                       aria-expanded={isPickerOpen}
@@ -277,8 +311,9 @@ export default function RelatedNameEditor({
                       >
                         {options.length === 0 ? (
                           <p className="px-2 py-2 text-sm text-app-faint">
-                            No matching contacts. Keep typing to use a custom
-                            name.
+                            {t(
+                              "editor.relatedNameEditor.noMatchingContacts",
+                            )}
                           </p>
                         ) : (
                           options.map((option) => {
@@ -310,7 +345,7 @@ export default function RelatedNameEditor({
                     data-row-controls-desktop
                   >
                     <RowReorderControls
-                      rowLabel="Related Name"
+                      rowLabel={t("editor.relatedNameEditor.title")}
                       rowGroup={rowGroup}
                       rowIndex={index}
                       rowCount={safeRows.length}
@@ -326,7 +361,9 @@ export default function RelatedNameEditor({
                 </div>
                 {selectedContact ? (
                   <p className="mt-1.5 text-[11px] text-app-faint">
-                    Linked to contact #{selectedContact.id}.
+                    {t("editor.relatedNameEditor.linkedToContact", {
+                      contactId: selectedContact.id,
+                    })}
                   </p>
                 ) : null}
                 {!selectedContact &&
@@ -334,14 +371,18 @@ export default function RelatedNameEditor({
                 !suggestionDismissed ? (
                   <div className="mt-1.5 flex flex-wrap items-center gap-2">
                     <p className="text-[11px] text-app-faint">
-                      Match found: {suggestedContact.display_name}
+                      {t("editor.relatedNameEditor.matchFound", {
+                        name: suggestedContact.display_name,
+                      })}
                     </p>
                     <button
                       className="btn-outline btn-outline-sm"
                       type="button"
-                      onClick={() => selectContactOption(index, suggestedContact)}
+                      onClick={() =>
+                        selectContactOption(index, suggestedContact)
+                      }
                     >
-                      Link
+                      {t("editor.relatedNameEditor.link")}
                     </button>
                     <button
                       className="btn-outline btn-outline-sm"
@@ -354,7 +395,7 @@ export default function RelatedNameEditor({
                         )
                       }
                     >
-                      Dismiss
+                      {t("editor.relatedNameEditor.dismiss")}
                     </button>
                   </div>
                 ) : null}
@@ -365,7 +406,9 @@ export default function RelatedNameEditor({
                     onChange={(event) =>
                       updateRow(index, { custom_label: event.target.value })
                     }
-                    placeholder="Custom label"
+                    placeholder={t(
+                      "editor.relatedNameEditor.customLabelPlaceholder",
+                    )}
                   />
                 ) : null}
               </div>

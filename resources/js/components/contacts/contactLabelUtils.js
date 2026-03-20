@@ -1,59 +1,148 @@
 export const PHONE_LABEL_OPTIONS = [
-  { value: "mobile", label: "Mobile" },
-  { value: "iphone", label: "iPhone" },
-  { value: "apple_watch", label: "Apple Watch" },
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "main", label: "Main" },
-  { value: "home_fax", label: "Home Fax" },
-  { value: "work_fax", label: "Work Fax" },
-  { value: "other_fax", label: "Other Fax" },
-  { value: "pager", label: "Pager" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "mobile",
+    labelKey: "fieldLabels.phone.mobile",
+    fallback: "Mobile",
+  },
+  {
+    value: "iphone",
+    labelKey: "fieldLabels.phone.iphone",
+    fallback: "iPhone",
+  },
+  {
+    value: "apple_watch",
+    labelKey: "fieldLabels.phone.appleWatch",
+    fallback: "Apple Watch",
+  },
+  { value: "home", labelKey: "fieldLabels.phone.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.phone.work", fallback: "Work" },
+  { value: "main", labelKey: "fieldLabels.phone.main", fallback: "Main" },
+  {
+    value: "home_fax",
+    labelKey: "fieldLabels.phone.homeFax",
+    fallback: "Home Fax",
+  },
+  {
+    value: "work_fax",
+    labelKey: "fieldLabels.phone.workFax",
+    fallback: "Work Fax",
+  },
+  {
+    value: "other_fax",
+    labelKey: "fieldLabels.phone.otherFax",
+    fallback: "Other Fax",
+  },
+  { value: "pager", labelKey: "fieldLabels.phone.pager", fallback: "Pager" },
+  { value: "other", labelKey: "fieldLabels.phone.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "fieldLabels.phone.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const EMAIL_LABEL_OPTIONS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  { value: "home", labelKey: "fieldLabels.email.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.email.work", fallback: "Work" },
+  { value: "other", labelKey: "fieldLabels.email.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "fieldLabels.email.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const URL_LABEL_OPTIONS = [
-  { value: "homepage", label: "Home Page" },
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "homepage",
+    labelKey: "fieldLabels.url.homepage",
+    fallback: "Home Page",
+  },
+  { value: "home", labelKey: "fieldLabels.url.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.url.work", fallback: "Work" },
+  { value: "other", labelKey: "fieldLabels.url.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "fieldLabels.url.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const ADDRESS_LABEL_OPTIONS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "school", label: "School" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  { value: "home", labelKey: "fieldLabels.address.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.address.work", fallback: "Work" },
+  {
+    value: "school",
+    labelKey: "fieldLabels.address.school",
+    fallback: "School",
+  },
+  { value: "other", labelKey: "fieldLabels.address.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "fieldLabels.address.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const DATE_LABEL_OPTIONS = [
-  { value: "anniversary", label: "Anniversary" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "anniversary",
+    labelKey: "fieldLabels.date.anniversary",
+    fallback: "Anniversary",
+  },
+  { value: "other", labelKey: "fieldLabels.date.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "fieldLabels.date.custom",
+    fallback: "Custom...",
+  },
 ];
 
 export const RELATED_LABEL_OPTIONS = [
-  { value: "spouse", label: "Spouse" },
-  { value: "partner", label: "Partner" },
-  { value: "parent", label: "Parent" },
-  { value: "child", label: "Child" },
-  { value: "sibling", label: "Sibling" },
-  { value: "assistant", label: "Assistant" },
-  { value: "friend", label: "Friend" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  {
+    value: "spouse",
+    labelKey: "fieldLabels.related.spouse",
+    fallback: "Spouse",
+  },
+  {
+    value: "partner",
+    labelKey: "fieldLabels.related.partner",
+    fallback: "Partner",
+  },
+  {
+    value: "parent",
+    labelKey: "fieldLabels.related.parent",
+    fallback: "Parent",
+  },
+  { value: "child", labelKey: "fieldLabels.related.child", fallback: "Child" },
+  {
+    value: "sibling",
+    labelKey: "fieldLabels.related.sibling",
+    fallback: "Sibling",
+  },
+  {
+    value: "assistant",
+    labelKey: "fieldLabels.related.assistant",
+    fallback: "Assistant",
+  },
+  {
+    value: "friend",
+    labelKey: "fieldLabels.related.friend",
+    fallback: "Friend",
+  },
+  { value: "other", labelKey: "fieldLabels.related.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "fieldLabels.related.custom",
+    fallback: "Custom...",
+  },
 ];
 
+/**
+ * Canonical relationship tokens used for matching/sync logic across frontend
+ * and backend/vCard services. These are not user-facing strings and should
+ * remain stable English-like identifiers (not localized).
+ */
 const RELATED_LABEL_DERIVED_VALUES = new Set([
   "spouse",
   "husband",
@@ -106,26 +195,69 @@ const RELATED_LABEL_DERIVED_VALUES = new Set([
 ]);
 
 const RELATED_LABEL_DISPLAY_OVERRIDES = {
-  parent_in_law: "Parent-in-Law",
-  father_in_law: "Father-in-Law",
-  mother_in_law: "Mother-in-Law",
-  child_in_law: "Child-in-Law",
-  son_in_law: "Son-in-Law",
-  daughter_in_law: "Daughter-in-Law",
-  sibling_in_law: "Sibling-in-Law",
-  brother_in_law: "Brother-in-Law",
-  sister_in_law: "Sister-in-Law",
-  aunt_uncle: "Aunt/Uncle",
-  niece_nephew: "Niece/Nephew",
-  grandpa: "Grandpa",
-  grandma: "Grandma",
+  parent_in_law: {
+    labelKey: "fieldLabels.relatedDerived.parentInLaw",
+    fallback: "Parent-in-Law",
+  },
+  father_in_law: {
+    labelKey: "fieldLabels.relatedDerived.fatherInLaw",
+    fallback: "Father-in-Law",
+  },
+  mother_in_law: {
+    labelKey: "fieldLabels.relatedDerived.motherInLaw",
+    fallback: "Mother-in-Law",
+  },
+  child_in_law: {
+    labelKey: "fieldLabels.relatedDerived.childInLaw",
+    fallback: "Child-in-Law",
+  },
+  son_in_law: {
+    labelKey: "fieldLabels.relatedDerived.sonInLaw",
+    fallback: "Son-in-Law",
+  },
+  daughter_in_law: {
+    labelKey: "fieldLabels.relatedDerived.daughterInLaw",
+    fallback: "Daughter-in-Law",
+  },
+  sibling_in_law: {
+    labelKey: "fieldLabels.relatedDerived.siblingInLaw",
+    fallback: "Sibling-in-Law",
+  },
+  brother_in_law: {
+    labelKey: "fieldLabels.relatedDerived.brotherInLaw",
+    fallback: "Brother-in-Law",
+  },
+  sister_in_law: {
+    labelKey: "fieldLabels.relatedDerived.sisterInLaw",
+    fallback: "Sister-in-Law",
+  },
+  aunt_uncle: {
+    labelKey: "fieldLabels.relatedDerived.auntUncle",
+    fallback: "Aunt/Uncle",
+  },
+  niece_nephew: {
+    labelKey: "fieldLabels.relatedDerived.nieceNephew",
+    fallback: "Niece/Nephew",
+  },
+  grandpa: {
+    labelKey: "fieldLabels.relatedDerived.grandpa",
+    fallback: "Grandpa",
+  },
+  grandma: {
+    labelKey: "fieldLabels.relatedDerived.grandma",
+    fallback: "Grandma",
+  },
 };
 
 export const IM_LABEL_OPTIONS = [
-  { value: "home", label: "Home" },
-  { value: "work", label: "Work" },
-  { value: "other", label: "Other" },
-  { value: "custom", label: "Custom..." },
+  { value: "home", labelKey: "fieldLabels.im.home", fallback: "Home" },
+  { value: "work", labelKey: "fieldLabels.im.work", fallback: "Work" },
+  { value: "other", labelKey: "fieldLabels.im.other", fallback: "Other" },
+  {
+    value: "custom",
+    labelKey: "fieldLabels.im.custom",
+    fallback: "Custom...",
+  },
 ];
 
 const SAVED_CUSTOM_LABEL_VALUE_PREFIX = "saved-custom:";
@@ -144,7 +276,11 @@ const CONTACT_LABEL_BUILTIN_VALUE_SETS = Object.fromEntries(
     fieldKey,
     new Set(
       CONTACT_LABEL_FIELD_OPTIONS[fieldKey]
-        .map((option) => String(option?.value ?? "").trim().toLowerCase())
+        .map((option) =>
+          String(option?.value ?? "")
+            .trim()
+            .toLowerCase(),
+        )
         .filter((value) => value !== "" && value !== "custom"),
     ),
   ]),
@@ -154,7 +290,9 @@ const EMPTY_CONTACT_CUSTOM_LABELS = Object.fromEntries(
 );
 
 function normalizeLabelValue(value) {
-  return String(value ?? "").trim().toLowerCase();
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
 }
 
 function normalizeCustomLabelText(value) {
@@ -235,7 +373,9 @@ export function buildSavedCustomLabelsByField(contacts) {
  * @returns {Array<{value: string, label: string, saved_custom_label?: string, saved_custom_key?: string}>}
  */
 export function buildLabelOptions(baseOptions, savedCustomLabels = []) {
-  const primaryOptions = baseOptions.filter((option) => option.value !== "custom");
+  const primaryOptions = baseOptions.filter(
+    (option) => option.value !== "custom",
+  );
   const customOption = baseOptions.find((option) => option.value === "custom");
   const customLabelOptions = savedCustomLabels.map((label) => ({
     value: savedCustomOptionValue(label),
@@ -254,36 +394,45 @@ export function buildLabelOptions(baseOptions, savedCustomLabels = []) {
 function formatRelatedLabelOptionLabel(value) {
   const normalized = normalizeLabelValue(value);
   if (!normalized) {
-    return "";
+    return { label: "" };
   }
 
   if (RELATED_LABEL_DISPLAY_OVERRIDES[normalized]) {
-    return RELATED_LABEL_DISPLAY_OVERRIDES[normalized];
+    const displayOverride = RELATED_LABEL_DISPLAY_OVERRIDES[normalized];
+    return {
+      ...displayOverride,
+      label: displayOverride.fallback,
+    };
   }
 
-  return normalized
-    .split(/[\s_-]+/)
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  return {
+    label: normalized
+      .split(/[\s_-]+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" "),
+  };
 }
 
 /**
  * Derives additional related-name label options from existing contact data.
  *
  * @param {unknown} contacts
- * @returns {Array<{value: string, label: string}>}
+ * @returns {Array<{value: string, label?: string, labelKey?: string, fallback?: string}>}
  */
 export function buildDerivedRelatedLabelOptions(contacts) {
   if (!Array.isArray(contacts) || contacts.length === 0) {
     return [];
   }
 
-  const builtInValues = CONTACT_LABEL_BUILTIN_VALUE_SETS.related_names ?? new Set();
+  const builtInValues =
+    CONTACT_LABEL_BUILTIN_VALUE_SETS.related_names ?? new Set();
   const derivedValues = new Set();
 
   for (const contact of contacts) {
-    const rows = Array.isArray(contact?.related_names) ? contact.related_names : [];
+    const rows = Array.isArray(contact?.related_names)
+      ? contact.related_names
+      : [];
 
     for (const row of rows) {
       const normalizedLabel = normalizeLabelValue(row?.label);
@@ -308,7 +457,7 @@ export function buildDerivedRelatedLabelOptions(contacts) {
     )
     .map((value) => ({
       value,
-      label: formatRelatedLabelOptionLabel(value),
+      ...formatRelatedLabelOptionLabel(value),
     }));
 }
 
@@ -320,7 +469,10 @@ export function buildDerivedRelatedLabelOptions(contacts) {
  * @returns {Array<{value: string, label: string, saved_custom_label?: string, saved_custom_key?: string}>}
  */
 export function buildRelatedNameLabelOptions(contacts, savedCustomLabels = []) {
-  const baseOptions = buildLabelOptions(RELATED_LABEL_OPTIONS, savedCustomLabels);
+  const baseOptions = buildLabelOptions(
+    RELATED_LABEL_OPTIONS,
+    savedCustomLabels,
+  );
   const derivedOptions = buildDerivedRelatedLabelOptions(contacts);
   if (derivedOptions.length === 0) {
     return baseOptions;

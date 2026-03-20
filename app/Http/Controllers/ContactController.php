@@ -76,7 +76,7 @@ class ContactController extends Controller
         if ($queued !== null) {
             return response()->json([
                 'queued' => true,
-                'message' => 'This change was submitted for owner/admin approval.',
+                'message' => __('contacts.change_submitted_for_owner_or_admin_approval'),
                 'group_uuid' => $queued['group_uuid'],
                 'request_ids' => $queued['request_ids'],
             ], 202);
@@ -107,7 +107,7 @@ class ContactController extends Controller
         if ($queued !== null) {
             return response()->json([
                 'queued' => true,
-                'message' => 'This delete request was submitted for owner/admin approval.',
+                'message' => __('contacts.delete_submitted_for_owner_or_admin_approval'),
                 'group_uuid' => $queued['group_uuid'],
                 'request_ids' => $queued['request_ids'],
             ], 202);
@@ -241,7 +241,7 @@ class ContactController extends Controller
             && $payload['company'] === null
         ) {
             throw ValidationException::withMessages([
-                'first_name' => ['Enter at least a first name, last name, or company.'],
+                'first_name' => [__('contacts.enter_first_last_or_company')],
             ]);
         }
 
@@ -368,7 +368,7 @@ class ContactController extends Controller
             if ($currentContactId !== null && $relatedContactId === $currentContactId) {
                 throw ValidationException::withMessages([
                     'related_names.'.$entry['index'].'.related_contact_id' => [
-                        'A contact cannot reference itself as a related name.',
+                        __('contacts.contact_cannot_reference_itself_related_name'),
                     ],
                 ]);
             }
@@ -388,7 +388,7 @@ class ContactController extends Controller
             if ($contact === null) {
                 throw ValidationException::withMessages([
                     'related_names.'.$index.'.related_contact_id' => [
-                        'Select a valid contact from your contacts list.',
+                        __('contacts.select_valid_contact_from_contacts_list'),
                     ],
                 ]);
             }
@@ -396,7 +396,7 @@ class ContactController extends Controller
             if ($ownerId !== null && (int) $contact->owner_id !== $ownerId) {
                 throw ValidationException::withMessages([
                     'related_names.'.$index.'.related_contact_id' => [
-                        'Related contacts must belong to the same contact owner.',
+                        __('contacts.related_contacts_must_share_same_owner'),
                     ],
                 ]);
             }

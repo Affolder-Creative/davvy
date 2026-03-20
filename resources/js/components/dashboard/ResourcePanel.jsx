@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Resource Panel.
@@ -27,6 +28,7 @@ export default function ResourcePanel({
   DownloadIcon,
   PencilIcon,
 }) {
+  const { t } = useTranslation("dashboard");
   const [editingItemId, setEditingItemId] = useState(null);
   const [nameDraft, setNameDraft] = useState("");
   const [renamingItemId, setRenamingItemId] = useState(null);
@@ -85,7 +87,7 @@ export default function ResourcePanel({
         <input
           className="input flex-1"
           value={form.display_name}
-          placeholder="Display name"
+          placeholder={t("resourcePanel.displayName")}
           onChange={(event) =>
             setForm({ ...form, display_name: event.target.value })
           }
@@ -99,7 +101,7 @@ export default function ResourcePanel({
               setForm({ ...form, is_sharable: event.target.checked })
             }
           />
-          Sharable
+          {t("resourcePanel.sharable")}
         </label>
         <button className="btn" type="submit">
           {createLabel}
@@ -108,7 +110,7 @@ export default function ResourcePanel({
 
       <div className="mt-5 space-y-3">
         {items.length === 0 ? (
-          <p className="text-sm text-app-faint">No owned resources yet.</p>
+          <p className="text-sm text-app-faint">{t("resourcePanel.noOwned")}</p>
         ) : (
           items.map((item) => (
             <div
@@ -128,7 +130,9 @@ export default function ResourcePanel({
                         className="input h-8 flex-1 px-2 py-1 text-sm"
                         value={nameDraft}
                         onChange={(event) => setNameDraft(event.target.value)}
-                        aria-label={`Edit name for ${item.display_name}`}
+                        aria-label={t("resourcePanel.editNameFor", {
+                          name: item.display_name,
+                        })}
                         required
                         autoFocus
                       />
@@ -137,7 +141,7 @@ export default function ResourcePanel({
                         type="submit"
                         disabled={renamingItemId === item.id}
                       >
-                        Save
+                        {t("resourcePanel.save")}
                       </button>
                       <button
                         className="btn-outline btn-outline-sm rounded-xl"
@@ -145,7 +149,7 @@ export default function ResourcePanel({
                         onClick={cancelEditing}
                         disabled={renamingItemId === item.id}
                       >
-                        Cancel
+                        {t("resourcePanel.cancel")}
                       </button>
                     </form>
                   ) : (
@@ -153,17 +157,21 @@ export default function ResourcePanel({
                       <p className="truncate font-medium text-app-strong">
                         {item.display_name}
                       </p>
-                      {item.is_default ? (
-                        <span className="shrink-0 text-xs font-semibold text-app-faint">
-                          (default)
-                        </span>
-                      ) : null}
+                        {item.is_default ? (
+                          <span className="shrink-0 text-xs font-semibold text-app-faint">
+                            {t("resourcePanel.default")}
+                          </span>
+                        ) : null}
                       <button
                         className="inline-flex h-5 w-5 items-center justify-center rounded text-app-dim transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                         type="button"
                         onClick={() => startEditing(item)}
-                        aria-label={`Edit name for ${item.display_name}`}
-                        title={`Edit name for ${item.display_name}`}
+                        aria-label={t("resourcePanel.editNameFor", {
+                          name: item.display_name,
+                        })}
+                        title={t("resourcePanel.editNameFor", {
+                          name: item.display_name,
+                        })}
                       >
                         <PencilIcon className="h-3.5 w-3.5" />
                       </button>
@@ -180,8 +188,12 @@ export default function ResourcePanel({
                     className="btn-outline btn-outline-sm rounded-xl"
                     type="button"
                     onClick={() => void onExportItem(item)}
-                    aria-label={`Export ${item.display_name}`}
-                    title={`Export ${item.display_name}`}
+                    aria-label={t("resourcePanel.exportItem", {
+                      name: item.display_name,
+                    })}
+                    title={t("resourcePanel.exportItem", {
+                      name: item.display_name,
+                    })}
                   >
                     <DownloadIcon className="h-3.5 w-3.5" />
                   </button>
@@ -197,7 +209,7 @@ export default function ResourcePanel({
                         )
                       }
                     />
-                    Sharable
+                    {t("resourcePanel.sharable")}
                   </label>
                 </div>
               </div>
@@ -213,11 +225,11 @@ export default function ResourcePanel({
 
       <div className="mt-6 border-t border-app-edge pt-4">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
-          Shared with you
+          {t("resourcePanel.sharedWithYou")}
         </h3>
         <div className="mt-3 space-y-2">
           {sharedItems.length === 0 ? (
-            <p className="text-sm text-app-faint">No shared resources.</p>
+            <p className="text-sm text-app-faint">{t("resourcePanel.noShared")}</p>
           ) : (
             sharedItems.map((item) => (
               <div
@@ -230,7 +242,10 @@ export default function ResourcePanel({
                       {item.display_name}
                     </p>
                     <p className="text-xs text-app-muted">
-                      Owner: {item.owner_name} ({item.owner_email})
+                      {t("resourcePanel.owner", {
+                        name: item.owner_name,
+                        email: item.owner_email,
+                      })}
                     </p>
                     <CopyableResourceUri
                       resourceKind={resourceKind}
@@ -243,8 +258,12 @@ export default function ResourcePanel({
                       className="btn-outline btn-outline-sm rounded-xl"
                       type="button"
                       onClick={() => void onExportItem(item)}
-                      aria-label={`Export ${item.display_name}`}
-                      title={`Export ${item.display_name}`}
+                      aria-label={t("resourcePanel.exportItem", {
+                        name: item.display_name,
+                      })}
+                      title={t("resourcePanel.exportItem", {
+                        name: item.display_name,
+                      })}
                     >
                       <DownloadIcon className="h-3.5 w-3.5" />
                     </button>

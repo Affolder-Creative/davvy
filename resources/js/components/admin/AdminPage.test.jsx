@@ -234,7 +234,7 @@ describe("AdminPage", () => {
       expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
     );
 
-    expect(screen.getByText("Admin Control Center")).toBeInTheDocument();
+    expect(screen.getByText("Admin Control Panel")).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Create User" }),
     ).toBeInTheDocument();

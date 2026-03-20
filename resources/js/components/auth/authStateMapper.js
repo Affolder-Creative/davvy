@@ -1,3 +1,5 @@
+import { SUPPORTED_LOCALES } from "../../lib/locale";
+
 /**
  * @typedef {{name: string, url: string}} SponsorshipLink
  */
@@ -29,6 +31,20 @@ function createDefaultSponsorship() {
   };
 }
 
+function normalizeLocales(rawLocales, fallback = "en") {
+  const locales = Array.isArray(rawLocales)
+    ? rawLocales
+        .map((locale) => String(locale ?? "").trim().toLowerCase())
+        .filter(Boolean)
+    : [];
+
+  if (locales.length === 0) {
+    return [fallback];
+  }
+
+  return [...new Set(locales)];
+}
+
 /**
  * Creates an initial loading auth state used before bootstrap requests complete.
  *
@@ -51,6 +67,9 @@ export function createDefaultAuthState() {
     twoFactorSetupRequired: false,
     twoFactorMandated: false,
     twoFactorGraceExpiresAt: null,
+    locale: "en",
+    supportedLocales: [...SUPPORTED_LOCALES],
+    fallbackLocale: "en",
     sponsorship: createDefaultSponsorship(),
   };
 }
@@ -105,6 +124,23 @@ export function parseSponsorshipConfig(rawConfig) {
  */
 export function buildAuthStateFromPayload(payload, { user = null } = {}) {
   const source = payload && typeof payload === "object" ? payload : {};
+  const fallbackLocale = String(source.fallback_locale ?? "en")
+    .trim()
+    .toLowerCase() || "en";
+  const supportedLocales = normalizeLocales(
+    source.supported_locales,
+    fallbackLocale,
+  );
+  const localeCandidate = String(source.locale ?? fallbackLocale)
+    .trim()
+    .toLowerCase()
+    .replace(/_/g, "-");
+  const localePrimary = localeCandidate.split("-")[0];
+  const locale = supportedLocales.includes(localeCandidate)
+    ? localeCandidate
+    : supportedLocales.includes(localePrimary)
+      ? localePrimary
+      : fallbackLocale;
 
   return {
     loading: false,
@@ -122,6 +158,9 @@ export function buildAuthStateFromPayload(payload, { user = null } = {}) {
     twoFactorSetupRequired: !!source.two_factor_setup_required,
     twoFactorMandated: !!source.two_factor_mandated,
     twoFactorGraceExpiresAt: source.two_factor_grace_expires_at || null,
+    locale,
+    supportedLocales,
+    fallbackLocale,
     sponsorship: parseSponsorshipConfig(source.sponsorship),
   };
 }

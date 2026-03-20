@@ -12,6 +12,9 @@ Set these in your app service environment.
 | `APP_DEBUG` | `false` | Required |
 | `APP_KEY` | `base64:<generated-key>` | Required; generate once and keep stable across replicas |
 | `APP_URL` | `https://<your-domain>` | Required |
+| `APP_LOCALE` | `en` | Default application locale |
+| `APP_FALLBACK_LOCALE` | `en` | Fallback locale for unsupported request/user locales |
+| `APP_SUPPORTED_LOCALES` | `de,en,es,fr` | Comma-separated supported locale codes |
 | `DB_CONNECTION` | `pgsql` | Required |
 | `DB_HOST` | platform-specific | Required |
 | `DB_PORT` | `5432` | Required unless your PostgreSQL uses a different port |
@@ -86,6 +89,9 @@ If you want automatic admin creation via seeding:
 7. DB migrations are applied successfully (no pending migration errors).
 8. If replicas > 1, logs show advisory-lock serialization during startup and no migration race errors.
 9. If automated backups are enabled, confirm scheduler is running (`RUN_SCHEDULER=true` or external `schedule:run`).
+10. Verify localization:
+    - `GET /api/public/config` returns `locale`, `supported_locales`, and `fallback_locale`
+    - Profile language switch updates UI language and persists after reload
 
 ## 4. Post-Deploy Security Quick Check
 

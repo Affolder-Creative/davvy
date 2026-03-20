@@ -80,7 +80,7 @@ class CalendarController extends Controller
         $this->authorizeOwnership($request, $calendar);
 
         if ($calendar->is_default) {
-            abort(422, 'Default calendars cannot be deleted.');
+            abort(422, __('contacts.default_calendars_cannot_be_deleted'));
         }
 
         $this->resourceDeletion->deleteCalendar($calendar);
@@ -96,7 +96,7 @@ class CalendarController extends Controller
         $user = $request->user();
 
         if ($calendar->owner_id !== $user->id && ! $user->isAdmin()) {
-            abort(403, 'You cannot modify this calendar.');
+            abort(403, __('contacts.cannot_modify_calendar'));
         }
     }
 }

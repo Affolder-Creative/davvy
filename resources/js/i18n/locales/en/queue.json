@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "Unable to load change requests.",
+    "approve": "Unable to approve request.",
+    "deny": "Unable to deny request.",
+    "bulk": "Unable to process bulk action.",
+    "resolvedPayloadJson": "Resolved payload must be valid JSON.",
+    "resolvedAddressIdsJson": "Resolved address book IDs must be valid JSON.",
+    "resolvedAddressIdsArray": "Resolved address book IDs must be an array of positive integers."
+  },
+  "bulk": {
+    "confirm": "This will {{verb}} {{count}} queued request(s) in the current filtered view. Continue?",
+    "approve": "approve",
+    "deny": "deny"
+  },
+  "filters": {
+    "open": "Open",
+    "pending": "Pending",
+    "manualMergeNeeded": "Manual Merge Needed",
+    "history": "History",
+    "all": "All",
+    "allOperations": "All operations",
+    "updates": "Updates",
+    "deletes": "Deletes",
+    "searchPlaceholder": "Search by contact/requester...",
+    "refresh": "Refresh"
+  },
+  "card": {
+    "group": "Group",
+    "unnamedContact": "Unnamed Contact",
+    "status": "Status",
+    "requested": "Requested",
+    "editApprove": "Edit & Approve",
+    "approve": "Approve",
+    "deny": "Deny",
+    "requester": "Requester",
+    "approvalOwner": "Approval Owner",
+    "source": "Source",
+    "reviewer": "Reviewer",
+    "notReviewed": "Not reviewed yet",
+    "changedFields": "Changed fields"
+  },
+  "modal": {
+    "title": "Edit Request #{{id}} Before Approve",
+    "subtitle": "Adjust payload/address book IDs, then approve this queued request.",
+    "resolvedPayload": "Resolved Payload JSON",
+    "resolvedAddressIds": "Resolved Address Book IDs JSON Array",
+    "cancel": "Cancel",
+    "approve": "Save Edits & Approve",
+    "approving": "Approving..."
+  },
+  "status": {
+    "pending": "Pending",
+    "approved": "Approved (awaiting others)",
+    "manualMergeNeeded": "Manual Merge Needed",
+    "applied": "Applied",
+    "denied": "Denied"
+  },
+  "notices": {
+    "approved": "Request approved.",
+    "denied": "Request denied.",
+    "bulk": "{{processed}} request group(s) processed. {{skipped}} skipped."
+  },
+  "page": {
+    "title": "Contact Change Review Queue",
+    "subtitle": "Review queued editor changes for contacts before they are applied."
+  },
+  "actions": {
+    "approveAll": "Approve All ({{count}})",
+    "denyAll": "Deny All ({{count}})"
+  },
+  "states": {
+    "loading": "Loading review queue...",
+    "empty": "No queued requests for this filter."
+  },
+  "operations": {
+    "delete": "Delete",
+    "update": "Update"
+  }
+}

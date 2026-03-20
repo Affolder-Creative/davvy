@@ -79,18 +79,18 @@ class ShareController extends Controller
         [$resourceOwnerId, $isSharable] = $this->resourceOwnershipAndSharableState($resourceType, (int) $data['resource_id']);
 
         if (! $isSharable) {
-            abort(422, 'Resource must be marked as sharable before assigning access.');
+            abort(422, __('shares.resource_must_be_sharable_before_assigning_access'));
         }
 
         if ($target->id === $resourceOwnerId) {
-            abort(422, 'You cannot share a resource with its owner.');
+            abort(422, __('shares.cannot_share_with_owner'));
         }
 
         if (! $actor->isAdmin()) {
             $this->assertOwnerShareManagementAllowed();
 
             if ($resourceOwnerId !== $actor->id) {
-                abort(403, 'You can only manage shares for resources you own.');
+                abort(403, __('shares.only_manage_own_resource_shares'));
             }
         }
 
@@ -124,7 +124,7 @@ class ShareController extends Controller
             $this->assertOwnerShareManagementAllowed();
 
             if ($share->owner_id !== $actor->id) {
-                abort(403, 'You can only remove shares for resources you own.');
+                abort(403, __('shares.only_remove_own_resource_shares'));
             }
         }
 
@@ -162,7 +162,7 @@ class ShareController extends Controller
     private function assertOwnerShareManagementAllowed(): void
     {
         if (! $this->settings->isOwnerShareManagementEnabled()) {
-            abort(403, 'Resource owner share management is currently disabled by admins.');
+            abort(403, __('shares.owner_share_management_disabled'));
         }
     }
 }

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Dashboard Overview Cards component.
@@ -7,23 +8,25 @@ import React from "react";
  * @returns {JSX.Element}
  */
 export default function DashboardOverviewCards({ auth, InfoCard }) {
+  const { t } = useTranslation("dashboard");
+
   return (
     <section className="fade-up grid gap-4 md:grid-cols-3">
       <InfoCard
-        title="DAV Endpoint"
+        title={t("overview.endpointTitle")}
         value={`${window.location.origin}/dav`}
-        helper="Use this URL in client connection settings."
+        helper={t("overview.endpointHelper")}
         copyable
       />
       <InfoCard
-        title="Principal"
+        title={t("overview.principalTitle")}
         value={`principals/${auth.user.id}`}
-        helper="Autodiscovery may resolve this automatically."
+        helper={t("overview.principalHelper")}
       />
       <InfoCard
-        title="Role"
+        title={t("overview.roleTitle")}
         value={auth.user.role.toUpperCase()}
-        helper="Admins can manage users and cross-user sharing."
+        helper={t("overview.roleHelper")}
       />
     </section>
   );

@@ -36,6 +36,11 @@ function buildProps(overrides = {}) {
         role: "admin",
       },
       twoFactorEnabled: false,
+      locale: "en",
+      supportedLocales: ["de", "en", "es", "fr"],
+      fallbackLocale: "en",
+      setAuth: vi.fn(),
+      refreshAuth: vi.fn().mockResolvedValue(undefined),
     },
     theme: {},
     api: {
@@ -206,5 +211,84 @@ describe("ProfilePage", () => {
     expect(copyTextToClipboard).not.toHaveBeenCalled();
     expect(backupCodeField.selectionStart).toBe(0);
     expect(backupCodeField.selectionEnd).toBe(expectedCodes.length);
+  });
+
+  it("updates locale preference through the profile language selector", async () => {
+    const user = userEvent.setup();
+    const setAuth = vi.fn();
+    const props = buildProps({
+      auth: {
+        user: {
+          name: "Admin User",
+          email: "admin@example.com",
+          role: "admin",
+        },
+        twoFactorEnabled: false,
+        locale: "en",
+        supportedLocales: ["de", "en", "es", "fr"],
+        fallbackLocale: "en",
+        setAuth,
+        refreshAuth: vi.fn().mockResolvedValue(undefined),
+      },
+      api: {
+        patch: vi.fn().mockResolvedValue({
+          data: {
+            user: {
+              id: 1,
+              name: "Admin User",
+              email: "admin@example.com",
+              role: "admin",
+            },
+            locale: "fr",
+            supported_locales: ["de", "en", "es", "fr"],
+            fallback_locale: "en",
+          },
+        }),
+        post: vi.fn().mockResolvedValue({ data: {} }),
+      },
+    });
+
+    render(<ProfilePage {...props} />);
+
+    expect(screen.getByRole("option", { name: "Deutsch" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "Français" })).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("Language"), "fr");
+    await user.click(screen.getByRole("button", { name: "Save Language" }));
+
+    expect(props.api.patch).toHaveBeenCalledWith("/api/auth/locale", {
+      locale: "fr",
+    });
+    await waitFor(() => expect(setAuth).toHaveBeenCalledTimes(1));
+    expect(screen.getByText("Language updated.")).toBeInTheDocument();
+  });
+
+  it("renders locale options from auth.supportedLocales", () => {
+    const props = buildProps({
+      auth: {
+        user: {
+          name: "Admin User",
+          email: "admin@example.com",
+          role: "admin",
+        },
+        twoFactorEnabled: false,
+        locale: "es",
+        supportedLocales: ["en", "es"],
+        fallbackLocale: "en",
+        setAuth: vi.fn(),
+        refreshAuth: vi.fn().mockResolvedValue(undefined),
+      },
+    });
+
+    render(<ProfilePage {...props} />);
+
+    const languageSelect = screen.getByRole("combobox");
+    const optionLabels = Array.from(languageSelect.options).map(
+      (option) => option.textContent,
+    );
+
+    expect(optionLabels).toEqual(["English", "Español"]);
+    expect(screen.queryByRole("option", { name: "Deutsch" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Français" })).not.toBeInTheDocument();
   });
 });

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import ContactEditorAddressBooksSection from "./ContactEditorAddressBooksSection";
 import ContactEditorCommunicationSection from "./ContactEditorCommunicationSection";
 import ContactEditorNameSection from "./ContactEditorNameSection";
@@ -49,6 +50,7 @@ export default function ContactEditorPanel({
   OPTIONAL_CONTACT_FIELDS,
   toggleAssignedAddressBook,
 }) {
+  const { t } = useTranslation("contacts");
   const saveDisabled =
     submitting ||
     addressBooks.length === 0 ||
@@ -60,11 +62,10 @@ export default function ContactEditorPanel({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-app-strong">
-            {form.id ? "Edit Contact" : "New Contact"}
+            {form.id ? t("editor.edit") : t("editor.new")}
           </h2>
           <p className="mt-1 text-sm text-app-muted">
-            Enter at least a First Name, Last Name, or Company. Address book
-            assignment supports one or more selections.
+            {t("editor.description")}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -75,7 +76,7 @@ export default function ContactEditorPanel({
               onClick={removeContact}
               disabled={submitting}
             >
-              Delete
+              {t("editor.delete")}
             </button>
           ) : null}
           <button
@@ -84,18 +85,22 @@ export default function ContactEditorPanel({
             form="contact-editor"
             disabled={saveDisabled}
           >
-            {submitting ? "Saving..." : "Save Contact"}
+            {submitting ? t("editor.saving") : t("editor.save")}
           </button>
         </div>
       </div>
 
       {addressBooks.length === 0 ? (
         <p className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-          You do not currently have write access to any address books.
+          {t("editor.noAddressBooks")}
         </p>
       ) : null}
 
-      <form id="contact-editor" className="mt-5 space-y-6" onSubmit={saveContact}>
+      <form
+        id="contact-editor"
+        className="mt-5 space-y-6"
+        onSubmit={saveContact}
+      >
         <ContactEditorNameSection
           isOpen={openSections.name}
           onToggle={() => toggleSection("name")}
@@ -175,7 +180,7 @@ export default function ContactEditorPanel({
                 onClick={removeContact}
                 disabled={submitting}
               >
-                Delete
+                {t("editor.delete")}
               </button>
             ) : null}
             <button
@@ -183,7 +188,7 @@ export default function ContactEditorPanel({
               type="submit"
               disabled={saveDisabled}
             >
-              {submitting ? "Saving..." : "Save Contact"}
+              {submitting ? t("editor.saving") : t("editor.save")}
             </button>
           </div>
         </section>

@@ -19,7 +19,7 @@ class EnsureContactManagementEnabled
     public function handle(Request $request, Closure $next): Response
     {
         if (! $this->settings->isContactManagementEnabled()) {
-            abort(403, 'Contact management is currently disabled by admins.');
+            abort(403, __('contacts.management_disabled_by_admins'));
         }
 
         return $next($request);

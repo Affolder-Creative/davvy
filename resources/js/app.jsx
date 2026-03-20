@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import {
   BrowserRouter,
@@ -6,11 +6,13 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
+import { I18nextProvider, useTranslation } from "react-i18next";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import useAuthState from "./components/auth/useAuthState";
 import FullPageState from "./components/common/FullPageState";
 import useThemePreference from "./components/theme/useThemePreference";
-import { api } from "./lib/api";
+import i18n, { setI18nLocale } from "./i18n";
+import { api, setApiLocale } from "./lib/api";
 
 const LoginPage = lazy(() =>
   import("./routes/AuthPageRoutes").then((module) => ({
@@ -46,21 +48,36 @@ const AdminPage = lazy(() => import("./routes/AdminPageRoute"));
 const ProfilePage = lazy(() => import("./routes/ProfilePageRoute"));
 
 function RouteLoader({ children }) {
+  const { t } = useTranslation("common");
+
   return (
-    <Suspense fallback={<FullPageState label="Loading Davvy..." />}>
+    <Suspense fallback={<FullPageState label={t("states.loadingApp")} />}>
       {children}
     </Suspense>
   );
 }
 
 function App() {
+  const { t } = useTranslation("common");
   const theme = useThemePreference();
   const { auth, value } = useAuthState({
     api,
   });
 
+  useEffect(() => {
+    setApiLocale(auth.locale, {
+      supportedLocales: auth.supportedLocales,
+      fallbackLocale: auth.fallbackLocale,
+    });
+
+    setI18nLocale(auth.locale, {
+      supportedLocales: auth.supportedLocales,
+      fallbackLocale: auth.fallbackLocale,
+    });
+  }, [auth.locale, auth.supportedLocales, auth.fallbackLocale]);
+
   if (auth.loading) {
-    return <FullPageState label="Loading Davvy..." />;
+    return <FullPageState label={t("states.loadingApp")} />;
   }
 
   return (
@@ -175,9 +192,11 @@ const mountNode = document.getElementById("app");
 
 if (mountNode) {
   createRoot(mountNode).render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>,
+    <I18nextProvider i18n={i18n}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </I18nextProvider>,
   );
 }
 

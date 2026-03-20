@@ -1,20 +1,84 @@
 export const OPTIONAL_CONTACT_FIELDS = [
-  { id: "prefix", label: "Prefix" },
-  { id: "middle_name", label: "Middle Name" },
-  { id: "suffix", label: "Suffix" },
-  { id: "nickname", label: "Nickname" },
-  { id: "maiden_name", label: "Maiden Name" },
-  { id: "phonetic_first_name", label: "Phonetic First Name" },
-  { id: "phonetic_last_name", label: "Phonetic Last Name" },
-  { id: "phonetic_company", label: "Phonetic Company" },
-  { id: "department", label: "Department" },
-  { id: "pronouns_custom", label: "Custom Pronouns" },
-  { id: "ringtone", label: "Ringtone" },
-  { id: "text_tone", label: "Text Tone" },
-  { id: "verification_code", label: "Verification Code" },
-  { id: "profile", label: "Profile" },
-  { id: "instant_messages", label: "Instant Message" },
-  { id: "dates", label: "Date" },
+  {
+    id: "prefix",
+    labelKey: "editor.nameSection.field.prefix",
+    fallback: "Prefix",
+  },
+  {
+    id: "middle_name",
+    labelKey: "editor.nameSection.field.middle",
+    fallback: "Middle Name",
+  },
+  {
+    id: "suffix",
+    labelKey: "editor.nameSection.field.suffix",
+    fallback: "Suffix",
+  },
+  {
+    id: "nickname",
+    labelKey: "editor.nameSection.field.nickname",
+    fallback: "Nickname",
+  },
+  {
+    id: "maiden_name",
+    labelKey: "editor.nameSection.field.maidenName",
+    fallback: "Maiden Name",
+  },
+  {
+    id: "phonetic_first_name",
+    labelKey: "editor.nameSection.field.phoneticFirstName",
+    fallback: "Phonetic First Name",
+  },
+  {
+    id: "phonetic_last_name",
+    labelKey: "editor.nameSection.field.phoneticLastName",
+    fallback: "Phonetic Last Name",
+  },
+  {
+    id: "phonetic_company",
+    labelKey: "editor.workSection.field.phoneticCompany",
+    fallback: "Phonetic Company",
+  },
+  {
+    id: "department",
+    labelKey: "editor.workSection.field.department",
+    fallback: "Department",
+  },
+  {
+    id: "pronouns_custom",
+    labelKey: "editor.personalSection.field.pronounsCustom",
+    fallback: "Custom Pronouns",
+  },
+  {
+    id: "ringtone",
+    labelKey: "editor.personalSection.field.ringtone",
+    fallback: "Ringtone",
+  },
+  {
+    id: "text_tone",
+    labelKey: "editor.personalSection.field.textTone",
+    fallback: "Text Tone",
+  },
+  {
+    id: "verification_code",
+    labelKey: "editor.personalSection.field.verificationCode",
+    fallback: "Verification Code",
+  },
+  {
+    id: "profile",
+    labelKey: "editor.personalSection.field.profile",
+    fallback: "Profile",
+  },
+  {
+    id: "instant_messages",
+    labelKey: "editor.communicationSection.field.instantMessage.title",
+    fallback: "Instant Message",
+  },
+  {
+    id: "dates",
+    labelKey: "editor.dateEditor.title",
+    fallback: "Date",
+  },
 ];
 
 /**

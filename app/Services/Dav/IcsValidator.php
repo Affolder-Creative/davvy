@@ -24,7 +24,7 @@ class IcsValidator
         $component = $this->parseVCalendar($calendarData);
         $this->validateCalendarEnvelope($component, $strictModeEnabled);
         if (! $component instanceof VCalendar) {
-            throw new BadRequest('Expected VCALENDAR payload.');
+            throw new BadRequest(__('dav.expected_vcalendar_payload'));
         }
 
         $primaryComponents = $this->primaryComponents($component);
@@ -72,11 +72,11 @@ class IcsValidator
         try {
             $component = Reader::read($calendarData);
         } catch (ParseException|\Throwable) {
-            throw new BadRequest('Invalid iCalendar payload.');
+            throw new BadRequest(__('dav.invalid_icalendar_payload'));
         }
 
         if (! $component instanceof VCalendar) {
-            throw new BadRequest('Expected VCALENDAR payload.');
+            throw new BadRequest(__('dav.expected_vcalendar_payload'));
         }
 
         return $component;
@@ -88,14 +88,14 @@ class IcsValidator
     private function validateCalendarEnvelope(VCalendar $calendar, bool $strictModeEnabled): void
     {
         if (trim((string) ($calendar->VERSION ?? '')) !== '2.0') {
-            throw new BadRequest('VCALENDAR must include VERSION:2.0.');
+            throw new BadRequest(__('dav.vcalendar_must_include_version_2_0'));
         }
 
         if (
             $strictModeEnabled
             && trim((string) ($calendar->PRODID ?? '')) === ''
         ) {
-            throw new BadRequest('VCALENDAR must include PRODID.');
+            throw new BadRequest(__('dav.vcalendar_must_include_prodid'));
         }
     }
 
@@ -127,14 +127,14 @@ class IcsValidator
     private function resolvePrimaryType(array $components): string
     {
         if ($components === []) {
-            throw new BadRequest('Calendar payload must include VEVENT, VTODO, or VJOURNAL.');
+            throw new BadRequest(__('dav.calendar_payload_requires_primary_component'));
         }
 
         $type = $components[0]->name;
 
         foreach ($components as $component) {
             if ($component->name !== $type) {
-                throw new BadRequest('Mixed primary component types in one resource are not supported.');
+                throw new BadRequest(__('dav.mixed_primary_component_types_not_supported'));
             }
         }
 
@@ -156,7 +156,7 @@ class IcsValidator
             $uid = trim((string) ($component->UID ?? ''));
 
             if ($uid === '' && $strictModeEnabled) {
-                throw new BadRequest('Calendar components must include UID.');
+                throw new BadRequest(__('dav.calendar_components_must_include_uid'));
             }
 
             if (
@@ -165,7 +165,7 @@ class IcsValidator
                 && $resourceUid !== null
                 && $resourceUid !== $uid
             ) {
-                throw new BadRequest('All components in a calendar resource must share the same UID.');
+                throw new BadRequest(__('dav.calendar_components_must_share_same_uid'));
             }
 
             if ($uid !== '') {
@@ -176,7 +176,7 @@ class IcsValidator
                 $strictModeEnabled
                 && trim((string) ($component->DTSTAMP ?? '')) === ''
             ) {
-                throw new BadRequest($componentType.' components must include DTSTAMP.');
+                throw new BadRequest(__('dav.components_must_include_dtstamp', ['component' => $componentType]));
             }
 
             $this->validateSequence($component);
@@ -186,11 +186,11 @@ class IcsValidator
                 $recurrenceId = trim((string) $component->{'RECURRENCE-ID'});
 
                 if ($recurrenceId === '') {
-                    throw new BadRequest('RECURRENCE-ID must not be empty.');
+                    throw new BadRequest(__('dav.recurrence_id_must_not_be_empty'));
                 }
 
                 if (isset($recurrenceIds[$recurrenceId])) {
-                    throw new BadRequest('Duplicate RECURRENCE-ID values are not allowed in one resource.');
+                    throw new BadRequest(__('dav.duplicate_recurrence_id_not_allowed'));
                 }
 
                 $recurrenceIds[$recurrenceId] = true;
@@ -212,11 +212,11 @@ class IcsValidator
             && $recurrenceIds !== []
             && ! $hasMasterComponent
         ) {
-            throw new BadRequest('Detached recurrence instances require a master component in the same resource.');
+            throw new BadRequest(__('dav.detached_recurrence_requires_master_component'));
         }
 
         if ($strictModeEnabled && $resourceUid === null) {
-            throw new BadRequest('Calendar components must include UID.');
+            throw new BadRequest(__('dav.calendar_components_must_include_uid'));
         }
 
         return $resourceUid;
@@ -228,18 +228,18 @@ class IcsValidator
     private function validateEventComponent(Component $component): void
     {
         if (! isset($component->DTSTART)) {
-            throw new BadRequest('VEVENT components must include DTSTART.');
+            throw new BadRequest(__('dav.vevent_must_include_dtstart'));
         }
 
         if (isset($component->DTEND) && isset($component->DURATION)) {
-            throw new BadRequest('VEVENT cannot contain both DTEND and DURATION.');
+            throw new BadRequest(__('dav.vevent_cannot_have_both_dtend_and_duration'));
         }
 
         $start = $this->safeDateTime($component->DTSTART);
         $end = $this->safeDateTime($component->DTEND ?? null);
 
         if ($start && $end && $end < $start) {
-            throw new BadRequest('VEVENT DTEND must be greater than or equal to DTSTART.');
+            throw new BadRequest(__('dav.vevent_dtend_must_be_gte_dtstart'));
         }
     }
 
@@ -249,11 +249,11 @@ class IcsValidator
     private function validateTodoComponent(Component $component): void
     {
         if (isset($component->DUE) && isset($component->DURATION)) {
-            throw new BadRequest('VTODO cannot contain both DUE and DURATION.');
+            throw new BadRequest(__('dav.vtodo_cannot_have_both_due_and_duration'));
         }
 
         if (isset($component->DURATION) && ! isset($component->DTSTART)) {
-            throw new BadRequest('VTODO with DURATION must include DTSTART.');
+            throw new BadRequest(__('dav.vtodo_duration_requires_dtstart'));
         }
     }
 
@@ -269,7 +269,7 @@ class IcsValidator
         $sequence = trim((string) $component->SEQUENCE);
 
         if (! preg_match('/^\d+$/', $sequence)) {
-            throw new BadRequest('SEQUENCE must be a non-negative integer.');
+            throw new BadRequest(__('dav.sequence_must_be_non_negative_integer'));
         }
     }
 
@@ -292,7 +292,7 @@ class IcsValidator
             $pair = explode('=', $segment, 2);
 
             if (count($pair) !== 2) {
-                throw new BadRequest('RRULE segments must be key=value.');
+                throw new BadRequest(__('dav.rrule_segments_must_be_key_value'));
             }
 
             [$key, $value] = $pair;
@@ -300,14 +300,14 @@ class IcsValidator
             $value = trim($value);
 
             if ($key === '' || $value === '') {
-                throw new BadRequest('RRULE segments must be key=value.');
+                throw new BadRequest(__('dav.rrule_segments_must_be_key_value'));
             }
 
             $parts[$key] = $value;
         }
 
         if (! isset($parts['FREQ'])) {
-            throw new BadRequest('RRULE must include FREQ.');
+            throw new BadRequest(__('dav.rrule_must_include_freq'));
         }
 
         if (
@@ -315,7 +315,7 @@ class IcsValidator
             && isset($parts['COUNT'])
             && isset($parts['UNTIL'])
         ) {
-            throw new BadRequest('RRULE cannot include both COUNT and UNTIL.');
+            throw new BadRequest(__('dav.rrule_cannot_include_count_and_until'));
         }
 
         if (
@@ -323,7 +323,7 @@ class IcsValidator
             && isset($parts['COUNT'])
             && (! preg_match('/^\d+$/', $parts['COUNT']) || (int) $parts['COUNT'] <= 0)
         ) {
-            throw new BadRequest('RRULE COUNT must be a positive integer.');
+            throw new BadRequest(__('dav.rrule_count_must_be_positive_integer'));
         }
 
         if (
@@ -331,7 +331,7 @@ class IcsValidator
             && isset($parts['INTERVAL'])
             && (! preg_match('/^\d+$/', $parts['INTERVAL']) || (int) $parts['INTERVAL'] <= 0)
         ) {
-            throw new BadRequest('RRULE INTERVAL must be a positive integer.');
+            throw new BadRequest(__('dav.rrule_interval_must_be_positive_integer'));
         }
     }
 

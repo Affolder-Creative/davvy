@@ -13,6 +13,7 @@ Start here to find the right Davvy guide quickly.
   - [User Guide](./user-guide.md)
 - Configure runtime behavior:
   - [Configuration Reference](./configuration.md)
+  - [Localization Guide](./localization.md)
 - Deploy and run in production:
   - [Deployment](./deployment.md)
   - [Release Checklist (Core)](./release-checklist-core.md)
@@ -33,4 +34,5 @@ Start here to find the right Davvy guide quickly.
   - [Troubleshooting](./troubleshooting.md)
 - Integrators / developers:
   - [API Reference](./api.md)
+  - [Localization Guide](./localization.md)
   - [Architecture](./architecture.md)

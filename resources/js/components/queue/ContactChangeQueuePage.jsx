@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ContactChangeEditModal from "./ContactChangeEditModal";
 import ContactChangeRequestCard from "./ContactChangeRequestCard";
 
@@ -16,6 +17,7 @@ export default function ContactChangeQueuePage({
   AppShell,
   FullPageState,
 }) {
+  const { t } = useTranslation("queue");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -48,7 +50,7 @@ export default function ContactChangeQueuePage({
 
       setRows(Array.isArray(response.data?.data) ? response.data.data : []);
     } catch (err) {
-      setError(extractError(err, "Unable to load change requests."));
+      setError(extractError(err, t("errors.load")));
     } finally {
       if (withLoading) {
         setLoading(false);
@@ -114,11 +116,11 @@ export default function ContactChangeQueuePage({
         `/api/contact-change-requests/${row.id}/approve`,
         payload,
       );
-      setNotice("Request approved.");
+      setNotice(t("notices.approved"));
       await loadQueue({ withLoading: false });
       window.dispatchEvent(new Event("review-queue-updated"));
     } catch (err) {
-      setError(extractError(err, "Unable to approve request."));
+      setError(extractError(err, t("errors.approve")));
     } finally {
       setSubmitting(false);
     }
@@ -130,11 +132,11 @@ export default function ContactChangeQueuePage({
 
     try {
       await api.patch(`/api/contact-change-requests/${row.id}/deny`);
-      setNotice("Request denied.");
+      setNotice(t("notices.denied"));
       await loadQueue({ withLoading: false });
       window.dispatchEvent(new Event("review-queue-updated"));
     } catch (err) {
-      setError(extractError(err, "Unable to deny request."));
+      setError(extractError(err, t("errors.deny")));
     } finally {
       setSubmitting(false);
     }
@@ -148,9 +150,12 @@ export default function ContactChangeQueuePage({
       return;
     }
 
-    const verb = action === "approve" ? "approve" : "deny";
+    const verb = action === "approve" ? t("bulk.approve") : t("bulk.deny");
     const confirmed = window.confirm(
-      `This will ${verb} ${ids.length} queued request(s) in the current filtered view. Continue?`,
+      t("bulk.confirm", {
+        verb,
+        count: ids.length,
+      }),
     );
     if (!confirmed) {
       return;
@@ -167,11 +172,11 @@ export default function ContactChangeQueuePage({
 
       const processed = Number(response.data?.processed ?? 0);
       const skipped = Number(response.data?.skipped ?? 0);
-      setNotice(`${processed} request group(s) processed. ${skipped} skipped.`);
+      setNotice(t("notices.bulk", { processed, skipped }));
       await loadQueue({ withLoading: false });
       window.dispatchEvent(new Event("review-queue-updated"));
     } catch (err) {
-      setError(extractError(err, "Unable to process bulk action."));
+      setError(extractError(err, t("errors.bulk")));
     } finally {
       setSubmitting(false);
     }
@@ -204,14 +209,14 @@ export default function ContactChangeQueuePage({
     try {
       resolvedPayload = JSON.parse(editPayloadText || "{}");
     } catch {
-      setError("Resolved payload must be valid JSON.");
+      setError(t("errors.resolvedPayloadJson"));
       return;
     }
 
     try {
       resolvedAddressBookIds = JSON.parse(editAddressBookIdsText || "[]");
     } catch {
-      setError("Resolved address book IDs must be valid JSON.");
+      setError(t("errors.resolvedAddressIdsJson"));
       return;
     }
 
@@ -219,9 +224,7 @@ export default function ContactChangeQueuePage({
       !Array.isArray(resolvedAddressBookIds) ||
       resolvedAddressBookIds.some((value) => Number(value) <= 0)
     ) {
-      setError(
-        "Resolved address book IDs must be an array of positive integers.",
-      );
+      setError(t("errors.resolvedAddressIdsArray"));
       return;
     }
 
@@ -248,10 +251,10 @@ export default function ContactChangeQueuePage({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-2xl font-bold text-app-strong">
-              Contact Change Review Queue
+              {t("page.title")}
             </h2>
             <p className="mt-1 text-sm text-app-muted">
-              Review queued editor changes for contacts before they are applied.
+              {t("page.subtitle")}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -261,7 +264,7 @@ export default function ContactChangeQueuePage({
               disabled={submitting || actionableRows.length === 0}
               onClick={() => runBulkAction("approve")}
             >
-              Approve All ({actionableRows.length})
+              {t("actions.approveAll", { count: actionableRows.length })}
             </button>
             <button
               className="btn-outline btn-outline-sm text-app-danger"
@@ -269,7 +272,7 @@ export default function ContactChangeQueuePage({
               disabled={submitting || actionableRows.length === 0}
               onClick={() => runBulkAction("deny")}
             >
-              Deny All ({actionableRows.length})
+              {t("actions.denyAll", { count: actionableRows.length })}
             </button>
           </div>
         </div>
@@ -280,25 +283,25 @@ export default function ContactChangeQueuePage({
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
           >
-            <option value="open">Open</option>
-            <option value="pending">Pending</option>
-            <option value="manual_merge_needed">Manual Merge Needed</option>
-            <option value="history">History</option>
-            <option value="all">All</option>
+            <option value="open">{t("filters.open")}</option>
+            <option value="pending">{t("filters.pending")}</option>
+            <option value="manual_merge_needed">{t("filters.manualMergeNeeded")}</option>
+            <option value="history">{t("filters.history")}</option>
+            <option value="all">{t("filters.all")}</option>
           </select>
           <select
             className="input"
             value={operationFilter}
             onChange={(event) => setOperationFilter(event.target.value)}
           >
-            <option value="all">All operations</option>
-            <option value="update">Updates</option>
-            <option value="delete">Deletes</option>
+            <option value="all">{t("filters.allOperations")}</option>
+            <option value="update">{t("filters.updates")}</option>
+            <option value="delete">{t("filters.deletes")}</option>
           </select>
           <input
             className="input"
             type="search"
-            placeholder="Search by contact/requester..."
+            placeholder={t("filters.searchPlaceholder")}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             onKeyDown={(event) => {
@@ -313,7 +316,7 @@ export default function ContactChangeQueuePage({
             disabled={submitting}
             onClick={() => loadQueue({ withLoading: false })}
           >
-            Refresh
+            {t("filters.refresh")}
           </button>
         </div>
 
@@ -321,12 +324,12 @@ export default function ContactChangeQueuePage({
       </section>
 
       {loading ? (
-        <FullPageState label="Loading review queue..." compact />
+        <FullPageState label={t("states.loading")} compact />
       ) : (
         <section className="mt-6 space-y-3">
           {rows.length === 0 ? (
             <div className="surface rounded-2xl p-4 text-sm text-app-faint">
-              No queued requests for this filter.
+              {t("states.empty")}
             </div>
           ) : (
             rows.map((row) => (

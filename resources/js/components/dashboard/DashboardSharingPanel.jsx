@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Dashboard Sharing Panel.
@@ -16,14 +17,15 @@ export default function DashboardSharingPanel({
   onDeleteShare,
   PermissionBadge,
 }) {
+  const { t } = useTranslation("dashboard");
+
   return (
     <section className="surface mt-6 rounded-3xl p-6">
       <h2 className="text-xl font-semibold text-app-strong">
-        Share Your Resources
+        {t("sharing.title")}
       </h2>
       <p className="mt-1 text-sm text-app-muted">
-        Grant read-only, editor, or admin access for resources you own and
-        marked as sharable. Admin access includes collection delete rights.
+        {t("sharing.subtitle")}
       </p>
       <form className="mt-4 grid gap-3 md:grid-cols-4" onSubmit={onSaveShare}>
         <select
@@ -37,8 +39,8 @@ export default function DashboardSharingPanel({
             })
           }
         >
-          <option value="calendar">Calendar</option>
-          <option value="address_book">Address Book</option>
+          <option value="calendar">{t("sharing.resourceCalendar")}</option>
+          <option value="address_book">{t("sharing.resourceAddressBook")}</option>
         </select>
         <select
           className="input"
@@ -48,7 +50,7 @@ export default function DashboardSharingPanel({
           }
           required
         >
-          <option value="">Select sharable resource</option>
+          <option value="">{t("sharing.selectSharableResource")}</option>
           {shareableResourceOptions.map((resource) => (
             <option key={resource.id} value={resource.id}>
               {resource.display_name}
@@ -66,7 +68,7 @@ export default function DashboardSharingPanel({
           }
           required
         >
-          <option value="">Select user</option>
+          <option value="">{t("sharing.selectUser")}</option>
           {targets.map((target) => (
             <option key={target.id} value={target.id}>
               {target.name} ({target.email})
@@ -81,19 +83,19 @@ export default function DashboardSharingPanel({
               setShareForm({ ...shareForm, permission: event.target.value })
             }
           >
-            <option value="read_only">General (read-only)</option>
-            <option value="editor">Full edit (no delete)</option>
-            <option value="admin">Admin (full edit + delete)</option>
+            <option value="read_only">{t("sharing.permReadOnly")}</option>
+            <option value="editor">{t("sharing.permEditor")}</option>
+            <option value="admin">{t("sharing.permAdmin")}</option>
           </select>
           <button className="btn" type="submit">
-            Share
+            {t("sharing.share")}
           </button>
         </div>
       </form>
 
       <div className="mt-5 space-y-2">
         {outgoing.length === 0 ? (
-          <p className="text-sm text-app-faint">No outgoing shares yet.</p>
+          <p className="text-sm text-app-faint">{t("sharing.noOutgoing")}</p>
         ) : (
           outgoing.map((share) => (
             <div
@@ -107,14 +109,16 @@ export default function DashboardSharingPanel({
                 <PermissionBadge permission={share.permission} />
               </div>
               <p className="text-app-muted">
-                Shared with: {share.shared_with?.name} ({share.shared_with?.email}
-                )
+                {t("sharing.sharedWith", {
+                  name: share.shared_with?.name,
+                  email: share.shared_with?.email,
+                })}
               </p>
               <button
                 className="mt-2 text-xs font-semibold text-app-danger"
                 onClick={() => onDeleteShare(share.id)}
               >
-                Revoke
+                {t("sharing.revoke")}
               </button>
             </div>
           ))

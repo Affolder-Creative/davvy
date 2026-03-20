@@ -1,10 +1,11 @@
-Hello {{ $user->name }},
+@php($expiresLabel = $expiresAt->locale(app()->getLocale())->isoFormat('lll'))
+{{ __('emails.greeting_name', ['name' => $user->name]) }}
 
-An administrator created an account for you on {{ config('app.name', 'Davvy') }}.
+{{ __('emails.admin_invite_account_created', ['app' => config('app.name', 'Davvy')]) }}
 
-Use this one-time link to set your password and activate your account:
+{{ __('emails.admin_invite_use_one_time_link') }}
 {{ $inviteUrl }}
 
-This link expires at {{ $expiresAt->toDayDateTimeString() }}.
+{{ __('emails.one_time_link_expires_at', ['expires_at' => $expiresLabel]) }}
 
-If you did not expect this invitation, you can ignore this email.
+{{ __('emails.admin_invite_footer', ['app' => config('app.name', 'Davvy')]) }}

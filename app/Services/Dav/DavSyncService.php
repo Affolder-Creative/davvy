@@ -71,7 +71,7 @@ class DavSyncService
         ?int $limit = null,
     ): array {
         if ($syncToken < 0) {
-            throw new InvalidSyncToken('Sync token must be non-negative.');
+            throw new InvalidSyncToken(__('dav.sync_token_must_be_non_negative'));
         }
 
         $this->initializeState($resourceType, $resourceId);
@@ -87,7 +87,7 @@ class DavSyncService
         );
 
         if ($syncToken > $currentToken) {
-            throw new InvalidSyncToken('Sync token is no longer valid for this resource.');
+            throw new InvalidSyncToken(__('dav.sync_token_no_longer_valid_for_resource'));
         }
 
         $query = DB::table('dav_resource_sync_changes')

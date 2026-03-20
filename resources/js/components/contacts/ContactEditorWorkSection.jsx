@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Contact Editor Work Section component.
@@ -14,6 +15,7 @@ export default function ContactEditorWorkSection({
   isOptionalFieldVisible,
   updateFormField,
 }) {
+  const { t } = useTranslation("contacts");
   return (
     <section className="rounded-2xl border border-app-edge bg-app-surface p-3">
       <button
@@ -24,10 +26,10 @@ export default function ContactEditorWorkSection({
       >
         <span>
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
-            Work
+            {t("editor.workSection.label")}
           </span>
           <span className="block text-xs text-app-faint">
-            Company and role details.
+            {t("editor.workSection.description")}
           </span>
         </span>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
@@ -38,15 +40,17 @@ export default function ContactEditorWorkSection({
       {isOpen ? (
         <div className="mt-3 px-1 pb-1">
           <div className="grid gap-3 md:grid-cols-2">
-            <Field label="Company">
+            <Field label={t("editor.workSection.field.company")}>
               <input
                 className="input"
                 value={form.company}
-                onChange={(event) => updateFormField("company", event.target.value)}
+                onChange={(event) =>
+                  updateFormField("company", event.target.value)
+                }
               />
             </Field>
             {isOptionalFieldVisible("phonetic_company") ? (
-              <Field label="Phonetic Company">
+              <Field label={t("editor.workSection.field.phoneticCompany")}>
                 <input
                   className="input"
                   value={form.phonetic_company}
@@ -56,15 +60,17 @@ export default function ContactEditorWorkSection({
                 />
               </Field>
             ) : null}
-            <Field label="Job Title">
+            <Field label={t("editor.workSection.field.jobTitle")}>
               <input
                 className="input"
                 value={form.job_title}
-                onChange={(event) => updateFormField("job_title", event.target.value)}
+                onChange={(event) =>
+                  updateFormField("job_title", event.target.value)
+                }
               />
             </Field>
             {isOptionalFieldVisible("department") ? (
-              <Field label="Department">
+              <Field label={t("editor.workSection.field.department")}>
                 <input
                   className="input"
                   value={form.department}

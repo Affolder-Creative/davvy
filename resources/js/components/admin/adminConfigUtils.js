@@ -1,29 +1,34 @@
 export const MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS = 6000;
 export const BACKUP_RUN_TOAST_AUTO_HIDE_MS = 3200;
 export const BACKUP_DRAWER_ANIMATION_MS = 220;
-export const WEEKDAY_OPTIONS = [
-  { value: 0, label: "Sunday" },
-  { value: 1, label: "Monday" },
-  { value: 2, label: "Tuesday" },
-  { value: 3, label: "Wednesday" },
-  { value: 4, label: "Thursday" },
-  { value: 5, label: "Friday" },
-  { value: 6, label: "Saturday" },
-];
-export const MONTH_OPTIONS = [
-  { value: 1, label: "January" },
-  { value: 2, label: "February" },
-  { value: 3, label: "March" },
-  { value: 4, label: "April" },
-  { value: 5, label: "May" },
-  { value: 6, label: "June" },
-  { value: 7, label: "July" },
-  { value: 8, label: "August" },
-  { value: 9, label: "September" },
-  { value: 10, label: "October" },
-  { value: 11, label: "November" },
-  { value: 12, label: "December" },
-];
+export function buildWeekdayOptions() {
+  return [
+    { value: 0, label: i18n.t("weekdays.0", { ns: "admin", defaultValue: "Sunday" }) },
+    { value: 1, label: i18n.t("weekdays.1", { ns: "admin", defaultValue: "Monday" }) },
+    { value: 2, label: i18n.t("weekdays.2", { ns: "admin", defaultValue: "Tuesday" }) },
+    { value: 3, label: i18n.t("weekdays.3", { ns: "admin", defaultValue: "Wednesday" }) },
+    { value: 4, label: i18n.t("weekdays.4", { ns: "admin", defaultValue: "Thursday" }) },
+    { value: 5, label: i18n.t("weekdays.5", { ns: "admin", defaultValue: "Friday" }) },
+    { value: 6, label: i18n.t("weekdays.6", { ns: "admin", defaultValue: "Saturday" }) },
+  ];
+}
+
+export function buildMonthOptions() {
+  return [
+    { value: 1, label: i18n.t("months.1", { ns: "admin", defaultValue: "January" }) },
+    { value: 2, label: i18n.t("months.2", { ns: "admin", defaultValue: "February" }) },
+    { value: 3, label: i18n.t("months.3", { ns: "admin", defaultValue: "March" }) },
+    { value: 4, label: i18n.t("months.4", { ns: "admin", defaultValue: "April" }) },
+    { value: 5, label: i18n.t("months.5", { ns: "admin", defaultValue: "May" }) },
+    { value: 6, label: i18n.t("months.6", { ns: "admin", defaultValue: "June" }) },
+    { value: 7, label: i18n.t("months.7", { ns: "admin", defaultValue: "July" }) },
+    { value: 8, label: i18n.t("months.8", { ns: "admin", defaultValue: "August" }) },
+    { value: 9, label: i18n.t("months.9", { ns: "admin", defaultValue: "September" }) },
+    { value: 10, label: i18n.t("months.10", { ns: "admin", defaultValue: "October" }) },
+    { value: 11, label: i18n.t("months.11", { ns: "admin", defaultValue: "November" }) },
+    { value: 12, label: i18n.t("months.12", { ns: "admin", defaultValue: "December" }) },
+  ];
+}
 export const RECOMMENDED_BACKUP_RETENTION = {
   daily: 7,
   weekly: 4,
@@ -235,13 +240,23 @@ export function areBackupConfigSnapshotsEqual(left, right) {
  */
 export function formatAdminTimestamp(value) {
   if (!value) {
-    return "Never";
+    return i18n.t("labels.never", {
+      ns: "admin",
+      defaultValue: "Never",
+    });
   }
 
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
-    return "Invalid timestamp";
+    return i18n.t("labels.invalidTimestamp", {
+      ns: "admin",
+      defaultValue: "Invalid timestamp",
+    });
   }
 
-  return parsed.toLocaleString();
+  return parsed.toLocaleString(
+    normalizeLocale(i18n.resolvedLanguage || i18n.language || "en"),
+  );
 }
+import i18n from "../../i18n";
+import { normalizeLocale } from "../../lib/locale";

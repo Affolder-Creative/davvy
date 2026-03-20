@@ -20,6 +20,9 @@ When an `app_settings` key exists, it overrides env defaults.
 | `APP_DEBUG` | `false` (production) | May be set to `true` for local development |
 | `APP_KEY` | _(empty)_ | Required at runtime. In production it must be a unique secret and must not match the local compose development key. |
 | `APP_URL` | `http://localhost` | Must be HTTPS in production |
+| `APP_LOCALE` | `en` | Base app locale used at bootstrap before request negotiation |
+| `APP_FALLBACK_LOCALE` | `en` | Fallback locale when request/user locale cannot be resolved |
+| `APP_SUPPORTED_LOCALES` | `de,en,es,fr` | Comma-separated supported locale codes |
 | `TRUSTED_PROXIES` | _(empty)_ | Use `*` or explicit list behind reverse proxy |
 | `CORS_ALLOWED_ORIGINS` | _(empty)_ | Comma-separated allowed browser origins for cross-origin API access; empty means same-origin only |
 | `CORS_ALLOWED_ORIGIN_PATTERNS` | _(empty)_ | Comma-separated regex origin patterns for CORS matching |
@@ -79,6 +82,11 @@ When an `app_settings` key exists, it overrides env defaults.
 | `DAV_LOG_CLIENT_TRAFFIC` | `false` | Debug logging for targeted DAV traffic patterns |
 | `DAV_AUTH_THROTTLE_MAX_ATTEMPTS` | `20` | Failed DAV auth attempts allowed per source key (`username + IP`) before temporary lockout |
 | `DAV_AUTH_THROTTLE_DECAY_SECONDS` | `60` | Lockout window (seconds) for DAV failed-auth throttling |
+
+Locale notes:
+- `APP_SUPPORTED_LOCALES` is normalized to lowercase and empty values are ignored.
+- Auth/public config payloads include `locale`, `supported_locales`, and `fallback_locale`.
+- Authenticated users can update preference using `PATCH /api/auth/locale`.
 
 ### Optional Remote S3 Credentials
 
@@ -179,5 +187,6 @@ Review Queue default strategy:
 ## Related Docs
 
 - [Deployment](./deployment.md)
+- [Localization Guide](./localization.md)
 - [Architecture](./architecture.md)
 - [Troubleshooting](./troubleshooting.md)

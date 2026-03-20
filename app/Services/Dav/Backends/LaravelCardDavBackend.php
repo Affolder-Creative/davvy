@@ -89,7 +89,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $addressBook = AddressBook::query()->find($addressBookId);
 
         if (! $addressBook) {
-            throw new NotFound('Address book not found.');
+            throw new NotFound(__('dav.address_book_not_found'));
         }
 
         $this->assertWritableAddressBook($addressBook);
@@ -124,7 +124,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $user = $this->principalUriService->userFromPrincipalUri($principalUri);
 
         if (! $user) {
-            throw new NotFound('Principal does not exist.');
+            throw new NotFound(__('dav.principal_does_not_exist'));
         }
 
         $uri = $this->resourceUriService->nextAddressBookUri(
@@ -143,7 +143,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ]);
         } catch (QueryException $exception) {
             if ($this->isOwnerUriUniqueConstraintViolation($exception)) {
-                throw new Conflict('Address book already exists for the requested URI.');
+                throw new Conflict(__('dav.address_book_already_exists_for_requested_uri'));
             }
 
             throw $exception;
@@ -238,7 +238,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $addressBook = AddressBook::query()->find($addressBookId);
 
         if (! $addressBook) {
-            throw new NotFound('Address book not found.');
+            throw new NotFound(__('dav.address_book_not_found'));
         }
 
         $this->assertWritableAddressBook($addressBook);
@@ -249,14 +249,14 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ->exists();
 
         if ($existing) {
-            throw new BadRequest('Card already exists for the requested URI.');
+            throw new BadRequest(__('dav.card_already_exists_for_requested_uri'));
         }
 
         $normalized = $this->vCardValidator->validateAndNormalize((string) $cardData);
         $resourceUid = $normalized['uid'] ?? $this->fallbackUidForLegacyPayload((string) $cardUri);
 
         if ($this->uidConflictExists($addressBook->id, $resourceUid)) {
-            throw new Conflict('A contact with the same UID already exists in this address book.');
+            throw new Conflict(__('dav.contact_with_same_uid_exists_in_address_book'));
         }
 
         $etag = md5($normalized['data']);
@@ -272,7 +272,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ]);
         } catch (QueryException $exception) {
             if ($this->isUidUniqueConstraintViolation($exception)) {
-                throw new Conflict('A contact with the same UID already exists in this address book.');
+                throw new Conflict(__('dav.contact_with_same_uid_exists_in_address_book'));
             }
 
             throw $exception;
@@ -297,7 +297,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $addressBook = AddressBook::query()->find($addressBookId);
 
         if (! $addressBook) {
-            throw new NotFound('Address book not found.');
+            throw new NotFound(__('dav.address_book_not_found'));
         }
 
         $this->assertWritableAddressBook($addressBook);
@@ -308,7 +308,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ->first();
 
         if (! $card) {
-            throw new NotFound('Card not found.');
+            throw new NotFound(__('dav.card_not_found'));
         }
 
         $user = $this->davContext->getAuthenticatedUser();
@@ -332,14 +332,14 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             );
 
             if ($queued !== null) {
-                throw new Conflict('Change submitted for owner/admin approval.');
+                throw new Conflict(__('dav.change_submitted_for_owner_or_admin_approval'));
             }
         }
 
         $resourceUid = $normalized['uid'] ?? $this->fallbackUidForLegacyPayload((string) $cardUri);
 
         if ($this->uidConflictExists($addressBook->id, $resourceUid, exceptCardId: $card->id)) {
-            throw new Conflict('A contact with the same UID already exists in this address book.');
+            throw new Conflict(__('dav.contact_with_same_uid_exists_in_address_book'));
         }
 
         $etag = md5($normalized['data']);
@@ -353,7 +353,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ]);
         } catch (QueryException $exception) {
             if ($this->isUidUniqueConstraintViolation($exception)) {
-                throw new Conflict('A contact with the same UID already exists in this address book.');
+                throw new Conflict(__('dav.contact_with_same_uid_exists_in_address_book'));
             }
 
             throw $exception;
@@ -406,7 +406,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             $queued = $this->changeRequestService->enqueueCardDavDeleteIfNeeded($user, $addressBook, $card);
 
             if ($queued !== null) {
-                throw new Conflict('Delete submitted for owner/admin approval.');
+                throw new Conflict(__('dav.delete_submitted_for_owner_or_admin_approval'));
             }
         }
 
@@ -515,13 +515,13 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $addressBook = AddressBook::query()->find($addressBookId);
 
         if (! $addressBook) {
-            throw new NotFound('Address book not found.');
+            throw new NotFound(__('dav.address_book_not_found'));
         }
 
         $user = $this->davContext->getAuthenticatedUser();
 
         if (! $user || ! $this->accessService->userCanReadAddressBook($user, $addressBook)) {
-            throw new Forbidden('Read access denied for address book.');
+            throw new Forbidden(__('dav.read_access_denied_for_address_book'));
         }
 
         return $addressBook;
@@ -535,7 +535,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $user = $this->davContext->getAuthenticatedUser();
 
         if (! $user || ! $this->accessService->userCanWriteAddressBook($user, $addressBook)) {
-            throw new Forbidden('Write access denied for address book.');
+            throw new Forbidden(__('dav.write_access_denied_for_address_book'));
         }
     }
 
@@ -547,7 +547,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $user = $this->davContext->getAuthenticatedUser();
 
         if (! $user || ! $this->accessService->userCanDeleteAddressBook($user, $addressBook)) {
-            throw new Forbidden('Delete access denied for address book.');
+            throw new Forbidden(__('dav.delete_access_denied_for_address_book'));
         }
     }
 
@@ -568,7 +568,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             }
         }
 
-        throw new InvalidSyncToken('Sync token format is invalid.');
+        throw new InvalidSyncToken(__('dav.sync_token_format_invalid'));
     }
 
     /**

@@ -41,7 +41,7 @@ class ContactChangeRequestService
         array $addressBookIds,
     ): ?array {
         if (! $this->contactService->canUserWriteContact($actor, $contact)) {
-            abort(403, 'You cannot modify this contact.');
+            abort(403, __('contacts.cannot_modify_contact'));
         }
 
         $this->assertUserCanWriteAddressBooks($actor, $addressBookIds);
@@ -65,7 +65,7 @@ class ContactChangeRequestService
     public function enqueueWebDeleteIfNeeded(User $actor, Contact $contact): ?array
     {
         if (! $this->contactService->canUserWriteContact($actor, $contact)) {
-            abort(403, 'You cannot modify this contact.');
+            abort(403, __('contacts.cannot_modify_contact'));
         }
 
         return $this->enqueueIfNeeded(
@@ -257,7 +257,7 @@ class ContactChangeRequestService
 
                 if (! $hasResolution) {
                     throw ValidationException::withMessages([
-                        'resolved_payload' => ['Resolve merge conflicts before approving this request.'],
+                        'resolved_payload' => [__('contacts.resolve_merge_conflicts_before_approving_request')],
                     ]);
                 }
 
@@ -327,7 +327,7 @@ class ContactChangeRequestService
                     'status' => ContactChangeStatus::Denied->value,
                     'reviewer_id' => $reviewer->id,
                     'reviewed_at' => now(),
-                    'status_reason' => 'Denied by reviewer.',
+                    'status_reason' => __('contacts.denied_by_reviewer'),
                 ]);
 
             return ContactChangeRequest::query()
@@ -460,7 +460,7 @@ class ContactChangeRequestService
 
         if ($impactedBooks->count() !== count($impactedAddressBookIds)) {
             throw ValidationException::withMessages([
-                'address_book_ids' => ['One or more selected address books could not be found.'],
+                'address_book_ids' => [__('contacts.selected_address_books_not_found')],
             ]);
         }
 
@@ -594,7 +594,7 @@ class ContactChangeRequestService
         $ids = $this->normalizeAddressBookIds($addressBookIds);
         if ($ids === []) {
             throw ValidationException::withMessages([
-                'address_book_ids' => ['Select at least one address book.'],
+                'address_book_ids' => [__('contacts.select_at_least_one_address_book')],
             ]);
         }
 
@@ -607,13 +607,13 @@ class ContactChangeRequestService
             $book = $books->get($id);
             if (! $book) {
                 throw ValidationException::withMessages([
-                    'address_book_ids' => ['One or more selected address books could not be found.'],
+                    'address_book_ids' => [__('contacts.selected_address_books_not_found')],
                 ]);
             }
 
             if (! $this->accessService->userCanWriteAddressBook($actor, $book)) {
                 throw ValidationException::withMessages([
-                    'address_book_ids' => ['You do not have write access to one or more selected address books.'],
+                    'address_book_ids' => [__('contacts.no_write_access_to_selected_address_books')],
                 ]);
             }
         }
@@ -674,7 +674,7 @@ class ContactChangeRequestService
         }
 
         if ((int) $request->approval_owner_id !== $reviewer->id) {
-            abort(403, 'You cannot review this request.');
+            abort(403, __('contacts.cannot_review_request'));
         }
     }
 
@@ -806,7 +806,7 @@ class ContactChangeRequestService
                 ->where('group_uuid', $canonical->group_uuid)
                 ->update([
                     'status' => ContactChangeStatus::Denied->value,
-                    'status_reason' => 'Contact no longer exists.',
+                    'status_reason' => __('contacts.contact_no_longer_exists'),
                     'reviewer_id' => $reviewer->id,
                     'reviewed_at' => now(),
                 ]);
@@ -851,7 +851,7 @@ class ContactChangeRequestService
                     ->where('group_uuid', $canonical->group_uuid)
                     ->update([
                         'status' => ContactChangeStatus::ManualMergeNeeded->value,
-                        'status_reason' => 'Contact changed since request creation. Resolve conflicts before approving.',
+                        'status_reason' => __('contacts.contact_changed_since_request_creation_resolve_conflicts'),
                     ]);
 
                 return;
@@ -1017,7 +1017,7 @@ class ContactChangeRequestService
         $outOfScopeIds = array_values(array_diff($addressBookIds, $scopeAddressBookIds));
         if ($outOfScopeIds !== []) {
             throw ValidationException::withMessages([
-                'resolved_address_book_ids' => ['Selected address books must remain within this request scope.'],
+                'resolved_address_book_ids' => [__('contacts.selected_address_books_must_remain_within_request_scope')],
             ]);
         }
     }

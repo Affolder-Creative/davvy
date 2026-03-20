@@ -10,6 +10,7 @@ on:
       - "bootstrap/**"
       - "config/**"
       - "database/**"
+      - "lang/**"
       - "resources/**"
       - "routes/**"
       - "tests/**"
@@ -34,6 +35,7 @@ on:
       - "bootstrap/**"
       - "config/**"
       - "database/**"
+      - "lang/**"
       - "resources/**"
       - "routes/**"
       - "tests/**"
@@ -116,6 +118,19 @@ jobs:
         run: |
           ./vendor/bin/pint --test
 
+      - name: Prepare Laravel runtime directories
+        run: |
+          mkdir -p bootstrap/cache
+          mkdir -p storage/framework/cache/data
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/framework/testing
+          mkdir -p storage/logs
+          chmod -R u+rwX bootstrap/cache storage/framework storage/logs
+
+      - name: Verify PHP translation key parity
+        run: php artisan test --testsuite=Unit --filter=LocalizationCatalogParityTest
+
   frontend-tests:
     name: Frontend Unit Tests (Vitest)
     runs-on: ubuntu-latest
@@ -138,8 +153,11 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Verify frontend i18n key parity
+        run: npm run check:i18n
+
       - name: Run Vitest suite
-        run: npm test
+        run: npx vitest run
 
   docs-link-check:
     name: Docs Link Check

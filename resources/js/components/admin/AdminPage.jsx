@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { setI18nLocale } from "../../i18n";
 import Toast from "../common/Toast";
 
 /**
@@ -31,6 +33,7 @@ export default function AdminPage({
   MONTH_OPTIONS,
   RECOMMENDED_BACKUP_RETENTION,
 }) {
+  const { t } = useTranslation("admin");
   const [state, setState] = useState({
     loading: true,
     users: [],
@@ -284,7 +287,7 @@ export default function AdminPage({
       setState((prev) => ({
         ...prev,
         loading: false,
-        error: extractError(err, "Unable to load admin data."),
+        error: extractError(err, t("errors.loadingAdminData")),
       }));
     }
   };
@@ -375,10 +378,10 @@ export default function AdminPage({
       setUserForm({ name: "", email: "", role: "regular" });
       setUserInviteResult({
         message: created?.invitation_sent
-          ? `Invitation email sent to ${targetEmail}.`
+          ? t("notices.invitationSent", { targetEmail })
           : created?.invitation_url
-            ? `User created. Share this invitation link with ${targetEmail}.`
-            : `User ${targetEmail} created.`,
+            ? t("notices.invitationUrl", { targetEmail })
+            : t("notices.userCreated", { targetEmail }),
         invitationUrl:
           typeof created?.invitation_url === "string"
             ? created.invitation_url
@@ -388,7 +391,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to create user."),
+        error: extractError(err, t("errors.creatingUser")),
       }));
     }
   };
@@ -400,7 +403,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to approve user."),
+        error: extractError(err, t("errors.approvingUser")),
       }));
     }
   };
@@ -430,12 +433,14 @@ export default function AdminPage({
     const expectedEmail = String(auth.user?.email || "")
       .trim()
       .toLowerCase();
-    const enteredEmail = String(deleteUserConfirmationEmail).trim().toLowerCase();
+    const enteredEmail = String(deleteUserConfirmationEmail)
+      .trim()
+      .toLowerCase();
 
     if (expectedEmail === "" || enteredEmail !== expectedEmail) {
       setState((prev) => ({
         ...prev,
-        error: "Type your account email to confirm this deletion.",
+        error: t("errors.confirmDeletion"),
       }));
       return;
     }
@@ -444,15 +449,20 @@ export default function AdminPage({
     setState((prev) => ({ ...prev, error: "" }));
 
     const transferOwnerId =
-      deleteUserTransferOwnerId === "" ? null : Number(deleteUserTransferOwnerId);
+      deleteUserTransferOwnerId === ""
+        ? null
+        : Number(deleteUserTransferOwnerId);
 
     try {
-      const response = await api.delete(`/api/admin/users/${deleteUserTarget.id}`, {
-        data: {
-          confirmation_email: deleteUserConfirmationEmail,
-          transfer_owner_id: transferOwnerId,
+      const response = await api.delete(
+        `/api/admin/users/${deleteUserTarget.id}`,
+        {
+          data: {
+            confirmation_email: deleteUserConfirmationEmail,
+            transfer_owner_id: transferOwnerId,
+          },
         },
-      });
+      );
 
       const transferred = response.data?.transferred ?? {};
       const transferredCalendars = Number(transferred.calendars ?? 0);
@@ -460,8 +470,9 @@ export default function AdminPage({
       const transferredContacts = Number(transferred.contacts ?? 0);
       const deletedUserName = deleteUserTarget.name;
       const transferTargetName = transferOwnerId
-        ? state.users.find((candidate) => Number(candidate.id) === transferOwnerId)
-            ?.name
+        ? state.users.find(
+            (candidate) => Number(candidate.id) === transferOwnerId,
+          )?.name
         : null;
 
       setDeleteUserTarget(null);
@@ -470,15 +481,21 @@ export default function AdminPage({
       setBackupRunToast({
         status: "success",
         message: transferOwnerId
-          ? `Deleted ${deletedUserName} and transferred ${transferredCalendars} calendar(s), ${transferredAddressBooks} address book(s), and ${transferredContacts} contact(s) to ${transferTargetName || "the selected owner"}.`
-          : `Deleted ${deletedUserName} and all owned data.`,
+          ? t("notices.transferredData", {
+              deletedUserName,
+              transferredCalendars,
+              transferredAddressBooks,
+              transferredContacts,
+              transferTargetName,
+            })
+          : t("notices.deletedUser", { deletedUserName }),
       });
 
       await load();
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to delete user."),
+        error: extractError(err, t("errors.unableToDeleteUser")),
       }));
     } finally {
       setDeleteUserSubmitting(false);
@@ -497,7 +514,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to save share."),
+        error: extractError(err, t("errors.unableToSaveShare")),
       }));
     }
   };
@@ -509,7 +526,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to remove share."),
+        error: extractError(err, t("errors.unableToDeleteShare")),
       }));
     }
   };
@@ -534,7 +551,10 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to update registration setting."),
+        error: extractError(
+          err,
+          t("errors.unableToUpdateRegistrationSetting"),
+        ),
       }));
     }
   };
@@ -550,7 +570,7 @@ export default function AdminPage({
 
       if (pendingCount > 0) {
         approvePending = window.confirm(
-          `Disable registration approval requirement?\n\n${pendingCount} account(s) are pending approval.\n\nClick OK to approve all pending accounts now, or Cancel to leave them pending.`,
+          t("notices.approvePending", { pendingCount }),
         );
       }
     }
@@ -572,11 +592,13 @@ export default function AdminPage({
       }));
 
       if (!next && approvePending) {
-        const bulkApproval = await api.patch("/api/admin/users/approve-pending");
+        const bulkApproval = await api.patch(
+          "/api/admin/users/approve-pending",
+        );
         const approvedCount = Number(bulkApproval.data?.approved_count ?? 0);
         setBackupRunToast({
           status: "success",
-          message: `Approved ${approvedCount} pending account(s).`,
+          message: t("notices.approvedPending", { approvedCount }),
         });
         await load();
       }
@@ -585,7 +607,7 @@ export default function AdminPage({
         ...prev,
         error: extractError(
           err,
-          "Unable to update registration approval setting.",
+          t("errors.unableToUpdateRegistrationApprovalSetting"),
         ),
       }));
     }
@@ -612,7 +634,7 @@ export default function AdminPage({
         ...prev,
         error: extractError(
           err,
-          "Unable to update owner share management setting.",
+          t("errors.unableToUpdateOwnerShareManagementSetting"),
         ),
       }));
     }
@@ -639,7 +661,7 @@ export default function AdminPage({
         ...prev,
         error: extractError(
           err,
-          "Unable to update DAV compatibility mode setting.",
+          t("errors.unableToUpdateDavCompatibilityModeSetting"),
         ),
       }));
     }
@@ -668,7 +690,7 @@ export default function AdminPage({
         ...prev,
         error: extractError(
           err,
-          "Unable to update contact management setting.",
+          t("errors.unableToUpdateContactManagementSetting"),
         ),
       }));
     }
@@ -697,7 +719,7 @@ export default function AdminPage({
         ...prev,
         error: extractError(
           err,
-          "Unable to update contact change moderation setting.",
+          t("errors.unableToUpdateContactChangeModerationSetting"),
         ),
       }));
     }
@@ -724,15 +746,16 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to update 2FA enforcement setting."),
+        error: extractError(
+          err,
+          t("errors.unableToUpdate2faEnforcementSetting"),
+        ),
       }));
     }
   };
 
   const resetUserTwoFactor = async (userId) => {
-    const confirmed = window.confirm(
-      "Reset this user's 2FA enrollment and revoke their DAV app passwords?",
-    );
+    const confirmed = window.confirm(t("admin.resetUser2fa"));
     if (!confirmed) {
       return;
     }
@@ -745,7 +768,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to reset user 2FA."),
+        error: extractError(err, t("errors.unableToResetUser2fa")),
       }));
     }
   };
@@ -756,7 +779,7 @@ export default function AdminPage({
     }
 
     const confirmed = window.confirm(
-      "This will delete all generated Birthday/Anniversary calendars and disable milestone sync across address books. Continue?",
+      t("admin.purgeGeneratedMilestoneCalendarsConfirmation"),
     );
     if (!confirmed) {
       return;
@@ -776,7 +799,11 @@ export default function AdminPage({
         response.data?.disabled_setting_count ?? 0,
       );
       setMilestonePurgeSummary(
-        `Purged ${purgedCalendars} generated calendar(s), removed ${purgedEvents} event(s), and disabled ${disabledSettings} setting(s).`,
+        t("admin.purgeGeneratedMilestoneCalendarsSummary", {
+          purgedCalendars,
+          purgedEvents,
+          disabledSettings,
+        }),
       );
       await load();
     } catch (err) {
@@ -784,7 +811,7 @@ export default function AdminPage({
         ...prev,
         error: extractError(
           err,
-          "Unable to purge generated milestone calendars.",
+          t("errors.unableToPurgeGeneratedMilestoneCalendars"),
         ),
       }));
     } finally {
@@ -797,7 +824,7 @@ export default function AdminPage({
     if (!Number.isFinite(days) || days < 1 || days > 3650) {
       setState((prev) => ({
         ...prev,
-        error: "Retention days must be between 1 and 3650.",
+        error: t("errors.retentionDaysRange"),
       }));
       return;
     }
@@ -820,7 +847,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to update retention setting."),
+        error: extractError(err, t("errors.unableToUpdateChangeRetention")),
       }));
     } finally {
       setRetentionSubmitting(false);
@@ -832,7 +859,7 @@ export default function AdminPage({
     if (!Number.isInteger(years) || years < 1 || years > 25) {
       setState((prev) => ({
         ...prev,
-        error: "Milestone generation years must be between 1 and 25.",
+        error: t("errors.milestoneRangeYears"),
       }));
       return;
     }
@@ -857,7 +884,7 @@ export default function AdminPage({
         ...prev,
         error: extractError(
           err,
-          "Unable to update milestone generation years.",
+          t("errors.unableToUpdateMilestoneGenerationYears"),
         ),
       }));
     } finally {
@@ -886,7 +913,7 @@ export default function AdminPage({
     if (scheduleTimes.length === 0) {
       setState((prev) => ({
         ...prev,
-        error: "Backup schedule must include one or more HH:MM values.",
+        error: t("errors.backupScheduleTimesInvalid"),
       }));
       return;
     }
@@ -898,8 +925,7 @@ export default function AdminPage({
     ) {
       setState((prev) => ({
         ...prev,
-        error:
-          "Enable at least one destination (local or S3) when backups are enabled.",
+        error: t("errors.backupDestinationRequired"),
       }));
       return;
     }
@@ -981,7 +1007,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(err, "Unable to save backup settings."),
+        error: extractError(err, t("errors.unableToSaveBackupSettings")),
       }));
     } finally {
       setBackupSaving(false);
@@ -996,8 +1022,7 @@ export default function AdminPage({
     if (!state.backupLocalEnabled && !state.backupS3Enabled) {
       setState((prev) => ({
         ...prev,
-        error:
-          "Configure at least one destination (local or S3) before running a backup.",
+        error: t("errors.backupConfigurationRequired"),
       }));
       return;
     }
@@ -1009,7 +1034,7 @@ export default function AdminPage({
       const response = await api.post("/api/admin/backups/run");
       const result = response.data ?? {};
       const nextStatus = result.status || "success";
-      const nextMessage = result.reason || "Backup completed successfully.";
+      const nextMessage = result.reason || t("notices.backupRunSuccess");
 
       setState((prev) => ({
         ...prev,
@@ -1024,7 +1049,7 @@ export default function AdminPage({
 
       await load();
     } catch (err) {
-      const message = extractError(err, "Unable to run backup now.");
+      const message = extractError(err, t("errors.backupRunFailed"));
       setState((prev) => ({
         ...prev,
         error: message,
@@ -1048,16 +1073,16 @@ export default function AdminPage({
     if (!backupRestoreFile) {
       setState((prev) => ({
         ...prev,
-        error: "Select a backup ZIP archive before running restore.",
+        error: t("errors.backupRestoreNoArchive"),
       }));
       return;
     }
 
     const confirmMessage = backupRestoreDryRun
-      ? "Run backup restore dry-run? No data will be modified."
+      ? t("backups.dryRun.confirm")
       : backupRestoreMode === "replace"
-        ? "Replace mode will delete existing calendars/address books for owners included in the archive before restoring. Continue?"
-        : "Run backup restore in merge mode?";
+        ? t("backups.dryRun.confirmReplace")
+        : t("backups.dryRun.confirmMerge");
     if (!window.confirm(confirmMessage)) {
       return;
     }
@@ -1082,14 +1107,14 @@ export default function AdminPage({
       setBackupRestoreResult(result);
       setBackupRunToast({
         status: result.status || "success",
-        message: result.reason || "Backup restore completed.",
+        message: result.reason || t("notices.backupRestoreCompleted"),
       });
 
       if (!backupRestoreDryRun) {
         await load();
       }
     } catch (err) {
-      const message = extractError(err, "Unable to restore backup archive.");
+      const message = extractError(err, t("errors.backupRestoreBroken"));
       setState((prev) => ({
         ...prev,
         error: message,
@@ -1135,9 +1160,9 @@ export default function AdminPage({
     ? `${state.backupLastRunStatus.toUpperCase()} at ${formatAdminTimestamp(
         state.backupLastRunAt,
       )}`
-    : "No backup has run yet.";
+    : t("states.backupLastRunNoRun");
   const backupDestinationSummary = [
-    state.backupLocalEnabled ? "Local" : null,
+    state.backupLocalEnabled ? t("labels.backupLocal") : null,
     state.backupS3Enabled ? `S3 (${state.backupS3Disk})` : null,
   ]
     .filter(Boolean)
@@ -1148,10 +1173,13 @@ export default function AdminPage({
   );
   const backupScheduleSummary =
     backupScheduleValues.length === 0
-      ? `No windows (${state.backupTimezone})`
+      ? t("backups.noWindows", { timezone: state.backupTimezone })
       : backupScheduleValues.length <= 2
         ? `${backupScheduleValues.join(", ")} (${state.backupTimezone})`
-        : `${backupScheduleValues.length} windows (${state.backupTimezone})`;
+        : t("backups.multipleWindows", {
+            windowsCount: backupScheduleValues.length,
+            timezone: state.backupTimezone,
+          });
   const backupRetentionSummary = `${Number(state.backupRetentionDaily)}d / ${Number(
     state.backupRetentionWeekly,
   )}w / ${Number(state.backupRetentionMonthly)}m / ${Number(
@@ -1183,50 +1211,49 @@ export default function AdminPage({
     <AppShell auth={auth} theme={theme}>
       <div className="surface fade-up rounded-3xl p-6">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-2xl font-bold">Admin Control Center</h2>
+          <h2 className="text-2xl font-bold">{t("controlPanel.title")}</h2>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           <AdminFeatureToggle
-            label="Public registration"
+            label={t("controlPanel.toggle.publicRegistration")}
             enabled={state.registrationEnabled}
             onClick={toggleRegistration}
           />
           <AdminFeatureToggle
-            label="Require registration approval"
+            label={t("controlPanel.toggle.registrationApproval")}
             enabled={state.registrationApprovalRequired}
             onClick={toggleRegistrationApproval}
           />
           <AdminFeatureToggle
-            label="Owner sharing"
+            label={t("controlPanel.toggle.ownerShareManagement")}
             enabled={state.ownerShareManagementEnabled}
             onClick={toggleOwnerShareManagement}
           />
           <AdminFeatureToggle
-            label="DAV compatibility mode"
+            label={t("controlPanel.toggle.davCompatibilityMode")}
             enabled={state.davCompatibilityModeEnabled}
             onClick={toggleDavCompatibilityMode}
           />
           <AdminFeatureToggle
-            label="Contact management"
+            label={t("controlPanel.toggle.contactManagement")}
             enabled={state.contactManagementEnabled}
             onClick={toggleContactManagement}
           />
           <AdminFeatureToggle
-            label="Review queue"
+            label={t("controlPanel.toggle.reviewQueue")}
             enabled={state.contactChangeModerationEnabled}
             onClick={toggleContactChangeModeration}
           />
           <AdminFeatureToggle
-            label="2FA enforcement"
+            label={t("controlPanel.toggle.2faEnforcement")}
             enabled={state.twoFactorEnforcementEnabled}
             onClick={toggleTwoFactorEnforcement}
           />
         </div>
         <div className="mt-4">
-          <Field label="Queue retention (days)">
+          <Field label={t("controlPanel.queueRetention")}>
             <p className="mb-2 text-xs text-app-faint">
-              Applied/denied queue history older than this is purged
-              automatically.
+              {t("controlPanel.queueRetentionDaysDescription")}
             </p>
             <div className="flex flex-wrap items-end gap-2">
               <input
@@ -1248,15 +1275,16 @@ export default function AdminPage({
                 onClick={saveContactChangeRetention}
                 disabled={retentionSubmitting}
               >
-                {retentionSubmitting ? "Saving..." : "Save Retention"}
+                {retentionSubmitting
+                  ? t("controlPanel.queueRetentionSaving")
+                  : t("controlPanel.queueRetentionSave")}
               </button>
             </div>
           </Field>
           <div className="mt-4">
-            <Field label="Milestone generation horizon (years)">
+            <Field label={t("controlPanel.milestoneGenerationHorizon")}>
               <p className="mb-2 text-xs text-app-faint">
-                How many upcoming years of birthday/anniversary events are
-                generated.
+                {t("controlPanel.milestoneGenerationHorizonDescription")}
               </p>
               <div className="flex flex-wrap items-end gap-2">
                 <input
@@ -1278,7 +1306,9 @@ export default function AdminPage({
                   onClick={saveMilestoneGenerationYears}
                   disabled={milestoneGenerationSubmitting}
                 >
-                  {milestoneGenerationSubmitting ? "Saving..." : "Save Horizon"}
+                  {milestoneGenerationSubmitting
+                    ? t("controlPanel.milestoneGenerationHorizonSaving")
+                    : t("controlPanel.milestoneGenerationHorizonSave")}
                 </button>
               </div>
             </Field>
@@ -1288,10 +1318,10 @@ export default function AdminPage({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="text-sm font-semibold text-app-strong">
-                Automated Backups
+                {t("backups.title")}
               </h3>
               <p className="mt-1 text-xs text-app-faint">
-                Rotating snapshots for calendars and address books.
+                {t("backups.description")}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -1300,7 +1330,7 @@ export default function AdminPage({
                 type="button"
                 onClick={openBackupRestoreDrawer}
               >
-                Restore
+                {t("backups.restore.label")}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="14"
@@ -1339,43 +1369,49 @@ export default function AdminPage({
                 disabled={backupRunNowDisabled}
                 title={
                   !backupHasDestination
-                    ? "Configure at least one destination first."
+                    ? t("backups.configureFirst")
                     : undefined
                 }
               >
-                {backupRunning ? "Running backup..." : "Run Backup Now"}
+                {backupRunning
+                  ? t("backups.runningBackup")
+                  : t("backups.runBackupNow")}
               </button>
               <button
                 className="btn-outline btn-outline-sm"
                 type="button"
                 onClick={openBackupConfigDrawer}
               >
-                Configure
+                {t("backups.configure")}
               </button>
             </div>
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
-              <span className="text-app-faint">Status</span>
+              <span className="text-app-faint">{t("backups.status")}</span>
               <span className="font-semibold text-app-strong">
-                {state.backupEnabled ? "Enabled" : "Disabled"}
+                {state.backupEnabled
+                  ? t("backups.enabled")
+                  : t("backups.disabled")}
               </span>
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
-              <span className="text-app-faint">Destinations</span>
+              <span className="text-app-faint">
+                {t("backups.destinations")}
+              </span>
               <span className="font-semibold text-app-strong">
-                {backupDestinationSummary || "None"}
+                {backupDestinationSummary || t("backups.noDestinations")}
               </span>
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
-              <span className="text-app-faint">Schedule</span>
+              <span className="text-app-faint">{t("backups.schedule")}</span>
               <span className="font-semibold text-app-strong">
                 {backupScheduleSummary}
               </span>
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
-              <span className="text-app-faint">Retention</span>
+              <span className="text-app-faint">{t("backups.retention")}</span>
               <span className="font-semibold text-app-strong">
                 {backupRetentionSummary}
               </span>
@@ -1383,7 +1419,7 @@ export default function AdminPage({
           </div>
 
           <p className="mt-3 text-xs text-app-faint">
-            Last Run: {backupLastRunLabel}
+            {t("backups.lastRun", { lastRunLabel: backupLastRunLabel })}
           </p>
           {state.backupLastRunMessage ? (
             <p
@@ -1410,17 +1446,18 @@ export default function AdminPage({
               }
               title={
                 !state.milestonePurgeAvailable
-                  ? "No enabled/generated milestone calendars to purge."
+                  ? t("backups.purge.noEnabledCalendars")
                   : undefined
               }
             >
               {milestonePurgeSubmitting
-                ? "Purging milestone calendars..."
-                : "Purge Generated Milestone Calendars"}
+                ? t("backups.purge.purging")
+                : t("backups.purge.purgeGeneratedMilestoneCalendars")}
             </button>
             <p className="text-xs text-app-faint">
-              Deletes generated Birthday/Anniversary calendars and disables
-              milestone sync settings.
+              {t(
+                "backups.purge.deletesGeneratedBirthdayAnniversaryCalendars",
+              )}
             </p>
           </div>
         ) : null}
@@ -1456,10 +1493,12 @@ export default function AdminPage({
                   id="delete-user-title"
                   className="text-lg font-semibold text-app-strong"
                 >
-                  Delete {deleteUserTarget.name}
+                  {t("admin.deleteUserTitle", {
+                    name: deleteUserTarget.name,
+                  })}
                 </h3>
                 <p className="mt-1 text-sm text-app-muted">
-                  This action permanently removes the account.
+                  {t("admin.deleteUserConfirmation")}
                 </p>
               </div>
               <button
@@ -1468,14 +1507,14 @@ export default function AdminPage({
                 onClick={closeDeleteUserDialog}
                 disabled={deleteUserSubmitting}
               >
-                Close
+                {t("admin.close")}
               </button>
             </div>
 
             <div className="mt-4 space-y-4">
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-app-faint">
-                  Transfer Ownership (Optional)
+                  {t("admin.transferOwnership")}
                 </span>
                 <select
                   className="input"
@@ -1485,7 +1524,7 @@ export default function AdminPage({
                   }
                   disabled={deleteUserSubmitting}
                 >
-                  <option value="">Delete all owned data</option>
+                  <option value="">{t("admin.deleteAllOwnedData")}</option>
                   {deleteUserTransferOptions.map((candidate) => (
                     <option key={candidate.id} value={candidate.id}>
                       {candidate.name} ({candidate.email})
@@ -1493,14 +1532,14 @@ export default function AdminPage({
                   ))}
                 </select>
                 <p className="mt-1 text-xs text-app-faint">
-                  If selected, ownership of calendars, address books, and
-                  contacts will transfer before deletion.
+                  {t("admin.transferOwnershipDescription")}
                 </p>
               </label>
 
               <label className="block">
                 <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-app-faint">
-                  Type Your Admin Email To Confirm
+                  {/* Type Your Admin Email To Confirm*/}
+                  {t("admin.confirmEmail")}
                 </span>
                 <input
                   className="input"
@@ -1522,7 +1561,7 @@ export default function AdminPage({
                 onClick={closeDeleteUserDialog}
                 disabled={deleteUserSubmitting}
               >
-                Cancel
+                {t("labels.cancel")}
               </button>
               <button
                 className="btn-outline btn-outline-sm text-app-danger"
@@ -1530,7 +1569,9 @@ export default function AdminPage({
                 onClick={deleteUser}
                 disabled={deleteUserActionDisabled}
               >
-                {deleteUserSubmitting ? "Deleting..." : "Delete User"}
+                {deleteUserSubmitting
+                  ? t("admin.deletingUser")
+                  : t("admin.deleteUser")}
               </button>
             </div>
           </div>
@@ -1546,7 +1587,7 @@ export default function AdminPage({
         >
           <button
             type="button"
-            aria-label="Close backup configuration"
+            aria-label={t("backups.closeBackupConfig")}
             className={`absolute inset-0 bg-black/45 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
               backupConfigOpen ? "opacity-100" : "opacity-0"
             }`}
@@ -1563,11 +1604,10 @@ export default function AdminPage({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-xl font-semibold text-app-strong">
-                  Backup Configuration
+                  {t("backups.backupConfiguration")}
                 </h3>
                 <p className="mt-1 text-sm text-app-muted">
-                  Configure destinations, schedule windows, and retention
-                  strategy.
+                  {t("backups.backupConfigurationDescription")}
                 </p>
               </div>
               <button
@@ -1575,14 +1615,14 @@ export default function AdminPage({
                 className="btn-outline btn-outline-sm"
                 onClick={closeBackupConfigDrawer}
               >
-                Close
+                {t("labels.close")}
               </button>
             </div>
 
             <section className="mt-5 rounded-2xl border border-app-edge p-4">
               <div className="flex flex-wrap items-center gap-1.5">
                 <AdminFeatureToggle
-                  label="Backups enabled"
+                  label={t("backups.enabled")}
                   enabled={state.backupEnabled}
                   onClick={() =>
                     setState((prev) => ({
@@ -1592,7 +1632,7 @@ export default function AdminPage({
                   }
                 />
                 <AdminFeatureToggle
-                  label="Local destination"
+                  label={t("backups.localDestination")}
                   enabled={state.backupLocalEnabled}
                   onClick={() =>
                     setState((prev) => ({
@@ -1602,7 +1642,7 @@ export default function AdminPage({
                   }
                 />
                 <AdminFeatureToggle
-                  label="S3 destination"
+                  label={t("backups.s3Destination")}
                   enabled={state.backupS3Enabled}
                   onClick={() =>
                     setState((prev) => ({
@@ -1614,7 +1654,7 @@ export default function AdminPage({
               </div>
 
               <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <Field label="Schedule times (HH:MM, comma-separated)">
+                <Field label={t("backups.scheduleTimes")}>
                   <input
                     className="input"
                     value={state.backupScheduleTimes}
@@ -1624,10 +1664,10 @@ export default function AdminPage({
                         backupScheduleTimes: event.target.value,
                       }))
                     }
-                    placeholder="02:30, 14:30"
+                    placeholder={t("backups.scheduleTimesPlaceholder")}
                   />
                 </Field>
-                <Field label="Timezone">
+                <Field label={t("backups.timezone")}>
                   <select
                     className="input"
                     value={state.backupTimezone}
@@ -1655,7 +1695,7 @@ export default function AdminPage({
                   </select>
                 </Field>
                 {state.backupLocalEnabled ? (
-                  <Field label="Local backup path">
+                  <Field label={t("backups.localPath")}>
                     <input
                       className="input"
                       value={state.backupLocalPath}
@@ -1670,7 +1710,7 @@ export default function AdminPage({
                   </Field>
                 ) : null}
                 {state.backupS3Enabled ? (
-                  <Field label="S3 disk name">
+                  <Field label={t("backups.s3Disk")}>
                     <input
                       className="input"
                       value={state.backupS3Disk}
@@ -1685,7 +1725,7 @@ export default function AdminPage({
                   </Field>
                 ) : null}
                 {state.backupS3Enabled ? (
-                  <Field label="S3 key prefix">
+                  <Field label={t("backups.s3Prefix")}>
                     <input
                       className="input"
                       value={state.backupS3Prefix}
@@ -1709,16 +1749,16 @@ export default function AdminPage({
                 onClick={() => setBackupAdvancedOpen((prev) => !prev)}
               >
                 <span className="text-sm font-semibold text-app-strong">
-                  Advanced
+                  {t("backups.advanced")}
                 </span>
                 <span className="text-xs text-app-muted">
-                  {backupAdvancedOpen ? "Hide" : "Show"}
+                  {backupAdvancedOpen ? t("labels.hide") : t("labels.show")}
                 </span>
               </button>
 
               {backupAdvancedOpen ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <Field label="Weekly backup day">
+                  <Field label={t("backups.weeklyBackupDay")}>
                     <select
                       className="input"
                       value={state.backupWeeklyDay}
@@ -1736,7 +1776,7 @@ export default function AdminPage({
                       ))}
                     </select>
                   </Field>
-                  <Field label="Monthly backup day">
+                  <Field label={t("backups.monthlyBackupDay")}>
                     <input
                       className="input"
                       type="number"
@@ -1751,7 +1791,7 @@ export default function AdminPage({
                       }
                     />
                   </Field>
-                  <Field label="Yearly backup month">
+                  <Field label={t("backups.yearlyBackupMonth")}>
                     <select
                       className="input"
                       value={state.backupYearlyMonth}
@@ -1769,7 +1809,7 @@ export default function AdminPage({
                       ))}
                     </select>
                   </Field>
-                  <Field label="Yearly backup day">
+                  <Field label={t("backups.yearlyBackupDay")}>
                     <input
                       className="input"
                       type="number"
@@ -1785,7 +1825,7 @@ export default function AdminPage({
                     />
                   </Field>
 
-                  <Field label="Retention strategy">
+                  <Field label={t("backups.retentionStrategy")}>
                     <select
                       className="input"
                       value={backupRetentionPreset}
@@ -1809,16 +1849,18 @@ export default function AdminPage({
                       }}
                     >
                       <option value="recommended">
-                        Recommended (7/4/12/3)
+                        {t("backups.recommendedRetention")}
                       </option>
-                      <option value="custom">Custom</option>
+                      <option value="custom">
+                        {t("backups.customRetention")}
+                      </option>
                     </select>
                   </Field>
 
                   {backupRetentionPreset === "custom" ? (
                     <div className="md:col-span-2">
                       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                        <Field label="Daily retention">
+                        <Field label={t("backups.dailyRetention")}>
                           <input
                             className="input"
                             type="number"
@@ -1833,7 +1875,7 @@ export default function AdminPage({
                             }
                           />
                         </Field>
-                        <Field label="Weekly retention">
+                        <Field label={t("backups.weeklyRetention")}>
                           <input
                             className="input"
                             type="number"
@@ -1848,7 +1890,7 @@ export default function AdminPage({
                             }
                           />
                         </Field>
-                        <Field label="Monthly retention">
+                        <Field label={t("backups.monthlyRetention")}>
                           <input
                             className="input"
                             type="number"
@@ -1863,7 +1905,7 @@ export default function AdminPage({
                             }
                           />
                         </Field>
-                        <Field label="Yearly retention">
+                        <Field label={t("backups.yearlyRetention")}>
                           <input
                             className="input"
                             type="number"
@@ -1891,7 +1933,7 @@ export default function AdminPage({
                 type="button"
                 onClick={closeBackupConfigDrawer}
               >
-                Cancel
+                {t("labels.cancel")}
               </button>
               <button
                 className={backupSaveButtonClass}
@@ -1899,7 +1941,9 @@ export default function AdminPage({
                 onClick={saveBackupSettings}
                 disabled={backupSaving}
               >
-                {backupSaving ? "Saving..." : "Save Backup Settings"}
+                {backupSaving
+                  ? t("backups.savingSettings")
+                  : t("backups.saveSettings")}
               </button>
             </div>
           </div>
@@ -1915,7 +1959,7 @@ export default function AdminPage({
         >
           <button
             type="button"
-            aria-label="Close backup restore"
+            aria-label={t("backups.closeRestore")}
             className={`absolute inset-0 bg-black/45 transition-opacity duration-200 ease-out motion-reduce:transition-none ${
               backupRestoreOpen ? "opacity-100" : "opacity-0"
             }`}
@@ -1932,11 +1976,10 @@ export default function AdminPage({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-xl font-semibold text-app-strong">
-                  Restore Backup Archive
+                  {t("backups.restoreArchive")}
                 </h3>
                 <p className="mt-1 text-sm text-app-muted">
-                  Import a generated backup ZIP into calendars and address
-                  books.
+                  {t("backups.restoreArchiveDescription")}
                 </p>
               </div>
               <button
@@ -1944,13 +1987,13 @@ export default function AdminPage({
                 className="btn-outline btn-outline-sm"
                 onClick={closeBackupRestoreDrawer}
               >
-                Close
+                {t("labels.close")}
               </button>
             </div>
 
             <section className="mt-5 rounded-2xl border border-app-edge p-4">
               <div className="grid gap-3 md:grid-cols-2">
-                <Field label="Backup ZIP file">
+                <Field label={t("backups.backupZipFile")}>
                   <input
                     className="input"
                     type="file"
@@ -1961,7 +2004,7 @@ export default function AdminPage({
                     }}
                   />
                 </Field>
-                <Field label="Restore mode">
+                <Field label={t("backups.restore.mode")}>
                   <select
                     className="input"
                     value={backupRestoreMode}
@@ -1969,15 +2012,19 @@ export default function AdminPage({
                       setBackupRestoreMode(event.target.value)
                     }
                   >
-                    <option value="merge">Merge (upsert)</option>
-                    <option value="replace">Replace owner data</option>
+                    <option value="merge">{t("backups.restore.merge")}</option>
+                    <option value="replace">
+                      {t("backups.restore.replace")}
+                    </option>
                   </select>
                 </Field>
               </div>
 
               {backupRestoreFile ? (
                 <p className="mt-2 max-w-full truncate text-xs text-app-faint">
-                  Selected: {backupRestoreFile.name}
+                  {t("backups.restore.selectedFile", {
+                    name: backupRestoreFile.name,
+                  })}
                 </p>
               ) : null}
 
@@ -1989,13 +2036,12 @@ export default function AdminPage({
                     setBackupRestoreDryRun(!!event.target.checked)
                   }
                 />
-                Dry run only (preview changes without writing data)
+                {t("backups.restore.dryRunDescription")}
               </label>
 
               {backupRestoreMode === "replace" ? (
                 <p className="mt-2 text-xs text-app-danger">
-                  Replace mode deletes existing owner resources in scope before
-                  restore.
+                  {t("backups.restore.replaceWarning")}
                 </p>
               ) : null}
             </section>
@@ -2003,36 +2049,35 @@ export default function AdminPage({
             {backupRestoreResult ? (
               <div className="mt-4 rounded-xl border border-app-edge bg-app-surface p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-app-faint">
-                  Restore Result
+                  {t("backups.restore.result")}
                 </p>
                 <p className="mt-1 text-sm text-app-strong">
-                  {backupRestoreResult.reason ||
-                    "Restore completed successfully."}
+                  {backupRestoreResult.reason || t("backups.restore.success")}
                 </p>
 
                 {backupRestoreSummary ? (
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <p className="text-xs text-app-faint">
-                      Files processed:{" "}
+                      {t("backups.restore.filesProcessed")}:{" "}
                       <span className="font-semibold text-app-strong">
                         {Number(backupRestoreSummary.files_processed || 0)}
                       </span>
                     </p>
                     <p className="text-xs text-app-faint">
-                      Files skipped:{" "}
+                      {t("backups.restore.filesSkipped")}:{" "}
                       <span className="font-semibold text-app-strong">
                         {Number(backupRestoreSummary.files_skipped || 0)}
                       </span>
                     </p>
                     <p className="text-xs text-app-faint">
-                      Calendars (create/update):{" "}
+                      {t("backups.restore.calendars")}:{" "}
                       <span className="font-semibold text-app-strong">
                         {Number(backupRestoreSummary.calendars_created || 0)}/
                         {Number(backupRestoreSummary.calendars_updated || 0)}
                       </span>
                     </p>
                     <p className="text-xs text-app-faint">
-                      Address books (create/update):{" "}
+                      {t("backups.restore.addressBooks")}:{" "}
                       <span className="font-semibold text-app-strong">
                         {Number(
                           backupRestoreSummary.address_books_created || 0,
@@ -2044,7 +2089,7 @@ export default function AdminPage({
                       </span>
                     </p>
                     <p className="text-xs text-app-faint">
-                      Objects (create/update):{" "}
+                      {t("backups.restore.objects")}:{" "}
                       <span className="font-semibold text-app-strong">
                         {Number(
                           (backupRestoreSummary.calendar_objects_created || 0) +
@@ -2058,7 +2103,7 @@ export default function AdminPage({
                       </span>
                     </p>
                     <p className="text-xs text-app-faint">
-                      Invalid resources skipped:{" "}
+                      {t("backups.restore.invalidResources")}:{" "}
                       <span className="font-semibold text-app-strong">
                         {Number(
                           backupRestoreSummary.resources_skipped_invalid || 0,
@@ -2071,7 +2116,7 @@ export default function AdminPage({
                 {backupRestoreWarnings.length > 0 ? (
                   <div className="mt-3">
                     <p className="text-xs font-semibold text-app-faint">
-                      Warnings
+                      {t("backups.restore.warnings")}
                     </p>
                     <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-app-faint">
                       {backupRestoreWarnings.map((warning, index) => (
@@ -2089,7 +2134,7 @@ export default function AdminPage({
                 type="button"
                 onClick={closeBackupRestoreDrawer}
               >
-                Cancel
+                {t("labels.cancel")}
               </button>
               <button
                 className={backupRestoreRunButtonClass}
@@ -2098,10 +2143,10 @@ export default function AdminPage({
                 disabled={backupRestoreRunDisabled}
               >
                 {backupRestoring
-                  ? "Running restore..."
+                  ? t("backups.restore.running")
                   : backupRestoreDryRun
-                    ? "Run Restore Dry-Run"
-                    : "Run Restore"}
+                    ? t("backups.restore.dryRun")
+                    : t("backups.restore.run")}
               </button>
             </div>
           </div>
@@ -2109,15 +2154,15 @@ export default function AdminPage({
       ) : null}
 
       {state.loading ? (
-        <FullPageState label="Loading admin data..." compact />
+        <FullPageState label={t("states.loadingAdminData")} compact />
       ) : (
         <div className="mt-6 grid gap-6 xl:grid-cols-2">
           <section className="surface rounded-3xl p-6">
-            <h3 className="text-lg font-semibold">Create User</h3>
+            <h3 className="text-lg font-semibold">{t("admin.createUser")}</h3>
             <form className="mt-3 space-y-3" onSubmit={createUser}>
               <input
                 className="input"
-                placeholder="Name"
+                placeholder={t("admin.namePlaceholder")}
                 value={userForm.name}
                 onChange={(e) =>
                   setUserForm({ ...userForm, name: e.target.value })
@@ -2127,7 +2172,7 @@ export default function AdminPage({
               <input
                 className="input"
                 type="email"
-                placeholder="Email"
+                placeholder={t("admin.emailPlaceholder")}
                 value={userForm.email}
                 onChange={(e) =>
                   setUserForm({ ...userForm, email: e.target.value })
@@ -2141,11 +2186,11 @@ export default function AdminPage({
                   setUserForm({ ...userForm, role: e.target.value })
                 }
               >
-                <option value="regular">Regular</option>
-                <option value="admin">Admin</option>
+                <option value="regular">{t("admin.role.regular")}</option>
+                <option value="admin">{t("admin.role.admin")}</option>
               </select>
               <button className="btn" type="submit">
-                Create User
+                {t("admin.createUser")}
               </button>
             </form>
             {userInviteResult ? (
@@ -2154,7 +2199,9 @@ export default function AdminPage({
                   {userInviteResult.message}
                 </p>
                 {userInviteResult.invitationUrl ? (
-                  <p className="mt-1 break-all">{userInviteResult.invitationUrl}</p>
+                  <p className="mt-1 break-all">
+                    {userInviteResult.invitationUrl}
+                  </p>
                 ) : null}
               </div>
             ) : null}
@@ -2169,7 +2216,9 @@ export default function AdminPage({
                     className="rounded-xl border border-app-edge bg-app-surface p-3 text-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <p className="font-semibold text-app-strong">{user.name}</p>
+                      <p className="font-semibold text-app-strong">
+                        {user.name}
+                      </p>
                       <div className="flex flex-wrap items-center gap-1">
                         {!isApproved ? (
                           <button
@@ -2177,7 +2226,7 @@ export default function AdminPage({
                             type="button"
                             onClick={() => approveUser(user.id)}
                           >
-                            <span>Approve</span>
+                            <span>{t("admin.approveUser")}</span>
                             {CheckIcon ? (
                               <CheckIcon className="h-3.5 w-3.5" />
                             ) : null}
@@ -2189,27 +2238,32 @@ export default function AdminPage({
                             type="button"
                             onClick={() => openDeleteUserDialog(user)}
                           >
-                            Delete
+                            {t("labels.delete")}
                           </button>
                         ) : null}
                       </div>
                     </div>
                     <p className="text-app-muted">{user.email}</p>
                     <p className="text-xs text-app-faint">
-                      Role: {user.role} | Calendars: {user.calendars_count} |
-                      Address books: {user.address_books_count} | 2FA:{" "}
-                      {user.two_factor_enabled ? "Enabled" : "Disabled"}
+                      {t("admin.userDetails", {
+                        role: user.role,
+                        calendars: user.calendars_count,
+                        address_books: user.address_books_count,
+                        two_factor: user.two_factor_enabled
+                          ? t("labels.enabled")
+                          : t("labels.disabled"),
+                      })}
                     </p>
                     <button
                       className="mt-2 text-xs font-semibold text-app-danger"
                       type="button"
                       onClick={() => resetUserTwoFactor(user.id)}
                     >
-                      Reset 2FA
+                      {t("admin.reset2fa")}
                     </button>
                     {!isApproved ? (
                       <p className="text-xs text-app-faint">
-                        Status: pending approval
+                        {t("admin.statusPendingApproval")}
                       </p>
                     ) : null}
                   </div>
@@ -2219,7 +2273,9 @@ export default function AdminPage({
           </section>
 
           <section className="surface rounded-3xl p-6">
-            <h3 className="text-lg font-semibold">Assign Share Access</h3>
+            <h3 className="text-lg font-semibold">
+              {t("admin.assignShareAccess")}
+            </h3>
             <form className="mt-3 space-y-3" onSubmit={saveShare}>
               <select
                 className="input"
@@ -2232,8 +2288,8 @@ export default function AdminPage({
                   })
                 }
               >
-                <option value="calendar">Calendar</option>
-                <option value="address_book">Address Book</option>
+                <option value="calendar">{t("labels.calendar")}</option>
+                <option value="address_book">{t("labels.addressBook")}</option>
               </select>
               <select
                 className="input"
@@ -2243,7 +2299,9 @@ export default function AdminPage({
                 }
                 required
               >
-                <option value="">Select sharable resource</option>
+                <option value="">
+                  {t("labels.share.selectSharableResource")}
+                </option>
                 {resourceOptions.map((resource) => (
                   <option key={resource.id} value={resource.id}>
                     {resource.display_name} ({resource.owner?.email})
@@ -2258,7 +2316,7 @@ export default function AdminPage({
                 }
                 required
               >
-                <option value="">Select user</option>
+                <option value="">{t("labels.share.selectUser")}</option>
                 {state.users.map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.name} ({user.email})
@@ -2272,12 +2330,18 @@ export default function AdminPage({
                   setShareForm({ ...shareForm, permission: e.target.value })
                 }
               >
-                <option value="read_only">General (read-only)</option>
-                <option value="editor">Editor (full edit, no delete)</option>
-                <option value="admin">Admin (full edit + delete)</option>
+                <option value="read_only">
+                  {t("labels.share.permission.general")}
+                </option>
+                <option value="editor">
+                  {t("labels.share.permission.editor")}
+                </option>
+                <option value="admin">
+                  {t("labels.share.permission.admin")}
+                </option>
               </select>
               <button className="btn" type="submit">
-                Save Share
+                {t("labels.share.save")}
               </button>
             </form>
 
@@ -2294,17 +2358,22 @@ export default function AdminPage({
                     <PermissionBadge permission={share.permission} />
                   </div>
                   <p className="text-app-muted">
-                    Owner: {share.owner.name} ({share.owner.email})
+                    {t("labels.share.owner", {
+                      name: share.owner.name,
+                      email: share.owner.email,
+                    })}
                   </p>
                   <p className="text-app-muted">
-                    Shared with: {share.shared_with.name} (
-                    {share.shared_with.email})
+                    {t("labels.share.sharedWith", {
+                      name: share.shared_with.name,
+                      email: share.shared_with.email,
+                    })}
                   </p>
                   <button
                     className="mt-2 text-xs font-semibold text-app-danger"
                     onClick={() => deleteShare(share.id)}
                   >
-                    Remove
+                    {t("labels.remove")}
                   </button>
                 </div>
               ))}

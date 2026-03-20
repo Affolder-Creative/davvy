@@ -12,6 +12,7 @@ export default function useContactsPageState({
   extractError,
   createEmptyContactForm,
   OPTIONAL_CONTACT_FIELDS,
+  getOptionalFieldLabel,
   createContactSectionOpenState,
   normalizePositiveInt,
   buildSavedCustomLabelsByField,
@@ -58,6 +59,25 @@ export default function useContactsPageState({
     createContactSectionOpenState(),
   );
 
+  const optionalFieldsWithLabels = useMemo(
+    () =>
+      OPTIONAL_CONTACT_FIELDS.map((field) => {
+        const fallbackLabel = String(
+          field?.label ?? field?.fallback ?? field?.id ?? "",
+        );
+        if (typeof getOptionalFieldLabel !== "function") {
+          return { ...field, resolvedLabel: fallbackLabel };
+        }
+
+        const translatedLabel = String(getOptionalFieldLabel(field) ?? "").trim();
+        return {
+          ...field,
+          resolvedLabel: translatedLabel !== "" ? translatedLabel : fallbackLabel,
+        };
+      }),
+    [OPTIONAL_CONTACT_FIELDS, getOptionalFieldLabel],
+  );
+
   const defaultAddressBookIds = useMemo(
     () => (addressBooks[0] ? [addressBooks[0].id] : []),
     [addressBooks],
@@ -65,10 +85,10 @@ export default function useContactsPageState({
 
   const hiddenOptionalFields = useMemo(
     () =>
-      OPTIONAL_CONTACT_FIELDS.filter(
+      optionalFieldsWithLabels.filter(
         (field) => !visibleOptionalFields.includes(field.id),
       ),
-    [visibleOptionalFields, OPTIONAL_CONTACT_FIELDS],
+    [visibleOptionalFields, optionalFieldsWithLabels],
   );
 
   const relatedNameOptions = useMemo(() => {
@@ -138,7 +158,9 @@ export default function useContactsPageState({
     }
 
     return hiddenOptionalFields.filter((field) =>
-      field.label.toLowerCase().includes(query),
+      String(field?.resolvedLabel ?? "")
+        .toLowerCase()
+        .includes(query),
     );
   }, [fieldSearchTerm, hiddenOptionalFields]);
 
@@ -576,8 +598,8 @@ export default function useContactsPageState({
     ? form.address_book_ids.length
     : 0;
   const pendingHideFieldLabel =
-    OPTIONAL_CONTACT_FIELDS.find((field) => field.id === pendingHideFieldId)
-      ?.label ?? pendingHideFieldId;
+    optionalFieldsWithLabels.find((field) => field.id === pendingHideFieldId)
+      ?.resolvedLabel ?? pendingHideFieldId;
 
   return {
     loading,

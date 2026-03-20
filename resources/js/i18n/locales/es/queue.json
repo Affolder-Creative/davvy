@@ -1,0 +1,80 @@
+{
+  "errors": {
+    "load": "No se pudieron cargar las solicitudes de cambio.",
+    "approve": "No se pudo aprobar la solicitud.",
+    "deny": "No se pudo rechazar la solicitud.",
+    "bulk": "No se pudo procesar la acción masiva.",
+    "resolvedPayloadJson": "El payload resuelto debe ser JSON válido.",
+    "resolvedAddressIdsJson": "Los IDs de libreta resueltos deben ser JSON válido.",
+    "resolvedAddressIdsArray": "Los IDs de libreta resueltos deben ser un arreglo de enteros positivos."
+  },
+  "bulk": {
+    "confirm": "Esto {{verb}} {{count}} solicitud(es) en cola en la vista filtrada actual. ¿Continuar?",
+    "approve": "aprobará",
+    "deny": "rechazará"
+  },
+  "filters": {
+    "open": "Abiertas",
+    "pending": "Pendientes",
+    "manualMergeNeeded": "Fusión manual necesaria",
+    "history": "Historial",
+    "all": "Todas",
+    "allOperations": "Todas las operaciones",
+    "updates": "Actualizaciones",
+    "deletes": "Eliminaciones",
+    "searchPlaceholder": "Buscar por contacto/solicitante...",
+    "refresh": "Actualizar"
+  },
+  "card": {
+    "group": "Grupo",
+    "unnamedContact": "Contacto sin nombre",
+    "status": "Estado",
+    "requested": "Solicitado",
+    "editApprove": "Editar y aprobar",
+    "approve": "Aprobar",
+    "deny": "Rechazar",
+    "requester": "Solicitante",
+    "approvalOwner": "Propietario de aprobación",
+    "source": "Origen",
+    "reviewer": "Revisor",
+    "notReviewed": "Aún sin revisar",
+    "changedFields": "Campos cambiados"
+  },
+  "modal": {
+    "title": "Editar solicitud #{{id}} antes de aprobar",
+    "subtitle": "Ajusta payload/IDs de libreta y luego aprueba esta solicitud en cola.",
+    "resolvedPayload": "JSON de payload resuelto",
+    "resolvedAddressIds": "Arreglo JSON de IDs de libreta resueltos",
+    "cancel": "Cancelar",
+    "approve": "Guardar ediciones y aprobar",
+    "approving": "Aprobando..."
+  },
+  "status": {
+    "pending": "Pendiente",
+    "approved": "Aprobada (esperando a otros)",
+    "manualMergeNeeded": "Fusión manual necesaria",
+    "applied": "Aplicada",
+    "denied": "Rechazada"
+  },
+  "notices": {
+    "approved": "Solicitud aprobada.",
+    "denied": "Solicitud rechazada.",
+    "bulk": "{{processed}} grupo(s) de solicitud procesado(s). {{skipped}} omitido(s)."
+  },
+  "page": {
+    "title": "Cola de revisión de cambios de contacto",
+    "subtitle": "Revisa cambios en cola antes de aplicarlos a los contactos."
+  },
+  "actions": {
+    "approveAll": "Aprobar todo ({{count}})",
+    "denyAll": "Rechazar todo ({{count}})"
+  },
+  "states": {
+    "loading": "Cargando cola de revisión...",
+    "empty": "No hay solicitudes en cola para este filtro."
+  },
+  "operations": {
+    "delete": "Eliminar",
+    "update": "Actualizar"
+  }
+}

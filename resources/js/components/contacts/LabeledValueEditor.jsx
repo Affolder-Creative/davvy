@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Labeled Value Editor component.
@@ -18,6 +19,7 @@ export default function LabeledValueEditor({
   useRowReorder,
   RowReorderControls,
 }) {
+  const { t } = useTranslation("contacts");
   const safeRows = Array.isArray(rows) ? rows : [];
   const safeLabelOptions =
     Array.isArray(labelOptions) && labelOptions.length > 0
@@ -35,6 +37,19 @@ export default function LabeledValueEditor({
         .replace(/\s+/g, "-")}`,
     [title],
   );
+  const optionLabel = (option) => {
+    if (typeof option?.labelKey === "string" && option.labelKey.trim() !== "") {
+      return t(option.labelKey, {
+        defaultValue: option?.fallback ?? option?.value ?? "",
+      });
+    }
+
+    if (typeof option?.label === "string" && option.label.trim() !== "") {
+      return option.label;
+    }
+
+    return option?.fallback ?? option?.value ?? "";
+  };
 
   const updateRow = (index, field, value) => {
     const patch =
@@ -101,7 +116,9 @@ export default function LabeledValueEditor({
       </div>
       <div className="mt-3 space-y-3">
         {safeRows.length === 0 ? (
-          <p className="text-sm text-app-faint">No entries.</p>
+          <p className="text-sm text-app-faint">
+            {t("editor.labeledValueEditor.noEntries")}
+          </p>
         ) : (
           safeRows.map((row, index) => {
             const rowIsDragSource = reorder.isDragSource(index);
@@ -119,7 +136,10 @@ export default function LabeledValueEditor({
                 } ${rowIsDragSource ? "opacity-70" : ""}`}
               >
                 <div className="grid items-center gap-2 md:grid-cols-[12rem_1fr_auto]">
-                  <div className="self-center md:hidden" data-row-controls-mobile>
+                  <div
+                    className="self-center md:hidden"
+                    data-row-controls-mobile
+                  >
                     <RowReorderControls
                       rowLabel={title}
                       rowGroup={rowGroup}
@@ -145,7 +165,7 @@ export default function LabeledValueEditor({
                   >
                     {safeLabelOptions.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {optionLabel(option)}
                       </option>
                     ))}
                   </select>
@@ -183,7 +203,9 @@ export default function LabeledValueEditor({
                     onChange={(event) =>
                       updateRow(index, "custom_label", event.target.value)
                     }
-                    placeholder="Custom label"
+                    placeholder={t(
+                      "editor.labeledValueEditor.customLabelPlaceholder",
+                    )}
                   />
                 ) : null}
               </div>

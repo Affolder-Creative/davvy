@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Address Book Milestone Controls component.
@@ -15,6 +16,7 @@ export default function AddressBookMilestoneControls({
   CheckIcon,
   TimesIcon,
 }) {
+  const { t } = useTranslation("dashboard");
   const birthdaySettings = item?.milestone_calendars?.birthdays ?? {};
   const anniversarySettings = item?.milestone_calendars?.anniversaries ?? {};
   const enabledCount =
@@ -148,8 +150,12 @@ export default function AddressBookMilestoneControls({
               <button
                 className="inline-flex h-7 w-7 items-center justify-center rounded text-app-faint transition hover:text-app-base focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                 type="button"
-                aria-label={`Cancel editing ${label} calendar name`}
-                title={`Cancel editing ${label} calendar name`}
+                aria-label={t("resourcePanel.cancelEditingCalendarName", {
+                  label,
+                })}
+                title={t("resourcePanel.cancelEditingCalendarName", {
+                  label,
+                })}
                 onClick={() => {
                   setEditingKey(null);
                   setNameDrafts((prev) => ({
@@ -164,8 +170,12 @@ export default function AddressBookMilestoneControls({
               <button
                 className="inline-flex h-7 w-7 items-center justify-center rounded text-app-accent transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                 type="button"
-                aria-label={`Save ${label} calendar name`}
-                title={`Save ${label} calendar name`}
+                aria-label={t("resourcePanel.saveCalendarName", {
+                  label,
+                })}
+                title={t("resourcePanel.saveCalendarName", {
+                  label,
+                })}
                 onClick={() => saveName(type)}
                 disabled={!canSaveName}
               >
@@ -185,8 +195,12 @@ export default function AddressBookMilestoneControls({
                   <button
                     type="button"
                     className="inline-flex h-6 w-6 -mr-[0.25rem] items-center justify-center rounded text-app-dim transition hover:text-app-base focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                    aria-label={`Reset ${label} calendar name to default`}
-                    title={`Reset ${label} calendar name to default`}
+                    aria-label={t("resourcePanel.resetCalendarName", {
+                      label,
+                    })}
+                    title={t("resourcePanel.resetCalendarName", {
+                      label,
+                    })}
                     onClick={() => resetName(type)}
                     disabled={isSaving || saveInProgress}
                   >
@@ -197,8 +211,12 @@ export default function AddressBookMilestoneControls({
               <button
                 type="button"
                 className="inline-flex h-6 w-6 items-center justify-center rounded text-app-dim transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                aria-label={`Rename ${label} calendar`}
-                title={`Rename ${label} calendar`}
+                aria-label={t("resourcePanel.renameCalendar", {
+                  label,
+                })}
+                title={t("resourcePanel.renameCalendar", {
+                  label,
+                })}
                 onClick={() => setEditingKey(type)}
                 disabled={isSaving || saveInProgress}
               >
@@ -208,7 +226,7 @@ export default function AddressBookMilestoneControls({
           )}
           {isSaving ? (
             <span className="shrink-0 text-[11px] text-app-faint">
-              Saving...
+              {t("resourcePanel.saving")}
             </span>
           ) : null}
         </div>
@@ -223,13 +241,13 @@ export default function AddressBookMilestoneControls({
         className="flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1 text-left transition hover:bg-app-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
         aria-label={
           collapsed
-            ? "Expand milestone calendars"
-            : "Collapse milestone calendars"
+            ? t("milestoneCalendars.expand")
+            : t("milestoneCalendars.collapse")
         }
         title={
           collapsed
-            ? "Expand milestone calendars"
-            : "Collapse milestone calendars"
+            ? t("milestoneCalendars.expand")
+            : t("milestoneCalendars.collapse")
         }
         aria-expanded={!collapsed}
         onClick={() => {
@@ -241,14 +259,20 @@ export default function AddressBookMilestoneControls({
       >
         <span>
           <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] leading-tight text-app-base">
-            Milestone Calendars
+            {t("milestoneCalendars.title")}
           </span>
           <span className="block text-[11px] leading-tight text-app-faint">
-            {enabledCount === 0 ? "Off" : `${enabledCount}/2 enabled`}
+            {enabledCount === 0
+              ? t("milestoneCalendars.off")
+              : t("milestoneCalendars.enabled", {
+                  count: enabledCount,
+                })}
           </span>
         </span>
         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-app-accent">
-          {collapsed ? "Configure" : "Hide"}
+          {collapsed
+            ? t("milestoneCalendars.configure")
+            : t("milestoneCalendars.hide")}
           <ChevronRightIcon
             className={`h-3.5 w-3.5 transition-transform ${collapsed ? "" : "rotate-90"}`}
           />
@@ -258,15 +282,19 @@ export default function AddressBookMilestoneControls({
         <div className="mt-1 pl-2 divide-y divide-app-edge">
           {renderRow(
             "birthdays",
-            "Birthdays",
+            t("milestoneCalendars.birthdays"),
             birthdaySettings,
-            `${item.display_name} Birthdays`,
+            t("milestoneCalendars.birthdaysFallback", {
+              name: item.display_name,
+            }),
           )}
           {renderRow(
             "anniversaries",
-            "Anniversaries",
+            t("milestoneCalendars.anniversaries"),
             anniversarySettings,
-            `${item.display_name} Anniversaries`,
+            t("milestoneCalendars.anniversariesFallback", {
+              name: item.display_name,
+            }),
           )}
         </div>
       ) : null}

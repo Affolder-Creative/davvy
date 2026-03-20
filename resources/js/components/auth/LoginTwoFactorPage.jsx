@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { buildAuthStateFromPayload } from "./authStateMapper";
 
@@ -16,6 +17,7 @@ export default function LoginTwoFactorPage({
   AuthShell,
   Field,
 }) {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -68,7 +70,7 @@ export default function LoginTwoFactorPage({
       auth.setAuth(buildAuthStateFromPayload(data, { user: data.user }));
       navigate("/", { replace: true });
     } catch (err) {
-      setError(extractError(err, "Unable to verify authentication code."));
+      setError(extractError(err, t("twoFactor.errorVerify")));
     } finally {
       setSubmitting(false);
     }
@@ -78,14 +80,14 @@ export default function LoginTwoFactorPage({
     <AuthShell
       theme={theme}
       themeControlPlacement="window-bottom-right"
-      title="Two-Factor Verification"
-      subtitle="Enter your 6-digit authenticator code or a backup code."
+      title={t("twoFactor.title")}
+      subtitle={t("twoFactor.subtitle")}
     >
       {loading ? (
-        <p className="text-sm text-app-muted">Checking sign-in challenge...</p>
+        <p className="text-sm text-app-muted">{t("twoFactor.checking")}</p>
       ) : (
         <form className="space-y-4" onSubmit={submit}>
-          <Field label="Authenticator or backup code">
+          <Field label={t("twoFactor.codeLabel")}>
             <input
               className="input"
               value={code}
@@ -97,15 +99,15 @@ export default function LoginTwoFactorPage({
           </Field>
           {error ? <p className="text-sm text-app-danger">{error}</p> : null}
           <button className="btn w-full" disabled={submitting}>
-            {submitting ? "Verifying..." : "Verify & Sign In"}
+            {submitting ? t("twoFactor.submitting") : t("twoFactor.submit")}
           </button>
         </form>
       )}
 
       <p className="mt-5 text-sm text-app-muted">
-        Need to use different credentials?{" "}
+        {t("twoFactor.returnPrompt")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          Return to sign in
+          {t("twoFactor.returnLink")}
         </Link>
       </p>
     </AuthShell>

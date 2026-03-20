@@ -24,6 +24,9 @@ describe("authStateMapper", () => {
       twoFactorSetupRequired: false,
       twoFactorMandated: false,
       twoFactorGraceExpiresAt: null,
+      locale: "en",
+      supportedLocales: ["de", "en", "es", "fr"],
+      fallbackLocale: "en",
       sponsorship: {
         enabled: false,
         links: [],
@@ -46,6 +49,9 @@ describe("authStateMapper", () => {
       twoFactorSetupRequired: false,
       twoFactorMandated: false,
       twoFactorGraceExpiresAt: null,
+      locale: "en",
+      supportedLocales: ["de", "en", "es", "fr"],
+      fallbackLocale: "en",
       sponsorship: {
         enabled: false,
         links: [],
@@ -96,6 +102,9 @@ describe("authStateMapper", () => {
           two_factor_setup_required: false,
           two_factor_mandated: true,
           two_factor_grace_expires_at: "2026-03-20T00:00:00Z",
+          locale: "es-MX",
+          supported_locales: ["en", "es"],
+          fallback_locale: "en",
           sponsorship: {
             enabled: true,
             links: [{ name: "Sponsor", url: "https://example.com/sponsor" }],
@@ -119,6 +128,9 @@ describe("authStateMapper", () => {
       twoFactorSetupRequired: false,
       twoFactorMandated: true,
       twoFactorGraceExpiresAt: "2026-03-20T00:00:00Z",
+      locale: "es",
+      supportedLocales: ["en", "es"],
+      fallbackLocale: "en",
       sponsorship: {
         enabled: true,
         links: [{ name: "Sponsor", url: "https://example.com/sponsor" }],

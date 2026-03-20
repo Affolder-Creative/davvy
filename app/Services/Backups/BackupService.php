@@ -45,7 +45,7 @@ class BackupService
         if (! $force && ! $settings['enabled']) {
             return $this->skipResult(
                 trigger: $trigger,
-                reason: 'Backups are disabled.',
+                reason: __('backups.backups_are_disabled'),
                 nowUtc: $nowUtc,
                 nowLocal: $nowLocal,
                 timezone: $settings['timezone'],
@@ -56,7 +56,7 @@ class BackupService
         if (! $force && ! $this->isDueForSchedule($nowLocal, $settings['schedule_times'])) {
             return $this->skipResult(
                 trigger: $trigger,
-                reason: 'No backup window matches the current schedule minute.',
+                reason: __('backups.no_backup_window_matches_current_schedule_minute'),
                 nowUtc: $nowUtc,
                 nowLocal: $nowLocal,
                 timezone: $settings['timezone'],
@@ -67,7 +67,7 @@ class BackupService
         if (! $settings['local_enabled'] && ! $settings['s3_enabled']) {
             $result = $this->failedResult(
                 trigger: $trigger,
-                reason: 'No backup destinations are enabled.',
+                reason: __('backups.no_backup_destinations_enabled'),
                 nowUtc: $nowUtc,
                 nowLocal: $nowLocal,
                 timezone: $settings['timezone'],
@@ -81,7 +81,7 @@ class BackupService
         if (! $lock->get()) {
             return $this->skipResult(
                 trigger: $trigger,
-                reason: 'A backup run is already in progress.',
+                reason: __('backups.backup_run_already_in_progress'),
                 nowUtc: $nowUtc,
                 nowLocal: $nowLocal,
                 timezone: $settings['timezone'],
@@ -96,7 +96,7 @@ class BackupService
             if ($tiers === []) {
                 $result = $this->skipResult(
                     trigger: $trigger,
-                    reason: 'No backup tiers are currently due based on retention strategy.',
+                    reason: __('backups.no_backup_tiers_currently_due'),
                     nowUtc: $nowUtc,
                     nowLocal: $nowLocal,
                     timezone: $settings['timezone'],
@@ -116,7 +116,7 @@ class BackupService
             if ($tiers === []) {
                 $result = $this->skipResult(
                     trigger: $trigger,
-                    reason: 'All due backup periods were already captured.',
+                    reason: __('backups.all_due_backup_periods_already_captured'),
                     nowUtc: $nowUtc,
                     nowLocal: $nowLocal,
                     timezone: $settings['timezone'],
@@ -153,11 +153,10 @@ class BackupService
             $result = [
                 'status' => 'success',
                 'trigger' => $trigger,
-                'reason' => sprintf(
-                    'Created %d backup snapshot(s) for tier(s): %s.',
-                    count($artifacts),
-                    implode(', ', array_keys($tiers))
-                ),
+                'reason' => __('backups.created_backup_snapshots_for_tiers', [
+                    'count' => count($artifacts),
+                    'tiers' => implode(', ', array_keys($tiers)),
+                ]),
                 'timezone' => $settings['timezone'],
                 'executed_at_utc' => $nowUtc->toIso8601String(),
                 'executed_at_local' => $nowLocal->toIso8601String(),
@@ -175,7 +174,7 @@ class BackupService
 
             $result = $this->failedResult(
                 trigger: $trigger,
-                reason: 'Backup failed: '.$throwable->getMessage(),
+                reason: __('backups.backup_failed_reason', ['reason' => $throwable->getMessage()]),
                 nowUtc: $nowUtc,
                 nowLocal: $nowLocal,
                 timezone: $settings['timezone'],
@@ -267,14 +266,14 @@ class BackupService
         $tmpPath = tempnam(sys_get_temp_dir(), 'davvy-backup-');
 
         if ($tmpPath === false) {
-            throw new RuntimeException('Unable to create temporary backup archive.');
+            throw new RuntimeException(__('backups.unable_to_create_temporary_backup_archive'));
         }
 
         $zip = new ZipArchive;
         $opened = $zip->open($tmpPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
         if ($opened !== true) {
             @unlink($tmpPath);
-            throw new RuntimeException('Unable to open backup archive for writing.');
+            throw new RuntimeException(__('backups.unable_to_open_backup_archive_for_writing'));
         }
 
         $calendarCount = 0;
@@ -319,7 +318,7 @@ class BackupService
         }
 
         if ($calendarCount === 0) {
-            $zip->addFromString('calendars/README.txt', "No calendar data was available.\n");
+            $zip->addFromString('calendars/README.txt', __('backups.no_calendar_data_available')."\n");
         }
 
         $addressBooks = AddressBook::query()
@@ -357,7 +356,7 @@ class BackupService
         }
 
         if ($addressBookCount === 0) {
-            $zip->addFromString('address-books/README.txt', "No address-book data was available.\n");
+            $zip->addFromString('address-books/README.txt', __('backups.no_address_book_data_available')."\n");
         }
 
         $manifest = [
@@ -463,7 +462,7 @@ class BackupService
     {
         $root = rtrim($localRoot, '/\\');
         if ($root === '') {
-            throw new RuntimeException('Backup local path is empty.');
+            throw new RuntimeException(__('backups.backup_local_path_is_empty'));
         }
 
         $tierDirectory = $root.DIRECTORY_SEPARATOR.$tier;
@@ -471,7 +470,7 @@ class BackupService
 
         $targetPath = $tierDirectory.DIRECTORY_SEPARATOR.$fileName;
         if (! copy($archivePath, $targetPath)) {
-            throw new RuntimeException('Unable to write local backup snapshot: '.$targetPath);
+            throw new RuntimeException(__('backups.unable_to_write_local_backup_snapshot', ['path' => $targetPath]));
         }
 
         return $targetPath;
@@ -492,14 +491,14 @@ class BackupService
         $stream = fopen($archivePath, 'rb');
 
         if ($stream === false) {
-            throw new RuntimeException('Unable to open backup archive stream for remote upload.');
+            throw new RuntimeException(__('backups.unable_to_open_backup_archive_stream_for_remote_upload'));
         }
 
         try {
             $written = Storage::disk($diskName)->put($remotePath, $stream);
             if ($written === false) {
                 throw new RuntimeException(
-                    sprintf('Unable to write remote backup snapshot to disk "%s".', $diskName)
+                    __('backups.unable_to_write_remote_backup_snapshot_to_disk', ['disk' => $diskName])
                 );
             }
         } finally {

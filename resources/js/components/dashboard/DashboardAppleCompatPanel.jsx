@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Dashboard Apple Compat Panel.
@@ -13,25 +14,30 @@ export default function DashboardAppleCompatPanel({
   canSelectAppleCompatSources,
   onSaveAppleCompat,
 }) {
+  const { t } = useTranslation("dashboard");
+
   return (
     <section className="surface mt-6 rounded-3xl p-6">
       <h2 className="text-xl font-semibold text-app-strong">
-        Apple Contacts Compatibility
+        {t("appleCompat.title")}
       </h2>
       <p className="mt-1 text-sm text-app-muted">
-        Off by default. Mirror selected address books into your main address
-        book (<code>{appleCompat.target_display_name}</code>) so macOS and iOS
-        clients can see them.
+        {t("appleCompat.subtitle", {
+          target: appleCompat.target_display_name,
+        })}{" "}
+        (<code>{appleCompat.target_display_name}</code>)
       </p>
 
       {appleCompat.target_address_book_id ? (
         <p className="mt-2 text-xs text-app-faint">
-          Mirror target: {appleCompat.target_display_name} (/
-          {appleCompat.target_address_book_uri})
+          {t("appleCompat.target", {
+            name: appleCompat.target_display_name,
+            uri: appleCompat.target_address_book_uri,
+          })}
         </p>
       ) : (
         <p className="mt-2 text-xs text-app-danger">
-          No default Contacts address book found for your account.
+          {t("appleCompat.missingTarget")}
         </p>
       )}
 
@@ -48,16 +54,16 @@ export default function DashboardAppleCompatPanel({
             }
             disabled={!appleCompat.target_address_book_id}
           />
-          Enable Apple compatibility mirroring
+          {t("appleCompat.enable")}
         </label>
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-app-strong">
-            Source address books to mirror
+            {t("appleCompat.sourcesTitle")}
           </p>
           {appleCompat.source_options.length === 0 ? (
             <p className="text-sm text-app-faint">
-              No eligible owned/shared address books available.
+              {t("appleCompat.noSources")}
             </p>
           ) : (
             appleCompat.source_options.map((option) => {
@@ -100,7 +106,10 @@ export default function DashboardAppleCompatPanel({
                       {option.display_name}
                     </span>
                     <span className="block text-xs text-app-faint">
-                      {option.scope === "owned" ? "Owned" : "Shared"} •{" "}
+                      {option.scope === "owned"
+                        ? t("resourcePanel.scope.owned")
+                        : t("resourcePanel.scope.shared")}{" "}
+                      •{" "}
                       {option.owner_name} ({option.owner_email})
                     </span>
                   </span>
@@ -116,7 +125,7 @@ export default function DashboardAppleCompatPanel({
             type="submit"
             disabled={!appleCompat.target_address_book_id}
           >
-            Save Apple Compatibility Settings
+            {t("appleCompat.save")}
           </button>
         </div>
       </form>

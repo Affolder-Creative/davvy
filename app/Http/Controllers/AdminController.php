@@ -84,6 +84,7 @@ class AdminController extends Controller
             'email' => $data['email'],
             'password' => Str::random(48),
             'role' => Role::from($data['role']),
+            'locale' => app()->getLocale(),
             'email_verified_at' => null,
             'is_approved' => true,
             'approved_at' => now(),
@@ -123,11 +124,11 @@ class AdminController extends Controller
         $actorEmail = Str::lower(trim((string) ($actor?->email ?? '')));
         $confirmationEmail = Str::lower(trim((string) $data['confirmation_email']));
         if ($confirmationEmail !== $actorEmail) {
-            abort(422, 'Type your account email to confirm this deletion.');
+            abort(422, __('admin.type_account_email_to_confirm_deletion'));
         }
 
         if ($actor && (int) $actor->id === (int) $user->id) {
-            abort(422, 'You cannot delete your own account.');
+            abort(422, __('admin.cannot_delete_own_account'));
         }
 
         if ($user->isAdmin()) {
@@ -137,7 +138,7 @@ class AdminController extends Controller
                 ->count();
 
             if ($remainingAdminCount === 0) {
-                abort(422, 'You cannot delete the last admin account.');
+                abort(422, __('admin.cannot_delete_last_admin_account'));
             }
         }
 
@@ -146,7 +147,7 @@ class AdminController extends Controller
             : null;
 
         if ($transferOwnerId !== null && $transferOwnerId === (int) $user->id) {
-            abort(422, 'Select a different account for ownership transfer.');
+            abort(422, __('admin.select_different_transfer_owner'));
         }
 
         $result = $this->userDeletionService->deleteUser(
@@ -347,7 +348,7 @@ class AdminController extends Controller
                 || ! Schema::hasTable('contact_address_book_assignments')
             )
         ) {
-            abort(422, 'Contact management schema is not available. Run migrations before enabling.');
+            abort(422, __('admin.contact_management_schema_missing'));
         }
 
         $this->registrationSettings->setContactManagementEnabled(
@@ -375,7 +376,7 @@ class AdminController extends Controller
             $enabled
             && ! Schema::hasTable('contact_change_requests')
         ) {
-            abort(422, 'Contact change moderation schema is not available. Run migrations before enabling.');
+            abort(422, __('admin.contact_change_moderation_schema_missing'));
         }
 
         if (! $enabled && Schema::hasTable('contact_change_requests')) {
@@ -390,7 +391,7 @@ class AdminController extends Controller
             if ($unresolvedCount > 0) {
                 abort(
                     422,
-                    "Resolve or deny {$unresolvedCount} unresolved review queue request(s) before disabling moderation."
+                    __('admin.resolve_or_deny_unresolved_queue_before_disabling', ['count' => $unresolvedCount])
                 );
             }
         }
@@ -560,7 +561,7 @@ class AdminController extends Controller
         ]);
 
         if ((bool) $data['enabled'] && ! (bool) $data['local_enabled'] && ! (bool) $data['s3_enabled']) {
-            abort(422, 'Enable at least one destination (local or S3) when backups are enabled.');
+            abort(422, __('backups.enable_at_least_one_destination'));
         }
 
         if (
@@ -569,7 +570,7 @@ class AdminController extends Controller
             && (int) $data['retention_monthly'] === 0
             && (int) $data['retention_yearly'] === 0
         ) {
-            abort(422, 'At least one retention tier must be greater than zero.');
+            abort(422, __('backups.at_least_one_retention_tier_gt_zero'));
         }
 
         return response()->json($this->backupSettings->update($data, $request->user()));
@@ -607,12 +608,12 @@ class AdminController extends Controller
 
         $archive = $request->file('backup');
         if (! $archive || ! $archive->isValid()) {
-            abort(422, 'Backup archive upload is missing or invalid.');
+            abort(422, __('backups.archive_upload_missing_or_invalid'));
         }
 
         $archivePath = $archive->getRealPath();
         if (! is_string($archivePath) || $archivePath === '') {
-            abort(422, 'Unable to access uploaded backup archive.');
+            abort(422, __('backups.unable_to_access_uploaded_archive'));
         }
 
         $mode = (string) ($data['mode'] ?? 'merge');
@@ -635,7 +636,7 @@ class AdminController extends Controller
 
             return response()->json([
                 'status' => 'failed',
-                'reason' => 'Backup restore failed: '.$throwable->getMessage(),
+                'reason' => __('backups.restore_failed_reason', ['reason' => $throwable->getMessage()]),
             ], 422);
         }
 

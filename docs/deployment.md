@@ -26,6 +26,9 @@ Minimum production variables:
 - `APP_DEBUG=false`
 - `APP_KEY` (unique secret, not the local compose dev key)
 - `APP_URL`
+- `APP_LOCALE`
+- `APP_FALLBACK_LOCALE`
+- `APP_SUPPORTED_LOCALES`
 - `DB_CONNECTION=pgsql`
 - `DB_HOST`
 - `DB_PORT`
@@ -40,6 +43,9 @@ Common Davvy feature/runtime vars:
 - `ENABLE_DAV_COMPATIBILITY_MODE`
 - `ENABLE_CONTACT_MANAGEMENT`
 - `ENABLE_CONTACT_CHANGE_MODERATION`
+- `APP_LOCALE`
+- `APP_FALLBACK_LOCALE`
+- `APP_SUPPORTED_LOCALES`
 - `CONTACT_CHANGE_REQUEST_RETENTION_DAYS`
 - `ENABLE_AUTOMATED_BACKUPS`
 - `BACKUPS_LOCAL_ENABLED`
@@ -156,4 +162,5 @@ Expected cache behavior:
 - [Release Checklist (Core)](./release-checklist-core.md)
 - [Release Checklist (Railway)](./release-checklist.md)
 - [Release Checklist (Coolify)](./release-checklist-coolify.md)
+- [Localization Guide](./localization.md)
 - [Troubleshooting](./troubleshooting.md)

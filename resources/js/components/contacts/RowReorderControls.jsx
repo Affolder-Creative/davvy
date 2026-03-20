@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * Renders the Row Reorder Controls component.
@@ -21,8 +22,10 @@ export default function RowReorderControls({
   showHandle = true,
   showActions = true,
 }) {
+  const { t } = useTranslation("contacts");
   const canMoveUp = rowIndex > 0;
   const canMoveDown = rowIndex < rowCount - 1;
+  const rowNumber = rowIndex + 1;
   const iconControlClass =
     "btn-outline btn-outline-sm !h-8 !w-8 !px-0 !py-0 hidden group-hover/row:inline-flex group-focus-within/row:inline-flex";
 
@@ -35,8 +38,11 @@ export default function RowReorderControls({
             type="button"
             onClick={() => onMoveUp(rowIndex)}
             disabled={!canMoveUp}
-            aria-label={`Move ${rowLabel} ${rowIndex + 1} up`}
-            title="Move up"
+            aria-label={t("editor.rowReorderControls.moveUpAria", {
+              rowLabel,
+              rowNumber,
+            })}
+            title={t("editor.rowReorderControls.moveUp")}
           >
             <svg
               className="h-3.5 w-3.5"
@@ -56,8 +62,11 @@ export default function RowReorderControls({
             type="button"
             onClick={() => onMoveDown(rowIndex)}
             disabled={!canMoveDown}
-            aria-label={`Move ${rowLabel} ${rowIndex + 1} down`}
-            title="Move down"
+            aria-label={t("editor.rowReorderControls.moveDownAria", {
+              rowLabel,
+              rowNumber,
+            })}
+            title={t("editor.rowReorderControls.moveDown")}
           >
             <svg
               className="h-3.5 w-3.5"
@@ -76,9 +85,12 @@ export default function RowReorderControls({
             className="btn-outline btn-outline-sm"
             type="button"
             onClick={() => onRemove(rowIndex)}
-            aria-label={`Remove ${rowLabel} ${rowIndex + 1}`}
+            aria-label={t("editor.rowReorderControls.removeAria", {
+              rowLabel,
+              rowNumber,
+            })}
           >
-            Remove
+            {t("editor.rowReorderControls.remove")}
           </button>
         </>
       ) : null}
@@ -86,8 +98,11 @@ export default function RowReorderControls({
         <button
           className="inline-flex h-7 w-7 cursor-grab touch-none items-center justify-center rounded-lg bg-transparent text-app-faint transition hover:text-app-accent active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-300"
           type="button"
-          aria-label={`Drag to reorder ${rowLabel} ${rowIndex + 1}`}
-          title="Drag to reorder"
+          aria-label={t("editor.rowReorderControls.dragAria", {
+            rowLabel,
+            rowNumber,
+          })}
+          title={t("editor.rowReorderControls.dragTitle")}
           data-reorder-group={rowGroup}
           onPointerDown={(event) => onDragStart(rowIndex, event)}
           onPointerMove={onDragMove}

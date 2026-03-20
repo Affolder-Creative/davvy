@@ -25,7 +25,7 @@ class ThrottleDavAuthentication
             $retryAfterSeconds = max(1, RateLimiter::availableIn($throttleKey));
 
             return response(
-                content: 'Too many DAV authentication attempts. Please try again later.',
+                content: __('dav.too_many_authentication_attempts_try_again_later'),
                 status: 429,
                 headers: [
                     'Retry-After' => (string) $retryAfterSeconds,

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { buildAuthStateFromPayload } from "./authStateMapper";
 
@@ -9,12 +10,13 @@ export default function VerifyEmailPage({
   extractError,
   AuthShell,
 }) {
+  const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") || "";
   const [status, setStatus] = useState(token ? "verifying" : "error");
   const [message, setMessage] = useState(
-    token ? "Verifying your email address..." : "Verification token is missing.",
+    token ? t("verifyEmail.verifying") : t("verifyEmail.missingToken"),
   );
 
   if (auth.user) {
@@ -46,7 +48,7 @@ export default function VerifyEmailPage({
 
         setStatus("success");
         setMessage(
-          data?.message || "Email verified. You can now sign in to continue.",
+          data?.message || t("verifyEmail.success"),
         );
       } catch (err) {
         if (!active) {
@@ -55,7 +57,7 @@ export default function VerifyEmailPage({
 
         setStatus("error");
         setMessage(
-          extractError(err, "Unable to verify this email link. Request a new one."),
+          extractError(err, t("verifyEmail.error")),
         );
       }
     };
@@ -71,8 +73,8 @@ export default function VerifyEmailPage({
     <AuthShell
       theme={theme}
       themeControlPlacement="window-bottom-right"
-      title="Verify Email"
-      subtitle="One moment while we confirm your email address."
+      title={t("verifyEmail.title")}
+      subtitle={t("verifyEmail.subtitle")}
     >
       <p
         className={
@@ -84,9 +86,9 @@ export default function VerifyEmailPage({
         {message}
       </p>
       <p className="mt-5 text-sm text-app-muted">
-        Return to{" "}
+        {t("verifyEmail.returnTo")}{" "}
         <Link to="/login" className="font-semibold text-app-accent">
-          Sign in
+          {t("verifyEmail.signIn")}
         </Link>
       </p>
     </AuthShell>

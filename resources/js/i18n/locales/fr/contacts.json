@@ -1,0 +1,286 @@
+{
+  "summary": {
+    "contactsTitle": "Contacts",
+    "contactsHelper": "Contacts gérés dans cette interface web.",
+    "booksTitle": "Carnets modifiables",
+    "booksHelper": "Carnets d’adresses où vous pouvez ajouter ou modifier des contacts.",
+    "userTitle": "Utilisateur",
+    "userHelper": "La propriété des contacts est limitée à votre compte."
+  },
+  "mobile": {
+    "viewAria": "Vue mobile des contacts",
+    "contacts": "Contacts",
+    "editorEdit": "Modifier",
+    "editorNewEdit": "Nouveau/Modifier"
+  },
+  "filters": {
+    "clear": "Effacer les filtres"
+  },
+  "sidebar": {
+    "title": "Contacts",
+    "new": "Nouveau",
+    "searchPlaceholder": "Rechercher des contacts...",
+    "filterAllOption": "Tous les carnets d’adresses",
+    "clearFilters": "Effacer",
+    "noContacts": "Aucun contact pour le moment.",
+    "noContactsMatchFilter": "Aucun contact ne correspond à ce filtre.",
+    "matchCount_one": "{{count}} correspondance",
+    "matchCount_other": "{{count}} correspondances",
+    "addressBookCount": "{{count}} carnet d’adresses{{plural}}",
+    "page": "Page {{current}} / {{total}}",
+    "prevPage": "Préc.",
+    "nextPage": "Suiv."
+  },
+  "fieldLabels": {
+    "pronouns": {
+      "notSet": "Non défini",
+      "sheHer": "elle",
+      "heHim": "il",
+      "theyThem": "iel",
+      "xeXem": "xe/xem",
+      "custom": "Personnalisé..."
+    },
+    "phone": {
+      "mobile": "Mobile",
+      "iphone": "iPhone",
+      "appleWatch": "Apple Watch",
+      "home": "Domicile",
+      "work": "Travail",
+      "main": "Principal",
+      "homeFax": "Fax domicile",
+      "workFax": "Fax travail",
+      "otherFax": "Autre fax",
+      "pager": "Bipeur",
+      "other": "Autre",
+      "custom": "Personnalisé..."
+    },
+    "email": {
+      "home": "Domicile",
+      "work": "Travail",
+      "other": "Autre",
+      "custom": "Personnalisé..."
+    },
+    "url": {
+      "homepage": "Page d’accueil",
+      "home": "Domicile",
+      "work": "Travail",
+      "other": "Autre",
+      "custom": "Personnalisé..."
+    },
+    "address": {
+      "home": "Domicile",
+      "work": "Travail",
+      "school": "École",
+      "other": "Autre",
+      "custom": "Personnalisé..."
+    },
+    "date": {
+      "anniversary": "Anniversaire",
+      "other": "Autre",
+      "custom": "Personnalisé..."
+    },
+    "related": {
+      "spouse": "Conjoint",
+      "partner": "Partenaire",
+      "parent": "Parent",
+      "child": "Enfant",
+      "sibling": "Frère/Sœur",
+      "assistant": "Assistant",
+      "friend": "Ami",
+      "other": "Autre",
+      "custom": "Personnalisé..."
+    },
+    "relatedDerived": {
+      "parentInLaw": "Beau-parent",
+      "fatherInLaw": "Beau-père",
+      "motherInLaw": "Belle-mère",
+      "childInLaw": "Bel-enfant",
+      "sonInLaw": "Beau-fils",
+      "daughterInLaw": "Belle-fille",
+      "siblingInLaw": "Beau-frère/Belle-sœur",
+      "brotherInLaw": "Beau-frère",
+      "sisterInLaw": "Belle-sœur",
+      "auntUncle": "Tante/Oncle",
+      "nieceNephew": "Nièce/Neveu",
+      "grandpa": "Grand-père",
+      "grandma": "Grand-mère"
+    },
+    "im": {
+      "home": "Domicile",
+      "work": "Travail",
+      "other": "Autre",
+      "custom": "Personnalisé..."
+    }
+  },
+  "editor": {
+    "new": "Nouveau contact",
+    "edit": "Modifier le contact",
+    "description": "Saisissez au moins un prénom, un nom ou une entreprise. L’attribution à un carnet d’adresses prend en charge une ou plusieurs sélections.",
+    "delete": "Supprimer",
+    "save": "Enregistrer le contact",
+    "saving": "Enregistrement...",
+    "noAddressBooks": "Vous n’avez actuellement aucun accès en écriture à des carnets d’adresses.",
+    "nameSection": {
+      "label": "Nom",
+      "description": "Champs d’identité de base et de prononciation phonétique.",
+      "field": {
+        "prefix": "Préfixe",
+        "first": "Prénom",
+        "middle": "Deuxième prénom",
+        "last": "Nom",
+        "suffix": "Suffixe",
+        "nickname": "Surnom",
+        "maidenName": "Nom de jeune fille",
+        "phoneticFirstName": "Prénom phonétique",
+        "phoneticLastName": "Nom phonétique"
+      }
+    },
+    "workSection": {
+      "label": "Travail",
+      "description": "Détails sur l’entreprise et le poste.",
+      "field": {
+        "company": "Entreprise",
+        "phoneticCompany": "Entreprise phonétique",
+        "jobTitle": "Poste",
+        "department": "Service"
+      }
+    },
+    "personalSection": {
+      "label": "Personnel",
+      "description": "Informations personnelles.",
+      "field": {
+        "pronouns": "Pronoms",
+        "pronounsCustom": "Pronoms personnalisés",
+        "pronounsCustomPlaceholder": "Valeur personnalisée facultative",
+        "ringtone": "Sonnerie",
+        "textTone": "Son du message",
+        "verificationCode": "Code de vérification",
+        "profile": "Profil",
+        "householdLabel": "Foyer",
+        "headOfHousehold": "Chef de foyer"
+      },
+      "milestonesDates": {
+        "label": "Événements marquants et dates",
+        "description": "Date de naissance, dates importantes et comportement du calendrier.",
+        "birthday": "Date de naissance",
+        "month": "Mois",
+        "monthPlaceholder": "MM",
+        "day": "Jour",
+        "dayPlaceholder": "JJ",
+        "year": "Année",
+        "yearPlaceholder": "AAAA",
+        "calendarBehavior": "Comportement du calendrier",
+        "excludeFromMilestoneCalendars": "Exclure des calendriers d’événements marquants",
+        "excludeFromMilestoneCalendarsDescription": "Ignorer les événements d’anniversaire et de commémoration pour ce contact dans les calendriers d’événements marquants générés."
+      }
+    },
+    "communicationSection": {
+      "label": "Communication",
+      "description": "Moyens de contact et adresses.",
+      "field": {
+        "phone": {
+          "title": "Téléphone",
+          "placeholder": "Numéro de téléphone",
+          "addLabel": "Ajouter un téléphone"
+        },
+        "email": {
+          "title": "E-mail",
+          "placeholder": "Adresse e-mail",
+          "addLabel": "Ajouter un e-mail"
+        },
+        "address": {
+          "title": "Adresse"
+        },
+        "url": {
+          "title": "URL",
+          "placeholder": "https://example.com",
+          "addLabel": "Ajouter une URL"
+        },
+        "instantMessage": {
+          "title": "Messagerie instantanée",
+          "placeholder": "im:username@example.com",
+          "addLabel": "Ajouter une IM"
+        }
+      }
+    },
+    "optionalFieldSection": {
+      "label": "Ajouter un champ facultatif",
+      "description": "Personnalisez ce formulaire selon vos besoins",
+      "allAdded": "Tous les champs facultatifs ont été ajoutés",
+      "search": "Rechercher des champs facultatifs...",
+      "noMatching": "Aucun champ facultatif correspondant.",
+      "addField": "Ajouter un champ",
+      "hiddenByDefault": "Les champs facultatifs sont masqués par défaut.",
+      "hideField": "Masquer {{pendingHideFieldLabel}}"
+    },
+    "hideFieldModal": {
+      "title": "Masquer {{pendingHideFieldLabel}} ?",
+      "description": "Ce champ contient actuellement des données. Conservez la valeur masquée ou effacez-la avant de masquer le champ.",
+      "cancel": "Annuler",
+      "keepHiddenValue": "Conserver la valeur masquée",
+      "clearAndHide": "Effacer et masquer"
+    },
+    "addressBooksSection": {
+      "label": "Carnets d’adresses",
+      "description": "Choisissez où ce contact sera stocké.",
+      "required": "Obligatoire",
+      "totalSelected": "{{count}} sélectionné(s)",
+      "hint": "Choisissez un ou plusieurs carnets d’adresses pour ce contact.",
+      "noAddressBooks": "Aucun carnet d’adresses modifiable.",
+      "selected": "Sélectionné",
+      "owned": "Appartient à l’utilisateur",
+      "shared": "Partagé"
+    },
+    "addressEditor": {
+      "title": "Adresse",
+      "address": "Adresse",
+      "addAddress": "Ajouter une adresse",
+      "noAddresses": "Aucune adresse.",
+      "streetPlaceholder": "Rue",
+      "cityPlaceholder": "Ville",
+      "statePlaceholder": "État / Région",
+      "zipPlaceholder": "Code postal",
+      "countryPlaceholder": "Pays",
+      "customLabelPlaceholder": "Libellé personnalisé"
+    },
+    "dateEditor": {
+      "title": "Date",
+      "addDate": "Ajouter une date",
+      "noDates": "Aucune date.",
+      "monthPlaceholder": "MM",
+      "dayPlaceholder": "JJ",
+      "yearPlaceholder": "AAAA",
+      "remove": "Supprimer",
+      "customLabelPlaceholder": "Libellé personnalisé"
+    },
+    "labeledValueEditor": {
+      "customLabelPlaceholder": "Libellé personnalisé",
+      "noEntries": "Aucune entrée."
+    },
+    "relatedNameEditor": {
+      "title": "Nom lié",
+      "addRelatedName": "Ajouter un nom lié",
+      "noRelatedNames": "Aucun nom lié.",
+      "namePlaceholder": "Nom",
+      "noMatchingContacts": "Aucun contact correspondant. Continuez à saisir pour utiliser un nom personnalisé.",
+      "linkedToContact": "Lié au contact #{{contactId}}.",
+      "matchFound": "Correspondance trouvée : {{name}}",
+      "link": "Lier",
+      "dismiss": "Ignorer",
+      "customLabelPlaceholder": "Libellé personnalisé"
+    },
+    "rowReorderControls": {
+      "moveUpAria": "Déplacer {{rowLabel}} {{rowNumber}} vers le haut",
+      "moveUp": "Monter",
+      "moveDownAria": "Déplacer {{rowLabel}} {{rowNumber}} vers le bas",
+      "moveDown": "Descendre",
+      "removeAria": "Supprimer {{rowLabel}} {{rowNumber}}",
+      "remove": "Supprimer",
+      "dragAria": "Faire glisser pour réorganiser {{rowLabel}} {{rowNumber}}",
+      "dragTitle": "Faire glisser pour réorganiser"
+    }
+  },
+  "states": {
+    "loading": "Chargement des contacts..."
+  }
+}
