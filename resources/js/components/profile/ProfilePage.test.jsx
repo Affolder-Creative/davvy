@@ -262,4 +262,33 @@ describe("ProfilePage", () => {
     await waitFor(() => expect(setAuth).toHaveBeenCalledTimes(1));
     expect(screen.getByText("Language updated.")).toBeInTheDocument();
   });
+
+  it("renders locale options from auth.supportedLocales", () => {
+    const props = buildProps({
+      auth: {
+        user: {
+          name: "Admin User",
+          email: "admin@example.com",
+          role: "admin",
+        },
+        twoFactorEnabled: false,
+        locale: "es",
+        supportedLocales: ["en", "es"],
+        fallbackLocale: "en",
+        setAuth: vi.fn(),
+        refreshAuth: vi.fn().mockResolvedValue(undefined),
+      },
+    });
+
+    render(<ProfilePage {...props} />);
+
+    const languageSelect = screen.getByRole("combobox");
+    const optionLabels = Array.from(languageSelect.options).map(
+      (option) => option.textContent,
+    );
+
+    expect(optionLabels).toEqual(["English", "Español"]);
+    expect(screen.queryByRole("option", { name: "Deutsch" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "Français" })).not.toBeInTheDocument();
+  });
 });

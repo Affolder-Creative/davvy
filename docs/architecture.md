@@ -104,6 +104,15 @@ Runtime toggles are read from `app_settings` (with env defaults if unset):
 - Strict mode is default.
 - Compatibility mode loosens strict RFC requirements for legacy clients.
 
+### Localization and Locale Negotiation
+- Locale is resolved per request in middleware with this order:
+  - authenticated user's stored locale
+  - explicit request locale (`?locale=...`, `X-Davvy-Locale`, `X-Locale`)
+  - `Accept-Language`
+  - configured fallback locale
+- Locale metadata (`locale`, `supported_locales`, `fallback_locale`) is returned in auth/public config payloads.
+- Web UI language changes update both i18n language and API locale header (`X-Davvy-Locale`).
+
 ### Contact <-> Card Sync
 - Web contact writes generate/update/delete underlying cards.
 - CardDAV writes can hydrate/update managed contact payloads.

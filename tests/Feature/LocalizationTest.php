@@ -76,6 +76,33 @@ class LocalizationTest extends TestCase
         $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr']);
     }
 
+    public function test_login_response_includes_locale_payload(): void
+    {
+        User::factory()->create([
+            'email' => 'locale-login@example.test',
+            'password' => 'password1234',
+            'locale' => 'es',
+        ]);
+
+        $response = $this->withHeaders([
+            'X-Davvy-Locale' => 'fr',
+        ])->postJson('/api/auth/login', [
+            'email' => 'locale-login@example.test',
+            'password' => 'password1234',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('locale', 'fr');
+        $response->assertJsonPath('fallback_locale', 'en');
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr']);
+        $response->assertJsonStructure([
+            'user',
+            'locale',
+            'supported_locales',
+            'fallback_locale',
+        ]);
+    }
+
     public function test_authenticated_user_can_update_locale_and_receive_updated_payload(): void
     {
         $user = User::factory()->create([
@@ -98,6 +125,54 @@ class LocalizationTest extends TestCase
             'id' => $user->id,
             'locale' => 'de',
         ]);
+    }
+
+    public function test_locale_update_rejects_unsupported_locale(): void
+    {
+        $user = User::factory()->create([
+            'locale' => 'en',
+        ]);
+
+        $response = $this->actingAs($user)
+            ->patchJson('/api/auth/locale', [
+                'locale' => 'it',
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['locale']);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'locale' => 'en',
+        ]);
+    }
+
+    public function test_supported_locales_are_normalized_from_config(): void
+    {
+        config()->set('app.supported_locales', [' EN ', 'es', '', 'de', 'EN', 'fr ']);
+
+        $response = $this->getJson('/api/public/config');
+
+        $response->assertOk();
+        $response->assertJsonPath('supported_locales', ['en', 'es', 'de', 'fr']);
+        $response->assertJsonPath('fallback_locale', 'en');
+        $response->assertJsonPath('locale', 'en');
+    }
+
+    public function test_fallback_locale_is_used_when_candidate_is_unsupported(): void
+    {
+        config()->set('app.fallback_locale', 'fr');
+        config()->set('app.supported_locales', ['de', 'en', 'fr']);
+
+        $response = $this->json('GET', '/api/public/config?locale=it', [], [
+            'X-Davvy-Locale' => 'pt-BR',
+            'Accept-Language' => 'es-MX,es;q=0.9',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('locale', 'fr');
+        $response->assertJsonPath('fallback_locale', 'fr');
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'fr']);
     }
 
     public function test_login_validation_error_message_localizes_to_request_locale(): void

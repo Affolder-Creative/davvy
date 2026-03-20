@@ -14,6 +14,16 @@ Davvy's web API is served from Laravel web routes (`routes/web.php`) and primari
   - HTTP Basic auth
   - default: email + account password
   - when 2FA is enabled (or mandated and grace expired): email + DAV app password
+- Locale negotiation:
+  - order: authenticated user locale -> explicit request locale -> `Accept-Language` -> fallback locale
+  - explicit request locale sources:
+    - query `locale=...`
+    - `X-Davvy-Locale` header
+    - `X-Locale` header
+  - locale response fields:
+    - `locale`
+    - `supported_locales`
+    - `fallback_locale`
 - Common response codes:
   - `200` success
   - `201` created
@@ -35,6 +45,10 @@ Request body:
 
 Response:
 - `user`
+- locale payload:
+  - `locale`
+  - `supported_locales`
+  - `fallback_locale`
 - feature flags:
   - `registration_enabled`
   - `registration_approval_required`
@@ -89,6 +103,10 @@ Response includes:
 - `contact_change_moderation_enabled`
 - `two_factor_enforcement_enabled`
 - `two_factor_grace_period_days`
+- locale payload:
+  - `locale`
+  - `supported_locales`
+  - `fallback_locale`
 
 ## Authenticated Endpoints
 
@@ -96,6 +114,13 @@ Response includes:
 
 #### `GET /api/auth/me`
 Current user + current feature flags.
+
+Includes:
+- `user`
+- locale payload:
+  - `locale`
+  - `supported_locales`
+  - `fallback_locale`
 
 #### `POST /api/auth/logout`
 Destroy current session.
@@ -109,6 +134,20 @@ Request body:
 - `password_confirmation` (required)
 
 Rate limited.
+
+#### `PATCH /api/auth/locale`
+Update the current user's preferred locale.
+
+Request body:
+- `locale` (required, must be one of `supported_locales`)
+
+Response includes:
+- `ok`
+- `user` (with updated `user.locale`)
+- locale payload:
+  - `locale`
+  - `supported_locales`
+  - `fallback_locale`
 
 #### `GET /api/auth/2fa`
 Current 2FA status for signed-in user.

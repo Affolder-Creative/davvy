@@ -30,6 +30,7 @@ It is designed for:
 - Session-based web auth (`/api/auth/*`)
 - Optional TOTP two-factor auth with backup codes
 - Optional org-wide 2FA enforcement with grace period
+- Localization support with per-user language preference and request-level locale negotiation
 - DAV basic auth at `/dav`
 - DAV app passwords for CalDAV/CardDAV clients when 2FA is enabled
 - Roles: `admin`, `regular`
@@ -84,6 +85,7 @@ It is designed for:
 - [DAV Client Setup](docs/clients.md)
 - [Architecture](docs/architecture.md)
 - [Configuration Reference](docs/configuration.md)
+- [Localization Guide](docs/localization.md)
 - [Deployment Guide](docs/deployment.md)
 - [Release Checklist (Core)](docs/release-checklist-core.md)
 - [Troubleshooting](docs/troubleshooting.md)
