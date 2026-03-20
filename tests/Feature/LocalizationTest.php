@@ -20,7 +20,7 @@ class LocalizationTest extends TestCase
 
         config()->set('app.locale', 'en');
         config()->set('app.fallback_locale', 'en');
-        config()->set('app.supported_locales', ['de', 'en', 'es', 'fr', 'ja']);
+        config()->set('app.supported_locales', ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'zh']);
     }
 
     public function test_public_locale_negotiation_honors_query_then_header_then_accept_language_then_fallback(): void
@@ -49,13 +49,13 @@ class LocalizationTest extends TestCase
         $acceptLanguageResponse->assertJsonPath('locale', 'fr');
 
         $fallbackResponse = $this->json('GET', '/api/public/config', [], [
-            'Accept-Language' => 'it-IT,it;q=0.9',
+            'Accept-Language' => 'nl-NL,nl;q=0.9',
         ]);
 
         $fallbackResponse->assertOk();
         $fallbackResponse->assertJsonPath('locale', 'en');
         $fallbackResponse->assertJsonPath('fallback_locale', 'en');
-        $fallbackResponse->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'ja']);
+        $fallbackResponse->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'zh']);
     }
 
     public function test_authenticated_user_locale_takes_precedence_over_request_locale_inputs(): void
@@ -74,7 +74,7 @@ class LocalizationTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('locale', 'es');
         $response->assertJsonPath('fallback_locale', 'en');
-        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'ja']);
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'zh']);
     }
 
     public function test_login_response_includes_locale_payload(): void
@@ -95,7 +95,7 @@ class LocalizationTest extends TestCase
         $response->assertOk();
         $response->assertJsonPath('locale', 'fr');
         $response->assertJsonPath('fallback_locale', 'en');
-        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'ja']);
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'zh']);
         $response->assertJsonStructure([
             'user',
             'locale',
@@ -119,7 +119,7 @@ class LocalizationTest extends TestCase
         $response->assertJsonPath('ok', true);
         $response->assertJsonPath('locale', 'de');
         $response->assertJsonPath('user.locale', 'de');
-        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'ja']);
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'zh']);
         $response->assertJsonPath('fallback_locale', 'en');
 
         $this->assertDatabaseHas('users', [
@@ -136,7 +136,7 @@ class LocalizationTest extends TestCase
 
         $response = $this->actingAs($user)
             ->patchJson('/api/auth/locale', [
-                'locale' => 'it',
+                'locale' => 'nl',
             ]);
 
         $response->assertStatus(422);
@@ -150,12 +150,12 @@ class LocalizationTest extends TestCase
 
     public function test_supported_locales_are_normalized_from_config(): void
     {
-        config()->set('app.supported_locales', [' EN ', 'es', '', 'de', 'EN', 'fr ', ' ja ']);
+        config()->set('app.supported_locales', [' DE ', 'en', '', 'es', 'DE', 'fr ', ' it ', ' ja ', ' pt ', ' zh ']);
 
         $response = $this->getJson('/api/public/config');
 
         $response->assertOk();
-        $response->assertJsonPath('supported_locales', ['en', 'es', 'de', 'fr', 'ja']);
+        $response->assertJsonPath('supported_locales', ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'zh']);
         $response->assertJsonPath('fallback_locale', 'en');
         $response->assertJsonPath('locale', 'en');
     }
@@ -165,8 +165,8 @@ class LocalizationTest extends TestCase
         config()->set('app.fallback_locale', 'fr');
         config()->set('app.supported_locales', ['de', 'en', 'fr']);
 
-        $response = $this->json('GET', '/api/public/config?locale=it', [], [
-            'X-Davvy-Locale' => 'pt-BR',
+        $response = $this->json('GET', '/api/public/config?locale=nl', [], [
+            'X-Davvy-Locale' => 'nl-NL',
             'Accept-Language' => 'es-MX,es;q=0.9',
         ]);
 
@@ -192,9 +192,9 @@ class LocalizationTest extends TestCase
         );
     }
 
-    public function test_login_validation_error_message_localizes_to_german_french_and_japanese(): void
+    public function test_login_validation_error_message_localizes_to_german_french_italian_japanese_portuguese_and_chinese(): void
     {
-        foreach (['de', 'fr', 'ja'] as $locale) {
+        foreach (['de', 'fr', 'it', 'ja', 'pt', 'zh'] as $locale) {
             $response = $this->withHeaders([
                 'X-Davvy-Locale' => $locale,
             ])->postJson('/api/auth/login', [
@@ -275,7 +275,7 @@ class LocalizationTest extends TestCase
         $this->assertStringContainsString('lang="es"', $inviteHtml);
     }
 
-    public function test_onboarding_mails_render_german_french_and_japanese_subject_and_body(): void
+    public function test_onboarding_mails_render_german_french_italian_japanese_portuguese_and_chinese_subject_and_body(): void
     {
         $cases = [
             'de' => [
@@ -288,10 +288,25 @@ class LocalizationTest extends TestCase
                 'verify_heading' => 'Vérifiez votre adresse e-mail',
                 'invite_heading' => 'Vous êtes invité à rejoindre',
             ],
+            'it' => [
+                'name' => 'Invitato',
+                'verify_heading' => 'Verifica la tua email',
+                'invite_heading' => 'Sei invitato a',
+            ],
             'ja' => [
                 'name' => '招待済み',
                 'verify_heading' => 'メールアドレスを確認してください',
                 'invite_heading' => '招待されています',
+            ],
+            'pt' => [
+                'name' => 'Convidado',
+                'verify_heading' => 'Verifique seu e-mail',
+                'invite_heading' => 'Você está convidado para',
+            ],
+            'zh' => [
+                'name' => '受邀用户',
+                'verify_heading' => '验证您的电子邮件',
+                'invite_heading' => '您被邀请了',
             ],
         ];
 
@@ -336,14 +351,14 @@ class LocalizationTest extends TestCase
         }
     }
 
-    public function test_german_french_and_japanese_catalogs_match_english_translation_keys(): void
+    public function test_german_french_italian_japanese_portuguese_and_chinese_catalogs_match_english_translation_keys(): void
     {
         $englishFiles = glob((string) lang_path('en/*.php'));
 
         $this->assertIsArray($englishFiles);
         $this->assertNotEmpty($englishFiles);
 
-        foreach (['de', 'fr', 'ja'] as $locale) {
+        foreach (['de', 'fr', 'it', 'ja', 'pt', 'zh'] as $locale) {
             foreach ($englishFiles as $englishPath) {
                 $filename = basename($englishPath);
                 $localePath = (string) lang_path($locale.'/'.$filename);

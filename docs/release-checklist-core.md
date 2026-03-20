@@ -14,7 +14,7 @@ Set these in your app service environment.
 | `APP_URL` | `https://<your-domain>` | Required |
 | `APP_LOCALE` | `en` | Default application locale |
 | `APP_FALLBACK_LOCALE` | `en` | Fallback locale for unsupported request/user locales |
-| `APP_SUPPORTED_LOCALES` | `de,en,es,fr,ja` | Comma-separated supported locale codes |
+| `APP_SUPPORTED_LOCALES` | `de,en,es,fr,it,ja,pt,zh` | Comma-separated supported locale codes |
 | `DB_CONNECTION` | `pgsql` | Required |
 | `DB_HOST` | platform-specific | Required |
 | `DB_PORT` | `5432` | Required unless your PostgreSQL uses a different port |

@@ -39,7 +39,7 @@ describe("i18n locale synchronization", () => {
 
   it("supports german locale when it is included in supported locales", async () => {
     setI18nLocale("de-DE", {
-      supportedLocales: ["de", "en", "es", "fr", "ja"],
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
       fallbackLocale: "en",
     });
 
@@ -51,9 +51,23 @@ describe("i18n locale synchronization", () => {
     expect(window.localStorage.getItem("davvy.locale")).toBe("de");
   });
 
+  it("supports italian locale when it is included in supported locales", async () => {
+    setI18nLocale("it-IT", {
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
+      fallbackLocale: "en",
+    });
+
+    await i18n.changeLanguage(i18n.language);
+
+    expect(i18n.resolvedLanguage).toBe("it");
+    expect(document.documentElement.lang).toBe("it");
+    expect(document.title).toBe("Davvy - Gestore CalDAV + CardDAV");
+    expect(window.localStorage.getItem("davvy.locale")).toBe("it");
+  });
+
   it("supports japanese locale when it is included in supported locales", async () => {
     setI18nLocale("ja-JP", {
-      supportedLocales: ["de", "en", "es", "fr", "ja"],
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
       fallbackLocale: "en",
     });
 
@@ -63,6 +77,34 @@ describe("i18n locale synchronization", () => {
     expect(document.documentElement.lang).toBe("ja");
     expect(document.title).toBe("Davvy - CalDAV + CardDAV マネージャー");
     expect(window.localStorage.getItem("davvy.locale")).toBe("ja");
+  });
+
+  it("supports portuguese locale when it is included in supported locales", async () => {
+    setI18nLocale("pt-BR", {
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
+      fallbackLocale: "en",
+    });
+
+    await i18n.changeLanguage(i18n.language);
+
+    expect(i18n.resolvedLanguage).toBe("pt");
+    expect(document.documentElement.lang).toBe("pt");
+    expect(document.title).toBe("Davvy - Gerente CalDAV + CardDAV");
+    expect(window.localStorage.getItem("davvy.locale")).toBe("pt");
+  });
+
+  it("supports chinese locale when it is included in supported locales", async () => {
+    setI18nLocale("zh-CN", {
+      supportedLocales: ["de", "en", "es", "fr", "it", "ja", "pt", "zh"],
+      fallbackLocale: "en",
+    });
+
+    await i18n.changeLanguage(i18n.language);
+
+    expect(i18n.resolvedLanguage).toBe("zh");
+    expect(document.documentElement.lang).toBe("zh");
+    expect(document.title).toBe("Davvy - CalDAV + CardDAV 管理器");
+    expect(window.localStorage.getItem("davvy.locale")).toBe("zh");
   });
 
   it("falls back to configured fallback locale", async () => {

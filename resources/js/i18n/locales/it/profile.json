@@ -1,0 +1,99 @@
+{
+  "cards": [
+    {
+      "label": "Nome",
+      "description": "Visualizzato ad altri utenti durante la condivisione delle risorse."
+    },
+    {
+      "label": "E-mail",
+      "description": "Utilizzato per l'accesso Web e i client DAV."
+    },
+    {
+      "label": "Ruolo",
+      "description": "Livello di accesso per le funzionalità amministrative."
+    }
+  ],
+  "locale": {
+    "title": "Lingua",
+    "description": "Scegli la tua lingua preferita per l'app Web e i messaggi DAV.",
+    "label": "Lingua",
+    "save": "Salva lingua",
+    "saving": "Salvataggio...",
+    "saved": "Lingua aggiornata."
+  },
+  "changePassword": {
+    "title": "Cambia password",
+    "description": "Cambia la tua password sia per l'accesso al web che per le connessioni al client DAV.",
+    "currentLabel": "Password attuale",
+    "newLabel": "Nuova password",
+    "newLabelConfirm": "Conferma la nuova password",
+    "update": "Aggiorna password",
+    "updating": "Aggiornamento password...",
+    "updated": "Password aggiornata."
+  },
+  "security": {
+    "title": "Sicurezza",
+    "description": "Configura l'autenticazione a due fattori e gestisci le password dell'app DAV.",
+    "2faMandated": "Gli amministratori richiedono la registrazione a due fattori.",
+    "2faMandatedWithDeadline": "Configura 2FA prima di {deadline}.",
+    "2faDeadlineExpired": "Il tuo periodo di grazia è terminato. Completa la configurazione a due fattori per continuare ad accedere a tutte le funzionalità dell'app.",
+    "2faRecreate": "Ricrea il segreto di installazione",
+    "2faStart": "Avvia la configurazione 2FA",
+    "2faSetupStep1": "1. Scansiona questo codice QR in Google Authenticator, 1Password o un'app di autenticazione compatibile.",
+    "2faSetupStep1QrCodeTitle": "Codice QR di configurazione a due fattori",
+    "2faSetupStep2": "2. Se necessario, inserire manualmente questa chiave:",
+    "2faSetupStep3": "3. Codice di verifica",
+    "2faEnable": "Abilita 2FA",
+    "2faEnabling": "Abilitazione...",
+    "2faEnabled": "L'autenticazione a due fattori è abilitata.",
+    "2faCode": "Autenticatore o codice di backup per azioni sensibili",
+    "2faCodePlaceholder": "Inserisci il codice",
+    "regenerateBackupCodes": "Rigenera i codici di backup",
+    "disable2fa": "Disabilita 2FA",
+    "saveBackupCodes": "Salva questi codici di backup adesso.",
+    "shownOnce": "Mostrato una volta",
+    "shownOnceDescription": "Ogni codice di backup può essere utilizzato una volta. Non sarai in grado di visualizzare nuovamente questi codici esatti.",
+    "backupCodes": "Codici di backup",
+    "selectAll": "Seleziona tutto",
+    "copyAllCodes": "Copia tutti i codici",
+    "copiedAllCodes": "Copiato tutti i codici.",
+    "copyFailed": "Copia non riuscita. Utilizzare Seleziona tutto, quindi copiare manualmente.",
+    "appPasswords": "Password dell'app DAV",
+    "appPasswordsDescription": "Utilizza queste password generate una sola volta per i client CalDAV/CardDAV che non possono completare l'accesso interattivo a due fattori.",
+    "appPasswordName": "Nome della password",
+    "appPasswordNamePlaceholder": "iPhone",
+    "appPasswordCode": "Codice di autenticazione/backup",
+    "appPasswordCodePlaceholder": "Obbligatorio",
+    "appPasswordCreate": "Crea password per l'app",
+    "appPasswordCodeShownOnce": "Mostrato una volta",
+    "appPasswordLoading": "Caricamento password app...",
+    "appPasswordNoCreated": "Nessuna password per l'app creata.",
+    "appPasswordRevoke": "Revoca",
+    "appPasswordPrefix": "Prefisso: {{prefix}}",
+    "appPasswordLastUsed": "Ultimo utilizzo: {{last_used_at}}",
+    "appPasswordNeverUsed": "Mai"
+  },
+  "errors": {
+    "updateLocale": "Impossibile aggiornare la lingua in questo momento.",
+    "loadAppPasswords": "Impossibile caricare le password dell'app DAV in questo momento.",
+    "updatePassword": "Impossibile aggiornare la password.",
+    "startTwoFactor": "Impossibile avviare la configurazione a due fattori.",
+    "enableTwoFactor": "Impossibile abilitare il due fattori.",
+    "disableTwoFactor": "Impossibile disabilitare il due fattori.",
+    "regenerateCodes": "Impossibile rigenerare i codici di backup.",
+    "createAppPassword": "Impossibile creare la password dell'app DAV.",
+    "revokeAppPassword": "Impossibile revocare la password dell'app DAV."
+  },
+  "notices": {
+    "passwordSuccess": "Password aggiornata. Utilizza la tua nuova password per l'accesso all'app e i client DAV.",
+    "2faSetupSuccess": "Configurazione inizializzata. Scansiona il codice QR e inserisci un codice di verifica.",
+    "2faEnableSuccess": "L'autenticazione a due fattori è stata abilitata.",
+    "2faDisableSuccess": "L'autenticazione a due fattori è stata disabilitata e le password dell'app DAV sono state revocate.",
+    "backupCodesRegenerated": "Codici di backup rigenerati.",
+    "appPasswordCreated": "Password dell'app DAV creata.",
+    "appPasswordRevoked": "Password dell'app DAV revocata."
+  },
+  "confirmations": {
+    "disable2fa": "Disabilitare l'autenticazione a due fattori e revocare tutte le password dell'app DAV?"
+  }
+}

@@ -11,7 +11,10 @@ describe("locale display helpers", () => {
     expect(localeDisplayName("en")).toBe("English");
     expect(localeDisplayName("es")).toBe("Español");
     expect(localeDisplayName("fr")).toBe("Français");
+    expect(localeDisplayName("it")).toBe("Italiano");
     expect(localeDisplayName("ja")).toBe("日本語");
+    expect(localeDisplayName("pt")).toBe("Português");
+    expect(localeDisplayName("zh")).toBe("中文");
   });
 
   it("classifies rtl locales for future UI support", () => {
@@ -21,13 +24,27 @@ describe("locale display helpers", () => {
   });
 
   it("builds deduplicated locale options with metadata", () => {
-    const options = buildLocaleOptions(["de", "en", "es", "ja", "en"]);
+    const options = buildLocaleOptions([
+      "de",
+      "en",
+      "es",
+      "fr",
+      "it",
+      "ja",
+      "pt",
+      "zh",
+      "en",
+    ]);
 
     expect(options).toEqual([
       { value: "de", label: "Deutsch", dir: "ltr" },
       { value: "en", label: "English", dir: "ltr" },
       { value: "es", label: "Español", dir: "ltr" },
+      { value: "fr", label: "Français", dir: "ltr" },
+      { value: "it", label: "Italiano", dir: "ltr" },
       { value: "ja", label: "日本語", dir: "ltr" },
+      { value: "pt", label: "Português", dir: "ltr" },
+      { value: "zh", label: "中文", dir: "ltr" },
     ]);
   });
 });

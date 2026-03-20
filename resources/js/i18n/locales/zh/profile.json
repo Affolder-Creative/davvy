@@ -1,0 +1,99 @@
+{
+  "cards": [
+    {
+      "label": "名称",
+      "description": "共享资源时向其他用户显示。"
+    },
+    {
+      "label": "电子邮件",
+      "description": "用于 Web 登录和 DAV 客户端。"
+    },
+    {
+      "label": "角色",
+      "description": "管理功能的访问级别。"
+    }
+  ],
+  "locale": {
+    "title": "语言",
+    "description": "选择您的 Web 应用程序和 DAV 消息的首选语言。",
+    "label": "语言",
+    "save": "保存语言",
+    "saving": "正在保存...",
+    "saved": "语言已更新。"
+  },
+  "changePassword": {
+    "title": "更改密码",
+    "description": "更改 Web 访问和 DAV 客户端连接的密码。",
+    "currentLabel": "当前密码",
+    "newLabel": "新密码",
+    "newLabelConfirm": "确认新密码",
+    "update": "更新密码",
+    "updating": "正在更新密码...",
+    "updated": "密码已更新。"
+  },
+  "security": {
+    "title": "安全性",
+    "description": "配置双因素身份验证并管理 DAV 应用程序密码。",
+    "2faMandated": "管理员要求进行两因素注册。",
+    "2faMandatedWithDeadline": "在{deadline}之前设置2FA。",
+    "2faDeadlineExpired": "您的宽限期已结束。完成两步设置以继续访问所有应用程序功能。",
+    "2faRecreate": "重新创建设置密码",
+    "2faStart": "开始 2FA 设置",
+    "2faSetupStep1": "1. 在 Google Authenticator、1Password 或兼容的身份验证器应用程序中扫描此二维码。",
+    "2faSetupStep1QrCodeTitle": "两步设置二维码",
+    "2faSetupStep2": "2. 如果需要，请手动输入此密钥：",
+    "2faSetupStep3": "3、验证码",
+    "2faEnable": "启用 2FA",
+    "2faEnabling": "启用...",
+    "2faEnabled": "已启用双因素身份验证。",
+    "2faCode": "敏感操作的验证器或备份代码",
+    "2faCodePlaceholder": "输入代码",
+    "regenerateBackupCodes": "重新生成备份代码",
+    "disable2fa": "禁用 2FA",
+    "saveBackupCodes": "立即保存这些备份代码。",
+    "shownOnce": "显示一次",
+    "shownOnceDescription": "每个备份代码只能使用一次。您将无法再次查看这些确切的代码。",
+    "backupCodes": "备份代码",
+    "selectAll": "选择全部",
+    "copyAllCodes": "复制所有代码",
+    "copiedAllCodes": "复制了所有代码。",
+    "copyFailed": "复制失败。使用全选，然后手动复制。",
+    "appPasswords": "DAV 应用程序密码",
+    "appPasswordsDescription": "对于无法完成交互式双因素登录的 CalDAV/CardDAV 客户端，请使用这些一次性生成的密码。",
+    "appPasswordName": "密码名称",
+    "appPasswordNamePlaceholder": "苹果手机",
+    "appPasswordCode": "验证码/备份码",
+    "appPasswordCodePlaceholder": "必填",
+    "appPasswordCreate": "创建应用程序密码",
+    "appPasswordCodeShownOnce": "显示一次",
+    "appPasswordLoading": "正在加载应用程序密码...",
+    "appPasswordNoCreated": "未创建应用程序密码。",
+    "appPasswordRevoke": "撤销",
+    "appPasswordPrefix": "前缀：{{prefix}}",
+    "appPasswordLastUsed": "最后使用：{{last_used_at}}",
+    "appPasswordNeverUsed": "从来没有"
+  },
+  "errors": {
+    "updateLocale": "目前无法更新语言。",
+    "loadAppPasswords": "目前无法加载 DAV 应用程序密码。",
+    "updatePassword": "无法更新密码。",
+    "startTwoFactor": "无法启动双因素设置。",
+    "enableTwoFactor": "无法启用双因素。",
+    "disableTwoFactor": "无法禁用双因素。",
+    "regenerateCodes": "无法重新生成备份代码。",
+    "createAppPassword": "无法创建 DAV 应用程序密码。",
+    "revokeAppPassword": "无法撤销 DAV 应用程序密码。"
+  },
+  "notices": {
+    "passwordSuccess": "密码已更新。使用您的新密码登录应用程序和 DAV 客户端。",
+    "2faSetupSuccess": "设置已初始化。扫描二维码并输入验证码。",
+    "2faEnableSuccess": "已启用双因素身份验证。",
+    "2faDisableSuccess": "双因素身份验证已被禁用，DAV 应用程序密码已被撤销。",
+    "backupCodesRegenerated": "备份代码已重新生成。",
+    "appPasswordCreated": "DAV 应用程序密码已创建。",
+    "appPasswordRevoked": "DAV 应用程序密码已撤销。"
+  },
+  "confirmations": {
+    "disable2fa": "禁用双因素身份验证并撤销所有 DAV 应用程序密码？"
+  }
+}

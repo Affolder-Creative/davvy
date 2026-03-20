@@ -45,6 +45,15 @@ import frQueue from "./locales/fr/queue.json";
 import frAdmin from "./locales/fr/admin.json";
 import frProfile from "./locales/fr/profile.json";
 
+import itCommon from "./locales/it/common.json";
+import itAuth from "./locales/it/auth.json";
+import itShell from "./locales/it/shell.json";
+import itDashboard from "./locales/it/dashboard.json";
+import itContacts from "./locales/it/contacts.json";
+import itQueue from "./locales/it/queue.json";
+import itAdmin from "./locales/it/admin.json";
+import itProfile from "./locales/it/profile.json";
+
 import jaCommon from "./locales/ja/common.json";
 import jaAuth from "./locales/ja/auth.json";
 import jaShell from "./locales/ja/shell.json";
@@ -53,6 +62,24 @@ import jaContacts from "./locales/ja/contacts.json";
 import jaQueue from "./locales/ja/queue.json";
 import jaAdmin from "./locales/ja/admin.json";
 import jaProfile from "./locales/ja/profile.json";
+
+import ptCommon from "./locales/pt/common.json";
+import ptAuth from "./locales/pt/auth.json";
+import ptShell from "./locales/pt/shell.json";
+import ptDashboard from "./locales/pt/dashboard.json";
+import ptContacts from "./locales/pt/contacts.json";
+import ptQueue from "./locales/pt/queue.json";
+import ptAdmin from "./locales/pt/admin.json";
+import ptProfile from "./locales/pt/profile.json";
+
+import zhCommon from "./locales/zh/common.json";
+import zhAuth from "./locales/zh/auth.json";
+import zhShell from "./locales/zh/shell.json";
+import zhDashboard from "./locales/zh/dashboard.json";
+import zhContacts from "./locales/zh/contacts.json";
+import zhQueue from "./locales/zh/queue.json";
+import zhAdmin from "./locales/zh/admin.json";
+import zhProfile from "./locales/zh/profile.json";
 
 const APP_TITLE_KEY = "meta.appTitle";
 let titleSyncBound = false;
@@ -109,6 +136,16 @@ const resources = {
     admin: frAdmin,
     profile: frProfile,
   },
+  it: {
+    common: itCommon,
+    auth: itAuth,
+    shell: itShell,
+    dashboard: itDashboard,
+    contacts: itContacts,
+    queue: itQueue,
+    admin: itAdmin,
+    profile: itProfile,
+  },
   ja: {
     common: jaCommon,
     auth: jaAuth,
@@ -118,6 +155,26 @@ const resources = {
     queue: jaQueue,
     admin: jaAdmin,
     profile: jaProfile,
+  },
+  pt: {
+    common: ptCommon,
+    auth: ptAuth,
+    shell: ptShell,
+    dashboard: ptDashboard,
+    contacts: ptContacts,
+    queue: ptQueue,
+    admin: ptAdmin,
+    profile: ptProfile,
+  },
+  zh: {
+    common: zhCommon,
+    auth: zhAuth,
+    shell: zhShell,
+    dashboard: zhDashboard,
+    contacts: zhContacts,
+    queue: zhQueue,
+    admin: zhAdmin,
+    profile: zhProfile,
   },
 };
 

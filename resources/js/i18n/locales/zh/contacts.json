@@ -1,0 +1,286 @@
+{
+  "summary": {
+    "contactsTitle": "联系方式",
+    "contactsHelper": "此 Web UI 中的托管联系人。",
+    "booksTitle": "可写书籍",
+    "booksHelper": "您可以在其中添加或编辑联系人的地址簿。",
+    "userTitle": "用户",
+    "userHelper": "联系人所有权仅限于您的帐户。"
+  },
+  "mobile": {
+    "viewAria": "联系手机查看",
+    "contacts": "联系方式",
+    "editorEdit": "编辑",
+    "editorNewEdit": "新建/编辑"
+  },
+  "filters": {
+    "clear": "清除过滤器"
+  },
+  "sidebar": {
+    "title": "联系方式",
+    "new": "新",
+    "searchPlaceholder": "搜索联系人...",
+    "filterAllOption": "所有地址簿",
+    "clearFilters": "清除",
+    "noContacts": "还没有联系方式。",
+    "noContactsMatchFilter": "没有联系人与此过滤器匹配。",
+    "matchCount_one": "{{count}}匹配",
+    "matchCount_other": "{{count}} 匹配",
+    "addressBookCount": "{{count}}通讯录{{plural}}",
+    "page": "页{{current}} / {{total}}",
+    "prevPage": "上一篇",
+    "nextPage": "下一步"
+  },
+  "fieldLabels": {
+    "pronouns": {
+      "notSet": "未设置",
+      "sheHer": "她/她",
+      "heHim": "他/他",
+      "theyThem": "他们/他们",
+      "xeXem": "xe/xem",
+      "custom": "定制..."
+    },
+    "phone": {
+      "mobile": "手机",
+      "iphone": "苹果手机",
+      "appleWatch": "苹果手表",
+      "home": "家",
+      "work": "工作",
+      "main": "主要",
+      "homeFax": "家庭传真",
+      "workFax": "工作传真",
+      "otherFax": "其他传真",
+      "pager": "寻呼机",
+      "other": "其他",
+      "custom": "定制..."
+    },
+    "email": {
+      "home": "家",
+      "work": "工作",
+      "other": "其他",
+      "custom": "定制..."
+    },
+    "url": {
+      "homepage": "主页",
+      "home": "家",
+      "work": "工作",
+      "other": "其他",
+      "custom": "定制..."
+    },
+    "address": {
+      "home": "家",
+      "work": "工作",
+      "school": "学校",
+      "other": "其他",
+      "custom": "定制..."
+    },
+    "date": {
+      "anniversary": "周年纪念日",
+      "other": "其他",
+      "custom": "定制..."
+    },
+    "related": {
+      "spouse": "配偶",
+      "partner": "合伙人",
+      "parent": "家长",
+      "child": "儿童",
+      "sibling": "兄弟姐妹",
+      "assistant": "助理",
+      "friend": "朋友",
+      "other": "其他",
+      "custom": "定制..."
+    },
+    "relatedDerived": {
+      "parentInLaw": "岳父母",
+      "fatherInLaw": "岳父",
+      "motherInLaw": "婆婆",
+      "childInLaw": "儿媳妇",
+      "sonInLaw": "女婿",
+      "daughterInLaw": "儿媳妇",
+      "siblingInLaw": "兄弟姐妹",
+      "brotherInLaw": "小舅子",
+      "sisterInLaw": "嫂子",
+      "auntUncle": "阿姨/叔叔",
+      "nieceNephew": "侄女/侄子",
+      "grandpa": "爷爷",
+      "grandma": "奶奶"
+    },
+    "im": {
+      "home": "家",
+      "work": "工作",
+      "other": "其他",
+      "custom": "定制..."
+    }
+  },
+  "editor": {
+    "new": "新联系人",
+    "edit": "编辑联系方式",
+    "description": "至少输入名字、姓氏或公司。地址簿分配支持一项或多项选择。",
+    "delete": "删除",
+    "save": "保存联系方式",
+    "saving": "正在保存...",
+    "noAddressBooks": "您当前没有任何地址簿的写入权限。",
+    "nameSection": {
+      "label": "名称",
+      "description": "基本身份和语音命名字段。",
+      "field": {
+        "prefix": "前缀",
+        "first": "名字",
+        "middle": "中间名",
+        "last": "姓氏",
+        "suffix": "后缀",
+        "nickname": "昵称",
+        "maidenName": "婚前姓名",
+        "phoneticFirstName": "名字拼音",
+        "phoneticLastName": "拼音姓氏"
+      }
+    },
+    "workSection": {
+      "label": "工作",
+      "description": "公司和角色详细信息。",
+      "field": {
+        "company": "公司简介",
+        "phoneticCompany": "拼音公司",
+        "jobTitle": "职位名称",
+        "department": "部门"
+      }
+    },
+    "personalSection": {
+      "label": "个人",
+      "description": "个人详细信息。",
+      "field": {
+        "pronouns": "代词",
+        "pronounsCustom": "自定义代词",
+        "pronounsCustomPlaceholder": "可选的自定义值",
+        "ringtone": "铃声",
+        "textTone": "文字提示音",
+        "verificationCode": "验证码",
+        "profile": "公司简介",
+        "householdLabel": "家庭用品",
+        "headOfHousehold": "户主"
+      },
+      "milestonesDates": {
+        "label": "里程碑和日期",
+        "description": "生日、重要日期和日历行为。",
+        "birthday": "生日",
+        "month": "月份",
+        "monthPlaceholder": "MM",
+        "day": "日",
+        "dayPlaceholder": "DD",
+        "year": "年份",
+        "yearPlaceholder": "YYYY",
+        "calendarBehavior": "日历行为",
+        "excludeFromMilestoneCalendars": "从里程碑日历中排除",
+        "excludeFromMilestoneCalendarsDescription": "在生成的里程碑日历中跳过此联系人的生日和周年纪念日活动。"
+      }
+    },
+    "communicationSection": {
+      "label": "通讯",
+      "description": "联系方式和地址。",
+      "field": {
+        "phone": {
+          "title": "电话",
+          "placeholder": "电话号码",
+          "addLabel": "添加电话"
+        },
+        "email": {
+          "title": "电子邮件",
+          "placeholder": "电子邮件地址",
+          "addLabel": "添加电子邮件"
+        },
+        "address": {
+          "title": "地址"
+        },
+        "url": {
+          "title": "网址",
+          "placeholder": "https://example.com",
+          "addLabel": "添加网址"
+        },
+        "instantMessage": {
+          "title": "即时消息",
+          "placeholder": "我:username@example.com",
+          "addLabel": "添加即时消息"
+        }
+      }
+    },
+    "optionalFieldSection": {
+      "label": "添加可选字段",
+      "description": "根据需要自定义此表单",
+      "allAdded": "添加了所有可选字段",
+      "search": "搜索可选字段...",
+      "noMatching": "没有匹配的可选字段。",
+      "addField": "添加字段",
+      "hiddenByDefault": "可选字段默认隐藏。",
+      "hideField": "隐藏{{pendingHideFieldLabel}}"
+    },
+    "hideFieldModal": {
+      "title": "隐藏{{pendingHideFieldLabel}}？",
+      "description": "该字段当前有数据。隐藏该值或在隐藏字段之前清除它。",
+      "cancel": "取消",
+      "keepHiddenValue": "保持隐藏价值",
+      "clearAndHide": "清除和隐藏"
+    },
+    "addressBooksSection": {
+      "label": "地址簿",
+      "description": "选择该联系人的存储位置。",
+      "required": "必填",
+      "totalSelected": "{{count}} 已选择",
+      "hint": "为此联系人选择一个或多个地址簿。",
+      "noAddressBooks": "没有可写的地址簿。",
+      "selected": "已选择",
+      "owned": "拥有",
+      "shared": "共享"
+    },
+    "addressEditor": {
+      "title": "地址",
+      "address": "地址",
+      "addAddress": "添加地址",
+      "noAddresses": "没有地址。",
+      "streetPlaceholder": "街道",
+      "cityPlaceholder": "城市",
+      "statePlaceholder": "州/地区",
+      "zipPlaceholder": "邮政编码",
+      "countryPlaceholder": "国家",
+      "customLabelPlaceholder": "定制标签"
+    },
+    "dateEditor": {
+      "title": "日期",
+      "addDate": "添加日期",
+      "noDates": "没有日期。",
+      "monthPlaceholder": "MM",
+      "dayPlaceholder": "DD",
+      "yearPlaceholder": "YYYY",
+      "remove": "删除",
+      "customLabelPlaceholder": "定制标签"
+    },
+    "labeledValueEditor": {
+      "customLabelPlaceholder": "定制标签",
+      "noEntries": "没有条目。"
+    },
+    "relatedNameEditor": {
+      "title": "相关名称",
+      "addRelatedName": "添加相关名称",
+      "noRelatedNames": "没有相关名称。",
+      "namePlaceholder": "名称",
+      "noMatchingContacts": "没有匹配的联系人。继续输入以使用自定义名称。",
+      "linkedToContact": "链接到联系人#{{contactId}}。",
+      "matchFound": "找到匹配项：{{name}}",
+      "link": "链接",
+      "dismiss": "解雇",
+      "customLabelPlaceholder": "定制标签"
+    },
+    "rowReorderControls": {
+      "moveUpAria": "向上移动 {{rowLabel}} {{rowNumber}}",
+      "moveUp": "向上移动",
+      "moveDownAria": "向下移动 {{rowLabel}} {{rowNumber}}",
+      "moveDown": "下移",
+      "removeAria": "删除{{rowLabel}}{{rowNumber}}",
+      "remove": "删除",
+      "dragAria": "拖动以重新排序 {{rowLabel}} {{rowNumber}}",
+      "dragTitle": "拖动以重新排序"
+    }
+  },
+  "states": {
+    "loading": "正在加载联系人..."
+  }
+}

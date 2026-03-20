@@ -1,0 +1,27 @@
+{
+  "copy": {
+    "copied": "复制了！",
+    "copyFailed": "复制失败",
+    "copiedUrl": "复制的网址",
+    "clickToCopy": "点击复制",
+    "ariaCopy": "复制{{value}}",
+    "ariaCopyUrl": "复制 {{value}} 网址"
+  },
+  "permission": {
+    "admin": "管理员",
+    "editor": "编辑",
+    "general": "一般"
+  },
+  "labels": {
+    "never": "从来没有",
+    "invalidTimestamp": "时间戳无效",
+    "na": "不适用",
+    "unknown": "未知"
+  },
+  "meta": {
+    "appTitle": "Davvy - CalDAV + CardDAV 管理器"
+  },
+  "states": {
+    "loadingApp": "正在加载 Davvy..."
+  }
+}
