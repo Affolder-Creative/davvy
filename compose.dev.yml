@@ -1,7 +1,10 @@
 services:
   app:
-    image: ghcr.io/kaffolder7/davvy:latest
-    pull_policy: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -70,6 +73,8 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    # ports:
+    #   - "5432:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-davvy}
       POSTGRES_USER: ${SERVICE_USER_POSTGRES:-davvy}
