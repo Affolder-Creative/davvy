@@ -280,37 +280,37 @@
       "dragTitle": "Trascina per riordinare"
     },
     "photo": {
-      "label": "Photo",
-      "description": "Upload, crop, and attach a square contact photo.",
-      "previewAlt": "Contact photo preview",
-      "empty": "No photo",
-      "constraints": "Minimum crop: {{min}}x{{min}} px. Max file size: {{maxMb}} MB.",
-      "cropTitle": "Crop Contact Photo",
-      "cropDescription": "Position and zoom your photo. The final image is saved as a 1:1 square (minimum {{min}}x{{min}}).",
+      "label": "Foto",
+      "description": "Carica, ritaglia e collega una foto contatto quadrata.",
+      "previewAlt": "Anteprima foto contatto",
+      "empty": "Nessuna foto",
+      "constraints": "Ritaglio minimo: {{min}}x{{min}} px. Dimensione massima file: {{maxMb}} MB.",
+      "cropTitle": "Ritaglia foto contatto",
+      "cropDescription": "Posiziona e ingrandisci la foto. L’immagine finale viene salvata in formato quadrato 1:1 (minimo {{min}}x{{min}}).",
       "zoomLabel": "Zoom",
       "status": {
-        "none": "Photo is optional.",
-        "saved": "Saved photo.",
-        "pendingUpload": "New photo selected. Save contact to apply.",
-        "pendingRemoval": "Photo marked for removal. Save contact to apply."
+        "none": "La foto è facoltativa.",
+        "saved": "Foto salvata.",
+        "pendingUpload": "Nuova foto selezionata. Salva il contatto per applicarla.",
+        "pendingRemoval": "Foto contrassegnata per la rimozione. Salva il contatto per applicarla."
       },
       "actions": {
-        "upload": "Upload Photo",
-        "change": "Change Photo",
-        "remove": "Remove Photo",
-        "undoRemove": "Undo Remove",
-        "clearPending": "Clear Pending",
-        "cancel": "Cancel",
-        "useCrop": "Use This Crop",
-        "uploading": "Uploading..."
+        "upload": "Carica foto",
+        "change": "Cambia foto",
+        "remove": "Rimuovi foto",
+        "undoRemove": "Annulla rimozione",
+        "clearPending": "Cancella in sospeso",
+        "cancel": "Annulla",
+        "useCrop": "Usa questo ritaglio",
+        "uploading": "Caricamento..."
       },
       "errors": {
-        "format": "Unsupported image format. Allowed formats: {{formats}}.",
-        "maxSize": "Image exceeds the maximum upload size of {{sizeMb}} MB.",
-        "minDimensions": "Image must be at least {{min}}x{{min}} pixels.",
-        "minCrop": "Crop area must be at least {{min}}x{{min}} pixels.",
-        "read": "Unable to read selected image.",
-        "upload": "Unable to upload contact photo."
+        "format": "Formato immagine non supportato. Formati consentiti: {{formats}}.",
+        "maxSize": "L’immagine supera la dimensione massima di caricamento di {{sizeMb}} MB.",
+        "minDimensions": "L’immagine deve essere almeno di {{min}}x{{min}} pixel.",
+        "minCrop": "L’area di ritaglio deve essere almeno di {{min}}x{{min}} pixel.",
+        "read": "Impossibile leggere l’immagine selezionata.",
+        "upload": "Impossibile caricare la foto del contatto."
       }
     }
   },
