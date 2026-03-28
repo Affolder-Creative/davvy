@@ -278,6 +278,40 @@
       "remove": "Eliminar",
       "dragAria": "Arrastrar para reordenar {{rowLabel}} {{rowNumber}}",
       "dragTitle": "Arrastrar para reordenar"
+    },
+    "photo": {
+      "label": "Foto",
+      "description": "Sube, recorta y adjunta una foto de contacto cuadrada.",
+      "previewAlt": "Vista previa de la foto de contacto",
+      "empty": "Sin foto",
+      "constraints": "Recorte mínimo: {{min}}x{{min}} px. Tamaño máximo de archivo: {{maxMb}} MB.",
+      "cropTitle": "Recortar foto de contacto",
+      "cropDescription": "Coloca y acerca/aleja tu foto. La imagen final se guarda en formato cuadrado 1:1 (mínimo {{min}}x{{min}}).",
+      "zoomLabel": "Zoom",
+      "status": {
+        "none": "La foto es opcional.",
+        "saved": "Foto guardada.",
+        "pendingUpload": "Nueva foto seleccionada. Guarda el contacto para aplicarla.",
+        "pendingRemoval": "Foto marcada para eliminar. Guarda el contacto para aplicarla."
+      },
+      "actions": {
+        "upload": "Subir foto",
+        "change": "Cambiar foto",
+        "remove": "Eliminar foto",
+        "undoRemove": "Deshacer eliminación",
+        "clearPending": "Borrar pendiente",
+        "cancel": "Cancelar",
+        "useCrop": "Usar este recorte",
+        "uploading": "Subiendo..."
+      },
+      "errors": {
+        "format": "Formato de imagen no compatible. Formatos permitidos: {{formats}}.",
+        "maxSize": "La imagen supera el tamaño máximo de carga de {{sizeMb}} MB.",
+        "minDimensions": "La imagen debe tener al menos {{min}}x{{min}} píxeles.",
+        "minCrop": "El área de recorte debe ser de al menos {{min}}x{{min}} píxeles.",
+        "read": "No se pudo leer la imagen seleccionada.",
+        "upload": "No se pudo subir la foto del contacto."
+      }
     }
   },
   "states": {

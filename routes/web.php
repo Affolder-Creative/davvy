@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ContactChangeRequestController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\ContactPhotoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DavController;
 use App\Http\Controllers\ExportController;
@@ -86,6 +87,9 @@ Route::middleware('auth')->group(function (): void {
 
         Route::middleware('contact-management')->group(function (): void {
             Route::get('/api/contacts', [ContactController::class, 'index']);
+            Route::post('/api/contacts/photos/stage', [ContactPhotoController::class, 'stage']);
+            Route::post('/api/contacts/{contact}/photo/stage', [ContactPhotoController::class, 'stageForContact']);
+            Route::get('/api/contacts/{contact}/photo', [ContactPhotoController::class, 'show']);
             Route::post('/api/contacts', [ContactController::class, 'store']);
             Route::patch('/api/contacts/{contact}', [ContactController::class, 'update']);
             Route::delete('/api/contacts/{contact}', [ContactController::class, 'destroy']);

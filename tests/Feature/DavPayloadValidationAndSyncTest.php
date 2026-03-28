@@ -112,6 +112,40 @@ class DavPayloadValidationAndSyncTest extends TestCase
         $this->assertContains('card-sync.vcf', $changes['deleted']);
     }
 
+    public function test_address_book_noop_update_does_not_emit_modified_change(): void
+    {
+        $owner = User::factory()->create();
+        $addressBook = AddressBook::factory()->create(['owner_id' => $owner->id]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($owner);
+
+        $backend = app(LaravelCardDavBackend::class);
+        $backend->createCard(
+            $addressBook->id,
+            'card-noop.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Jane Noop\nUID:card-noop-1\nEMAIL:jane@example.com\nEND:VCARD"
+        );
+
+        $card = Card::query()
+            ->where('address_book_id', $addressBook->id)
+            ->where('uri', 'card-noop.vcf')
+            ->firstOrFail();
+        $tokenBefore = (string) $backend->getChangesForAddressBook($addressBook->id, '0', 1)['syncToken'];
+
+        $etag = $backend->updateCard(
+            $addressBook->id,
+            'card-noop.vcf',
+            (string) $card->data,
+        );
+        $changes = $backend->getChangesForAddressBook($addressBook->id, $tokenBefore, 1);
+
+        $this->assertSame('"'.$card->etag.'"', $etag);
+        $this->assertSame($tokenBefore, $changes['syncToken']);
+        $this->assertSame([], $changes['added']);
+        $this->assertSame([], $changes['modified']);
+        $this->assertSame([], $changes['deleted']);
+    }
+
     public function test_initial_calendar_sync_includes_existing_objects(): void
     {
         $owner = User::factory()->create();

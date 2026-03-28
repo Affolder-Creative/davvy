@@ -278,6 +278,40 @@
       "remove": "Entfernen",
       "dragAria": "Zum Neuanordnen von {{rowLabel}} {{rowNumber}} ziehen",
       "dragTitle": "Zum Neuanordnen ziehen"
+    },
+    "photo": {
+      "label": "Foto",
+      "description": "Lade ein quadratisches Kontaktfoto hoch, schneide es zu und füge es hinzu.",
+      "previewAlt": "Vorschau des Kontaktfotos",
+      "empty": "Kein Foto",
+      "constraints": "Mindestzuschnitt: {{min}}x{{min}} px. Maximale Dateigröße: {{maxMb}} MB.",
+      "cropTitle": "Kontaktfoto zuschneiden",
+      "cropDescription": "Positioniere und zoome dein Foto. Das endgültige Bild wird als 1:1-Quadrat gespeichert (mindestens {{min}}x{{min}}).",
+      "zoomLabel": "Zoom",
+      "status": {
+        "none": "Foto ist optional.",
+        "saved": "Foto gespeichert.",
+        "pendingUpload": "Neues Foto ausgewählt. Kontakt speichern, um es zu übernehmen.",
+        "pendingRemoval": "Foto zum Entfernen markiert. Kontakt speichern, um es zu übernehmen."
+      },
+      "actions": {
+        "upload": "Foto hochladen",
+        "change": "Foto ändern",
+        "remove": "Foto entfernen",
+        "undoRemove": "Entfernen rückgängig",
+        "clearPending": "Ausstehendes löschen",
+        "cancel": "Abbrechen",
+        "useCrop": "Diesen Zuschnitt verwenden",
+        "uploading": "Wird hochgeladen..."
+      },
+      "errors": {
+        "format": "Nicht unterstütztes Bildformat. Erlaubte Formate: {{formats}}.",
+        "maxSize": "Das Bild überschreitet die maximale Uploadgröße von {{sizeMb}} MB.",
+        "minDimensions": "Das Bild muss mindestens {{min}}x{{min}} Pixel groß sein.",
+        "minCrop": "Der Zuschnitt muss mindestens {{min}}x{{min}} Pixel groß sein.",
+        "read": "Das ausgewählte Bild konnte nicht gelesen werden.",
+        "upload": "Kontaktfoto konnte nicht hochgeladen werden."
+      }
     }
   },
   "states": {

@@ -1,6 +1,23 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
+function contactInitials(displayName) {
+  const parts = String(displayName ?? "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return "?";
+  }
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 1).toUpperCase();
+  }
+
+  return `${parts[0].slice(0, 1)}${parts[1].slice(0, 1)}`.toUpperCase();
+}
+
 /**
  * Renders the Contacts List Sidebar component.
  *
@@ -93,6 +110,10 @@ export default function ContactsListSidebar({
             const addressBookCount = Array.isArray(contact.address_books)
               ? contact.address_books.length
               : 0;
+            const thumbnailUrl = String(
+              contact?.photo?.thumbnail_url ?? contact?.photo?.url ?? "",
+            ).trim();
+            const initials = contactInitials(contact.display_name);
 
             return (
               <button
@@ -105,15 +126,34 @@ export default function ContactsListSidebar({
                 }`}
                 onClick={() => onSelectContact(contact)}
               >
-                <p className="truncate text-sm font-semibold">
-                  {contact.display_name}
-                </p>
-                <p className="mt-1 text-xs text-app-faint">
-                  {t("sidebar.addressBookCount", {
-                    count: addressBookCount,
-                    plural: addressBookCount > 1 ? "s" : "",
-                  })}
-                </p>
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-app-edge bg-app-panel">
+                    {thumbnailUrl ? (
+                      <img
+                        src={thumbnailUrl}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-xs font-semibold text-app-faint">
+                        {initials}
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">
+                      {contact.display_name}
+                    </p>
+                    <p className="mt-1 text-xs text-app-faint">
+                      {t("sidebar.addressBookCount", {
+                        count: addressBookCount,
+                        plural: addressBookCount > 1 ? "s" : "",
+                      })}
+                    </p>
+                  </div>
+                </div>
               </button>
             );
           })

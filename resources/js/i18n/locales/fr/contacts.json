@@ -278,6 +278,40 @@
       "remove": "Supprimer",
       "dragAria": "Faire glisser pour réorganiser {{rowLabel}} {{rowNumber}}",
       "dragTitle": "Faire glisser pour réorganiser"
+    },
+    "photo": {
+      "label": "Photo",
+      "description": "Importez, recadrez et ajoutez une photo de contact carrée.",
+      "previewAlt": "Aperçu de la photo du contact",
+      "empty": "Aucune photo",
+      "constraints": "Recadrage minimum : {{min}}x{{min}} px. Taille maximale du fichier : {{maxMb}} Mo.",
+      "cropTitle": "Recadrer la photo du contact",
+      "cropDescription": "Positionnez et zoomez votre photo. L’image finale est enregistrée au format carré 1:1 (minimum {{min}}x{{min}}).",
+      "zoomLabel": "Zoom",
+      "status": {
+        "none": "La photo est facultative.",
+        "saved": "Photo enregistrée.",
+        "pendingUpload": "Nouvelle photo sélectionnée. Enregistrez le contact pour l’appliquer.",
+        "pendingRemoval": "Photo marquée pour suppression. Enregistrez le contact pour l’appliquer."
+      },
+      "actions": {
+        "upload": "Importer une photo",
+        "change": "Changer la photo",
+        "remove": "Supprimer la photo",
+        "undoRemove": "Annuler la suppression",
+        "clearPending": "Effacer en attente",
+        "cancel": "Annuler",
+        "useCrop": "Utiliser ce recadrage",
+        "uploading": "Importation..."
+      },
+      "errors": {
+        "format": "Format d’image non pris en charge. Formats autorisés : {{formats}}.",
+        "maxSize": "L’image dépasse la taille maximale d’envoi de {{sizeMb}} Mo.",
+        "minDimensions": "L’image doit mesurer au moins {{min}}x{{min}} pixels.",
+        "minCrop": "La zone de recadrage doit mesurer au moins {{min}}x{{min}} pixels.",
+        "read": "Impossible de lire l’image sélectionnée.",
+        "upload": "Impossible d’importer la photo du contact."
+      }
     }
   },
   "states": {

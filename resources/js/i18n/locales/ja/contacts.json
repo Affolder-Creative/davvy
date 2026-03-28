@@ -278,6 +278,40 @@
       "remove": "削除する",
       "dragAria": "ドラッグして並べ替えます {{rowLabel}} {{rowNumber}}",
       "dragTitle": "ドラッグして並べ替えます"
+    },
+    "photo": {
+      "label": "写真",
+      "description": "正方形の連絡先写真をアップロードしてトリミングし、添付します。",
+      "previewAlt": "連絡先写真のプレビュー",
+      "empty": "写真なし",
+      "constraints": "最小トリミング: {{min}}x{{min}} px。最大ファイルサイズ: {{maxMb}} MB。",
+      "cropTitle": "連絡先写真をトリミング",
+      "cropDescription": "写真の位置とズームを調整してください。最終画像は 1:1 の正方形（最小 {{min}}x{{min}}）で保存されます。",
+      "zoomLabel": "ズーム",
+      "status": {
+        "none": "写真は任意です。",
+        "saved": "写真を保存しました。",
+        "pendingUpload": "新しい写真を選択しました。適用するには連絡先を保存してください。",
+        "pendingRemoval": "写真を削除予定にしました。適用するには連絡先を保存してください。"
+      },
+      "actions": {
+        "upload": "写真をアップロード",
+        "change": "写真を変更",
+        "remove": "写真を削除",
+        "undoRemove": "削除を元に戻す",
+        "clearPending": "保留をクリア",
+        "cancel": "キャンセル",
+        "useCrop": "このトリミングを使用",
+        "uploading": "アップロード中..."
+      },
+      "errors": {
+        "format": "未対応の画像形式です。使用可能な形式: {{formats}}。",
+        "maxSize": "画像が最大アップロードサイズ {{sizeMb}} MB を超えています。",
+        "minDimensions": "画像は少なくとも {{min}}x{{min}} ピクセル必要です。",
+        "minCrop": "トリミング範囲は少なくとも {{min}}x{{min}} ピクセル必要です。",
+        "read": "選択した画像を読み込めませんでした。",
+        "upload": "連絡先写真をアップロードできませんでした。"
+      }
     }
   },
   "states": {

@@ -424,6 +424,9 @@ export function createEmptyContactForm(defaultAddressBookIds = []) {
     dates: [createEmptyDate("anniversary")],
     related_names: [createEmptyRelatedName("other")],
     instant_messages: [createEmptyLabeledValue("other")],
+    photo: null,
+    photo_upload_token: null,
+    photo_remove: false,
     address_book_ids: defaultAddressBookIds,
   };
 }
@@ -547,6 +550,28 @@ export function hydrateContactForm(contact, defaultAddressBookIds = []) {
     instant_messages: nonEmptyRows(contact.instant_messages, () =>
       createEmptyLabeledValue("other"),
     ),
+    photo:
+      contact.photo &&
+      typeof contact.photo.url === "string" &&
+      contact.photo.url.trim() !== ""
+        ? {
+            url: contact.photo.url,
+            thumbnail_url:
+              typeof contact.photo.thumbnail_url === "string"
+                ? contact.photo.thumbnail_url
+                : "",
+            width: Number(contact.photo.width ?? 0) || 0,
+            height: Number(contact.photo.height ?? 0) || 0,
+            thumbnail_width: Number(contact.photo.thumbnail_width ?? 0) || 0,
+            thumbnail_height: Number(contact.photo.thumbnail_height ?? 0) || 0,
+            mime: String(contact.photo.mime ?? ""),
+            bytes: Number(contact.photo.bytes ?? 0) || 0,
+            thumbnail_bytes: Number(contact.photo.thumbnail_bytes ?? 0) || 0,
+            version: String(contact.photo.version ?? ""),
+          }
+        : null,
+    photo_upload_token: null,
+    photo_remove: false,
     address_book_ids: addressBookIds,
   };
 }

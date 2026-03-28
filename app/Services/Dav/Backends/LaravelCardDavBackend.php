@@ -181,6 +181,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
 
         return Card::query()
             ->where('address_book_id', $addressBook->id)
+            ->select(['id', 'uri', 'etag', 'size', 'updated_at'])
             ->orderBy('id')
             ->get()
             ->map(fn (Card $card): array => $this->transformCard($card, withData: false))
@@ -342,14 +343,24 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             throw new Conflict(__('dav.contact_with_same_uid_exists_in_address_book'));
         }
 
-        $etag = md5($normalized['data']);
+        $normalizedData = $normalized['data'];
+        $size = strlen($normalizedData);
+        $etag = md5($normalizedData);
+        $isNoOp = $card->uid === $resourceUid
+            && $card->etag === $etag
+            && (int) $card->size === $size
+            && $card->data === $normalizedData;
+
+        if ($isNoOp) {
+            return '"'.$etag.'"';
+        }
 
         try {
             $card->update([
                 'uid' => $resourceUid,
                 'etag' => $etag,
-                'size' => strlen($normalized['data']),
-                'data' => $normalized['data'],
+                'size' => $size,
+                'data' => $normalizedData,
             ]);
         } catch (QueryException $exception) {
             if ($this->isUidUniqueConstraintViolation($exception)) {
@@ -363,8 +374,8 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $card->fill([
             'uid' => $resourceUid,
             'etag' => $etag,
-            'size' => strlen($normalized['data']),
-            'data' => $normalized['data'],
+            'size' => $size,
+            'data' => $normalizedData,
         ]);
         $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
         $this->syncManagedContactUpsert($addressBook, $card);

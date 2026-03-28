@@ -16,6 +16,9 @@ function createEmptyContactForm(addressBookIds = []) {
     urls: [],
     addresses: [],
     instant_messages: [],
+    photo: null,
+    photo_upload_token: null,
+    photo_remove: false,
     address_book_ids: addressBookIds,
   };
 }
@@ -175,5 +178,66 @@ describe("useContactsPageState", () => {
 
     await waitFor(() => expect(deps.auth.refreshAuth).toHaveBeenCalledTimes(1));
     expect(deps.navigate).toHaveBeenCalledWith("/", { replace: true });
+  });
+
+  it("stages a photo upload token and tracks remove/undo state", async () => {
+    const deps = createBaseDependencies({
+      api: {
+        get: vi.fn().mockResolvedValue({
+          data: {
+            contacts: [],
+            address_books: [{ id: 3, display_name: "Personal", uri: "personal" }],
+            photo_constraints: {
+              max_upload_kb: 8192,
+              min_crop_size: 600,
+              output_size: 1024,
+              allowed_mimes: ["image/jpeg"],
+            },
+          },
+        }),
+        post: vi
+          .fn()
+          .mockResolvedValueOnce({ data: { token: "stage-token-123" } })
+          .mockResolvedValueOnce({ data: {} }),
+        patch: vi.fn().mockResolvedValue({ data: {} }),
+        delete: vi.fn().mockResolvedValue({ data: {} }),
+      },
+    });
+
+    const { result } = renderHook(() => useContactsPageState(deps));
+
+    await waitFor(() => expect(deps.api.get).toHaveBeenCalledTimes(1));
+
+    const testFile = new File(["stub"], "photo.jpg", { type: "image/jpeg" });
+
+    await act(async () => {
+      await result.current.stageContactPhotoUpload({
+        file: testFile,
+        crop: { x: 12, y: 18, width: 650, height: 650 },
+      });
+    });
+
+    expect(deps.api.post).toHaveBeenCalledWith(
+      "/api/contacts/photos/stage",
+      expect.any(FormData),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "Content-Type": "multipart/form-data",
+        }),
+      }),
+    );
+    expect(result.current.form.photo_upload_token).toBe("stage-token-123");
+    expect(result.current.form.photo_remove).toBe(false);
+
+    await act(async () => {
+      result.current.removePhotoFromForm();
+    });
+    expect(result.current.form.photo_upload_token).toBe(null);
+    expect(result.current.form.photo_remove).toBe(false);
+
+    await act(async () => {
+      result.current.undoPhotoRemoval();
+    });
+    expect(result.current.form.photo_remove).toBe(false);
   });
 });

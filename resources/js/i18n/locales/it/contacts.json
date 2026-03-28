@@ -278,6 +278,40 @@
       "remove": "Rimuovi",
       "dragAria": "Trascina per riordinare {{rowLabel}} {{rowNumber}}",
       "dragTitle": "Trascina per riordinare"
+    },
+    "photo": {
+      "label": "Foto",
+      "description": "Carica, ritaglia e collega una foto contatto quadrata.",
+      "previewAlt": "Anteprima foto contatto",
+      "empty": "Nessuna foto",
+      "constraints": "Ritaglio minimo: {{min}}x{{min}} px. Dimensione massima file: {{maxMb}} MB.",
+      "cropTitle": "Ritaglia foto contatto",
+      "cropDescription": "Posiziona e ingrandisci la foto. L’immagine finale viene salvata in formato quadrato 1:1 (minimo {{min}}x{{min}}).",
+      "zoomLabel": "Zoom",
+      "status": {
+        "none": "La foto è facoltativa.",
+        "saved": "Foto salvata.",
+        "pendingUpload": "Nuova foto selezionata. Salva il contatto per applicarla.",
+        "pendingRemoval": "Foto contrassegnata per la rimozione. Salva il contatto per applicarla."
+      },
+      "actions": {
+        "upload": "Carica foto",
+        "change": "Cambia foto",
+        "remove": "Rimuovi foto",
+        "undoRemove": "Annulla rimozione",
+        "clearPending": "Cancella in sospeso",
+        "cancel": "Annulla",
+        "useCrop": "Usa questo ritaglio",
+        "uploading": "Caricamento..."
+      },
+      "errors": {
+        "format": "Formato immagine non supportato. Formati consentiti: {{formats}}.",
+        "maxSize": "L’immagine supera la dimensione massima di caricamento di {{sizeMb}} MB.",
+        "minDimensions": "L’immagine deve essere almeno di {{min}}x{{min}} pixel.",
+        "minCrop": "L’area di ritaglio deve essere almeno di {{min}}x{{min}} pixel.",
+        "read": "Impossibile leggere l’immagine selezionata.",
+        "upload": "Impossibile caricare la foto del contatto."
+      }
     }
   },
   "states": {

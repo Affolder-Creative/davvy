@@ -278,6 +278,40 @@
       "remove": "删除",
       "dragAria": "拖动以重新排序 {{rowLabel}} {{rowNumber}}",
       "dragTitle": "拖动以重新排序"
+    },
+    "photo": {
+      "label": "照片",
+      "description": "上传、裁剪并附加方形联系人照片。",
+      "previewAlt": "联系人照片预览",
+      "empty": "无照片",
+      "constraints": "最小裁剪：{{min}}x{{min}} 像素。最大文件大小：{{maxMb}} MB。",
+      "cropTitle": "裁剪联系人照片",
+      "cropDescription": "调整照片位置和缩放。最终图片将保存为 1:1 方形（最小 {{min}}x{{min}}）。",
+      "zoomLabel": "缩放",
+      "status": {
+        "none": "照片为可选项。",
+        "saved": "照片已保存。",
+        "pendingUpload": "已选择新照片。保存联系人后生效。",
+        "pendingRemoval": "照片已标记为删除。保存联系人后生效。"
+      },
+      "actions": {
+        "upload": "上传照片",
+        "change": "更换照片",
+        "remove": "删除照片",
+        "undoRemove": "撤销删除",
+        "clearPending": "清除待处理",
+        "cancel": "取消",
+        "useCrop": "使用此裁剪",
+        "uploading": "上传中..."
+      },
+      "errors": {
+        "format": "不支持的图片格式。允许的格式：{{formats}}。",
+        "maxSize": "图片超过最大上传大小 {{sizeMb}} MB。",
+        "minDimensions": "图片尺寸至少需为 {{min}}x{{min}} 像素。",
+        "minCrop": "裁剪区域至少需为 {{min}}x{{min}} 像素。",
+        "read": "无法读取所选图片。",
+        "upload": "无法上传联系人照片。"
+      }
     }
   },
   "states": {

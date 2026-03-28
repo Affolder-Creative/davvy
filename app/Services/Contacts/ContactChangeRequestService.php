@@ -22,6 +22,7 @@ class ContactChangeRequestService
 {
     public function __construct(
         private readonly ContactService $contactService,
+        private readonly ContactPhotoService $contactPhotoService,
         private readonly ContactVCardService $vCardService,
         private readonly ResourceAccessService $accessService,
         private readonly RegistrationSettingsService $settingsService,
@@ -46,11 +47,20 @@ class ContactChangeRequestService
 
         $this->assertUserCanWriteAddressBooks($actor, $addressBookIds);
 
+        $normalizedPayload = $payload;
+        if ($this->shouldQueueModeratedUpdate($actor, $contact, $addressBookIds)) {
+            $normalizedPayload = $this->contactPhotoService->prepareWebPayloadForModeration(
+                actor: $actor,
+                contact: $contact,
+                incomingPayload: $payload,
+            );
+        }
+
         return $this->enqueueIfNeeded(
             actor: $actor,
             contact: $contact,
             operation: ContactChangeOperation::Update,
-            proposedPayload: $payload,
+            proposedPayload: $normalizedPayload,
             proposedAddressBookIds: $addressBookIds,
             source: 'web',
             meta: [],
@@ -102,12 +112,22 @@ class ContactChangeRequestService
             return null;
         }
 
+        $normalizedPayload = $parsed['payload'];
+        $contactAddressBookIds = $this->contactService->addressBookIdsForContact($contact);
+        if ($this->shouldQueueModeratedUpdate($actor, $contact, $contactAddressBookIds)) {
+            $normalizedPayload = $this->contactPhotoService->prepareCardDavPayloadForModeration(
+                contact: $contact,
+                incomingPayload: $parsed['payload'],
+                parsedPhoto: is_array($parsed['parsed_photo'] ?? null) ? $parsed['parsed_photo'] : null,
+            );
+        }
+
         return $this->enqueueIfNeeded(
             actor: $actor,
             contact: $contact,
             operation: ContactChangeOperation::Update,
-            proposedPayload: $parsed['payload'],
-            proposedAddressBookIds: $this->contactService->addressBookIdsForContact($contact),
+            proposedPayload: $normalizedPayload,
+            proposedAddressBookIds: $contactAddressBookIds,
             source: 'carddav',
             meta: [
                 'address_book_id' => $addressBook->id,
@@ -582,6 +602,46 @@ class ContactChangeRequestService
         sort($keys);
 
         return $keys;
+    }
+
+    /**
+     * Checks if this update would be queued under moderation rules.
+     *
+     * @param  array<int, int>  $requestedAddressBookIds
+     */
+    private function shouldQueueModeratedUpdate(
+        User $actor,
+        Contact $contact,
+        array $requestedAddressBookIds,
+    ): bool {
+        if (! $this->settingsService->isContactChangeModerationEnabled()) {
+            return false;
+        }
+
+        if ($actor->isAdmin()) {
+            return false;
+        }
+
+        $baseAddressBookIds = $this->normalizeAddressBookIds(
+            $this->contactService->addressBookIdsForContact($contact),
+        );
+        $requestedIds = $this->normalizeAddressBookIds(
+            $requestedAddressBookIds === [] ? $baseAddressBookIds : $requestedAddressBookIds,
+        );
+        $impactedIds = $this->normalizeAddressBookIds([
+            ...$baseAddressBookIds,
+            ...$requestedIds,
+        ]);
+
+        if ($impactedIds === []) {
+            return false;
+        }
+
+        $books = AddressBook::query()
+            ->whereIn('id', $impactedIds)
+            ->get();
+
+        return $this->queueOwnerIdsFor($actor, $books) !== [];
     }
 
     /**

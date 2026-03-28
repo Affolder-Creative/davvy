@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Contact;
 use App\Services\Contacts\ContactChangeRequestService;
+use App\Services\Contacts\ContactPhotoService;
 use App\Services\Contacts\ContactService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,7 @@ class ContactController extends Controller
     public function __construct(
         private readonly ContactService $contactService,
         private readonly ContactChangeRequestService $changeRequestService,
+        private readonly ContactPhotoService $contactPhotoService,
     ) {}
 
     /**
@@ -31,6 +33,7 @@ class ContactController extends Controller
         return response()->json([
             'contacts' => $contacts,
             'address_books' => $this->contactService->writableAddressBooksFor($user)->all(),
+            'photo_constraints' => $this->contactPhotoService->uploadConstraints(),
         ]);
     }
 
@@ -189,6 +192,8 @@ class ContactController extends Controller
             'instant_messages.*.label' => ['nullable', 'string', 'max:64'],
             'instant_messages.*.custom_label' => ['nullable', 'string', 'max:100'],
             'instant_messages.*.value' => ['nullable', 'string', 'max:255'],
+            'photo_upload_token' => ['nullable', 'uuid'],
+            'photo_remove' => ['sometimes', 'boolean'],
             'address_book_ids' => ['required', 'array', 'min:1'],
             'address_book_ids.*' => ['integer', 'min:1'],
         ]);
@@ -233,6 +238,8 @@ class ContactController extends Controller
                 $relatedContactDisplayNames,
             ),
             'instant_messages' => $this->normalizeValueRows($data['instant_messages'] ?? []),
+            'photo_upload_token' => $this->normalizeString($data['photo_upload_token'] ?? null),
+            'photo_remove' => (bool) ($data['photo_remove'] ?? false),
         ];
 
         if (
@@ -261,6 +268,8 @@ class ContactController extends Controller
     private function serializeContact(Contact $contact): array
     {
         $payload = is_array($contact->payload) ? $contact->payload : [];
+        $publicPhoto = $this->contactPhotoService->publicPhotoData($payload, (int) $contact->id);
+        unset($payload['photo_upload_token'], $payload['photo_remove'], $payload['photo']);
 
         $addressBooks = $contact->assignments
             ->filter(fn ($assignment): bool => $assignment->addressBook !== null)
@@ -279,6 +288,7 @@ class ContactController extends Controller
                 'display_name' => $contact->full_name ?: 'Unnamed Contact',
                 'address_book_ids' => $addressBooks->pluck('id')->all(),
                 'address_books' => $addressBooks->all(),
+                'photo' => $publicPhoto,
             ],
             $payload,
         );

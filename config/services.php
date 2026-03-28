@@ -20,6 +20,24 @@ return [
         'birthday_prioritize_nickname' => (bool) env('MILESTONE_BIRTHDAY_PRIORITIZE_NICKNAME', true),
         'anniversary_pair_include_last_name' => (bool) env('MILESTONE_ANNIVERSARY_PAIR_INCLUDE_LAST_NAME', false),
         'anniversary_prioritize_nickname' => (bool) env('MILESTONE_ANNIVERSARY_PRIORITIZE_NICKNAME', true),
+        'photo' => [
+            'disk' => (string) env('CONTACT_PHOTO_DISK', 'local'),
+            'prefix' => trim((string) env('CONTACT_PHOTO_PREFIX', 'contacts/photos'), '/'),
+            'max_upload_kb' => (int) env('CONTACT_PHOTO_MAX_UPLOAD_KB', 8192),
+            'min_crop_size' => (int) env('CONTACT_PHOTO_MIN_CROP_SIZE', 600),
+            'output_size' => (int) env('CONTACT_PHOTO_OUTPUT_SIZE', 1024),
+            'jpeg_quality' => (int) env('CONTACT_PHOTO_JPEG_QUALITY', 82),
+            'thumbnail_size' => (int) env('CONTACT_PHOTO_THUMBNAIL_SIZE', 192),
+            'thumbnail_quality' => (int) env('CONTACT_PHOTO_THUMBNAIL_QUALITY', 74),
+            'stage_ttl_minutes' => (int) env('CONTACT_PHOTO_STAGE_TTL_MINUTES', 10080),
+            'allowed_mimes' => array_values(array_filter(array_map(
+                fn (string $mime): string => strtolower(trim($mime)),
+                explode(',', (string) env(
+                    'CONTACT_PHOTO_ALLOWED_MIMES',
+                    'image/jpeg,image/png,image/webp',
+                )),
+            ))),
+        ],
     ],
     'backups' => [
         'enabled' => (bool) env('ENABLE_AUTOMATED_BACKUPS', false),
