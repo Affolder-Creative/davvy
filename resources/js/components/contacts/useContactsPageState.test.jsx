@@ -240,4 +240,46 @@ describe("useContactsPageState", () => {
     });
     expect(result.current.form.photo_remove).toBe(false);
   });
+
+  it("filters sidebar results by core name fields and excludes related-name matches", async () => {
+    const deps = createBaseDependencies({
+      api: {
+        get: vi.fn().mockResolvedValue({
+          data: {
+            contacts: [
+              { id: 101, first_name: "Aster", address_book_ids: [3] },
+              { id: 102, middle_name: "Aster", address_book_ids: [3] },
+              { id: 103, last_name: "Aster", address_book_ids: [3] },
+              { id: 104, nickname: "Aster", address_book_ids: [3] },
+              { id: 105, maiden_name: "Aster", address_book_ids: [3] },
+              {
+                id: 106,
+                first_name: "Taylor",
+                related_names: [{ value: "Aster", label: "spouse" }],
+                address_book_ids: [3],
+              },
+              { id: 107, company: "Aster Co", address_book_ids: [3] },
+            ],
+            address_books: [{ id: 3, display_name: "Personal", uri: "personal" }],
+          },
+        }),
+        post: vi.fn().mockResolvedValue({ data: {} }),
+        patch: vi.fn().mockResolvedValue({ data: {} }),
+        delete: vi.fn().mockResolvedValue({ data: {} }),
+      },
+    });
+
+    const { result } = renderHook(() => useContactsPageState(deps));
+
+    await waitFor(() => expect(deps.api.get).toHaveBeenCalledWith("/api/contacts"));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.setContactSearchTerm("aster");
+    });
+
+    expect(result.current.filteredContacts.map((contact) => contact.id)).toEqual([
+      101, 102, 103, 104, 105,
+    ]);
+  });
 });

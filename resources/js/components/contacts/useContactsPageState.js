@@ -181,14 +181,6 @@ export default function useContactsPageState({
       String(value ?? "")
         .toLowerCase()
         .includes(query);
-    const rowValueIncludesQuery = (rows) =>
-      Array.isArray(rows)
-        ? rows.some(
-            (row) =>
-              searchValueIncludesQuery(row?.value) ||
-              searchValueIncludesQuery(row?.custom_label),
-          )
-        : false;
 
     return contacts.filter((contact) => {
       if (activeAddressBookId !== null) {
@@ -207,53 +199,17 @@ export default function useContactsPageState({
 
       if (
         [
-          contact.display_name,
           contact.first_name,
           contact.middle_name,
           contact.last_name,
           contact.nickname,
-          contact.company,
-          contact.job_title,
-          contact.department,
-          contact.profile,
+          contact.maiden_name,
         ].some(searchValueIncludesQuery)
       ) {
         return true;
       }
 
-      if (
-        Array.isArray(contact.address_books) &&
-        contact.address_books.some(
-          (book) =>
-            searchValueIncludesQuery(book?.display_name) ||
-            searchValueIncludesQuery(book?.uri),
-        )
-      ) {
-        return true;
-      }
-
-      if (
-        rowValueIncludesQuery(contact.phones) ||
-        rowValueIncludesQuery(contact.emails) ||
-        rowValueIncludesQuery(contact.urls) ||
-        rowValueIncludesQuery(contact.related_names) ||
-        rowValueIncludesQuery(contact.instant_messages)
-      ) {
-        return true;
-      }
-
-      return Array.isArray(contact.addresses)
-        ? contact.addresses.some((address) =>
-            [
-              address?.street,
-              address?.city,
-              address?.state,
-              address?.postal_code,
-              address?.country,
-              address?.custom_label,
-            ].some(searchValueIncludesQuery),
-          )
-        : false;
+      return false;
     });
   }, [contactAddressBookFilter, contactSearchTerm, contacts]);
 
