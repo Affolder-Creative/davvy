@@ -9,11 +9,15 @@ const CONTACTS = [
     id: 11,
     display_name: "Alice Smith",
     address_books: [{ id: 1 }],
+    photo: {
+      thumbnail_url: "/api/contacts/11/photo?variant=thumb&v=test-thumb",
+    },
   },
   {
     id: 12,
     display_name: "Bob Jones",
     address_books: [{ id: 1 }, { id: 2 }],
+    photo: null,
   },
 ];
 
@@ -115,5 +119,15 @@ describe("ContactsListSidebar", () => {
     render(<ContactsListSidebar {...props} />);
 
     expect(screen.getByText("1 match")).toBeInTheDocument();
+  });
+
+  it("renders contact thumbnails when available and falls back to initials", () => {
+    render(<ContactsListSidebar {...buildProps()} />);
+
+    const thumbnail = document.querySelector(
+      'img[src*="/api/contacts/11/photo?variant=thumb"]',
+    );
+    expect(thumbnail).toBeInTheDocument();
+    expect(screen.getByText("BJ")).toBeInTheDocument();
   });
 });

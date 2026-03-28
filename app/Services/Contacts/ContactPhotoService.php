@@ -276,7 +276,18 @@ class ContactPhotoService
      * Returns public photo metadata for API serialization.
      *
      * @param  array<string, mixed>  $payload
-     * @return array{url:string,width:int,height:int,mime:string,bytes:int,version:string}|null
+     * @return array{
+     *   url:string,
+     *   thumbnail_url:string,
+     *   width:int,
+     *   height:int,
+     *   thumbnail_width:int,
+     *   thumbnail_height:int,
+     *   mime:string,
+     *   bytes:int,
+     *   thumbnail_bytes:int,
+     *   version:string
+     * }|null
      */
     public function publicPhotoData(array $payload, int $contactId): ?array
     {
@@ -287,13 +298,19 @@ class ContactPhotoService
 
         $version = $this->cleanString($photo['version'] ?? null)
             ?? substr((string) ($photo['sha256'] ?? sha1((string) ($photo['path'] ?? 'photo'))), 0, 16);
+        $thumbnailVersion = $this->cleanString($photo['thumb_version'] ?? null)
+            ?? substr((string) ($photo['thumb_sha256'] ?? $version), 0, 16);
 
         return [
             'url' => '/api/contacts/'.$contactId.'/photo?v='.$version,
+            'thumbnail_url' => '/api/contacts/'.$contactId.'/photo?variant=thumb&v='.$thumbnailVersion,
             'width' => (int) ($photo['width'] ?? $this->outputSize()),
             'height' => (int) ($photo['height'] ?? $this->outputSize()),
+            'thumbnail_width' => (int) ($photo['thumb_width'] ?? $this->thumbnailSize()),
+            'thumbnail_height' => (int) ($photo['thumb_height'] ?? $this->thumbnailSize()),
             'mime' => $this->cleanString($photo['mime'] ?? null) ?? 'image/jpeg',
             'bytes' => max(0, (int) ($photo['bytes'] ?? 0)),
+            'thumbnail_bytes' => max(0, (int) ($photo['thumb_bytes'] ?? 0)),
             'version' => $version,
         ];
     }
@@ -304,24 +321,42 @@ class ContactPhotoService
      * @param  array<string, mixed>  $payload
      * @return array{binary:string,mime:string,etag:string}|null
      */
-    public function readPhotoBinary(array $payload): ?array
+    public function readPhotoBinary(array $payload, string $variant = 'full'): ?array
     {
         $photo = $this->photoFromPayload($payload);
         if ($photo === null) {
             return null;
         }
 
+        $normalizedVariant = strtolower(trim($variant));
+        $wantsThumbnail = $normalizedVariant === 'thumb' || $normalizedVariant === 'thumbnail';
         $disk = $this->photoDiskForMeta($photo);
-        $path = $this->photoPath($photo);
+        $path = $wantsThumbnail
+            ? $this->photoThumbnailPath($photo)
+            : $this->photoPath($photo);
+
+        if ($path === null && $wantsThumbnail) {
+            $path = $this->photoPath($photo);
+            $wantsThumbnail = false;
+        }
 
         if ($path === null || ! Storage::disk($disk)->exists($path)) {
             return null;
         }
 
         $binary = Storage::disk($disk)->get($path);
-        $mime = $this->cleanString($photo['mime'] ?? null) ?? 'image/jpeg';
-        $etag = $this->cleanString($photo['version'] ?? null)
-            ?? substr((string) ($photo['sha256'] ?? sha1($binary)), 0, 16);
+        $mime = $wantsThumbnail
+            ? 'image/jpeg'
+            : ($this->cleanString($photo['mime'] ?? null) ?? 'image/jpeg');
+        $etag = $wantsThumbnail
+            ? (
+                $this->cleanString($photo['thumb_version'] ?? null)
+                ?? substr((string) ($photo['thumb_sha256'] ?? sha1($binary)), 0, 16)
+            )
+            : (
+                $this->cleanString($photo['version'] ?? null)
+                ?? substr((string) ($photo['sha256'] ?? sha1($binary)), 0, 16)
+            );
 
         return [
             'binary' => $binary,
@@ -367,21 +402,24 @@ class ContactPhotoService
         $referenced = Contact::query()
             ->orderBy('id')
             ->get(['payload'])
-            ->map(function (Contact $contact): ?string {
+            ->flatMap(function (Contact $contact): array {
                 $payload = is_array($contact->payload) ? $contact->payload : [];
                 $photo = $this->photoFromPayload($payload);
                 if ($photo === null) {
-                    return null;
+                    return [];
                 }
 
                 $disk = $this->photoDiskForMeta($photo);
                 if ($disk !== $this->photoDisk()) {
-                    return null;
+                    return [];
                 }
 
-                return $this->photoPath($photo);
+                return array_values(array_filter([
+                    $this->photoPath($photo),
+                    $this->photoThumbnailPath($photo),
+                ]));
             })
-            ->filter(fn (?string $path): bool => is_string($path) && $path !== '')
+            ->filter(fn (mixed $path): bool => is_string($path) && $path !== '')
             ->values()
             ->all();
 
@@ -541,6 +579,18 @@ class ContactPhotoService
     }
 
     /**
+     * Returns thumbnail file path for a final photo.
+     */
+    private function thumbnailPath(string $finalPath): string
+    {
+        $normalized = ltrim($finalPath, '/');
+        $directory = trim((string) dirname($normalized), '/');
+        $stem = pathinfo($normalized, PATHINFO_FILENAME);
+
+        return $directory.'/thumb/'.$stem.'.jpg';
+    }
+
+    /**
      * Returns photo root prefix.
      */
     private function photoPrefix(): string
@@ -559,7 +609,23 @@ class ContactPhotoService
     /**
      * Promotes staged upload to final location.
      *
-     * @return array{disk:string,path:string,mime:string,width:int,height:int,bytes:int,sha256:string,version:string,updated_at:string}
+     * @return array{
+     *   disk:string,
+     *   path:string,
+     *   thumb_path:string,
+     *   mime:string,
+     *   width:int,
+     *   height:int,
+     *   thumb_width:int,
+     *   thumb_height:int,
+     *   bytes:int,
+     *   thumb_bytes:int,
+     *   sha256:string,
+     *   thumb_sha256:string,
+     *   version:string,
+     *   thumb_version:string,
+     *   updated_at:string
+     * }
      */
     private function promoteUploadToFinalPhoto(ContactPhotoUpload $upload, Contact $contact): array
     {
@@ -575,6 +641,7 @@ class ContactPhotoService
         $finalPath = $this->finalPath($contact, $upload->sha256);
         $binary = $storage->get($upload->path);
         $storage->put($finalPath, $binary);
+        $thumbnail = $this->createThumbnailForFinalPhoto($disk, $finalPath, $binary);
         $storage->delete($upload->path);
 
         $upload->consumed_at = now();
@@ -583,12 +650,18 @@ class ContactPhotoService
         return [
             'disk' => $disk,
             'path' => $finalPath,
+            'thumb_path' => $thumbnail['path'],
             'mime' => $upload->mime,
             'width' => (int) $upload->width,
             'height' => (int) $upload->height,
+            'thumb_width' => $thumbnail['width'],
+            'thumb_height' => $thumbnail['height'],
             'bytes' => (int) $upload->bytes,
+            'thumb_bytes' => $thumbnail['bytes'],
             'sha256' => $upload->sha256,
+            'thumb_sha256' => $thumbnail['sha256'],
             'version' => substr($upload->sha256, 0, 16),
+            'thumb_version' => substr($thumbnail['sha256'], 0, 16),
             'updated_at' => now()->toIso8601String(),
         ];
     }
@@ -597,7 +670,23 @@ class ContactPhotoService
      * Stores parsed CardDAV photo content to final location.
      *
      * @param  array{binary:string,mime:string,sha256:string,width:int,height:int}  $parsedPhoto
-     * @return array{disk:string,path:string,mime:string,width:int,height:int,bytes:int,sha256:string,version:string,updated_at:string}|null
+     * @return array{
+     *   disk:string,
+     *   path:string,
+     *   thumb_path:string,
+     *   mime:string,
+     *   width:int,
+     *   height:int,
+     *   thumb_width:int,
+     *   thumb_height:int,
+     *   bytes:int,
+     *   thumb_bytes:int,
+     *   sha256:string,
+     *   thumb_sha256:string,
+     *   version:string,
+     *   thumb_version:string,
+     *   updated_at:string
+     * }|null
      */
     private function storeParsedPhoto(Contact $contact, array $parsedPhoto): ?array
     {
@@ -609,16 +698,23 @@ class ContactPhotoService
         $disk = $this->photoDisk();
         $path = $this->finalPath($contact, $normalized['sha256']);
         Storage::disk($disk)->put($path, $normalized['binary']);
+        $thumbnail = $this->createThumbnailForFinalPhoto($disk, $path, $normalized['binary']);
 
         return [
             'disk' => $disk,
             'path' => $path,
+            'thumb_path' => $thumbnail['path'],
             'mime' => $normalized['mime'],
             'width' => $normalized['width'],
             'height' => $normalized['height'],
+            'thumb_width' => $thumbnail['width'],
+            'thumb_height' => $thumbnail['height'],
             'bytes' => strlen($normalized['binary']),
+            'thumb_bytes' => $thumbnail['bytes'],
             'sha256' => $normalized['sha256'],
+            'thumb_sha256' => $thumbnail['sha256'],
             'version' => substr($normalized['sha256'], 0, 16),
+            'thumb_version' => substr($thumbnail['sha256'], 0, 16),
             'updated_at' => now()->toIso8601String(),
         ];
     }
@@ -804,11 +900,65 @@ class ContactPhotoService
     }
 
     /**
+     * Renders and stores a thumbnail next to the final photo.
+     *
+     * @return array{path:string,width:int,height:int,bytes:int,sha256:string}
+     */
+    private function createThumbnailForFinalPhoto(string $disk, string $finalPath, string $sourceBinary): array
+    {
+        $imagick = new Imagick;
+        $imagick->readImageBlob($sourceBinary);
+
+        $size = $this->thumbnailSize();
+        $imagick->resizeImage($size, $size, Imagick::FILTER_LANCZOS, 1, true);
+        $imagick->stripImage();
+        $imagick->setImageFormat('jpeg');
+        $imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+        $imagick->setImageCompressionQuality($this->thumbnailJpegQuality());
+        $imagick->setInterlaceScheme(Imagick::INTERLACE_PLANE);
+
+        $binary = (string) $imagick->getImageBlob();
+        $imagick->clear();
+        $imagick->destroy();
+
+        if ($binary === '') {
+            throw new RuntimeException('Unable to generate contact photo thumbnail.');
+        }
+
+        $path = $this->thumbnailPath($finalPath);
+        Storage::disk($disk)->put($path, $binary);
+
+        return [
+            'path' => $path,
+            'width' => $size,
+            'height' => $size,
+            'bytes' => strlen($binary),
+            'sha256' => hash('sha256', $binary),
+        ];
+    }
+
+    /**
      * Returns JPEG quality.
      */
     private function jpegQuality(): int
     {
         return max(1, min(100, (int) config('services.contacts.photo.jpeg_quality', 82)));
+    }
+
+    /**
+     * Returns output thumbnail dimension.
+     */
+    private function thumbnailSize(): int
+    {
+        return max(48, min(512, (int) config('services.contacts.photo.thumbnail_size', 192)));
+    }
+
+    /**
+     * Returns thumbnail JPEG quality.
+     */
+    private function thumbnailJpegQuality(): int
+    {
+        return max(1, min(100, (int) config('services.contacts.photo.thumbnail_quality', 74)));
     }
 
     /**
@@ -874,6 +1024,26 @@ class ContactPhotoService
     }
 
     /**
+     * Returns thumbnail path from metadata.
+     *
+     * @param  array<string, mixed>  $photo
+     */
+    private function photoThumbnailPath(array $photo): ?string
+    {
+        $path = $this->cleanString($photo['thumb_path'] ?? null);
+        if ($path !== null) {
+            return ltrim($path, '/');
+        }
+
+        $mainPath = $this->photoPath($photo);
+        if ($mainPath === null) {
+            return null;
+        }
+
+        return $this->thumbnailPath($mainPath);
+    }
+
+    /**
      * Returns disk from photo metadata.
      *
      * @param  array<string, mixed>  $photo
@@ -892,11 +1062,13 @@ class ContactPhotoService
     {
         $disk = $this->photoDiskForMeta($photo);
         $path = $this->photoPath($photo);
-        if ($path === null) {
+        $thumbnailPath = $this->photoThumbnailPath($photo);
+
+        if ($path === null && $thumbnailPath === null) {
             return;
         }
 
-        Storage::disk($disk)->delete($path);
+        Storage::disk($disk)->delete(array_values(array_filter([$path, $thumbnailPath])));
     }
 
     /**

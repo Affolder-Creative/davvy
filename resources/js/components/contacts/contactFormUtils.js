@@ -556,10 +556,17 @@ export function hydrateContactForm(contact, defaultAddressBookIds = []) {
       contact.photo.url.trim() !== ""
         ? {
             url: contact.photo.url,
+            thumbnail_url:
+              typeof contact.photo.thumbnail_url === "string"
+                ? contact.photo.thumbnail_url
+                : "",
             width: Number(contact.photo.width ?? 0) || 0,
             height: Number(contact.photo.height ?? 0) || 0,
+            thumbnail_width: Number(contact.photo.thumbnail_width ?? 0) || 0,
+            thumbnail_height: Number(contact.photo.thumbnail_height ?? 0) || 0,
             mime: String(contact.photo.mime ?? ""),
             bytes: Number(contact.photo.bytes ?? 0) || 0,
+            thumbnail_bytes: Number(contact.photo.thumbnail_bytes ?? 0) || 0,
             version: String(contact.photo.version ?? ""),
           }
         : null,

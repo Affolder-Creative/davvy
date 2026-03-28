@@ -60,10 +60,19 @@ class ContactPhotoManagementTest extends TestCase
 
         $this->assertIsArray($photo);
         $this->assertSame('image/jpeg', $photo['mime'] ?? null);
+        $this->assertSame(192, (int) ($photo['thumb_width'] ?? 0));
+        $this->assertSame(192, (int) ($photo['thumb_height'] ?? 0));
+        $this->assertNotSame('', (string) ($created->json('photo.thumbnail_url') ?? ''));
         Storage::disk('local')->assertExists((string) ($photo['path'] ?? ''));
+        Storage::disk('local')->assertExists((string) ($photo['thumb_path'] ?? ''));
 
         $this->actingAs($user)
             ->get('/api/contacts/'.$contactId.'/photo')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/jpeg');
+
+        $this->actingAs($user)
+            ->get('/api/contacts/'.$contactId.'/photo?variant=thumb')
             ->assertOk()
             ->assertHeader('Content-Type', 'image/jpeg');
 
@@ -85,6 +94,7 @@ class ContactPhotoManagementTest extends TestCase
         $contact = $this->createContactWithPhoto($user, $book);
         $payload = is_array($contact->payload) ? $contact->payload : [];
         $existingPhotoPath = (string) ($payload['photo']['path'] ?? '');
+        $existingThumbnailPath = (string) ($payload['photo']['thumb_path'] ?? '');
 
         $this->actingAs($user)
             ->patchJson('/api/contacts/'.$contact->id, [
@@ -107,6 +117,7 @@ class ContactPhotoManagementTest extends TestCase
         $updatedPayload = is_array($contact->payload) ? $contact->payload : [];
         $this->assertArrayNotHasKey('photo', $updatedPayload);
         Storage::disk('local')->assertMissing($existingPhotoPath);
+        Storage::disk('local')->assertMissing($existingThumbnailPath);
 
         $assignment = ContactAddressBookAssignment::query()
             ->where('contact_id', $contact->id)

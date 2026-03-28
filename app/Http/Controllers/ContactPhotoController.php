@@ -43,7 +43,8 @@ class ContactPhotoController extends Controller
         $this->assertCanWriteContact($request, $model);
 
         $payload = is_array($model->payload) ? $model->payload : [];
-        $photo = $this->contactPhotoService->readPhotoBinary($payload);
+        $variant = strtolower(trim((string) $request->query('variant', 'full')));
+        $photo = $this->contactPhotoService->readPhotoBinary($payload, $variant);
         if ($photo === null) {
             abort(404);
         }

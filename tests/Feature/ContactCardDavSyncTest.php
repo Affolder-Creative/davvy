@@ -457,6 +457,7 @@ class ContactCardDavSyncTest extends TestCase
         $this->assertIsArray($payload['photo'] ?? null);
         $this->assertSame('image/jpeg', $payload['photo']['mime'] ?? null);
         Storage::disk('local')->assertExists((string) ($payload['photo']['path'] ?? ''));
+        Storage::disk('local')->assertExists((string) ($payload['photo']['thumb_path'] ?? ''));
 
         $photoPath = (string) ($payload['photo']['path'] ?? '');
 

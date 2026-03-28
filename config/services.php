@@ -27,6 +27,8 @@ return [
             'min_crop_size' => (int) env('CONTACT_PHOTO_MIN_CROP_SIZE', 600),
             'output_size' => (int) env('CONTACT_PHOTO_OUTPUT_SIZE', 1024),
             'jpeg_quality' => (int) env('CONTACT_PHOTO_JPEG_QUALITY', 82),
+            'thumbnail_size' => (int) env('CONTACT_PHOTO_THUMBNAIL_SIZE', 192),
+            'thumbnail_quality' => (int) env('CONTACT_PHOTO_THUMBNAIL_QUALITY', 74),
             'stage_ttl_minutes' => (int) env('CONTACT_PHOTO_STAGE_TTL_MINUTES', 10080),
             'allowed_mimes' => array_values(array_filter(array_map(
                 fn (string $mime): string => strtolower(trim($mime)),
