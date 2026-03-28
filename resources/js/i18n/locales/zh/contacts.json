@@ -289,7 +289,7 @@
       "cropDescription": "Position and zoom your photo. The final image is saved as a 1:1 square (minimum {{min}}x{{min}}).",
       "zoomLabel": "Zoom",
       "status": {
-        "none": "No photo saved.",
+        "none": "Photo is optional.",
         "saved": "Saved photo.",
         "pendingUpload": "New photo selected. Save contact to apply.",
         "pendingRemoval": "Photo marked for removal. Save contact to apply."
