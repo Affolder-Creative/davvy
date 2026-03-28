@@ -107,6 +107,15 @@ export default function ContactEditorPanel({
         className="mt-5 space-y-6"
         onSubmit={saveContact}
       >
+        <ContactEditorNameSection
+          isOpen={openSections.name}
+          onToggle={() => toggleSection("name")}
+          form={form}
+          Field={Field}
+          isOptionalFieldVisible={isOptionalFieldVisible}
+          updateFormField={updateFormField}
+        />
+
         <ContactEditorPhotoSection
           photo={form.photo}
           photoUploadToken={form.photo_upload_token}
@@ -117,15 +126,6 @@ export default function ContactEditorPanel({
           onRemovePhoto={removePhotoFromForm}
           onUndoPhotoRemoval={undoPhotoRemoval}
           onClearPendingUpload={clearPendingPhotoUpload}
-        />
-
-        <ContactEditorNameSection
-          isOpen={openSections.name}
-          onToggle={() => toggleSection("name")}
-          form={form}
-          Field={Field}
-          isOptionalFieldVisible={isOptionalFieldVisible}
-          updateFormField={updateFormField}
         />
 
         <ContactEditorWorkSection
