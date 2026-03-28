@@ -31,7 +31,7 @@ FROM ${PHP_IMAGE} AS runtime-base
 WORKDIR /var/www/html
 
 RUN set -eux; \
-    apk add --no-cache nginx icu-libs libpq oniguruma libzip imagemagick; \
+    apk add --no-cache nginx icu-libs libpq oniguruma libzip imagemagick imagemagick-jpeg; \
     apk add --no-cache --virtual .build-deps $PHPIZE_DEPS icu-dev libpq-dev oniguruma-dev libzip-dev imagemagick-dev; \
     docker-php-ext-install -j"$(nproc)" pdo pdo_pgsql intl mbstring zip; \
     pecl install imagick; \
