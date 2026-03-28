@@ -1,5 +1,6 @@
 import React from "react";
 import Cropper from "react-easy-crop";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import "react-easy-crop/react-easy-crop.css";
 
@@ -171,6 +172,28 @@ export default function ContactEditorPhotoSection({
 
     setPendingPreview("");
   }, [photoUploadToken, setPendingPreview]);
+
+  React.useEffect(() => {
+    if (!modalOpen || typeof document === "undefined") {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape" && !uploading) {
+        clearCropSelection();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [clearCropSelection, modalOpen, uploading]);
 
   const handleChooseFile = async (event) => {
     const file = event.target?.files?.[0];
@@ -378,82 +401,98 @@ export default function ContactEditorPhotoSection({
         </p>
       ) : null}
 
-      {modalOpen ? (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/65 p-4">
-          <div className="surface w-full max-w-3xl rounded-2xl p-4 shadow-2xl shadow-black/30">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <h3 className="text-lg font-semibold text-app-strong">
-                  {t("editor.photo.cropTitle")}
-                </h3>
-                <p className="mt-1 text-xs text-app-muted">
-                  {t("editor.photo.cropDescription", {
-                    min: minCropSize,
-                  })}
-                </p>
+      {modalOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div className="fixed inset-0 z-[120]">
+              <button
+                type="button"
+                aria-label={t("editor.photo.actions.cancel")}
+                className="absolute inset-0 bg-app-surface/70 backdrop-blur-[2px]"
+                onClick={clearCropSelection}
+                disabled={uploading}
+              />
+
+              <div className="relative mx-auto flex min-h-full w-full max-w-5xl items-start justify-center px-4 pb-6 pt-12 sm:pt-16">
+                <div className="surface w-full max-w-3xl rounded-2xl border border-app-edge p-4 shadow-2xl shadow-black/10">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-lg font-semibold text-app-strong">
+                        {t("editor.photo.cropTitle")}
+                      </h3>
+                      <p className="mt-1 text-xs text-app-muted">
+                        {t("editor.photo.cropDescription", {
+                          min: minCropSize,
+                        })}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-outline btn-outline-sm"
+                      onClick={clearCropSelection}
+                      disabled={uploading}
+                    >
+                      {t("editor.photo.actions.cancel")}
+                    </button>
+                  </div>
+
+                  <div className="relative mt-4 h-[58vh] min-h-[280px] w-full overflow-hidden rounded-xl bg-black">
+                    <Cropper
+                      image={cropSourceUrl}
+                      crop={crop}
+                      zoom={zoom}
+                      aspect={1}
+                      onCropChange={setCrop}
+                      onZoomChange={setZoom}
+                      onCropComplete={(_, areaPixels) => setCroppedAreaPixels(areaPixels)}
+                    />
+                  </div>
+
+                  <div className="mt-4">
+                    <label
+                      className="mb-1 block text-xs font-semibold text-app-muted"
+                      htmlFor="photo-crop-zoom"
+                    >
+                      {t("editor.photo.zoomLabel")}
+                    </label>
+                    <input
+                      id="photo-crop-zoom"
+                      type="range"
+                      min={1}
+                      max={3}
+                      step={0.01}
+                      value={zoom}
+                      onChange={(event) => setZoom(Number(event.target.value))}
+                      className="w-full"
+                      disabled={uploading}
+                    />
+                  </div>
+
+                  <div className="mt-4 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      className="btn-outline btn-outline-sm"
+                      onClick={clearCropSelection}
+                      disabled={uploading}
+                    >
+                      {t("editor.photo.actions.cancel")}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={handleSaveCrop}
+                      disabled={uploading}
+                    >
+                      {uploading
+                        ? t("editor.photo.actions.uploading")
+                        : t("editor.photo.actions.useCrop")}
+                    </button>
+                  </div>
+                </div>
               </div>
-              <button
-                type="button"
-                className="btn-outline btn-outline-sm"
-                onClick={clearCropSelection}
-                disabled={uploading}
-              >
-                {t("editor.photo.actions.cancel")}
-              </button>
-            </div>
-
-            <div className="relative mt-4 h-[58vh] min-h-[280px] w-full overflow-hidden rounded-xl bg-black">
-              <Cropper
-                image={cropSourceUrl}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={(_, areaPixels) => setCroppedAreaPixels(areaPixels)}
-              />
-            </div>
-
-            <div className="mt-4">
-              <label className="mb-1 block text-xs font-semibold text-app-muted" htmlFor="photo-crop-zoom">
-                {t("editor.photo.zoomLabel")}
-              </label>
-              <input
-                id="photo-crop-zoom"
-                type="range"
-                min={1}
-                max={3}
-                step={0.01}
-                value={zoom}
-                onChange={(event) => setZoom(Number(event.target.value))}
-                className="w-full"
-                disabled={uploading}
-              />
-            </div>
-
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                className="btn-outline btn-outline-sm"
-                onClick={clearCropSelection}
-                disabled={uploading}
-              >
-                {t("editor.photo.actions.cancel")}
-              </button>
-              <button
-                type="button"
-                className="btn"
-                onClick={handleSaveCrop}
-                disabled={uploading}
-              >
-                {uploading
-                  ? t("editor.photo.actions.uploading")
-                  : t("editor.photo.actions.useCrop")}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+            </div>,
+            document.body,
+          )
+        : null}
 
     </section>
   );
