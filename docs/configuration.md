@@ -124,7 +124,7 @@ User recovery tooling:
 | --- | --- | --- |
 | `RUN_DB_MIGRATIONS` | `true` | Runs migrations on startup |
 | `RUN_DB_SEED` | `false` | Runs seeder on startup |
-| `RUN_SCHEDULER` | `true` | Runs `php artisan schedule:work` in the container for scheduled tasks (including backups) |
+| `RUN_SCHEDULER` | `true` | Runs `php artisan schedule:work` in the container for scheduled tasks (including backups and milestone horizon roll-forward sync) |
 | `DEFAULT_ADMIN_EMAIL` | _(empty)_ | Used by seeder when seeding enabled |
 | `DEFAULT_ADMIN_PASSWORD` | _(empty)_ | Used by seeder when seeding enabled |
 

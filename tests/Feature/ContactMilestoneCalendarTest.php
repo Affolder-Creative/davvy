@@ -1446,6 +1446,75 @@ class ContactMilestoneCalendarTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_milestone_sync_command_rolls_birthday_horizon_forward(): void
+    {
+        $this->travelTo(Carbon::create(2026, 1, 15, 12, 0, 0, 'UTC'));
+        AppSetting::query()->updateOrCreate(
+            ['key' => 'milestone_calendar_generation_years'],
+            ['value' => '3'],
+        );
+
+        $user = User::factory()->create();
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Family',
+            'uri' => 'family',
+        ]);
+
+        $this->actingAs($user)
+            ->postJson('/api/contacts', $this->contactPayload([
+                'address_book_ids' => [$addressBook->id],
+                'dates' => [],
+            ]))
+            ->assertCreated();
+
+        $enabled = $this->actingAs($user)
+            ->patchJson('/api/address-books/'.$addressBook->id.'/milestone-calendars', [
+                'birthdays_enabled' => true,
+                'anniversaries_enabled' => false,
+            ])
+            ->assertOk();
+
+        $birthdayCalendarId = (int) $enabled->json('milestone_calendars.birthdays.calendar_id');
+
+        $extractYears = fn () => CalendarObject::query()
+            ->where('calendar_id', $birthdayCalendarId)
+            ->orderBy('uri')
+            ->pluck('uri')
+            ->map(function (string $uri): int {
+                preg_match('/-(\d{4})\.ics$/', $uri, $matches);
+
+                return (int) ($matches[1] ?? 0);
+            })
+            ->values()
+            ->all();
+
+        $this->assertSame([2026, 2027, 2028], $extractYears());
+
+        $this->travelTo(Carbon::create(2027, 1, 16, 12, 0, 0, 'UTC'));
+        $this->artisan('app:milestones:sync')->assertExitCode(0);
+
+        $rolledYears = $extractYears();
+        $this->assertCount(3, $rolledYears);
+        $this->assertSame([2027, 2028, 2029], $rolledYears);
+    }
+
+    public function test_milestone_sync_command_is_noop_when_no_enabled_milestone_calendars_exist(): void
+    {
+        $this->assertDatabaseCount('calendars', 0);
+
+        $this->artisan('app:milestones:sync')->assertExitCode(0);
+
+        $this->assertDatabaseCount('calendars', 0);
+    }
+
+    public function test_milestone_sync_command_skips_when_milestone_schema_is_missing(): void
+    {
+        Schema::dropIfExists('address_book_contact_milestone_calendars');
+
+        $this->artisan('app:milestones:sync')->assertExitCode(0);
+    }
+
     public function test_dashboard_still_loads_when_milestone_schema_is_missing(): void
     {
         $user = User::factory()->create();

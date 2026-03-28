@@ -71,7 +71,7 @@ It is designed for:
 
 ### Runtime and Deployment 🛠️
 - Docker-first runtime with preflight checks (`php artisan app:preflight`)
-- Built-in scheduler worker support (`RUN_SCHEDULER=true`) for periodic jobs
+- Built-in scheduler worker support (`RUN_SCHEDULER=true`) for periodic jobs (automated backups + milestone horizon roll-forward sync)
 - Automated backup tiers with rotating retention (`daily`, `weekly`, `monthly`, `yearly`)
 - Restore snapshots via CLI (`app:backup:restore`) or Admin Control Center import flow
 - Railway and Coolify deployment support

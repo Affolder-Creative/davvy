@@ -46,6 +46,8 @@ For each owned address book, you can configure:
 - Optional custom calendar names
 
 Generated calendars are read from contact data and auto-updated.
+- Upcoming milestone horizons are automatically rolled forward daily at `00:15` in `APP_TIMEZONE`/`app.timezone` by scheduled command `app:milestones:sync`.
+- Keep a scheduler running (`RUN_SCHEDULER=true`) or run `php artisan schedule:run` externally every minute.
 
 Birthday generation behavior:
 - `MILESTONE_BIRTHDAY_INCLUDE_LAST_NAME` controls whether birthday titles include last names (default is `true`, so `Ben Williams`; set `false` for `Ben`).
