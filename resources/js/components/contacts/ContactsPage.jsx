@@ -90,6 +90,7 @@ export default function ContactsPage({
     hasContactFilters,
     setContactsPage,
     selectedAddressBookCount,
+    photoConstraints,
     hasRequiredContactIdentity,
     pendingHideFieldId,
     pendingHideFieldLabel,
@@ -105,6 +106,10 @@ export default function ContactsPage({
     relatedNameOptions,
     saveContact,
     removeContact,
+    stageContactPhotoUpload,
+    removePhotoFromForm,
+    undoPhotoRemoval,
+    clearPendingPhotoUpload,
     startNewContact,
     selectContact,
     updateFormField,
@@ -276,9 +281,14 @@ export default function ContactsPage({
                 submitting={submitting}
                 addressBooks={addressBooks}
                 selectedAddressBookCount={selectedAddressBookCount}
+                photoConstraints={photoConstraints}
                 hasRequiredContactIdentity={hasRequiredContactIdentity}
                 saveContact={saveContact}
                 removeContact={removeContact}
+                stageContactPhotoUpload={stageContactPhotoUpload}
+                removePhotoFromForm={removePhotoFromForm}
+                undoPhotoRemoval={undoPhotoRemoval}
+                clearPendingPhotoUpload={clearPendingPhotoUpload}
                 openSections={openSections}
                 toggleSection={toggleSection}
                 isOptionalFieldVisible={isOptionalFieldVisible}

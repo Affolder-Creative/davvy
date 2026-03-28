@@ -285,6 +285,7 @@ class ContactService
 
     public function __construct(
         private readonly ContactVCardService $vCardService,
+        private readonly ContactPhotoService $contactPhotoService,
         private readonly ResourceAccessService $accessService,
         private readonly VCardValidator $vCardValidator,
         private readonly DavSyncService $syncService,
@@ -428,6 +429,17 @@ class ContactService
                 'payload' => $payload,
             ]);
 
+            $resolvedPayload = $this->contactPhotoService->preparePayloadForPersistence(
+                actor: $actor,
+                contact: $contact,
+                incomingPayload: $payload,
+            );
+
+            $contact->update([
+                'full_name' => $this->vCardService->displayName($resolvedPayload),
+                'payload' => $resolvedPayload,
+            ]);
+
             $this->syncAssignments($contact, $addressBooks);
 
             $relatedAddressBookIds = $this->syncBidirectionalRelatedNamesForContact($contact, []);
@@ -460,6 +472,12 @@ class ContactService
     {
         $this->assertCanMutateContact($actor, $contact);
 
+        $payload = $this->contactPhotoService->preparePayloadForPersistence(
+            actor: $actor,
+            contact: $contact,
+            incomingPayload: $payload,
+        );
+
         $addressBooks = $this->writableAddressBookModels($actor, $addressBookIds);
 
         return $this->persistContactUpdate($contact, $payload, $addressBooks);
@@ -483,6 +501,12 @@ class ContactService
      */
     public function applyApprovedUpdate(Contact $contact, array $payload, array $addressBookIds): Contact
     {
+        $payload = $this->contactPhotoService->preparePayloadForPersistence(
+            actor: null,
+            contact: $contact,
+            incomingPayload: $payload,
+        );
+
         $addressBooks = $this->addressBookModelsByIds($addressBookIds);
 
         return $this->persistContactUpdate($contact, $payload, $addressBooks);
@@ -642,6 +666,8 @@ class ContactService
 
         DB::transaction(function () use ($contact, &$relatedAddressBookIds): void {
             $relatedAddressBookIds = $this->removeBidirectionalRelatedNamesForContact($contact);
+            $payload = is_array($contact->payload) ? $contact->payload : [];
+            $this->contactPhotoService->deletePhotoFromPayload($payload);
 
             $assignments = $contact->assignments()->with(['card', 'addressBook'])->get();
 

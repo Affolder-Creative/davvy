@@ -5,6 +5,7 @@ import ContactEditorCommunicationSection from "./ContactEditorCommunicationSecti
 import ContactEditorNameSection from "./ContactEditorNameSection";
 import ContactEditorOptionalFieldsSection from "./ContactEditorOptionalFieldsSection";
 import ContactEditorPersonalSection from "./ContactEditorPersonalSection";
+import ContactEditorPhotoSection from "./ContactEditorPhotoSection";
 import ContactEditorWorkSection from "./ContactEditorWorkSection";
 
 /**
@@ -18,9 +19,14 @@ export default function ContactEditorPanel({
   submitting,
   addressBooks,
   selectedAddressBookCount,
+  photoConstraints,
   hasRequiredContactIdentity,
   saveContact,
   removeContact,
+  stageContactPhotoUpload,
+  removePhotoFromForm,
+  undoPhotoRemoval,
+  clearPendingPhotoUpload,
   openSections,
   toggleSection,
   isOptionalFieldVisible,
@@ -101,6 +107,18 @@ export default function ContactEditorPanel({
         className="mt-5 space-y-6"
         onSubmit={saveContact}
       >
+        <ContactEditorPhotoSection
+          photo={form.photo}
+          photoUploadToken={form.photo_upload_token}
+          photoRemove={form.photo_remove}
+          constraints={photoConstraints}
+          submitting={submitting}
+          onStagePhotoUpload={stageContactPhotoUpload}
+          onRemovePhoto={removePhotoFromForm}
+          onUndoPhotoRemoval={undoPhotoRemoval}
+          onClearPendingUpload={clearPendingPhotoUpload}
+        />
+
         <ContactEditorNameSection
           isOpen={openSections.name}
           onToggle={() => toggleSection("name")}

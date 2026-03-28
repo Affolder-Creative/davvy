@@ -80,6 +80,9 @@ function createEmptyContactForm(addressBookIds = []) {
     instant_messages: [],
     pronouns: "",
     pronouns_custom: "",
+    photo: null,
+    photo_upload_token: null,
+    photo_remove: false,
     address_book_ids: addressBookIds,
   };
 }

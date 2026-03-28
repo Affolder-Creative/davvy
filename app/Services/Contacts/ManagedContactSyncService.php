@@ -14,6 +14,7 @@ class ManagedContactSyncService
 {
     public function __construct(
         private readonly ContactVCardService $vCardService,
+        private readonly ContactPhotoService $contactPhotoService,
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
     ) {}
 
@@ -44,7 +45,9 @@ class ManagedContactSyncService
         $payload = is_array($parsed['payload'] ?? null)
             ? $parsed['payload']
             : [];
-        $fullName = $this->vCardService->displayName($payload);
+        $parsedPhoto = is_array($parsed['parsed_photo'] ?? null)
+            ? $parsed['parsed_photo']
+            : null;
         $hintContactId = $this->toInteger(
             $parsed['managed_contact_id'] ?? null,
         );
@@ -57,7 +60,7 @@ class ManagedContactSyncService
             $card,
             $uid,
             $payload,
-            $fullName,
+            $parsedPhoto,
             $hintContactId,
             $trustManagedMetadataHints,
             &$relatedAddressBookIds,
@@ -110,8 +113,8 @@ class ManagedContactSyncService
                 $targetContact = Contact::query()->create([
                     'owner_id' => $ownerId,
                     'uid' => $uid,
-                    'full_name' => $fullName,
-                    'payload' => $payload,
+                    'full_name' => $this->vCardService->displayName($payload),
+                    'payload' => [],
                 ]);
             } else {
                 $previousPayload = is_array($targetContact->payload)
@@ -131,11 +134,17 @@ class ManagedContactSyncService
                         $targetContact->uid = $uid;
                     }
                 }
-
-                $targetContact->full_name = $fullName;
-                $targetContact->payload = $payload;
-                $targetContact->save();
             }
+
+            $resolvedPayload = $this->contactPhotoService->applyParsedCardDavPhoto(
+                contact: $targetContact,
+                incomingPayload: $payload,
+                parsedPhoto: $parsedPhoto,
+            );
+
+            $targetContact->full_name = $this->vCardService->displayName($resolvedPayload);
+            $targetContact->payload = $resolvedPayload;
+            $targetContact->save();
 
             $oldContactId = $assignment?->contact_id;
 
@@ -312,6 +321,8 @@ class ManagedContactSyncService
         $relatedAddressBookIds = $this->contactService()->removeBidirectionalRelatedNamesForContact(
             $contact,
         );
+        $payload = is_array($contact->payload) ? $contact->payload : [];
+        $this->contactPhotoService->deletePhotoFromPayload($payload);
         $contact->delete();
 
         return $relatedAddressBookIds;

@@ -58,6 +58,12 @@ export default function useContactsPageState({
   const [openSections, setOpenSections] = useState(
     createContactSectionOpenState(),
   );
+  const [photoConstraints, setPhotoConstraints] = useState({
+    max_upload_kb: 8192,
+    min_crop_size: 600,
+    output_size: 1024,
+    allowed_mimes: ["image/jpeg", "image/png", "image/webp"],
+  });
 
   const optionalFieldsWithLabels = useMemo(
     () =>
@@ -344,9 +350,24 @@ export default function useContactsPageState({
       const nextAddressBooks = Array.isArray(response.data?.address_books)
         ? response.data.address_books
         : [];
+      const nextPhotoConstraints =
+        response.data?.photo_constraints &&
+        typeof response.data.photo_constraints === "object"
+          ? response.data.photo_constraints
+          : {};
 
       setContacts(nextContacts);
       setAddressBooks(nextAddressBooks);
+      setPhotoConstraints({
+        max_upload_kb: Number(nextPhotoConstraints.max_upload_kb ?? 8192) || 8192,
+        min_crop_size: Number(nextPhotoConstraints.min_crop_size ?? 600) || 600,
+        output_size: Number(nextPhotoConstraints.output_size ?? 1024) || 1024,
+        allowed_mimes: Array.isArray(nextPhotoConstraints.allowed_mimes)
+          ? nextPhotoConstraints.allowed_mimes
+              .map((value) => String(value ?? "").trim().toLowerCase())
+              .filter((value) => value !== "")
+          : ["image/jpeg", "image/png", "image/webp"],
+      });
 
       const fallbackIds = nextAddressBooks[0] ? [nextAddressBooks[0].id] : [];
       const hasExplicitSelectId = selectId !== undefined;
@@ -445,8 +466,11 @@ export default function useContactsPageState({
       birthday: normalizeDatePartsForPayload(form.birthday),
       dates: normalizeDateRowsForPayload(form.dates),
       address_book_ids: form.address_book_ids.map((id) => Number(id)),
+      photo_upload_token: form.photo_upload_token || null,
+      photo_remove: !!form.photo_remove,
     };
     delete payload.id;
+    delete payload.photo;
 
     try {
       const response = form.id
@@ -511,6 +535,72 @@ export default function useContactsPageState({
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const stageContactPhotoUpload = async ({ file, crop }) => {
+    const endpoint = form.id
+      ? `/api/contacts/${form.id}/photo/stage`
+      : "/api/contacts/photos/stage";
+    const data = new FormData();
+    data.append("photo", file);
+    data.append("crop_x", String(Math.max(0, Math.round(crop.x ?? 0))));
+    data.append("crop_y", String(Math.max(0, Math.round(crop.y ?? 0))));
+    data.append(
+      "crop_width",
+      String(Math.max(1, Math.round(crop.width ?? 1))),
+    );
+    data.append(
+      "crop_height",
+      String(Math.max(1, Math.round(crop.height ?? 1))),
+    );
+
+    const response = await api.post(endpoint, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    const token = String(response.data?.token ?? "").trim();
+    if (!token) {
+      throw new Error("Photo upload token missing from server response.");
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      photo_upload_token: token,
+      photo_remove: false,
+    }));
+
+    return response.data ?? {};
+  };
+
+  const removePhotoFromForm = () => {
+    setForm((prev) => {
+      const hasPersistedPhoto = !!(
+        prev.photo && typeof prev.photo.url === "string" && prev.photo.url !== ""
+      );
+
+      return {
+        ...prev,
+        photo_upload_token: null,
+        photo_remove: hasPersistedPhoto,
+      };
+    });
+  };
+
+  const undoPhotoRemoval = () => {
+    setForm((prev) => ({
+      ...prev,
+      photo_upload_token: null,
+      photo_remove: false,
+    }));
+  };
+
+  const clearPendingPhotoUpload = () => {
+    setForm((prev) => ({
+      ...prev,
+      photo_upload_token: null,
+    }));
   };
 
   const toggleAssignedAddressBook = (addressBookId, checked) => {
@@ -637,10 +727,15 @@ export default function useContactsPageState({
     setFieldToAdd,
     visibleOptionalFields,
     setForm,
+    photoConstraints,
     labelOptions,
     relatedNameOptions,
     saveContact,
     removeContact,
+    stageContactPhotoUpload,
+    removePhotoFromForm,
+    undoPhotoRemoval,
+    clearPendingPhotoUpload,
     startNewContact,
     selectContact,
     updateFormField,

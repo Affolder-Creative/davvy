@@ -199,6 +199,10 @@ class ContactVCardService
 
     private const RELATED_CONTACT_ID_PARAMETER = 'X-DAVVY-RELATED-CONTACT-ID';
 
+    public function __construct(
+        private readonly ContactPhotoService $contactPhotoService,
+    ) {}
+
     /**
      * Builds a display name from contact payload fields.
      */
@@ -445,6 +449,13 @@ class ContactVCardService
         $this->addSimpleProperty($vCard, 'X-DAVVY-CONTACT-ID', (string) $contact->id);
         $this->addSimpleProperty($vCard, 'X-DAVVY-CONTACT-OWNER', (string) $contact->owner_id);
 
+        $photo = $this->contactPhotoService->readPhotoBinary(is_array($payload) ? $payload : []);
+        if ($photo !== null) {
+            $photoProperty = $vCard->add('PHOTO', base64_encode($photo['binary']));
+            $photoProperty['ENCODING'] = 'b';
+            $photoProperty['MEDIATYPE'] = $photo['mime'];
+        }
+
         $data = $vCard->serialize();
         $vCard->destroy();
 
@@ -458,7 +469,8 @@ class ContactVCardService
      *   uid:?string,
      *   payload:array<string,mixed>,
      *   managed_contact_id:?int,
-     *   managed_owner_id:?int
+     *   managed_owner_id:?int,
+     *   parsed_photo:?array{binary:string,mime:string,sha256:string,width:int,height:int}
      * }|null
      */
     public function parse(string $cardData): ?array
@@ -654,12 +666,123 @@ class ContactVCardService
             ];
         }
 
+        $parsedPhoto = $this->parsePhoto($component);
+
         return [
             'uid' => $this->firstPropertyValue($component, 'UID'),
             'payload' => $payload,
             'managed_contact_id' => $this->toInteger($this->firstPropertyValue($component, 'X-DAVVY-CONTACT-ID')),
             'managed_owner_id' => $this->toInteger($this->firstPropertyValue($component, 'X-DAVVY-CONTACT-OWNER')),
+            'parsed_photo' => $parsedPhoto,
         ];
+    }
+
+    /**
+     * Parses the first PHOTO property from a vCard into normalized metadata.
+     *
+     * @return array{binary:string,mime:string,sha256:string,width:int,height:int}|null
+     */
+    private function parsePhoto(VCard $vCard): ?array
+    {
+        $photoProperty = $this->firstProperty($vCard, 'PHOTO');
+        if ($photoProperty === null) {
+            return null;
+        }
+
+        $rawValue = trim((string) $photoProperty);
+        if ($rawValue === '') {
+            return null;
+        }
+
+        $mime = $this->mimeFromPhotoProperty($photoProperty);
+        $binary = $this->decodePhotoBinary(
+            rawValue: $rawValue,
+            encoding: $this->propertyParameterValue($photoProperty, 'ENCODING'),
+            mimeFromDataUri: $mime,
+        );
+
+        if ($binary === null || $mime === null) {
+            return null;
+        }
+
+        if (strlen($binary) > $this->contactPhotoService->maxDecodedPhotoBytes()) {
+            return null;
+        }
+
+        $dimensions = @getimagesizefromstring($binary);
+        $width = is_array($dimensions) ? (int) ($dimensions[0] ?? 0) : 0;
+        $height = is_array($dimensions) ? (int) ($dimensions[1] ?? 0) : 0;
+        if ($width <= 0 || $height <= 0) {
+            return null;
+        }
+
+        return [
+            'binary' => $binary,
+            'mime' => $mime,
+            'sha256' => hash('sha256', $binary),
+            'width' => $width,
+            'height' => $height,
+        ];
+    }
+
+    /**
+     * Decodes PHOTO value bytes from data-uri or base64 payloads.
+     */
+    private function decodePhotoBinary(
+        string $rawValue,
+        ?string $encoding,
+        ?string &$mimeFromDataUri = null,
+    ): ?string {
+        $trimmed = trim($rawValue);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        if (preg_match('/^data:(?<mime>[^;,]+)?(?<params>(;[^,]*)*),(?<data>.*)$/is', $trimmed, $matches) === 1) {
+            $params = strtolower((string) ($matches['params'] ?? ''));
+            $data = (string) ($matches['data'] ?? '');
+            $mimeCandidate = $this->cleanString($matches['mime'] ?? null);
+            if ($mimeCandidate !== null) {
+                $mimeFromDataUri = strtolower($mimeCandidate);
+            }
+
+            if (str_contains($params, ';base64')) {
+                return base64_decode(preg_replace('/\s+/', '', $data) ?? '', true) ?: null;
+            }
+
+            return rawurldecode($data);
+        }
+
+        $normalizedEncoding = strtolower(trim((string) ($encoding ?? '')));
+        if (in_array($normalizedEncoding, ['b', 'base64'], true) || preg_match('/^[A-Za-z0-9+\/=\s]+$/', $trimmed) === 1) {
+            return base64_decode(preg_replace('/\s+/', '', $trimmed) ?? '', true) ?: null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolves PHOTO MIME from MEDIATYPE/TYPE parameters.
+     */
+    private function mimeFromPhotoProperty(mixed $property): ?string
+    {
+        $mediaType = $this->cleanString($this->propertyParameterValue($property, 'MEDIATYPE'));
+        if ($mediaType !== null) {
+            return strtolower($mediaType);
+        }
+
+        $type = $this->cleanString($this->propertyParameterValue($property, 'TYPE'));
+        if ($type === null) {
+            return null;
+        }
+
+        $primary = strtoupper(trim(explode(',', $type)[0] ?? ''));
+        return match ($primary) {
+            'JPEG', 'JPG' => 'image/jpeg',
+            'PNG' => 'image/png',
+            'WEBP' => 'image/webp',
+            default => null,
+        };
     }
 
     /**

@@ -17,6 +17,7 @@ use App\Services\Dav\Backends\LaravelCardDavBackend;
 use App\Services\DavRequestContext;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Mockery\MockInterface;
 use Sabre\HTTP\Request as SabreRequest;
 use Sabre\HTTP\Response as SabreResponse;
@@ -398,6 +399,77 @@ class ContactCardDavSyncTest extends TestCase
         $this->assertStringContainsString('RELATED;TYPE=CHILD', $roundTrippedCardData);
         $this->assertStringContainsString('X-ABLABEL=Son', $roundTrippedCardData);
         $this->assertStringContainsString('X-ABLABEL=Daughter-in-Law', $roundTrippedCardData);
+    }
+
+    public function test_carddav_photo_updates_and_removes_managed_contact_photo_payload(): void
+    {
+        if (! class_exists(\Imagick::class)) {
+            $this->markTestSkipped('Imagick is required for CardDAV photo parsing.');
+        }
+
+        Storage::fake('local');
+        config()->set('services.contacts.photo.disk', 'local');
+
+        $user = User::factory()->create();
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'uri' => 'photo-roundtrip',
+        ]);
+
+        $created = $this->actingAs($user)->postJson('/api/contacts', [
+            'first_name' => 'Jordan',
+            'last_name' => 'Photo',
+            'address_book_ids' => [$addressBook->id],
+            'phones' => [],
+            'emails' => [],
+            'urls' => [],
+            'addresses' => [],
+            'dates' => [],
+            'related_names' => [],
+            'instant_messages' => [],
+        ]);
+        $created->assertCreated();
+
+        $contactId = (int) $created->json('id');
+        $uid = (string) $created->json('uid');
+        $cardUri = (string) ContactAddressBookAssignment::query()
+            ->where('contact_id', $contactId)
+            ->where('address_book_id', $addressBook->id)
+            ->value('card_uri');
+
+        $image = new \Imagick;
+        $image->newImage(1400, 900, new \ImagickPixel('#0891b2'));
+        $image->setImageFormat('jpeg');
+        $photoBase64 = base64_encode((string) $image->getImageBlob());
+        $image->clear();
+        $image->destroy();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($user);
+
+        app(LaravelCardDavBackend::class)->updateCard(
+            $addressBook->id,
+            $cardUri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Jordan Photo\nN:Photo;Jordan;;;\nUID:{$uid}\nPHOTO;ENCODING=b;TYPE=JPEG:{$photoBase64}\nEND:VCARD"
+        );
+
+        $contact = Contact::query()->findOrFail($contactId);
+        $payload = is_array($contact->payload) ? $contact->payload : [];
+        $this->assertIsArray($payload['photo'] ?? null);
+        $this->assertSame('image/jpeg', $payload['photo']['mime'] ?? null);
+        Storage::disk('local')->assertExists((string) ($payload['photo']['path'] ?? ''));
+
+        $photoPath = (string) ($payload['photo']['path'] ?? '');
+
+        app(LaravelCardDavBackend::class)->updateCard(
+            $addressBook->id,
+            $cardUri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Jordan Photo\nN:Photo;Jordan;;;\nUID:{$uid}\nEND:VCARD"
+        );
+
+        $contact->refresh();
+        $updatedPayload = is_array($contact->payload) ? $contact->payload : [];
+        $this->assertArrayNotHasKey('photo', $updatedPayload);
+        Storage::disk('local')->assertMissing($photoPath);
     }
 
     public function test_related_name_synonym_label_round_trips_through_carddav(): void

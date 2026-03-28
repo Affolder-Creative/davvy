@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\Backups\BackupRestoreService;
 use App\Services\Backups\BackupService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
+use App\Services\Contacts\ContactPhotoService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schedule;
@@ -413,6 +414,27 @@ Artisan::command('app:milestones:sync', function (): int {
     return 0;
 })->purpose('Re-sync enabled milestone calendars to roll forward upcoming horizon events');
 
+Artisan::command('app:contacts:photos:prune', function (): int {
+    if (! Schema::hasTable('contact_photo_uploads')) {
+        $this->line('Skipped: contact photo uploads table not found.');
+
+        return 0;
+    }
+
+    /** @var ContactPhotoService $photoService */
+    $photoService = app(ContactPhotoService::class);
+    $expiredDeleted = $photoService->pruneExpiredStagedUploads();
+    $orphanedDeleted = $photoService->pruneOrphanedFinalPhotos();
+
+    $this->info(sprintf(
+        'Pruned %d expired staged upload(s) and %d orphaned final photo(s).',
+        $expiredDeleted,
+        $orphanedDeleted,
+    ));
+
+    return 0;
+})->purpose('Prune expired staged uploads and orphaned managed contact photos');
+
 Artisan::command(
     'app:backup:restore
     {archive : Path to backup ZIP archive}
@@ -483,6 +505,10 @@ Artisan::command(
 
 Schedule::command('app:backup')
     ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::command('app:contacts:photos:prune')
+    ->hourly()
     ->withoutOverlapping();
 
 Schedule::command('app:milestones:sync')

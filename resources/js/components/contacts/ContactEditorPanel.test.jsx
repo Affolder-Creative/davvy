@@ -25,6 +25,9 @@ function buildProps(overrides = {}) {
       id: null,
       address_book_ids: [1],
       related_names: [],
+      photo: null,
+      photo_upload_token: null,
+      photo_remove: false,
     },
     submitting: false,
     addressBooks: [
@@ -37,9 +40,19 @@ function buildProps(overrides = {}) {
       },
     ],
     selectedAddressBookCount: 1,
+    photoConstraints: {
+      max_upload_kb: 8192,
+      min_crop_size: 600,
+      output_size: 1024,
+      allowed_mimes: ["image/jpeg", "image/png", "image/webp"],
+    },
     hasRequiredContactIdentity: true,
     saveContact: vi.fn((event) => event.preventDefault()),
     removeContact: vi.fn(),
+    stageContactPhotoUpload: vi.fn(),
+    removePhotoFromForm: vi.fn(),
+    undoPhotoRemoval: vi.fn(),
+    clearPendingPhotoUpload: vi.fn(),
     openSections: {
       name: false,
       work: false,
@@ -94,6 +107,9 @@ describe("ContactEditorPanel", () => {
         id: 44,
         address_book_ids: [1],
         related_names: [],
+        photo: null,
+        photo_upload_token: null,
+        photo_remove: false,
       },
     });
 
