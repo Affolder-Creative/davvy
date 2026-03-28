@@ -100,6 +100,20 @@ function buildProps(overrides = {}) {
 }
 
 describe("ContactEditorPanel", () => {
+  it("renders the name section before the photo section", () => {
+    const props = buildProps();
+
+    render(<ContactEditorPanel {...props} />);
+
+    const nameSectionLabel = screen.getByText("Name");
+    const photoLabel = screen.getByText("Photo");
+
+    expect(
+      nameSectionLabel.compareDocumentPosition(photoLabel) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it("submits contact form and wires delete/address-book actions", async () => {
     const user = userEvent.setup();
     const props = buildProps({
