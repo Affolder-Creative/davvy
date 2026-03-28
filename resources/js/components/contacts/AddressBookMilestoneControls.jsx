@@ -112,7 +112,13 @@ export default function AddressBookMilestoneControls({
     }
   };
 
-  const renderRow = (type, label, settings, fallbackName) => {
+  const renderRow = (
+    type,
+    label,
+    settings,
+    fallbackName,
+    { withTopDivider = false } = {},
+  ) => {
     const isSaving = savingKey === type;
     const saveInProgress = !!savingKey && !isSaving;
     const isEditing = editingKey === type;
@@ -122,7 +128,18 @@ export default function AddressBookMilestoneControls({
       (nameDrafts[type] ?? "").trim() !== currentCustom.trim() && !isSaving;
 
     return (
-      <div className="py-0.5" key={type}>
+      <div
+        className={`py-0.5 ${withTopDivider ? "border-t" : ""}`}
+        style={
+          withTopDivider
+            ? {
+                borderTopStyle: "dashed",
+                borderTopColor: "var(--edge-strong)",
+              }
+            : undefined
+        }
+        key={type}
+      >
         <div className="flex items-center gap-2">
           <label className="inline-flex shrink-0 items-center gap-2 text-xs font-semibold text-app-base">
             <input
@@ -279,7 +296,7 @@ export default function AddressBookMilestoneControls({
         </span>
       </button>
       {!collapsed ? (
-        <div className="mt-1 pl-2 divide-y divide-app-edge">
+        <div className="mt-1 pl-2">
           {renderRow(
             "birthdays",
             t("milestoneCalendars.birthdays"),
@@ -295,6 +312,7 @@ export default function AddressBookMilestoneControls({
             t("milestoneCalendars.anniversariesFallback", {
               name: item.display_name,
             }),
+            { withTopDivider: true },
           )}
         </div>
       ) : null}
