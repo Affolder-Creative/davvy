@@ -777,6 +777,7 @@ class ContactVCardService
         }
 
         $primary = strtoupper(trim(explode(',', $type)[0] ?? ''));
+
         return match ($primary) {
             'JPEG', 'JPG' => 'image/jpeg',
             'PNG' => 'image/png',

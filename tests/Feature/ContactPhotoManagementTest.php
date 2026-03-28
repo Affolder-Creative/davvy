@@ -262,4 +262,3 @@ class ContactPhotoManagementTest extends TestCase
         $this->markTestSkipped('Imagick is required for managed contact photo tests.');
     }
 }
-

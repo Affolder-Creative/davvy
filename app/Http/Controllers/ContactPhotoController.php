@@ -115,4 +115,3 @@ class ContactPhotoController extends Controller
         abort(403, __('contacts.cannot_modify_contact'));
     }
 }
-
