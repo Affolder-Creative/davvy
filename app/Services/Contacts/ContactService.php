@@ -1073,8 +1073,7 @@ class ContactService
         AddressBook $addressBook,
         ContactAddressBookAssignment $assignment,
         string $cardData,
-    ): void
-    {
+    ): void {
         $card = $assignment->card;
         if (! $card) {
             $this->assertNoUidConflict($addressBook, $contact->uid);
