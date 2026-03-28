@@ -12,6 +12,7 @@ use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ContactManagementTest extends TestCase
@@ -106,6 +107,43 @@ class ContactManagementTest extends TestCase
             ->all();
 
         $this->assertSame([$bookB->id, $bookC->id], $assignedBookIds);
+    }
+
+    public function test_updating_contact_with_identical_payload_does_not_emit_card_modified_sync_entries(): void
+    {
+        $user = User::factory()->create();
+        $book = AddressBook::factory()->create(['owner_id' => $user->id, 'uri' => 'noop-sync']);
+
+        $created = $this->actingAs($user)->postJson('/api/contacts', $this->payload([
+            'address_book_ids' => [$book->id],
+        ]));
+        $created->assertCreated();
+
+        $contact = Contact::query()->findOrFail((int) $created->json('id'));
+        $storedPayload = is_array($contact->payload) ? $contact->payload : [];
+
+        $beforeModifiedCount = DB::table('dav_resource_sync_changes')
+            ->where('resource_type', ShareResourceType::AddressBook->value)
+            ->where('resource_id', $book->id)
+            ->where('operation', 'modified')
+            ->count();
+
+        $this->assertSame(0, $beforeModifiedCount);
+
+        $this->actingAs($user)
+            ->patchJson('/api/contacts/'.$contact->id, [
+                ...$storedPayload,
+                'address_book_ids' => [$book->id],
+            ])
+            ->assertOk();
+
+        $afterModifiedCount = DB::table('dav_resource_sync_changes')
+            ->where('resource_type', ShareResourceType::AddressBook->value)
+            ->where('resource_id', $book->id)
+            ->where('operation', 'modified')
+            ->count();
+
+        $this->assertSame($beforeModifiedCount, $afterModifiedCount);
     }
 
     public function test_related_name_can_link_to_existing_contact_by_id(): void

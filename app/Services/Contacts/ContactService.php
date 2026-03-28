@@ -1006,6 +1006,8 @@ class ContactService
      */
     private function syncAssignments(Contact $contact, Collection $addressBooks): void
     {
+        $cardData = $this->normalizedCardData($contact);
+
         $existing = $contact->assignments()
             ->with(['card', 'addressBook'])
             ->get()
@@ -1025,21 +1027,20 @@ class ContactService
             $assignment = $existing->get($addressBook->id);
 
             if (! $assignment) {
-                $this->createAssignment($contact, $addressBook);
+                $this->createAssignment($contact, $addressBook, $cardData);
 
                 continue;
             }
 
-            $this->upsertAssignmentCard($contact, $addressBook, $assignment);
+            $this->upsertAssignmentCard($contact, $addressBook, $assignment, $cardData);
         }
     }
 
     /**
      * Creates assignment.
      */
-    private function createAssignment(Contact $contact, AddressBook $addressBook): void
+    private function createAssignment(Contact $contact, AddressBook $addressBook, string $cardData): void
     {
-        $cardData = $this->normalizedCardData($contact);
         $this->assertNoUidConflict($addressBook, $contact->uid);
 
         $uri = $this->nextAvailableCardUri($addressBook, $contact, null, null);
@@ -1067,10 +1068,13 @@ class ContactService
     /**
      * Performs the upsert assignment card operation.
      */
-    private function upsertAssignmentCard(Contact $contact, AddressBook $addressBook, ContactAddressBookAssignment $assignment): void
+    private function upsertAssignmentCard(
+        Contact $contact,
+        AddressBook $addressBook,
+        ContactAddressBookAssignment $assignment,
+        string $cardData,
+    ): void
     {
-        $cardData = $this->normalizedCardData($contact);
-
         $card = $assignment->card;
         if (! $card) {
             $this->assertNoUidConflict($addressBook, $contact->uid);
@@ -1101,23 +1105,30 @@ class ContactService
 
         $this->assertNoUidConflict($addressBook, $contact->uid, $card->id);
 
+        $size = strlen($cardData);
         $etag = md5($cardData);
+        $isNoOp = $card->uid === $contact->uid
+            && $card->etag === $etag
+            && (int) $card->size === $size
+            && $card->data === $cardData;
 
-        $card->update([
-            'uid' => $contact->uid,
-            'etag' => $etag,
-            'size' => strlen($cardData),
-            'data' => $cardData,
-        ]);
+        if (! $isNoOp) {
+            $card->update([
+                'uid' => $contact->uid,
+                'etag' => $etag,
+                'size' => $size,
+                'data' => $cardData,
+            ]);
 
-        $this->syncService->recordModified(ShareResourceType::AddressBook, $addressBook->id, $card->uri);
-        $card->fill([
-            'uid' => $contact->uid,
-            'etag' => $etag,
-            'size' => strlen($cardData),
-            'data' => $cardData,
-        ]);
-        $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
+            $this->syncService->recordModified(ShareResourceType::AddressBook, $addressBook->id, $card->uri);
+            $card->fill([
+                'uid' => $contact->uid,
+                'etag' => $etag,
+                'size' => $size,
+                'data' => $cardData,
+            ]);
+            $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
+        }
 
         if ($assignment->card_uri !== $card->uri) {
             $assignment->update([
