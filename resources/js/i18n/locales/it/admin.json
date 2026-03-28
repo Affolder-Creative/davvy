@@ -217,6 +217,8 @@
     "deletedUser": "Eliminato {{deletedUserName}} e tutti i dati di proprietà.",
     "approvePending": "Disattivare il requisito di approvazione della registrazione?\n\n{{pendingCount}} gli account sono in attesa di approvazione.\n\nFai clic su OK per approvare subito tutti gli account in sospeso oppure su Annulla per lasciarli in sospeso.",
     "approvedPending": "Account in sospeso {{approvedCount}} approvati.",
+    "queueRetentionSaved": "La conservazione della coda è stata aggiornata a {{days}} giorno/i.",
+    "milestoneGenerationHorizonSaved": "L’orizzonte di generazione delle milestone è stato aggiornato a {{years}} anno/i.",
     "backupRunSuccess": "Backup completato con successo.",
     "backupRestoreCompleted": "Ripristino del backup completato."
   },

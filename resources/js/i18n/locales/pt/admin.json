@@ -217,6 +217,8 @@
     "deletedUser": "Excluído {{deletedUserName}} e todos os dados de propriedade.",
     "approvePending": "Desativar requisito de aprovação de registro?\n\n{{pendingCount}} conta(s) com aprovação pendente.\n\nClique em OK para aprovar todas as contas pendentes agora ou em Cancelar para deixá-las pendentes.",
     "approvedPending": "{{approvedCount}} conta(s) pendente(s) aprovada(s).",
+    "queueRetentionSaved": "A retenção da fila foi atualizada para {{days}} dia(s).",
+    "milestoneGenerationHorizonSaved": "O horizonte de geração de marcos foi atualizado para {{years}} ano(s).",
     "backupRunSuccess": "Backup concluído com sucesso.",
     "backupRestoreCompleted": "Restauração de backup concluída."
   },

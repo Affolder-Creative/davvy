@@ -217,6 +217,8 @@
     "deletedUser": "{{deletedUserName}} a été supprimé ainsi que toutes ses données.",
     "approvePending": "Désactiver l’obligation d’approbation des inscriptions ?\n\n{{pendingCount}} compte(s) sont en attente d’approbation.\n\nCliquez sur OK pour approuver tous les comptes en attente maintenant, ou sur Annuler pour les laisser en attente.",
     "approvedPending": "{{approvedCount}} compte(s) en attente approuvé(s).",
+    "queueRetentionSaved": "La conservation de la file a été mise à jour à {{days}} jour(s).",
+    "milestoneGenerationHorizonSaved": "L’horizon de génération des événements marquants a été mis à jour à {{years}} an(s).",
     "backupRunSuccess": "Sauvegarde terminée avec succès.",
     "backupRestoreCompleted": "Restauration de sauvegarde terminée."
   },

@@ -217,6 +217,8 @@
     "deletedUser": "删除{{deletedUserName}} 和所有拥有的数据。",
     "approvePending": "禁用注册批准要求？\n\n{{pendingCount}} 帐户正在等待批准。\n\n单击“确定”立即批准所有待批准的帐户，或单击“取消”将其保留为待批准状态。",
     "approvedPending": "已批准 {{approvedCount}} 待处理帐户。",
+    "queueRetentionSaved": "队列保留期已更新为 {{days}} 天。",
+    "milestoneGenerationHorizonSaved": "里程碑生成范围已更新为 {{years}} 年。",
     "backupRunSuccess": "备份成功完成。",
     "backupRestoreCompleted": "备份恢复完成。"
   },

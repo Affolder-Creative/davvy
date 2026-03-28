@@ -217,6 +217,8 @@
     "deletedUser": "Deleted {{deletedUserName}} and all owned data.",
     "approvePending": "Disable registration approval requirement?\n\n{{pendingCount}} account(s) are pending approval.\n\nClick OK to approve all pending accounts now, or Cancel to leave them pending.",
     "approvedPending": "Approved {{approvedCount}} pending account(s).",
+    "queueRetentionSaved": "Queue retention updated to {{days}} day(s).",
+    "milestoneGenerationHorizonSaved": "Milestone generation horizon updated to {{years}} year(s).",
     "backupRunSuccess": "Backup completed successfully.",
     "backupRestoreCompleted": "Backup restore completed."
   },

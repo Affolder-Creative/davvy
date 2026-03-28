@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AdminPage from "./AdminPage";
+import { ToastProvider } from "../common/ToastProvider";
 
 function AppShellStub({ children }) {
   return <div>{children}</div>;
@@ -35,6 +36,14 @@ const RECOMMENDED_BACKUP_RETENTION = {
   monthly: 12,
   yearly: 3,
 };
+
+function renderAdminPage(props) {
+  return render(
+    <ToastProvider>
+      <AdminPage {...props} />
+    </ToastProvider>,
+  );
+}
 
 function buildApi({ users } = {}) {
   const usersData = Array.isArray(users)
@@ -135,6 +144,10 @@ function buildApi({ users } = {}) {
       return Promise.resolve({ data: { days: Number(payload.days) } });
     }
 
+    if (url === "/api/admin/settings/milestone-generation-years") {
+      return Promise.resolve({ data: { years: Number(payload.years) } });
+    }
+
     if (url === "/api/admin/settings/two-factor-enforcement") {
       return Promise.resolve({
         data: {
@@ -213,7 +226,6 @@ function buildProps(overrides = {}) {
       JSON.stringify(left) === JSON.stringify(right),
     formatAdminTimestamp: () => "Mar 1, 2026",
     MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS: 6000,
-    BACKUP_RUN_TOAST_AUTO_HIDE_MS: 3200,
     BACKUP_DRAWER_ANIMATION_MS: 220,
     WEEKDAY_OPTIONS,
     MONTH_OPTIONS,
@@ -226,7 +238,7 @@ describe("AdminPage", () => {
   it("loads admin data and renders the control center", async () => {
     const props = buildProps();
 
-    render(<AdminPage {...props} />);
+    renderAdminPage(props);
 
     expect(screen.getByText("Loading admin data...")).toBeInTheDocument();
 
@@ -241,11 +253,11 @@ describe("AdminPage", () => {
     expect(screen.getByText("Assign Share Access")).toBeInTheDocument();
   });
 
-  it("toggles registration and saves queue retention", async () => {
+  it("toggles registration and shows toasts when saving retention and horizon", async () => {
     const user = userEvent.setup();
     const props = buildProps();
 
-    render(<AdminPage {...props} />);
+    renderAdminPage(props);
 
     await waitFor(() =>
       expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
@@ -284,6 +296,26 @@ describe("AdminPage", () => {
         { days: 120 },
       ),
     );
+    expect(
+      await screen.findByText("Queue retention updated to 120 day(s)."),
+    ).toBeInTheDocument();
+
+    const milestoneInput = screen.getAllByRole("spinbutton")[1];
+    await user.clear(milestoneInput);
+    await user.type(milestoneInput, "4");
+    await user.click(screen.getByRole("button", { name: "Save Horizon" }));
+
+    await waitFor(() =>
+      expect(props.api.patch).toHaveBeenCalledWith(
+        "/api/admin/settings/milestone-generation-years",
+        { years: 4 },
+      ),
+    );
+    expect(
+      await screen.findByText(
+        "Milestone generation horizon updated to 4 year(s).",
+      ),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /2fa enforcement/i }));
 
@@ -329,7 +361,7 @@ describe("AdminPage", () => {
       }),
     });
 
-    render(<AdminPage {...props} />);
+    renderAdminPage(props);
 
     await waitFor(() =>
       expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
@@ -396,7 +428,7 @@ describe("AdminPage", () => {
       },
     });
 
-    render(<AdminPage {...props} />);
+    renderAdminPage(props);
 
     await waitFor(() =>
       expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),

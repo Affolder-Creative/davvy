@@ -4,7 +4,6 @@ import AdminFeatureToggleComponent from "../components/admin/AdminFeatureToggle"
 import AdminPageComponent from "../components/admin/AdminPage";
 import {
   BACKUP_DRAWER_ANIMATION_MS,
-  BACKUP_RUN_TOAST_AUTO_HIDE_MS,
   MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS,
   RECOMMENDED_BACKUP_RETENTION,
   areBackupConfigSnapshotsEqual,
@@ -88,7 +87,6 @@ export default function AdminPageRoute({ auth, theme }) {
       areBackupConfigSnapshotsEqual={areBackupConfigSnapshotsEqual}
       formatAdminTimestamp={formatAdminTimestamp}
       MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS={MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS}
-      BACKUP_RUN_TOAST_AUTO_HIDE_MS={BACKUP_RUN_TOAST_AUTO_HIDE_MS}
       BACKUP_DRAWER_ANIMATION_MS={BACKUP_DRAWER_ANIMATION_MS}
       WEEKDAY_OPTIONS={buildWeekdayOptions()}
       MONTH_OPTIONS={buildMonthOptions()}

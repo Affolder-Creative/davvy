@@ -217,6 +217,8 @@
     "deletedUser": "{{deletedUserName}} と所有するすべてのデータを削除しました。",
     "approvePending": "登録承認要件を無効にしますか?\n\n{{pendingCount}} アカウントは承認待ちです。\n\nすべての保留中のアカウントを今すぐ承認するには [OK] をクリックし、保留のままにする場合は [キャンセル] をクリックします。",
     "approvedPending": "{{approvedCount}} 保留中のアカウントを承認しました。",
+    "queueRetentionSaved": "キュー保持期間を {{days}} 日に更新しました。",
+    "milestoneGenerationHorizonSaved": "マイルストーン生成期間を {{years}} 年に更新しました。",
     "backupRunSuccess": "バックアップが正常に完了しました。",
     "backupRestoreCompleted": "バックアップの復元が完了しました。"
   },

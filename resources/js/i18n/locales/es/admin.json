@@ -217,6 +217,8 @@
     "deletedUser": "Se eliminó a {{deletedUserName}} y todos los datos de su propiedad.",
     "approvePending": "¿Deshabilitar el requisito de aprobación de registro?\n\n{{pendingCount}} cuenta(s) están pendientes de aprobación.\n\nHaz clic en Aceptar para aprobar ahora todas las cuentas pendientes, o en Cancelar para dejarlas pendientes.",
     "approvedPending": "Se aprobaron {{approvedCount}} cuenta(s) pendiente(s).",
+    "queueRetentionSaved": "La retención de la cola se actualizó a {{days}} día(s).",
+    "milestoneGenerationHorizonSaved": "El horizonte de generación de hitos se actualizó a {{years}} año(s).",
     "backupRunSuccess": "La copia de seguridad se completó correctamente.",
     "backupRestoreCompleted": "La restauración de la copia de seguridad se completó."
   },

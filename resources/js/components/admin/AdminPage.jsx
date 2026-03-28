@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { setI18nLocale } from "../../i18n";
-import Toast from "../common/Toast";
+import { useToast } from "../common/ToastProvider";
 
 /**
  * Renders the Admin Page.
@@ -27,13 +27,13 @@ export default function AdminPage({
   areBackupConfigSnapshotsEqual,
   formatAdminTimestamp,
   MILESTONE_PURGE_SUMMARY_AUTO_HIDE_MS,
-  BACKUP_RUN_TOAST_AUTO_HIDE_MS,
   BACKUP_DRAWER_ANIMATION_MS,
   WEEKDAY_OPTIONS,
   MONTH_OPTIONS,
   RECOMMENDED_BACKUP_RETENTION,
 }) {
   const { t } = useTranslation("admin");
+  const { showToast } = useToast();
   const [state, setState] = useState({
     loading: true,
     users: [],
@@ -104,7 +104,6 @@ export default function AdminPage({
   const [backupRestoreResult, setBackupRestoreResult] = useState(null);
   const [backupRestoreOpen, setBackupRestoreOpen] = useState(false);
   const [backupRestoreRendered, setBackupRestoreRendered] = useState(false);
-  const [backupRunToast, setBackupRunToast] = useState(null);
   const [backupConfigOpen, setBackupConfigOpen] = useState(false);
   const [backupConfigRendered, setBackupConfigRendered] = useState(false);
   const [backupAdvancedOpen, setBackupAdvancedOpen] = useState(false);
@@ -310,19 +309,6 @@ export default function AdminPage({
   }, [milestonePurgeSummary]);
 
   useEffect(() => {
-    if (!backupRunToast) {
-      return undefined;
-    }
-
-    const timer = window.setTimeout(
-      () => setBackupRunToast(null),
-      BACKUP_RUN_TOAST_AUTO_HIDE_MS,
-    );
-
-    return () => window.clearTimeout(timer);
-  }, [backupRunToast]);
-
-  useEffect(() => {
     if (backupConfigOpen) {
       setBackupConfigRendered(true);
       return undefined;
@@ -478,7 +464,7 @@ export default function AdminPage({
       setDeleteUserTarget(null);
       setDeleteUserConfirmationEmail("");
       setDeleteUserTransferOwnerId("");
-      setBackupRunToast({
+      showToast({
         status: "success",
         message: transferOwnerId
           ? t("notices.transferredData", {
@@ -596,7 +582,7 @@ export default function AdminPage({
           "/api/admin/users/approve-pending",
         );
         const approvedCount = Number(bulkApproval.data?.approved_count ?? 0);
-        setBackupRunToast({
+        showToast({
           status: "success",
           message: t("notices.approvedPending", { approvedCount }),
         });
@@ -844,6 +830,13 @@ export default function AdminPage({
         ...prev,
         contactChangeRetentionDays: Number(response.data?.days || days),
       }));
+      const nextDays = Number(response.data?.days || days);
+      showToast({
+        status: "success",
+        message: t("notices.queueRetentionSaved", {
+          days: nextDays,
+        }),
+      });
     } catch (err) {
       setState((prev) => ({
         ...prev,
@@ -879,6 +872,13 @@ export default function AdminPage({
         ...prev,
         milestoneGenerationYears: Number(response.data?.years || years),
       }));
+      const nextYears = Number(response.data?.years || years);
+      showToast({
+        status: "success",
+        message: t("notices.milestoneGenerationHorizonSaved", {
+          years: nextYears,
+        }),
+      });
     } catch (err) {
       setState((prev) => ({
         ...prev,
@@ -1042,7 +1042,7 @@ export default function AdminPage({
         backupLastRunStatus: nextStatus,
         backupLastRunMessage: nextMessage,
       }));
-      setBackupRunToast({
+      showToast({
         status: nextStatus,
         message: nextMessage,
       });
@@ -1056,7 +1056,7 @@ export default function AdminPage({
         backupLastRunStatus: "failed",
         backupLastRunMessage: message,
       }));
-      setBackupRunToast({
+      showToast({
         status: "failed",
         message,
       });
@@ -1105,7 +1105,7 @@ export default function AdminPage({
       const result = response.data ?? {};
 
       setBackupRestoreResult(result);
-      setBackupRunToast({
+      showToast({
         status: result.status || "success",
         message: result.reason || t("notices.backupRestoreCompleted"),
       });
@@ -1119,7 +1119,7 @@ export default function AdminPage({
         ...prev,
         error: message,
       }));
-      setBackupRunToast({
+      showToast({
         status: "failed",
         message,
       });
@@ -1470,13 +1470,6 @@ export default function AdminPage({
           <p className="mt-3 text-sm text-app-danger">{state.error}</p>
         ) : null}
       </div>
-
-      {backupRunToast ? (
-        <Toast
-          status={backupRunToast.status}
-          message={backupRunToast.message}
-        />
-      ) : null}
 
       {deleteUserTarget ? (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/45 p-4">

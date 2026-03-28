@@ -217,6 +217,8 @@
     "deletedUser": "{{deletedUserName}} und alle zugehörigen Daten gelöscht.",
     "approvePending": "Anforderung zur Registrierungsgenehmigung deaktivieren?\n\n{{pendingCount}} Konto/Konten warten auf Genehmigung.\n\nKlicken Sie auf OK, um alle ausstehenden Konten jetzt zu genehmigen, oder auf Abbrechen, um sie weiter ausstehend zu lassen.",
     "approvedPending": "{{approvedCount}} ausstehende(s) Konto/Konten genehmigt.",
+    "queueRetentionSaved": "Die Aufbewahrung der Warteschlange wurde auf {{days}} Tag(e) aktualisiert.",
+    "milestoneGenerationHorizonSaved": "Der Horizont für die Meilensteingenerierung wurde auf {{years}} Jahr(e) aktualisiert.",
     "backupRunSuccess": "Backup erfolgreich abgeschlossen.",
     "backupRestoreCompleted": "Backup-Wiederherstellung abgeschlossen."
   },

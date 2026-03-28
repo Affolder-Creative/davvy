@@ -10,6 +10,7 @@ import { I18nextProvider, useTranslation } from "react-i18next";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import useAuthState from "./components/auth/useAuthState";
 import FullPageState from "./components/common/FullPageState";
+import { ToastProvider } from "./components/common/ToastProvider";
 import useThemePreference from "./components/theme/useThemePreference";
 import i18n, { setI18nLocale } from "./i18n";
 import { api, setApiLocale } from "./lib/api";
@@ -193,9 +194,11 @@ const mountNode = document.getElementById("app");
 if (mountNode) {
   createRoot(mountNode).render(
     <I18nextProvider i18n={i18n}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <ToastProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ToastProvider>
     </I18nextProvider>,
   );
 }
