@@ -82,7 +82,7 @@ Note on `ENABLE_PUBLIC_REGISTRATION`:
 - If seeding runs, public registration is initialized to disabled.
 
 Backup scheduler note:
-- When `RUN_SCHEDULER=true` (default), the container runs `php artisan schedule:work` for periodic jobs.
+- When `RUN_SCHEDULER=true` (default), the container runs `php artisan schedule:work` for periodic jobs (automated backups + milestone horizon roll-forward sync).
 - If you set `RUN_SCHEDULER=false`, you must run `php artisan schedule:run` externally every minute.
 
 ## Railway

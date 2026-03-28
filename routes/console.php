@@ -2,12 +2,15 @@
 
 use App\Mail\AdminUserInviteMail;
 use App\Mail\PublicRegistrationVerificationMail;
+use App\Models\AddressBookContactMilestoneCalendar;
 use App\Models\User;
 use App\Services\Backups\BackupRestoreService;
 use App\Services\Backups\BackupService;
+use App\Services\Contacts\ContactMilestoneCalendarService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 Artisan::command('app:about', function (): void {
@@ -376,6 +379,40 @@ Artisan::command('app:backup {--force : Run immediately, ignoring enabled flag a
     return 1;
 })->purpose('Run automated data backups with retention (local and optional S3)');
 
+Artisan::command('app:milestones:sync', function (): int {
+    if (! Schema::hasTable('address_book_contact_milestone_calendars')) {
+        $this->line('Skipped: milestone settings table not found.');
+
+        return 0;
+    }
+
+    $addressBookIds = AddressBookContactMilestoneCalendar::query()
+        ->where('enabled', true)
+        ->pluck('address_book_id')
+        ->map(fn (mixed $id): int => (int) $id)
+        ->filter(fn (int $id): bool => $id > 0)
+        ->unique()
+        ->values()
+        ->all();
+
+    if ($addressBookIds === []) {
+        $this->line('Skipped: no enabled milestone calendars found.');
+
+        return 0;
+    }
+
+    /** @var ContactMilestoneCalendarService $milestoneCalendarService */
+    $milestoneCalendarService = app(ContactMilestoneCalendarService::class);
+    $milestoneCalendarService->syncAddressBooksByIds($addressBookIds);
+
+    $this->info(sprintf(
+        'Synchronized milestone calendars for %d address book(s).',
+        count($addressBookIds),
+    ));
+
+    return 0;
+})->purpose('Re-sync enabled milestone calendars to roll forward upcoming horizon events');
+
 Artisan::command(
     'app:backup:restore
     {archive : Path to backup ZIP archive}
@@ -446,4 +483,9 @@ Artisan::command(
 
 Schedule::command('app:backup')
     ->everyMinute()
+    ->withoutOverlapping();
+
+Schedule::command('app:milestones:sync')
+    ->dailyAt('00:15')
+    ->timezone(config('app.timezone', 'UTC'))
     ->withoutOverlapping();
