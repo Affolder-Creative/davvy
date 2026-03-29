@@ -30,6 +30,7 @@ return [
             'thumbnail_size' => (int) env('CONTACT_PHOTO_THUMBNAIL_SIZE', 192),
             'thumbnail_quality' => (int) env('CONTACT_PHOTO_THUMBNAIL_QUALITY', 74),
             'stage_ttl_minutes' => (int) env('CONTACT_PHOTO_STAGE_TTL_MINUTES', 10080),
+            'metrics_enabled' => (bool) env('CONTACT_PHOTO_METRICS_ENABLED', true),
             'allowed_mimes' => array_values(array_filter(array_map(
                 fn (string $mime): string => strtolower(trim($mime)),
                 explode(',', (string) env(

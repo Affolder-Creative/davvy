@@ -7,9 +7,11 @@ use App\Models\User;
 use App\Services\Backups\BackupRestoreService;
 use App\Services\Backups\BackupService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
+use App\Services\Contacts\ContactPhotoMetricsService;
 use App\Services\Contacts\ContactPhotoService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -435,6 +437,32 @@ Artisan::command('app:contacts:photos:prune', function (): int {
     return 0;
 })->purpose('Prune expired staged uploads and orphaned managed contact photos');
 
+Artisan::command('app:contacts:photos:metrics-summary', function (): int {
+    if (! Schema::hasTable('contacts') || ! Schema::hasTable('cards')) {
+        $this->line('Skipped: contacts/cards tables not found.');
+
+        return 0;
+    }
+
+    /** @var ContactPhotoMetricsService $metricsService */
+    $metricsService = app(ContactPhotoMetricsService::class);
+    $summary = $metricsService->summarizeCurrentFootprint();
+    Log::info('contact_photo_metric_summary', $summary);
+
+    $cardsP95 = $summary['cards_data_bytes']['p95'] ?? null;
+    $photoCardsP95 = $summary['cards_with_embedded_photo_bytes']['p95'] ?? null;
+
+    $this->info(sprintf(
+        'Logged contact photo summary: %d/%d contacts with photos; cards p95=%s bytes; photo-cards p95=%s bytes.',
+        (int) ($summary['contacts_with_photo'] ?? 0),
+        (int) ($summary['contacts_total'] ?? 0),
+        $cardsP95 === null ? 'n/a' : (string) $cardsP95,
+        $photoCardsP95 === null ? 'n/a' : (string) $photoCardsP95,
+    ));
+
+    return 0;
+})->purpose('Log managed contact photo and cards.data size distributions');
+
 Artisan::command(
     'app:backup:restore
     {archive : Path to backup ZIP archive}
@@ -509,6 +537,11 @@ Schedule::command('app:backup')
 
 Schedule::command('app:contacts:photos:prune')
     ->hourly()
+    ->withoutOverlapping();
+
+Schedule::command('app:contacts:photos:metrics-summary')
+    ->dailyAt('00:30')
+    ->timezone(config('app.timezone', 'UTC'))
     ->withoutOverlapping();
 
 Schedule::command('app:milestones:sync')

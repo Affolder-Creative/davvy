@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -124,6 +125,82 @@ class ContactPhotoManagementTest extends TestCase
             ->where('address_book_id', $book->id)
             ->firstOrFail();
         $this->assertStringNotContainsString('PHOTO;', (string) $assignment->card?->data);
+    }
+
+    public function test_photo_save_and_remove_emit_structured_metrics_logs(): void
+    {
+        $this->skipWhenImagickMissing();
+        Storage::fake('local');
+        Log::spy();
+
+        $user = User::factory()->create();
+        $book = AddressBook::factory()->create(['owner_id' => $user->id, 'uri' => 'photo-metrics']);
+        $token = $this->stageToken($user, null);
+
+        $created = $this->actingAs($user)->postJson('/api/contacts', [
+            'first_name' => 'Metrics',
+            'last_name' => 'Photo',
+            'address_book_ids' => [$book->id],
+            'photo_upload_token' => $token,
+            'phones' => [],
+            'emails' => [],
+            'urls' => [],
+            'addresses' => [],
+            'dates' => [],
+            'related_names' => [],
+            'instant_messages' => [],
+        ]);
+
+        $created->assertCreated();
+        $contactId = (int) $created->json('id');
+
+        Log::shouldHaveReceived('info')->withArgs(
+            fn (string $message, array $context): bool => $message === 'contact_photo_metric'
+                && ($context['metric'] ?? null) === 'photo_saved'
+                && ($context['source'] ?? null) === 'web_stage_token'
+                && (int) ($context['contact_id'] ?? 0) === $contactId
+                && (int) ($context['photo_bytes'] ?? 0) > 0
+        )->atLeast()->once();
+
+        Log::shouldHaveReceived('info')->withArgs(
+            fn (string $message, array $context): bool => $message === 'contact_photo_metric'
+                && ($context['metric'] ?? null) === 'vcard_built'
+                && (int) ($context['contact_id'] ?? 0) === $contactId
+                && (bool) ($context['has_photo'] ?? false) === true
+                && (int) ($context['cards_data_bytes'] ?? 0) > 0
+        )->atLeast()->once();
+
+        $this->actingAs($user)
+            ->patchJson('/api/contacts/'.$contactId, [
+                'first_name' => 'Metrics',
+                'last_name' => 'Photo',
+                'address_book_ids' => [$book->id],
+                'photo_remove' => true,
+                'phones' => [],
+                'emails' => [],
+                'urls' => [],
+                'addresses' => [],
+                'dates' => [],
+                'related_names' => [],
+                'instant_messages' => [],
+            ])
+            ->assertOk();
+
+        Log::shouldHaveReceived('info')->withArgs(
+            fn (string $message, array $context): bool => $message === 'contact_photo_metric'
+                && ($context['metric'] ?? null) === 'photo_removed'
+                && ($context['source'] ?? null) === 'web_remove'
+                && (int) ($context['contact_id'] ?? 0) === $contactId
+                && (bool) ($context['had_photo'] ?? false) === true
+        )->atLeast()->once();
+
+        Log::shouldHaveReceived('info')->withArgs(
+            fn (string $message, array $context): bool => $message === 'contact_photo_metric'
+                && ($context['metric'] ?? null) === 'vcard_built'
+                && (int) ($context['contact_id'] ?? 0) === $contactId
+                && (bool) ($context['has_photo'] ?? false) === false
+                && (int) ($context['cards_data_bytes'] ?? 0) > 0
+        )->atLeast()->once();
     }
 
     public function test_moderated_photo_update_is_queued_and_applied_after_approval(): void

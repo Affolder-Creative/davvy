@@ -14,6 +14,10 @@ use RuntimeException;
 
 class ContactPhotoService
 {
+    public function __construct(
+        private readonly ContactPhotoMetricsService $contactPhotoMetricsService,
+    ) {}
+
     /**
      * Stages a cropped + normalized contact photo upload.
      *
@@ -102,6 +106,7 @@ class ContactPhotoService
         if ($removePhoto) {
             if ($existingPhoto !== null) {
                 $this->deletePhotoFile($existingPhoto);
+                $this->contactPhotoMetricsService->recordPhotoRemoved($contact, $existingPhoto, 'web_remove');
             }
 
             return $payload;
@@ -118,9 +123,13 @@ class ContactPhotoService
 
             if ($existingPhoto !== null && $this->photoPath($existingPhoto) !== $photo['path']) {
                 $this->deletePhotoFile($existingPhoto);
+                $this->contactPhotoMetricsService->recordPhotoRemoved($contact, $existingPhoto, 'web_replace');
             }
 
             $payload['photo'] = $photo;
+            if ($existingPhoto === null || $this->photoPath($existingPhoto) !== $photo['path']) {
+                $this->contactPhotoMetricsService->recordPhotoSaved($contact, $photo, 'web_stage_token');
+            }
 
             return $payload;
         }
@@ -130,6 +139,11 @@ class ContactPhotoService
 
             if ($existingPhoto !== null && $this->photoPath($existingPhoto) !== $this->photoPath($incomingPhoto)) {
                 $this->deletePhotoFile($existingPhoto);
+                $this->contactPhotoMetricsService->recordPhotoRemoved($contact, $existingPhoto, 'web_payload_replace');
+            }
+
+            if ($existingPhoto === null || $this->photoPath($existingPhoto) !== $this->photoPath($incomingPhoto)) {
+                $this->contactPhotoMetricsService->recordPhotoSaved($contact, $incomingPhoto, 'web_payload');
             }
 
             return $payload;
@@ -234,6 +248,7 @@ class ContactPhotoService
         if ($parsedPhoto === null) {
             if ($existingPhoto !== null) {
                 $this->deletePhotoFile($existingPhoto);
+                $this->contactPhotoMetricsService->recordPhotoRemoved($contact, $existingPhoto, 'carddav_remove');
             }
 
             return $payload;
@@ -250,9 +265,13 @@ class ContactPhotoService
 
         if ($existingPhoto !== null && $this->photoPath($existingPhoto) !== $photo['path']) {
             $this->deletePhotoFile($existingPhoto);
+            $this->contactPhotoMetricsService->recordPhotoRemoved($contact, $existingPhoto, 'carddav_replace');
         }
 
         $payload['photo'] = $photo;
+        if ($existingPhoto === null || $this->photoPath($existingPhoto) !== $photo['path']) {
+            $this->contactPhotoMetricsService->recordPhotoSaved($contact, $photo, 'carddav_photo');
+        }
 
         return $payload;
     }

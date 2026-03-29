@@ -201,6 +201,7 @@ class ContactVCardService
 
     public function __construct(
         private readonly ContactPhotoService $contactPhotoService,
+        private readonly ContactPhotoMetricsService $contactPhotoMetricsService,
     ) {}
 
     /**
@@ -450,7 +451,9 @@ class ContactVCardService
         $this->addSimpleProperty($vCard, 'X-DAVVY-CONTACT-OWNER', (string) $contact->owner_id);
 
         $photo = $this->contactPhotoService->readPhotoBinary(is_array($payload) ? $payload : []);
+        $embeddedPhotoBytes = null;
         if ($photo !== null) {
+            $embeddedPhotoBytes = strlen((string) $photo['binary']);
             $photoProperty = $vCard->add('PHOTO', base64_encode($photo['binary']));
             $photoProperty['ENCODING'] = 'b';
             $photoProperty['MEDIATYPE'] = $photo['mime'];
@@ -458,6 +461,12 @@ class ContactVCardService
 
         $data = $vCard->serialize();
         $vCard->destroy();
+        $this->contactPhotoMetricsService->recordVCardBuilt(
+            contact: $contact,
+            cardDataBytes: strlen($data),
+            hasPhoto: $embeddedPhotoBytes !== null,
+            photoBinaryBytes: $embeddedPhotoBytes,
+        );
 
         return $data;
     }
