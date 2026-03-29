@@ -14,13 +14,8 @@ use App\Services\Dav\IcsValidator;
 use App\Services\Dav\VCardValidator;
 use App\Services\ResourceDeletionService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use RuntimeException;
-use Sabre\VObject\Component;
-use Sabre\VObject\Component\VCalendar;
-use Sabre\VObject\Reader;
 use Throwable;
-use ZipArchive;
 
 class BackupRestoreService
 {
@@ -30,6 +25,10 @@ class BackupRestoreService
         private readonly DavSyncService $syncService,
         private readonly ManagedContactSyncService $managedContactSync,
         private readonly ResourceDeletionService $resourceDeletion,
+        private readonly BackupArchiveReader $archiveReader,
+        private readonly BackupRestoreCollectionService $collectionService,
+        private readonly BackupResourceUriService $resourceUriService,
+        private readonly BackupPayloadSplitService $payloadSplitService,
     ) {}
 
     /**
@@ -72,7 +71,7 @@ class BackupRestoreService
         }
 
         $warnings = [];
-        [$entries, $manifest, $ownerIdsInArchive] = $this->readArchiveEntries(
+        [$entries, $manifest, $ownerIdsInArchive] = $this->archiveReader->readArchiveEntries(
             archivePath: $archivePath,
             warnings: $warnings,
         );
@@ -234,7 +233,7 @@ class BackupRestoreService
             $legacyCollectionUriCounts = [];
 
             foreach ($processableEntries as $entry) {
-                $legacyUriCandidate = $this->legacyCollectionUriCandidateFromStem((string) $entry['file_stem']);
+                $legacyUriCandidate = $this->collectionService->legacyCollectionUriCandidateFromStem((string) $entry['file_stem']);
                 if (! is_string($legacyUriCandidate) || $legacyUriCandidate === '') {
                     continue;
                 }
@@ -251,7 +250,7 @@ class BackupRestoreService
             foreach ($processableEntries as $entry) {
                 $summary['files_processed']++;
                 $resolvedOwnerId = (int) $entry['resolved_owner_id'];
-                $legacyUriCandidate = $this->legacyCollectionUriCandidateFromStem((string) $entry['file_stem']);
+                $legacyUriCandidate = $this->collectionService->legacyCollectionUriCandidateFromStem((string) $entry['file_stem']);
                 $legacyKey = $legacyUriCandidate === null
                     ? null
                     : sprintf('%s|%d|%s', (string) $entry['type'], $resolvedOwnerId, $legacyUriCandidate);
@@ -265,7 +264,7 @@ class BackupRestoreService
                 }
 
                 if ($entry['type'] === 'calendar') {
-                    $calendar = $this->upsertCalendarCollection(
+                    $calendar = $this->collectionService->upsertCalendarCollection(
                         ownerId: $resolvedOwnerId,
                         fileStem: (string) $entry['file_stem'],
                         collectionUri: $collectionUri,
@@ -291,7 +290,7 @@ class BackupRestoreService
                         : [];
 
                     try {
-                        $calendarResources = $this->splitCalendarPayload(
+                        $calendarResources = $this->payloadSplitService->splitCalendarPayload(
                             payload: (string) $entry['contents'],
                             archivePath: (string) $entry['archive_path'],
                         );
@@ -343,7 +342,7 @@ class BackupRestoreService
                                 ->first();
 
                             if (! $existingObject) {
-                                $fallbackUri = $this->normalizeResourceUri(
+                                $fallbackUri = $this->resourceUriService->normalizeResourceUri(
                                     candidate: (string) $resource['uri_candidate'],
                                     extension: 'ics',
                                     fallbackStem: 'item',
@@ -380,7 +379,7 @@ class BackupRestoreService
                             continue;
                         }
 
-                        $resourceUri = $this->nextUniqueResourceUri(
+                        $resourceUri = $this->resourceUriService->nextUniqueResourceUri(
                             candidate: (string) $resource['uri_candidate'],
                             extension: 'ics',
                             fallbackStem: 'item',
@@ -414,7 +413,7 @@ class BackupRestoreService
                     continue;
                 }
 
-                $addressBook = $this->upsertAddressBookCollection(
+                $addressBook = $this->collectionService->upsertAddressBookCollection(
                     ownerId: $resolvedOwnerId,
                     fileStem: (string) $entry['file_stem'],
                     collectionUri: $collectionUri,
@@ -443,7 +442,7 @@ class BackupRestoreService
                     : [];
 
                 try {
-                    $cards = $this->splitAddressBookPayload(
+                    $cards = $this->payloadSplitService->splitAddressBookPayload(
                         payload: (string) $entry['contents'],
                         archivePath: (string) $entry['archive_path'],
                     );
@@ -485,7 +484,7 @@ class BackupRestoreService
                             ->first();
 
                         if (! $existingCard) {
-                            $fallbackUri = $this->normalizeResourceUri(
+                            $fallbackUri = $this->resourceUriService->normalizeResourceUri(
                                 candidate: (string) $resource['uri_candidate'],
                                 extension: 'vcf',
                                 fallbackStem: 'card',
@@ -531,7 +530,7 @@ class BackupRestoreService
                         continue;
                     }
 
-                    $resourceUri = $this->nextUniqueResourceUri(
+                    $resourceUri = $this->resourceUriService->nextUniqueResourceUri(
                         candidate: (string) $resource['uri_candidate'],
                         extension: 'vcf',
                         fallbackStem: 'card',
@@ -603,587 +602,5 @@ class BackupRestoreService
             'summary' => $summary,
             'warnings' => array_values(array_unique($warnings)),
         ];
-    }
-
-    /**
-     * Returns archive entries.
-     *
-     * @param  array<int, string>  $warnings
-     * @return array{
-     *   0:array<int, array{
-     *     type:'calendar'|'address_book',
-     *     archive_path:string,
-     *     owner_id:int,
-     *     file_stem:string,
-     *     collection_uri:?string,
-     *     contents:string
-     *   }>,
-     *   1:array<string, mixed>|null,
-     *   2:array<int, int>
-     * }
-     */
-    private function readArchiveEntries(string $archivePath, array &$warnings): array
-    {
-        $zip = new ZipArchive;
-        $opened = $zip->open($archivePath);
-        if ($opened !== true) {
-            throw new RuntimeException(__('backups.unable_to_open_backup_archive'));
-        }
-
-        $entries = [];
-        $ownerIds = [];
-        $manifest = null;
-
-        try {
-            for ($index = 0; $index < $zip->numFiles; $index++) {
-                $entryName = $zip->getNameIndex($index);
-                if (! is_string($entryName) || $entryName === '' || str_ends_with($entryName, '/')) {
-                    continue;
-                }
-
-                if ($entryName === 'manifest.json') {
-                    $manifestPayload = $zip->getFromIndex($index);
-                    if (is_string($manifestPayload)) {
-                        $decoded = json_decode($manifestPayload, true);
-                        if (is_array($decoded)) {
-                            $manifest = $decoded;
-                        } else {
-                            $warnings[] = __('backups.manifest_exists_but_invalid_json');
-                        }
-                    }
-
-                    continue;
-                }
-
-                $matchType = null;
-                $ownerId = null;
-                $fileStem = null;
-                if (preg_match('#^calendars/user-(\d+)/([^/]+)\.ics$#i', $entryName, $matches) === 1) {
-                    $matchType = 'calendar';
-                    $ownerId = (int) $matches[1];
-                    $fileStem = (string) $matches[2];
-                } elseif (preg_match('#^address-books/user-(\d+)/([^/]+)\.vcf$#i', $entryName, $matches) === 1) {
-                    $matchType = 'address_book';
-                    $ownerId = (int) $matches[1];
-                    $fileStem = (string) $matches[2];
-                } else {
-                    continue;
-                }
-
-                $contents = $zip->getFromIndex($index);
-                if (! is_string($contents)) {
-                    $warnings[] = sprintf('Skipping unreadable archive entry "%s".', $entryName);
-
-                    continue;
-                }
-
-                $ownerIds[] = $ownerId;
-                $entries[] = [
-                    'type' => $matchType,
-                    'archive_path' => $entryName,
-                    'owner_id' => $ownerId,
-                    'file_stem' => $fileStem,
-                    'collection_uri' => null,
-                    'contents' => $contents,
-                ];
-            }
-        } finally {
-            $zip->close();
-        }
-
-        $collectionUriMap = $this->collectionUriMapFromManifest($manifest);
-        if ($collectionUriMap !== []) {
-            foreach ($entries as &$entry) {
-                $manifestKey = (string) $entry['type'].'|'.(string) $entry['archive_path'];
-                if (isset($collectionUriMap[$manifestKey])) {
-                    $entry['collection_uri'] = $collectionUriMap[$manifestKey];
-                }
-            }
-            unset($entry);
-        }
-
-        $ownerIds = array_values(array_unique($ownerIds));
-        sort($ownerIds);
-
-        return [$entries, $manifest, $ownerIds];
-    }
-
-    /**
-     * Returns upsert calendar collection.
-     *
-     * @param  array<int, string>  $uriPool
-     * @param  array<string, int|null>  $summary
-     * @return array{id:int|null,uri:string,display_name:string}
-     */
-    private function upsertCalendarCollection(
-        int $ownerId,
-        string $fileStem,
-        ?string $collectionUri,
-        ?string $legacyUriCandidate,
-        bool $allowLegacyUriMatch,
-        bool $dryRun,
-        string $mode,
-        array &$uriPool,
-        array &$summary,
-    ): array {
-        [$uriBase, $displayName] = $this->collectionIdentityFromStem($fileStem, 'calendar', 'Calendar');
-        if (is_string($collectionUri) && trim($collectionUri) !== '') {
-            $uriBase = trim($collectionUri);
-        }
-
-        $existing = $mode === 'merge'
-            ? Calendar::query()
-                ->where('owner_id', $ownerId)
-                ->where('uri', $uriBase)
-                ->first()
-            : null;
-
-        if (
-            ! $existing
-            && $mode === 'merge'
-            && $allowLegacyUriMatch
-            && is_string($legacyUriCandidate)
-            && $legacyUriCandidate !== ''
-            && $legacyUriCandidate !== $uriBase
-        ) {
-            $existing = Calendar::query()
-                ->where('owner_id', $ownerId)
-                ->where('uri', $legacyUriCandidate)
-                ->first();
-        }
-
-        if ($existing) {
-            if ($existing->display_name !== $displayName) {
-                $summary['calendars_updated']++;
-
-                if (! $dryRun) {
-                    $existing->update(['display_name' => $displayName]);
-                }
-            }
-
-            if (! in_array($existing->uri, $uriPool, true)) {
-                $uriPool[] = $existing->uri;
-            }
-
-            if (! $dryRun) {
-                $this->syncService->ensureResource(ShareResourceType::Calendar, (int) $existing->id);
-            }
-
-            return [
-                'id' => (int) $existing->id,
-                'uri' => (string) $existing->uri,
-                'display_name' => (string) $existing->display_name,
-            ];
-        }
-
-        $nextUri = $this->nextUniqueCollectionUri($uriBase, $uriPool);
-        $summary['calendars_created']++;
-
-        if ($dryRun) {
-            return [
-                'id' => null,
-                'uri' => $nextUri,
-                'display_name' => $displayName,
-            ];
-        }
-
-        $calendar = Calendar::query()->create([
-            'owner_id' => $ownerId,
-            'uri' => $nextUri,
-            'display_name' => $displayName,
-            'description' => null,
-            'color' => null,
-            'timezone' => null,
-            'is_default' => false,
-            'is_sharable' => false,
-        ]);
-        $this->syncService->ensureResource(ShareResourceType::Calendar, (int) $calendar->id);
-
-        return [
-            'id' => (int) $calendar->id,
-            'uri' => $nextUri,
-            'display_name' => $displayName,
-        ];
-    }
-
-    /**
-     * Returns upsert address book collection.
-     *
-     * @param  array<int, string>  $uriPool
-     * @param  array<string, int|null>  $summary
-     * @return array{id:int|null,uri:string,display_name:string}
-     */
-    private function upsertAddressBookCollection(
-        int $ownerId,
-        string $fileStem,
-        ?string $collectionUri,
-        ?string $legacyUriCandidate,
-        bool $allowLegacyUriMatch,
-        bool $dryRun,
-        string $mode,
-        array &$uriPool,
-        array &$summary,
-    ): array {
-        [$uriBase, $displayName] = $this->collectionIdentityFromStem($fileStem, 'address-book', 'Address Book');
-        if (is_string($collectionUri) && trim($collectionUri) !== '') {
-            $uriBase = trim($collectionUri);
-        }
-
-        $existing = $mode === 'merge'
-            ? AddressBook::query()
-                ->where('owner_id', $ownerId)
-                ->where('uri', $uriBase)
-                ->first()
-            : null;
-
-        if (
-            ! $existing
-            && $mode === 'merge'
-            && $allowLegacyUriMatch
-            && is_string($legacyUriCandidate)
-            && $legacyUriCandidate !== ''
-            && $legacyUriCandidate !== $uriBase
-        ) {
-            $existing = AddressBook::query()
-                ->where('owner_id', $ownerId)
-                ->where('uri', $legacyUriCandidate)
-                ->first();
-        }
-
-        if ($existing) {
-            if ($existing->display_name !== $displayName) {
-                $summary['address_books_updated']++;
-
-                if (! $dryRun) {
-                    $existing->update(['display_name' => $displayName]);
-                }
-            }
-
-            if (! in_array($existing->uri, $uriPool, true)) {
-                $uriPool[] = $existing->uri;
-            }
-
-            if (! $dryRun) {
-                $this->syncService->ensureResource(ShareResourceType::AddressBook, (int) $existing->id);
-            }
-
-            return [
-                'id' => (int) $existing->id,
-                'uri' => (string) $existing->uri,
-                'display_name' => (string) $existing->display_name,
-            ];
-        }
-
-        $nextUri = $this->nextUniqueCollectionUri($uriBase, $uriPool);
-        $summary['address_books_created']++;
-
-        if ($dryRun) {
-            return [
-                'id' => null,
-                'uri' => $nextUri,
-                'display_name' => $displayName,
-            ];
-        }
-
-        $addressBook = AddressBook::query()->create([
-            'owner_id' => $ownerId,
-            'uri' => $nextUri,
-            'display_name' => $displayName,
-            'description' => null,
-            'is_default' => false,
-            'is_sharable' => false,
-        ]);
-        $this->syncService->ensureResource(ShareResourceType::AddressBook, (int) $addressBook->id);
-
-        return [
-            'id' => (int) $addressBook->id,
-            'uri' => $nextUri,
-            'display_name' => $displayName,
-        ];
-    }
-
-    /**
-     * Returns collection URI map from manifest.
-     *
-     * @param  array<string, mixed>|null  $manifest
-     * @return array<string, string>
-     */
-    private function collectionUriMapFromManifest(?array $manifest): array
-    {
-        if (! is_array($manifest)) {
-            return [];
-        }
-
-        $collections = $manifest['collections'] ?? null;
-        if (! is_array($collections)) {
-            return [];
-        }
-
-        $map = [];
-        foreach ([
-            'calendars' => 'calendar',
-            'address_books' => 'address_book',
-        ] as $manifestKey => $entryType) {
-            $items = $collections[$manifestKey] ?? null;
-            if (! is_array($items)) {
-                continue;
-            }
-
-            foreach ($items as $item) {
-                if (! is_array($item)) {
-                    continue;
-                }
-
-                $archivePath = (isset($item['archive_path']) && is_string($item['archive_path']))
-                    ? trim($item['archive_path'])
-                    : '';
-                $uri = (isset($item['uri']) && is_string($item['uri']))
-                    ? trim($item['uri'])
-                    : '';
-                if ($archivePath === '' || $uri === '') {
-                    continue;
-                }
-
-                $map[$entryType.'|'.$archivePath] = $uri;
-            }
-        }
-
-        return $map;
-    }
-
-    /**
-     * Returns legacy collection URI candidate from stem.
-     */
-    private function legacyCollectionUriCandidateFromStem(string $fileStem): ?string
-    {
-        $rawStem = trim($fileStem);
-        if (preg_match('/^\d+-(.+)$/', $rawStem, $matches) !== 1) {
-            return null;
-        }
-
-        $candidate = Str::slug((string) ($matches[1] ?? ''));
-
-        return $candidate === '' ? null : $candidate;
-    }
-
-    /**
-     * Returns collection identity from stem.
-     *
-     * @return array{0:string,1:string}
-     */
-    private function collectionIdentityFromStem(string $fileStem, string $fallbackUriStem, string $fallbackDisplayName): array
-    {
-        $rawStem = trim($fileStem);
-        $displayStem = $rawStem;
-
-        if (preg_match('/^\d+-(.+)$/', $rawStem, $matches) === 1) {
-            $displayStem = (string) ($matches[1] ?? $displayStem);
-        }
-
-        // Keep numeric ID prefixes from archive stems in URI generation so
-        // same-name collections from the same owner restore as distinct resources.
-        $uri = Str::slug($rawStem);
-        if ($uri === '') {
-            $uri = $fallbackUriStem;
-        }
-
-        $displayName = Str::of($displayStem)
-            ->replace(['-', '_'], ' ')
-            ->squish()
-            ->title()
-            ->value();
-        if ($displayName === '') {
-            $displayName = $fallbackDisplayName;
-        }
-
-        return [$uri, $displayName];
-    }
-
-    /**
-     * Returns next unique collection URI.
-     *
-     * @param  array<int, string>  $uriPool
-     */
-    private function nextUniqueCollectionUri(string $baseUri, array &$uriPool): string
-    {
-        $seed = Str::slug($baseUri);
-        if ($seed === '') {
-            $seed = 'resource';
-        }
-
-        $candidate = $seed;
-        $counter = 2;
-        while (in_array($candidate, $uriPool, true)) {
-            $candidate = $seed.'-'.$counter;
-            $counter++;
-        }
-
-        $uriPool[] = $candidate;
-
-        return $candidate;
-    }
-
-    /**
-     * Returns next unique resource URI.
-     *
-     * @param  array<int, string>  $uriPool
-     */
-    private function nextUniqueResourceUri(
-        string $candidate,
-        string $extension,
-        string $fallbackStem,
-        array &$uriPool,
-    ): string {
-        $normalized = $this->normalizeResourceUri($candidate, $extension, $fallbackStem);
-        $base = pathinfo($normalized, PATHINFO_FILENAME);
-        $ext = pathinfo($normalized, PATHINFO_EXTENSION);
-
-        $next = $normalized;
-        $counter = 2;
-        while (in_array($next, $uriPool, true)) {
-            $next = sprintf('%s-%d.%s', $base, $counter, $ext);
-            $counter++;
-        }
-
-        $uriPool[] = $next;
-
-        return $next;
-    }
-
-    /**
-     * Normalizes resource URI.
-     */
-    private function normalizeResourceUri(string $candidate, string $extension, string $fallbackStem): string
-    {
-        $stem = Str::slug(pathinfo(trim($candidate), PATHINFO_FILENAME));
-        if ($stem === '') {
-            $stem = $fallbackStem;
-        }
-
-        $ext = Str::lower(pathinfo(trim($candidate), PATHINFO_EXTENSION));
-        if ($ext === '') {
-            $ext = $extension;
-        }
-
-        return $stem.'.'.$ext;
-    }
-
-    /**
-     * Returns split calendar payload.
-     *
-     * @return array<int, array{uri_candidate:string,payload:string}>
-     */
-    private function splitCalendarPayload(string $payload, string $archivePath): array
-    {
-        $component = Reader::read($payload);
-        if (! $component instanceof VCalendar) {
-            throw new RuntimeException(__('backups.entry_missing_vcalendar_payload', ['path' => $archivePath]));
-        }
-
-        $timezones = [];
-        foreach ($component->select('VTIMEZONE') as $timezoneComponent) {
-            if ($timezoneComponent instanceof Component) {
-                $timezones[] = clone $timezoneComponent;
-            }
-        }
-
-        $primaryComponents = [];
-        foreach (['VEVENT', 'VTODO', 'VJOURNAL'] as $type) {
-            foreach ($component->select($type) as $child) {
-                if ($child instanceof Component) {
-                    $primaryComponents[] = clone $child;
-                }
-            }
-        }
-
-        if ($primaryComponents === []) {
-            return [];
-        }
-
-        $groups = [];
-        $counter = 1;
-        foreach ($primaryComponents as $child) {
-            $uid = trim((string) ($child->UID ?? ''));
-            $groupKey = $uid !== '' ? mb_strtolower($uid) : 'item-'.$counter;
-            $counter++;
-
-            if (! isset($groups[$groupKey])) {
-                $groups[$groupKey] = [
-                    'uid' => $uid !== '' ? $uid : null,
-                    'components' => [],
-                ];
-            }
-
-            $groups[$groupKey]['components'][] = $child;
-        }
-
-        $resources = [];
-        $groupIndex = 1;
-        foreach ($groups as $group) {
-            $resourceCalendar = new VCalendar([
-                'VERSION' => '2.0',
-                'PRODID' => '-//Davvy//Backup Restore//EN',
-            ]);
-
-            foreach ($timezones as $timezoneComponent) {
-                $resourceCalendar->add(clone $timezoneComponent);
-            }
-
-            foreach ($group['components'] as $child) {
-                $resourceCalendar->add(clone $child);
-            }
-
-            $uid = is_string($group['uid']) ? trim($group['uid']) : '';
-            $stem = $uid !== ''
-                ? (Str::slug($uid) !== '' ? Str::slug($uid) : 'item-'.substr(sha1($uid), 0, 12))
-                : 'item-'.$groupIndex;
-
-            $resources[] = [
-                'uri_candidate' => $stem.'.ics',
-                'payload' => $resourceCalendar->serialize(),
-            ];
-            $groupIndex++;
-        }
-
-        return $resources;
-    }
-
-    /**
-     * Returns split address book payload.
-     *
-     * @return array<int, array{uri_candidate:string,payload:string}>
-     */
-    private function splitAddressBookPayload(string $payload, string $archivePath): array
-    {
-        $resources = [];
-
-        preg_match_all('/BEGIN:VCARD[\s\S]*?END:VCARD/iu', $payload, $matches);
-        $cards = is_array($matches[0] ?? null) ? $matches[0] : [];
-
-        if ($cards === []) {
-            throw new RuntimeException(__('backups.entry_missing_vcard_payloads', ['path' => $archivePath]));
-        }
-
-        $index = 1;
-        foreach ($cards as $cardPayload) {
-            $trimmed = trim((string) $cardPayload);
-            if ($trimmed === '') {
-                continue;
-            }
-
-            $normalizedPayload = $trimmed."\r\n";
-            $uid = $this->vCardValidator->extractUid($normalizedPayload);
-            $stem = $uid !== null && trim($uid) !== ''
-                ? (Str::slug($uid) !== '' ? Str::slug($uid) : 'card-'.substr(sha1($uid), 0, 12))
-                : 'card-'.$index;
-
-            $resources[] = [
-                'uri_candidate' => $stem.'.vcf',
-                'payload' => $normalizedPayload,
-            ];
-            $index++;
-        }
-
-        return $resources;
     }
 }
