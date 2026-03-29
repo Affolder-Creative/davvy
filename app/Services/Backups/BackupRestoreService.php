@@ -2,33 +2,23 @@
 
 namespace App\Services\Backups;
 
-use App\Enums\ShareResourceType;
 use App\Models\AddressBook;
 use App\Models\Calendar;
 use App\Models\CalendarObject;
 use App\Models\Card;
 use App\Models\User;
-use App\Services\Contacts\ManagedContactSyncService;
-use App\Services\Dav\DavSyncService;
-use App\Services\Dav\IcsValidator;
-use App\Services\Dav\VCardValidator;
 use App\Services\ResourceDeletionService;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
-use Throwable;
 
 class BackupRestoreService
 {
     public function __construct(
-        private readonly IcsValidator $icsValidator,
-        private readonly VCardValidator $vCardValidator,
-        private readonly DavSyncService $syncService,
-        private readonly ManagedContactSyncService $managedContactSync,
         private readonly ResourceDeletionService $resourceDeletion,
         private readonly BackupArchiveReader $archiveReader,
         private readonly BackupRestoreCollectionService $collectionService,
-        private readonly BackupResourceUriService $resourceUriService,
-        private readonly BackupPayloadSplitService $payloadSplitService,
+        private readonly BackupRestoreCalendarHandler $calendarHandler,
+        private readonly BackupRestoreAddressBookHandler $addressBookHandler,
     ) {}
 
     /**
@@ -264,310 +254,36 @@ class BackupRestoreService
                 }
 
                 if ($entry['type'] === 'calendar') {
-                    $calendar = $this->collectionService->upsertCalendarCollection(
-                        ownerId: $resolvedOwnerId,
-                        fileStem: (string) $entry['file_stem'],
+                    $this->calendarHandler->restoreEntry(
+                        entry: $entry,
+                        resolvedOwnerId: $resolvedOwnerId,
                         collectionUri: $collectionUri,
                         legacyUriCandidate: $legacyUriCandidate,
                         allowLegacyUriMatch: $allowLegacyUriMatch,
                         dryRun: $dryRun,
                         mode: $normalizedMode,
-                        uriPool: $calendarUriPools[$resolvedOwnerId],
+                        ownerUriPool: $calendarUriPools[$resolvedOwnerId],
+                        calendarObjectUriPools: $calendarObjectUriPools,
                         summary: $summary,
+                        warnings: $warnings,
                     );
-
-                    $calendarKey = $calendar['id'] !== null
-                        ? 'calendar:'.$calendar['id']
-                        : 'calendar-dry-run:'.$resolvedOwnerId.':'.$calendar['uri'];
-                    $calendarObjectUriPools[$calendarKey] ??= $calendar['id'] !== null
-                        ? CalendarObject::query()
-                            ->where('calendar_id', (int) $calendar['id'])
-                            ->pluck('uri')
-                            ->map(fn (string $uri): string => trim($uri))
-                            ->filter()
-                            ->values()
-                            ->all()
-                        : [];
-
-                    try {
-                        $calendarResources = $this->payloadSplitService->splitCalendarPayload(
-                            payload: (string) $entry['contents'],
-                            archivePath: (string) $entry['archive_path'],
-                        );
-                    } catch (Throwable $throwable) {
-                        $warnings[] = sprintf(
-                            'Skipping calendar payload "%s": %s',
-                            $entry['archive_path'],
-                            $throwable->getMessage(),
-                        );
-                        $summary['resources_skipped_invalid']++;
-
-                        continue;
-                    }
-
-                    if ($calendarResources === []) {
-                        $warnings[] = sprintf(
-                            'Skipping calendar payload "%s": no VEVENT/VTODO/VJOURNAL components found.',
-                            $entry['archive_path'],
-                        );
-                        $summary['resources_skipped_invalid']++;
-
-                        continue;
-                    }
-
-                    foreach ($calendarResources as $resource) {
-                        try {
-                            $normalized = $this->icsValidator->validateAndNormalize(
-                                (string) $resource['payload'],
-                            );
-                        } catch (Throwable $throwable) {
-                            $warnings[] = sprintf(
-                                'Skipping invalid calendar object in "%s": %s',
-                                $entry['archive_path'],
-                                $throwable->getMessage(),
-                            );
-                            $summary['resources_skipped_invalid']++;
-
-                            continue;
-                        }
-
-                        $resourceUid = $normalized['uid']
-                            ?? 'legacy-calendar-'.sha1((string) $resource['uri_candidate']);
-                        $existingObject = null;
-
-                        if ($calendar['id'] !== null) {
-                            $existingObject = CalendarObject::query()
-                                ->where('calendar_id', (int) $calendar['id'])
-                                ->where('uid', $resourceUid)
-                                ->first();
-
-                            if (! $existingObject) {
-                                $fallbackUri = $this->resourceUriService->normalizeResourceUri(
-                                    candidate: (string) $resource['uri_candidate'],
-                                    extension: 'ics',
-                                    fallbackStem: 'item',
-                                );
-
-                                $existingObject = CalendarObject::query()
-                                    ->where('calendar_id', (int) $calendar['id'])
-                                    ->where('uri', $fallbackUri)
-                                    ->first();
-                            }
-                        }
-
-                        if ($existingObject) {
-                            $summary['calendar_objects_updated']++;
-
-                            if (! $dryRun) {
-                                $existingObject->update([
-                                    'uid' => $resourceUid,
-                                    'etag' => md5($normalized['data']),
-                                    'size' => strlen($normalized['data']),
-                                    'component_type' => $normalized['component_type'],
-                                    'first_occurred_at' => $normalized['first_occurred_at'],
-                                    'last_occurred_at' => $normalized['last_occurred_at'],
-                                    'data' => $normalized['data'],
-                                ]);
-
-                                $this->syncService->recordModified(
-                                    ShareResourceType::Calendar,
-                                    (int) $calendar['id'],
-                                    (string) $existingObject->uri,
-                                );
-                            }
-
-                            continue;
-                        }
-
-                        $resourceUri = $this->resourceUriService->nextUniqueResourceUri(
-                            candidate: (string) $resource['uri_candidate'],
-                            extension: 'ics',
-                            fallbackStem: 'item',
-                            uriPool: $calendarObjectUriPools[$calendarKey],
-                        );
-                        $summary['calendar_objects_created']++;
-
-                        if ($dryRun || $calendar['id'] === null) {
-                            continue;
-                        }
-
-                        CalendarObject::query()->create([
-                            'calendar_id' => (int) $calendar['id'],
-                            'uri' => $resourceUri,
-                            'uid' => $resourceUid,
-                            'etag' => md5($normalized['data']),
-                            'size' => strlen($normalized['data']),
-                            'component_type' => $normalized['component_type'],
-                            'first_occurred_at' => $normalized['first_occurred_at'],
-                            'last_occurred_at' => $normalized['last_occurred_at'],
-                            'data' => $normalized['data'],
-                        ]);
-
-                        $this->syncService->recordAdded(
-                            ShareResourceType::Calendar,
-                            (int) $calendar['id'],
-                            $resourceUri,
-                        );
-                    }
 
                     continue;
                 }
 
-                $addressBook = $this->collectionService->upsertAddressBookCollection(
-                    ownerId: $resolvedOwnerId,
-                    fileStem: (string) $entry['file_stem'],
+                $this->addressBookHandler->restoreEntry(
+                    entry: $entry,
+                    resolvedOwnerId: $resolvedOwnerId,
                     collectionUri: $collectionUri,
                     legacyUriCandidate: $legacyUriCandidate,
                     allowLegacyUriMatch: $allowLegacyUriMatch,
                     dryRun: $dryRun,
                     mode: $normalizedMode,
-                    uriPool: $addressBookUriPools[$resolvedOwnerId],
+                    ownerUriPool: $addressBookUriPools[$resolvedOwnerId],
+                    cardUriPools: $cardUriPools,
                     summary: $summary,
+                    warnings: $warnings,
                 );
-
-                $addressBookKey = $addressBook['id'] !== null
-                    ? 'address-book:'.$addressBook['id']
-                    : 'address-book-dry-run:'.$resolvedOwnerId.':'.$addressBook['uri'];
-                $addressBookModel = (! $dryRun && $addressBook['id'] !== null)
-                    ? AddressBook::query()->find((int) $addressBook['id'])
-                    : null;
-                $cardUriPools[$addressBookKey] ??= $addressBook['id'] !== null
-                    ? Card::query()
-                        ->where('address_book_id', (int) $addressBook['id'])
-                        ->pluck('uri')
-                        ->map(fn (string $uri): string => trim($uri))
-                        ->filter()
-                        ->values()
-                        ->all()
-                    : [];
-
-                try {
-                    $cards = $this->payloadSplitService->splitAddressBookPayload(
-                        payload: (string) $entry['contents'],
-                        archivePath: (string) $entry['archive_path'],
-                    );
-                } catch (Throwable $throwable) {
-                    $warnings[] = sprintf(
-                        'Skipping address-book payload "%s": %s',
-                        $entry['archive_path'],
-                        $throwable->getMessage(),
-                    );
-                    $summary['resources_skipped_invalid']++;
-
-                    continue;
-                }
-
-                foreach ($cards as $resource) {
-                    try {
-                        $normalized = $this->vCardValidator->validateAndNormalize(
-                            (string) $resource['payload'],
-                        );
-                    } catch (Throwable $throwable) {
-                        $warnings[] = sprintf(
-                            'Skipping invalid vCard in "%s": %s',
-                            $entry['archive_path'],
-                            $throwable->getMessage(),
-                        );
-                        $summary['resources_skipped_invalid']++;
-
-                        continue;
-                    }
-
-                    $resourceUid = $normalized['uid']
-                        ?? 'legacy-card-'.sha1((string) $resource['uri_candidate']);
-                    $existingCard = null;
-
-                    if ($addressBook['id'] !== null) {
-                        $existingCard = Card::query()
-                            ->where('address_book_id', (int) $addressBook['id'])
-                            ->where('uid', $resourceUid)
-                            ->first();
-
-                        if (! $existingCard) {
-                            $fallbackUri = $this->resourceUriService->normalizeResourceUri(
-                                candidate: (string) $resource['uri_candidate'],
-                                extension: 'vcf',
-                                fallbackStem: 'card',
-                            );
-
-                            $existingCard = Card::query()
-                                ->where('address_book_id', (int) $addressBook['id'])
-                                ->where('uri', $fallbackUri)
-                                ->first();
-                        }
-                    }
-
-                    if ($existingCard) {
-                        $summary['cards_updated']++;
-
-                        if (! $dryRun) {
-                            $existingCard->update([
-                                'uid' => $resourceUid,
-                                'etag' => md5($normalized['data']),
-                                'size' => strlen($normalized['data']),
-                                'data' => $normalized['data'],
-                            ]);
-
-                            $this->syncService->recordModified(
-                                ShareResourceType::AddressBook,
-                                (int) $addressBook['id'],
-                                (string) $existingCard->uri,
-                            );
-
-                            if ($addressBookModel) {
-                                try {
-                                    $existingCard->refresh();
-                                    $this->managedContactSync->syncCardUpsert(
-                                        addressBook: $addressBookModel,
-                                        card: $existingCard,
-                                    );
-                                } catch (Throwable $throwable) {
-                                    report($throwable);
-                                }
-                            }
-                        }
-
-                        continue;
-                    }
-
-                    $resourceUri = $this->resourceUriService->nextUniqueResourceUri(
-                        candidate: (string) $resource['uri_candidate'],
-                        extension: 'vcf',
-                        fallbackStem: 'card',
-                        uriPool: $cardUriPools[$addressBookKey],
-                    );
-                    $summary['cards_created']++;
-
-                    if ($dryRun || $addressBook['id'] === null) {
-                        continue;
-                    }
-
-                    $card = Card::query()->create([
-                        'address_book_id' => (int) $addressBook['id'],
-                        'uri' => $resourceUri,
-                        'uid' => $resourceUid,
-                        'etag' => md5($normalized['data']),
-                        'size' => strlen($normalized['data']),
-                        'data' => $normalized['data'],
-                    ]);
-
-                    $this->syncService->recordAdded(
-                        ShareResourceType::AddressBook,
-                        (int) $addressBook['id'],
-                        $resourceUri,
-                    );
-
-                    if ($addressBookModel) {
-                        try {
-                            $this->managedContactSync->syncCardUpsert(
-                                addressBook: $addressBookModel,
-                                card: $card,
-                            );
-                        } catch (Throwable $throwable) {
-                            report($throwable);
-                        }
-                    }
-                }
             }
         };
 
