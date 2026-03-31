@@ -237,6 +237,7 @@ class ResourceExportTest extends TestCase
     private function seedCalendarObjects(Calendar $calendar, int $count, string $uidPrefix): void
     {
         $rows = [];
+        $timestamp = now();
 
         for ($index = 1; $index <= $count; $index++) {
             $uid = $uidPrefix.'-'.$index;
@@ -250,8 +251,8 @@ class ResourceExportTest extends TestCase
                 'size' => strlen($ics),
                 'component_type' => 'VEVENT',
                 'data' => $ics,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
             ];
 
             if (count($rows) === 250) {
@@ -268,6 +269,7 @@ class ResourceExportTest extends TestCase
     private function seedCards(AddressBook $addressBook, int $count, string $uidPrefix): void
     {
         $rows = [];
+        $timestamp = now();
 
         for ($index = 1; $index <= $count; $index++) {
             $uid = $uidPrefix.'-'.$index;
@@ -280,8 +282,8 @@ class ResourceExportTest extends TestCase
                 'etag' => sha1($vcard),
                 'size' => strlen($vcard),
                 'data' => $vcard,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
             ];
 
             if (count($rows) === 400) {
