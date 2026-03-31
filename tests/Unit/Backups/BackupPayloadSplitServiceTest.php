@@ -12,7 +12,7 @@ class BackupPayloadSplitServiceTest extends TestCase
     {
         $service = app(BackupPayloadSplitService::class);
 
-        $payload = <<<ICS
+        $payload = <<<'ICS'
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Test//EN
