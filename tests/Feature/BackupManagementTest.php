@@ -186,6 +186,60 @@ class BackupManagementTest extends TestCase
         $zip->close();
     }
 
+    public function test_backup_command_can_archive_large_calendar_and_card_volumes(): void
+    {
+        $this->seedBackupData();
+
+        $calendar = Calendar::query()->where('uri', 'household-calendar')->firstOrFail();
+        $addressBook = AddressBook::query()->where('uri', 'household-contacts')->firstOrFail();
+
+        $extraObjects = 620;
+        $extraCards = 840;
+        $this->seedCalendarObjects($calendar, $extraObjects, 'backup-bulk-event');
+        $this->seedCards($addressBook, $extraCards, 'backup-bulk-card');
+
+        $expectedCalendarCount = Calendar::query()->count();
+        $expectedAddressBookCount = AddressBook::query()->count();
+        $expectedCalendarObjectCount = CalendarObject::query()->count();
+        $expectedCardCount = Card::query()->count();
+
+        $archivePath = $this->createBackupArchiveAt(
+            directory: storage_path('framework/testing/backups-large-volume'),
+            date: [2026, 3, 13, 2, 30, 0],
+        );
+
+        $zip = new ZipArchive;
+        $opened = $zip->open($archivePath);
+        $this->assertTrue($opened === true, 'Unable to open high-volume backup archive.');
+
+        $manifestPayload = $zip->getFromName('manifest.json');
+        $this->assertIsString($manifestPayload, 'manifest.json missing from high-volume backup archive.');
+        $manifest = json_decode($manifestPayload, true);
+        $this->assertIsArray($manifest, 'manifest.json payload is not valid JSON.');
+
+        $this->assertSame($expectedCalendarCount, $manifest['counts']['calendars'] ?? null);
+        $this->assertSame($expectedAddressBookCount, $manifest['counts']['address_books'] ?? null);
+        $this->assertSame($expectedCalendarObjectCount, $manifest['counts']['calendar_objects'] ?? null);
+        $this->assertSame($expectedCardCount, $manifest['counts']['cards'] ?? null);
+
+        $entryNames = [];
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $name = $zip->getNameIndex($index);
+            if ($name !== false) {
+                $entryNames[] = $name;
+            }
+        }
+
+        $this->assertTrue(
+            collect($entryNames)->contains(fn (string $name): bool => str_contains($name, 'household-calendar.ics'))
+        );
+        $this->assertTrue(
+            collect($entryNames)->contains(fn (string $name): bool => str_contains($name, 'household-contacts.vcf'))
+        );
+
+        $zip->close();
+    }
+
     public function test_forced_backup_command_applies_daily_retention_for_local_and_remote_destinations(): void
     {
         $this->seedBackupData();
@@ -627,6 +681,69 @@ class BackupManagementTest extends TestCase
             'size' => strlen($vcard),
             'data' => $vcard,
         ]);
+    }
+
+    private function seedCalendarObjects(Calendar $calendar, int $count, string $uidPrefix): void
+    {
+        $rows = [];
+        $timestamp = now();
+
+        for ($index = 1; $index <= $count; $index++) {
+            $uid = $uidPrefix.'-'.$index;
+            $ics = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Davvy//Tests//EN\nBEGIN:VEVENT\nUID:{$uid}\nDTSTAMP:20260301T120000Z\nDTSTART:20260301T130000Z\nDTEND:20260301T140000Z\nSUMMARY:Backup Bulk Event {$index}\nEND:VEVENT\nEND:VCALENDAR";
+
+            $rows[] = [
+                'calendar_id' => $calendar->id,
+                'uri' => $uid.'.ics',
+                'uid' => $uid,
+                'etag' => sha1($ics),
+                'size' => strlen($ics),
+                'component_type' => 'VEVENT',
+                'data' => $ics,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+
+            if (count($rows) === 250) {
+                CalendarObject::query()->insert($rows);
+                $rows = [];
+            }
+        }
+
+        if ($rows !== []) {
+            CalendarObject::query()->insert($rows);
+        }
+    }
+
+    private function seedCards(AddressBook $addressBook, int $count, string $uidPrefix): void
+    {
+        $rows = [];
+        $timestamp = now();
+
+        for ($index = 1; $index <= $count; $index++) {
+            $uid = $uidPrefix.'-'.$index;
+            $vcard = "BEGIN:VCARD\nVERSION:4.0\nFN:Backup Bulk Contact {$index}\nUID:{$uid}\nEMAIL:backup-bulk-contact-{$index}@example.com\nEND:VCARD";
+
+            $rows[] = [
+                'address_book_id' => $addressBook->id,
+                'uri' => $uid.'.vcf',
+                'uid' => $uid,
+                'etag' => sha1($vcard),
+                'size' => strlen($vcard),
+                'data' => $vcard,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+
+            if (count($rows) === 400) {
+                Card::query()->insert($rows);
+                $rows = [];
+            }
+        }
+
+        if ($rows !== []) {
+            Card::query()->insert($rows);
+        }
     }
 
     /**

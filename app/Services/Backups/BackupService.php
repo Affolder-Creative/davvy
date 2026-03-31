@@ -284,17 +284,14 @@ class BackupService
         $addressBookCollections = [];
 
         $calendars = Calendar::query()
-            ->with([
-                'owner:id,email',
-                'objects' => fn ($query) => $query->orderBy('id'),
-            ])
             ->orderBy('owner_id')
             ->orderBy('id')
-            ->get();
+            ->cursor();
 
         foreach ($calendars as $calendar) {
             $calendarCount++;
-            $calendarObjectCount += $calendar->objects->count();
+            $calendarPayload = $this->buildCalendarPayload($calendar);
+            $calendarObjectCount += $calendarPayload['object_count'];
 
             $entryPath = sprintf(
                 'calendars/user-%d/%d-%s',
@@ -307,7 +304,7 @@ class BackupService
                 ),
             );
 
-            $zip->addFromString($entryPath, $this->buildCalendarPayload($calendar));
+            $zip->addFromString($entryPath, $calendarPayload['payload']);
             $calendarCollections[] = [
                 'archive_path' => $entryPath,
                 'owner_id' => (int) $calendar->owner_id,
@@ -322,17 +319,14 @@ class BackupService
         }
 
         $addressBooks = AddressBook::query()
-            ->with([
-                'owner:id,email',
-                'cards' => fn ($query) => $query->orderBy('id'),
-            ])
             ->orderBy('owner_id')
             ->orderBy('id')
-            ->get();
+            ->cursor();
 
         foreach ($addressBooks as $addressBook) {
             $addressBookCount++;
-            $cardCount += $addressBook->cards->count();
+            $addressBookPayload = $this->buildAddressBookPayload($addressBook);
+            $cardCount += $addressBookPayload['card_count'];
 
             $entryPath = sprintf(
                 'address-books/user-%d/%d-%s',
@@ -345,7 +339,7 @@ class BackupService
                 ),
             );
 
-            $zip->addFromString($entryPath, $this->buildAddressBookPayload($addressBook));
+            $zip->addFromString($entryPath, $addressBookPayload['payload']);
             $addressBookCollections[] = [
                 'archive_path' => $entryPath,
                 'owner_id' => (int) $addressBook->owner_id,
@@ -607,39 +601,77 @@ class BackupService
 
     /**
      * Builds calendar payload.
+     *
+     * @return array{payload:string,object_count:int}
      */
-    private function buildCalendarPayload(Calendar $calendar): string
+    private function buildCalendarPayload(Calendar $calendar): array
     {
         $export = new VCalendar([
             'VERSION' => '2.0',
             'PRODID' => '-//Davvy//Automated Backup//EN',
         ]);
 
-        foreach ($calendar->objects as $object) {
-            $source = Reader::read($object->data);
-            if (! $source instanceof VCalendar) {
-                continue;
-            }
+        $objectCount = 0;
+        $calendar->objects()
+            ->orderBy('id')
+            ->chunkById(250, function ($objects) use ($export, &$objectCount): void {
+                $objectCount += $objects->count();
 
-            foreach ($source->children() as $child) {
-                if ($child instanceof Component) {
-                    $export->add(clone $child);
+                foreach ($objects as $object) {
+                    $source = Reader::read($object->data);
+                    if (! $source instanceof VCalendar) {
+                        continue;
+                    }
+
+                    foreach ($source->children() as $child) {
+                        if ($child instanceof Component) {
+                            $export->add(clone $child);
+                        }
+                    }
                 }
-            }
-        }
+            });
 
-        return $export->serialize();
+        return [
+            'payload' => $export->serialize(),
+            'object_count' => $objectCount,
+        ];
     }
 
     /**
      * Builds address book payload.
+     *
+     * @return array{payload:string,card_count:int}
      */
-    private function buildAddressBookPayload(AddressBook $addressBook): string
+    private function buildAddressBookPayload(AddressBook $addressBook): array
     {
-        return $addressBook->cards
-            ->map(fn ($card): string => rtrim((string) $card->data, "\r\n"))
-            ->filter(fn (string $card): bool => $card !== '')
-            ->implode("\r\n");
+        $payload = '';
+        $cardCount = 0;
+        $isFirstCard = true;
+
+        $addressBook->cards()
+            ->orderBy('id')
+            ->chunkById(500, function ($cards) use (&$payload, &$cardCount, &$isFirstCard): void {
+                $cardCount += $cards->count();
+
+                foreach ($cards as $card) {
+                    $normalized = rtrim((string) $card->data, "\r\n");
+                    if ($normalized === '') {
+                        continue;
+                    }
+
+                    if (! $isFirstCard) {
+                        $payload .= "\r\n";
+                    }
+
+                    $payload .= $normalized;
+                    $isFirstCard = false;
+                }
+            });
+
+        return [
+            'payload' => $payload,
+            'card_count' => $cardCount,
+        ];
     }
 
     /**

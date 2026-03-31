@@ -8,9 +8,9 @@ use App\Models\Calendar;
 use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\ResourceAccessService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Sabre\VObject\Component;
 use Sabre\VObject\Component\VCalendar;
@@ -27,14 +27,26 @@ class ExportController extends Controller
      */
     public function exportAllCalendars(Request $request): BinaryFileResponse
     {
-        $calendars = $this->readableCalendars($request->user());
-        $files = $calendars->map(fn (Calendar $calendar): array => [
-            'name' => $this->resourceFileName($calendar->display_name, 'calendar', 'ics'),
-            'contents' => $this->buildCalendarPayload($calendar),
-        ])->all();
-
         return $this->downloadZip(
-            files: $files,
+            addEntries: function (ZipArchive $zip, array &$usedNames) use ($request): bool {
+                $hasEntries = false;
+
+                foreach ($this->readableCalendarsQuery($request->user())
+                    ->orderBy('display_name')
+                    ->orderBy('id')
+                    ->cursor() as $calendar) {
+                    $hasEntries = true;
+
+                    $entryName = $this->uniqueArchiveEntryName(
+                        $this->resourceFileName((string) $calendar->display_name, 'calendar', 'ics'),
+                        $usedNames,
+                    );
+
+                    $zip->addFromString($entryName, $this->buildCalendarPayload($calendar));
+                }
+
+                return $hasEntries;
+            },
             emptyEntryName: 'calendars.txt',
             emptyEntryContents: "No calendars are available for export.\n",
             archiveName: $this->exportArchiveName('calendars')
@@ -69,14 +81,26 @@ class ExportController extends Controller
      */
     public function exportAllAddressBooks(Request $request): BinaryFileResponse
     {
-        $addressBooks = $this->readableAddressBooks($request->user());
-        $files = $addressBooks->map(fn (AddressBook $addressBook): array => [
-            'name' => $this->resourceFileName($addressBook->display_name, 'address-book', 'vcf'),
-            'contents' => $this->buildAddressBookPayload($addressBook),
-        ])->all();
-
         return $this->downloadZip(
-            files: $files,
+            addEntries: function (ZipArchive $zip, array &$usedNames) use ($request): bool {
+                $hasEntries = false;
+
+                foreach ($this->readableAddressBooksQuery($request->user())
+                    ->orderBy('display_name')
+                    ->orderBy('id')
+                    ->cursor() as $addressBook) {
+                    $hasEntries = true;
+
+                    $entryName = $this->uniqueArchiveEntryName(
+                        $this->resourceFileName((string) $addressBook->display_name, 'address-book', 'vcf'),
+                        $usedNames,
+                    );
+
+                    $zip->addFromString($entryName, $this->buildAddressBookPayload($addressBook));
+                }
+
+                return $hasEntries;
+            },
             emptyEntryName: 'address-books.txt',
             emptyEntryContents: "No address books are available for export.\n",
             archiveName: $this->exportArchiveName('address-books')
@@ -107,63 +131,39 @@ class ExportController extends Controller
     }
 
     /**
-     * Returns readable calendars.
-     *
-     * @return Collection<int, Calendar>
+     * Returns readable calendars query.
      */
-    private function readableCalendars(User $user): Collection
+    private function readableCalendarsQuery(User $user): Builder
     {
-        $ids = Calendar::query()
-            ->where('owner_id', $user->id)
-            ->pluck('id')
-            ->merge(
-                ResourceShare::query()
-                    ->where('shared_with_id', $user->id)
-                    ->where('resource_type', ShareResourceType::Calendar->value)
-                    ->pluck('resource_id')
-            )
-            ->unique()
-            ->values();
-
-        if ($ids->isEmpty()) {
-            return collect();
-        }
+        $sharedCalendarIds = ResourceShare::query()
+            ->select('resource_id')
+            ->where('shared_with_id', $user->id)
+            ->where('resource_type', ShareResourceType::Calendar->value);
 
         return Calendar::query()
-            ->with(['objects' => fn ($query) => $query->orderBy('id')])
-            ->whereIn('id', $ids)
-            ->orderBy('display_name')
-            ->get();
+            ->where(function (Builder $query) use ($user, $sharedCalendarIds): void {
+                $query
+                    ->where('owner_id', $user->id)
+                    ->orWhereIn('id', $sharedCalendarIds);
+            });
     }
 
     /**
-     * Returns readable address books.
-     *
-     * @return Collection<int, AddressBook>
+     * Returns readable address books query.
      */
-    private function readableAddressBooks(User $user): Collection
+    private function readableAddressBooksQuery(User $user): Builder
     {
-        $ids = AddressBook::query()
-            ->where('owner_id', $user->id)
-            ->pluck('id')
-            ->merge(
-                ResourceShare::query()
-                    ->where('shared_with_id', $user->id)
-                    ->where('resource_type', ShareResourceType::AddressBook->value)
-                    ->pluck('resource_id')
-            )
-            ->unique()
-            ->values();
-
-        if ($ids->isEmpty()) {
-            return collect();
-        }
+        $sharedAddressBookIds = ResourceShare::query()
+            ->select('resource_id')
+            ->where('shared_with_id', $user->id)
+            ->where('resource_type', ShareResourceType::AddressBook->value);
 
         return AddressBook::query()
-            ->with(['cards' => fn ($query) => $query->orderBy('id')])
-            ->whereIn('id', $ids)
-            ->orderBy('display_name')
-            ->get();
+            ->where(function (Builder $query) use ($user, $sharedAddressBookIds): void {
+                $query
+                    ->where('owner_id', $user->id)
+                    ->orWhereIn('id', $sharedAddressBookIds);
+            });
     }
 
     /**
@@ -171,26 +171,28 @@ class ExportController extends Controller
      */
     private function buildCalendarPayload(Calendar $calendar): string
     {
-        $calendar->loadMissing(['objects' => fn ($query) => $query->orderBy('id')]);
-
         $export = new VCalendar([
             'VERSION' => '2.0',
             'PRODID' => '-//Davvy//Calendar Export//EN',
         ]);
 
-        foreach ($calendar->objects as $object) {
-            $source = Reader::read($object->data);
+        $calendar->objects()
+            ->orderBy('id')
+            ->chunkById(250, function ($objects) use ($export): void {
+                foreach ($objects as $object) {
+                    $source = Reader::read($object->data);
 
-            if (! $source instanceof VCalendar) {
-                continue;
-            }
+                    if (! $source instanceof VCalendar) {
+                        continue;
+                    }
 
-            foreach ($source->children() as $child) {
-                if ($child instanceof Component) {
-                    $export->add(clone $child);
+                    foreach ($source->children() as $child) {
+                        if ($child instanceof Component) {
+                            $export->add(clone $child);
+                        }
+                    }
                 }
-            }
-        }
+            });
 
         return $export->serialize();
     }
@@ -200,21 +202,37 @@ class ExportController extends Controller
      */
     private function buildAddressBookPayload(AddressBook $addressBook): string
     {
-        $addressBook->loadMissing(['cards' => fn ($query) => $query->orderBy('id')]);
+        $payload = '';
+        $isFirstCard = true;
 
-        return $addressBook->cards
-            ->map(fn ($card): string => rtrim((string) $card->data, "\r\n"))
-            ->filter(fn (string $card): bool => $card !== '')
-            ->implode("\r\n");
+        $addressBook->cards()
+            ->orderBy('id')
+            ->chunkById(500, function ($cards) use (&$payload, &$isFirstCard): void {
+                foreach ($cards as $card) {
+                    $normalized = rtrim((string) $card->data, "\r\n");
+                    if ($normalized === '') {
+                        continue;
+                    }
+
+                    if (! $isFirstCard) {
+                        $payload .= "\r\n";
+                    }
+
+                    $payload .= $normalized;
+                    $isFirstCard = false;
+                }
+            });
+
+        return $payload;
     }
 
     /**
      * Returns download zip.
      *
-     * @param  array<int, array{name: string, contents: string}>  $files
+     * @param  callable(ZipArchive, array<string, true>&): bool  $addEntries
      */
     private function downloadZip(
-        array $files,
+        callable $addEntries,
         string $emptyEntryName,
         string $emptyEntryContents,
         string $archiveName
@@ -234,12 +252,8 @@ class ExportController extends Controller
         }
 
         $usedNames = [];
-        foreach ($files as $file) {
-            $entryName = $this->uniqueArchiveEntryName($file['name'], $usedNames);
-            $zip->addFromString($entryName, $file['contents']);
-        }
-
-        if ($files === []) {
+        $hasEntries = $addEntries($zip, $usedNames);
+        if (! $hasEntries) {
             $zip->addFromString($emptyEntryName, $emptyEntryContents);
         }
 

@@ -154,6 +154,40 @@ class ResourceExportTest extends TestCase
         $this->assertTrue($this->zipEntryContains($entries, 'FN:Bob Shared'));
     }
 
+    public function test_user_can_export_large_calendars_and_address_books_without_loading_all_payloads_at_once(): void
+    {
+        $user = User::factory()->create();
+        $calendar = Calendar::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Large Calendar',
+            'uri' => 'large-calendar',
+        ]);
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Large Address Book',
+            'uri' => 'large-address-book',
+        ]);
+
+        $this->seedCalendarObjects($calendar, 620, 'bulk-calendar-event');
+        $this->seedCards($addressBook, 840, 'bulk-contact');
+
+        $calendarExport = $this->actingAs($user)->get('/api/exports/calendars');
+        $calendarExport->assertOk()->assertHeader('content-type', 'application/zip');
+
+        $calendarEntries = $this->zipEntries($calendarExport);
+        $this->assertArrayHasKey('large-calendar.ics', $calendarEntries);
+        $this->assertStringContainsString('SUMMARY:Bulk Event 1', $calendarEntries['large-calendar.ics']);
+        $this->assertStringContainsString('SUMMARY:Bulk Event 620', $calendarEntries['large-calendar.ics']);
+
+        $addressBookExport = $this->actingAs($user)->get('/api/exports/address-books');
+        $addressBookExport->assertOk()->assertHeader('content-type', 'application/zip');
+
+        $addressBookEntries = $this->zipEntries($addressBookExport);
+        $this->assertArrayHasKey('large-address-book.vcf', $addressBookEntries);
+        $this->assertStringContainsString('FN:Bulk Contact 1', $addressBookEntries['large-address-book.vcf']);
+        $this->assertStringContainsString('FN:Bulk Contact 840', $addressBookEntries['large-address-book.vcf']);
+    }
+
     public function test_export_endpoints_reject_unreadable_resources(): void
     {
         $owner = User::factory()->create();
@@ -198,6 +232,69 @@ class ResourceExportTest extends TestCase
             'size' => strlen($vcard),
             'data' => $vcard,
         ]);
+    }
+
+    private function seedCalendarObjects(Calendar $calendar, int $count, string $uidPrefix): void
+    {
+        $rows = [];
+        $timestamp = now();
+
+        for ($index = 1; $index <= $count; $index++) {
+            $uid = $uidPrefix.'-'.$index;
+            $ics = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Davvy//Tests//EN\nBEGIN:VEVENT\nUID:{$uid}\nDTSTAMP:20260301T120000Z\nDTSTART:20260301T130000Z\nDTEND:20260301T140000Z\nSUMMARY:Bulk Event {$index}\nEND:VEVENT\nEND:VCALENDAR";
+
+            $rows[] = [
+                'calendar_id' => $calendar->id,
+                'uri' => $uid.'.ics',
+                'uid' => $uid,
+                'etag' => sha1($ics),
+                'size' => strlen($ics),
+                'component_type' => 'VEVENT',
+                'data' => $ics,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+
+            if (count($rows) === 250) {
+                CalendarObject::query()->insert($rows);
+                $rows = [];
+            }
+        }
+
+        if ($rows !== []) {
+            CalendarObject::query()->insert($rows);
+        }
+    }
+
+    private function seedCards(AddressBook $addressBook, int $count, string $uidPrefix): void
+    {
+        $rows = [];
+        $timestamp = now();
+
+        for ($index = 1; $index <= $count; $index++) {
+            $uid = $uidPrefix.'-'.$index;
+            $vcard = "BEGIN:VCARD\nVERSION:4.0\nFN:Bulk Contact {$index}\nUID:{$uid}\nEMAIL:bulk-contact-{$index}@example.com\nEND:VCARD";
+
+            $rows[] = [
+                'address_book_id' => $addressBook->id,
+                'uri' => $uid.'.vcf',
+                'uid' => $uid,
+                'etag' => sha1($vcard),
+                'size' => strlen($vcard),
+                'data' => $vcard,
+                'created_at' => $timestamp,
+                'updated_at' => $timestamp,
+            ];
+
+            if (count($rows) === 400) {
+                Card::query()->insert($rows);
+                $rows = [];
+            }
+        }
+
+        if ($rows !== []) {
+            Card::query()->insert($rows);
+        }
     }
 
     /**
