@@ -25,12 +25,25 @@ Set these in your app service environment.
 | `SESSION_SECURE_COOKIE` | `true` | Required in production |
 | `SESSION_HTTP_ONLY` | `true` | Recommended |
 | `SESSION_SAME_SITE` | `lax` | Recommended |
+| `MAIL_MAILER` | `smtp` (or other non-`log` mailer) | Required when onboarding emails should be delivered |
+| `MAIL_HOST` | platform-specific | Required for SMTP delivery |
+| `MAIL_PORT` | platform-specific | Required for SMTP delivery |
+| `MAIL_USERNAME` | platform-specific | Required for authenticated SMTP providers |
+| `MAIL_PASSWORD` | platform-specific | Required for authenticated SMTP providers |
+| `MAIL_ENCRYPTION` | provider-specific (`tls`/`ssl`) | Recommended for SMTP |
+| `MAIL_FROM_ADDRESS` | `noreply@<your-domain>` | Recommended sender address for onboarding emails |
+| `MAIL_FROM_NAME` | `Davvy` (or your app name) | Sender display name for onboarding emails |
 | `CORS_ALLOWED_ORIGINS` | *(empty)* | Recommended for same-origin deployments; set explicit origins only when needed |
 | `CORS_SUPPORTS_CREDENTIALS` | `false` | Recommended; if `true`, do not use wildcard origins |
 | `CACHE_STORE` | `database` | Recommended |
 | `QUEUE_CONNECTION` | `database` | Recommended |
 | `TRUSTED_PROXIES` | `*` or explicit proxies | Recommended behind reverse proxy |
 | `ENABLE_PUBLIC_REGISTRATION` | `false` | Env default only; setting is primarily managed via app settings/admin toggle |
+| `ONBOARDING_REQUIRE_PUBLIC_EMAIL_VERIFICATION` | `true` | Require verification before sign-in for public registration users |
+| `ONBOARDING_SEND_EMAILS` | `true` (with working mailer) | Sends onboarding verification and invitation emails |
+| `ONBOARDING_INVITE_EXPIRES_HOURS` | `72` | Admin invite token TTL in hours |
+| `ONBOARDING_VERIFICATION_EXPIRES_HOURS` | `24` | Public registration verification token TTL in hours |
+| `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER` | `false` (production recommendation) | When `true`, fallback onboarding URLs may be returned by API when mail delivery is unavailable |
 | `ENABLE_OWNER_SHARE_MANAGEMENT` | `true` | Product default |
 | `ENABLE_DAV_COMPATIBILITY_MODE` | `false` | Secure default (strict mode) |
 | `ENABLE_CONTACT_MANAGEMENT` | `false` | Secure default for gated contacts UI/API |

@@ -46,6 +46,40 @@ When an `app_settings` key exists, it overrides env defaults.
 | `SESSION_HTTP_ONLY` | `true` | Recommended |
 | `SESSION_SAME_SITE` | `lax` | Recommended |
 
+### Mail Delivery and Onboarding
+
+#### Mail Transport (`config/mail.php`)
+
+| Variable | Default | Notes |
+| --- | --- | --- |
+| `MAIL_MAILER` | `log` | Active Laravel mailer (`log`, `smtp`, `array`) |
+| `MAIL_HOST` | `127.0.0.1` | SMTP host when using `MAIL_MAILER=smtp` |
+| `MAIL_PORT` | `2525` | SMTP port when using `MAIL_MAILER=smtp` |
+| `MAIL_USERNAME` | _(empty)_ | SMTP username |
+| `MAIL_PASSWORD` | _(empty)_ | SMTP password |
+| `MAIL_ENCRYPTION` | _(empty)_ | SMTP encryption (`tls`/`ssl`) |
+| `MAIL_FROM_ADDRESS` | `hello@example.com` | Sender address for onboarding mail |
+| `MAIL_FROM_NAME` | `Example` | Sender display name for onboarding mail |
+| `MAIL_EHLO_DOMAIN` | _(empty)_ | Optional SMTP EHLO domain override |
+| `MAIL_LOG_CHANNEL` | _(default log channel)_ | Optional channel override when `MAIL_MAILER=log` |
+
+#### Onboarding Email + Token Controls (`config/onboarding.php`)
+
+| Variable | Default | Notes |
+| --- | --- | --- |
+| `ONBOARDING_REQUIRE_PUBLIC_EMAIL_VERIFICATION` | `true` | Requires public registrations to verify email before sign-in |
+| `ONBOARDING_SEND_EMAILS` | `MAIL_MAILER != log` | Sends onboarding emails through configured mailer when `true` |
+| `ONBOARDING_INVITE_EXPIRES_HOURS` | `72` | Expiration window (hours) for admin invitation tokens |
+| `ONBOARDING_VERIFICATION_EXPIRES_HOURS` | `24` | Expiration window (hours) for public registration verification tokens |
+| `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER` | `true` | Includes manual onboarding URLs in API responses if delivery is disabled or fails |
+
+Onboarding flow behavior:
+- `POST /api/auth/register` returns `verification_email_sent` and may include `verification_url` when email delivery is unavailable and `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER=true`.
+- `POST /api/admin/users` returns `invitation_sent` and may include `invitation_url` under the same fallback rule.
+- For production, keep `ONBOARDING_SEND_EMAILS=true` only when `MAIL_MAILER` points to a working mail transport; otherwise delivery will fail and fallback links may be exposed.
+- For stricter production posture, set `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER=false` and rely on delivered email links only.
+- Local `.env.example` and `.env.ddev.example` intentionally prefer non-delivery-safe defaults (`MAIL_MAILER=log`, `ONBOARDING_SEND_EMAILS=false`, `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER=true`) for development and testing workflows.
+
 ### Davvy Feature and Runtime Flags
 
 | Variable | Default | Notes |

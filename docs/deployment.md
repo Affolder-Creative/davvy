@@ -76,6 +76,19 @@ Common Davvy feature/runtime vars:
 - `DEFAULT_ADMIN_EMAIL`
 - `DEFAULT_ADMIN_PASSWORD`
 - `TRUSTED_PROXIES`
+- `MAIL_MAILER`
+- `MAIL_HOST`
+- `MAIL_PORT`
+- `MAIL_USERNAME`
+- `MAIL_PASSWORD`
+- `MAIL_ENCRYPTION`
+- `MAIL_FROM_ADDRESS`
+- `MAIL_FROM_NAME`
+- `ONBOARDING_REQUIRE_PUBLIC_EMAIL_VERIFICATION`
+- `ONBOARDING_SEND_EMAILS`
+- `ONBOARDING_INVITE_EXPIRES_HOURS`
+- `ONBOARDING_VERIFICATION_EXPIRES_HOURS`
+- `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER`
 
 Note on `ENABLE_PUBLIC_REGISTRATION`:
 - Public registration is ultimately controlled by `app_settings` and admin toggles.
@@ -84,6 +97,10 @@ Note on `ENABLE_PUBLIC_REGISTRATION`:
 Backup scheduler note:
 - When `RUN_SCHEDULER=true` (default), the container runs `php artisan schedule:work` for periodic jobs (automated backups + milestone horizon roll-forward sync).
 - If you set `RUN_SCHEDULER=false`, you must run `php artisan schedule:run` externally every minute.
+
+Onboarding mailer note:
+- If onboarding should deliver real email links, configure a working mail transport (`MAIL_MAILER=smtp` plus SMTP credentials or another non-`log` mailer) and set `ONBOARDING_SEND_EMAILS=true`.
+- If no working mail transport is configured, keep `ONBOARDING_SEND_EMAILS=false`; otherwise onboarding delivery attempts fail and API fallback-link behavior depends on `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER`.
 
 ## Railway
 
