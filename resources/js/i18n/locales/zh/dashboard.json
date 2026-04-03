@@ -88,7 +88,7 @@
   },
   "appleCompat": {
     "title": "Apple 通讯录兼容性",
-    "subtitle": "默认关闭。将选定的地址簿镜像到主地址簿中，以便 macOS 和 iOS 客户端可以看到它们。",
+    "subtitle": "默认关闭。将选定的地址簿镜像到主地址簿中，以提升在 macOS 通讯录中的可见性。",
     "target": "镜像目标：{{name}} (/{{uri}})",
     "missingTarget": "找不到您帐户的默认联系人地址簿。",
     "enable": "启用 Apple 兼容性镜像",

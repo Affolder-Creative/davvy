@@ -88,7 +88,7 @@
   },
   "appleCompat": {
     "title": "Compatibilità dei contatti Apple",
-    "subtitle": "Disattivato per impostazione predefinita. Specchia le rubriche selezionate nella tua rubrica principale in modo che i client macOS e iOS possano vederle.",
+    "subtitle": "Disattivato per impostazione predefinita. Rispecchia le rubriche selezionate nella tua rubrica principale per una migliore visibilità in Contatti su macOS.",
     "target": "Destinazione specchio: {{name}} (/{{uri}})",
     "missingTarget": "Nessuna rubrica predefinita dei contatti trovata per il tuo account.",
     "enable": "Abilita il mirroring della compatibilità Apple",

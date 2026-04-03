@@ -30,6 +30,7 @@ class DavController extends Controller
     public function handle(Request $request): Response
     {
         $this->davContext->clear();
+        $this->davContext->setUserAgent($request->userAgent());
 
         $rawBody = $request->getContent();
         $shouldLogClientDavTraffic = $this->shouldLogClientDavTraffic($request);

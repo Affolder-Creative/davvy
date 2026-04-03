@@ -88,7 +88,7 @@
   },
   "appleCompat": {
     "title": "Compatibilité Apple Contacts",
-    "subtitle": "Désactivée par défaut. Reflète les carnets d’adresses sélectionnés dans votre carnet principal afin que les clients macOS et iOS puissent les voir.",
+    "subtitle": "Désactivée par défaut. Reflète les carnets d’adresses sélectionnés dans votre carnet principal pour une meilleure visibilité dans Contacts macOS.",
     "target": "Cible du miroir : {{name}} (/{{uri}})",
     "missingTarget": "Aucun carnet d’adresses Contacts par défaut trouvé pour votre compte.",
     "enable": "Activer le miroir de compatibilité Apple",

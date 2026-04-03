@@ -88,7 +88,7 @@
   },
   "appleCompat": {
     "title": "Compatibilidade de contatos da Apple",
-    "subtitle": "Desativado por padrão. Espelhe os catálogos de endereços selecionados em seu catálogo de endereços principal para que os clientes macOS e iOS possam vê-los.",
+    "subtitle": "Desativado por padrão. Espelhe os catálogos de endereços selecionados em seu catálogo de endereços principal para melhor visibilidade no Contatos do macOS.",
     "target": "Alvo do espelho: {{name}} (@{{uri}})",
     "missingTarget": "Nenhum catálogo de endereços padrão de Contatos foi encontrado para sua conta.",
     "enable": "Habilite o espelhamento de compatibilidade da Apple",

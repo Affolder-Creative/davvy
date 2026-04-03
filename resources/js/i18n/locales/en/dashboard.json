@@ -88,7 +88,7 @@
   },
   "appleCompat": {
     "title": "Apple Contacts Compatibility",
-    "subtitle": "Off by default. Mirror selected address books into your main address book so macOS and iOS clients can see them.",
+    "subtitle": "Off by default. Mirror selected address books into your main address book for better macOS Contacts visibility.",
     "target": "Mirror target: {{name}} (/{{uri}})",
     "missingTarget": "No default Contacts address book found for your account.",
     "enable": "Enable Apple compatibility mirroring",

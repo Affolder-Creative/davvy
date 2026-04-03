@@ -88,7 +88,7 @@
   },
   "appleCompat": {
     "title": "Compatibilidad con Contactos de Apple",
-    "subtitle": "Desactivado por defecto. Refleja libretas seleccionadas en tu libreta principal para que clientes macOS e iOS puedan verlas.",
+    "subtitle": "Desactivado por defecto. Refleja libretas seleccionadas en tu libreta principal para mejorar la visibilidad en Contactos de macOS.",
     "target": "Destino de espejo: {{name}} (/{{uri}})",
     "missingTarget": "No se encontró una libreta predeterminada de Contactos para tu cuenta.",
     "enable": "Habilitar espejo de compatibilidad con Apple",

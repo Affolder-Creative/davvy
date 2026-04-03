@@ -88,7 +88,7 @@
   },
   "appleCompat": {
     "title": "Apple-Kontakte-Kompatibilität",
-    "subtitle": "Standardmäßig deaktiviert. Spiegeln Sie ausgewählte Adressbücher in Ihr Hauptadressbuch, damit macOS- und iOS-Clients sie sehen können.",
+    "subtitle": "Standardmäßig deaktiviert. Spiegeln Sie ausgewählte Adressbücher in Ihr Hauptadressbuch für bessere Sichtbarkeit in macOS Kontakte.",
     "target": "Spiegelziel: {{name}} (/{{uri}})",
     "missingTarget": "Für Ihr Konto wurde kein Standard-Adressbuch „Kontakte“ gefunden.",
     "enable": "Apple-Kompatibilitätsspiegelung aktivieren",

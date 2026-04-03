@@ -190,6 +190,105 @@ class AppleCompatAddressBookMirrorTest extends TestCase
         $this->assertSame(0, AddressBookMirrorLink::query()->where('user_id', $user->id)->count());
     }
 
+    public function test_ios_client_hides_mirrored_cards_from_carddav_reads_and_sync(): void
+    {
+        $user = User::factory()->create();
+        $source = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Family',
+            'uri' => 'family',
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'source-ios.vcf',
+            'uid' => 'source-ios-uid',
+            'etag' => md5('source-ios'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Source iOS\nUID:source-ios-uid\nEMAIL:source-ios@example.test\nEND:VCARD",
+        ]);
+
+        $this->actingAs($user)->patchJson('/api/address-books/apple-compat', [
+            'enabled' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $target = $this->defaultContactsBookFor($user);
+        $mirrored = Card::query()->where('address_book_id', $target->id)->firstOrFail();
+
+        $context = app(DavRequestContext::class);
+        $context->setAuthenticatedUser($user);
+        $context->setUserAgent('CardDAVPlugin/1.0 (iPhone; iOS/18.0)');
+        $backend = app(LaravelCardDavBackend::class);
+
+        $cards = $backend->getCards($target->id);
+        $this->assertCount(0, $cards);
+        $this->assertNull($backend->getCard($target->id, $mirrored->uri));
+
+        $initialChanges = $backend->getChangesForAddressBook($target->id, null, 1);
+        $this->assertSame([], $initialChanges['added']);
+        $this->assertSame([], $initialChanges['modified']);
+        $this->assertSame([], $initialChanges['deleted']);
+
+        $backend->updateCard(
+            $source->id,
+            'source-ios.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Source iOS Updated\nUID:source-ios-uid\nEMAIL:source-ios@example.test\nEND:VCARD"
+        );
+
+        $incrementalChanges = $backend->getChangesForAddressBook(
+            $target->id,
+            (string) $initialChanges['syncToken'],
+            1,
+        );
+
+        $this->assertSame([], $incrementalChanges['added']);
+        $this->assertSame([], $incrementalChanges['modified']);
+        $this->assertContains($mirrored->uri, $incrementalChanges['deleted']);
+    }
+
+    public function test_macos_client_still_sees_mirrored_cards_in_carddav_reads_and_sync(): void
+    {
+        $user = User::factory()->create();
+        $source = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Family',
+            'uri' => 'family',
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'source-macos.vcf',
+            'uid' => 'source-macos-uid',
+            'etag' => md5('source-macos'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Source macOS\nUID:source-macos-uid\nEMAIL:source-macos@example.test\nEND:VCARD",
+        ]);
+
+        $this->actingAs($user)->patchJson('/api/address-books/apple-compat', [
+            'enabled' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $target = $this->defaultContactsBookFor($user);
+        $mirrored = Card::query()->where('address_book_id', $target->id)->firstOrFail();
+
+        $context = app(DavRequestContext::class);
+        $context->setAuthenticatedUser($user);
+        $context->setUserAgent(
+            'AddressBookCore/2820 CFNetwork/1496.0.7 Darwin/23.6.0 (Mac OS X/14.6)'
+        );
+        $backend = app(LaravelCardDavBackend::class);
+
+        $cards = $backend->getCards($target->id);
+        $this->assertCount(1, $cards);
+        $this->assertSame($mirrored->uri, $cards[0]['uri']);
+        $this->assertNotNull($backend->getCard($target->id, $mirrored->uri));
+
+        $initialChanges = $backend->getChangesForAddressBook($target->id, null, 1);
+        $this->assertContains($mirrored->uri, $initialChanges['added']);
+    }
+
     public function test_editor_permission_user_can_update_mirrored_contact_and_sync_back_to_source(): void
     {
         $owner = User::factory()->create();

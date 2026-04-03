@@ -5,6 +5,7 @@ namespace App\Services\Dav\Backends;
 use App\Enums\SharePermission;
 use App\Enums\ShareResourceType;
 use App\Models\AddressBook;
+use App\Models\AddressBookMirrorLink;
 use App\Models\Card;
 use App\Models\ResourceShare;
 use App\Services\AddressBookMirrorService;
@@ -18,6 +19,7 @@ use App\Services\PrincipalUriService;
 use App\Services\ResourceAccessService;
 use App\Services\ResourceDeletionService;
 use App\Services\ResourceUriService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use Sabre\CardDAV\Backend\AbstractBackend;
@@ -179,10 +181,12 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
     {
         $addressBook = $this->loadReadableAddressBook($addressBookId);
 
-        return Card::query()
+        $query = Card::query()
             ->where('address_book_id', $addressBook->id)
             ->select(['id', 'uri', 'etag', 'size', 'updated_at'])
-            ->orderBy('id')
+            ->orderBy('id');
+
+        return $this->applyMirroredCardVisibilityToQuery($query)
             ->get()
             ->map(fn (Card $card): array => $this->transformCard($card, withData: false))
             ->all();
@@ -198,10 +202,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
     {
         $addressBook = $this->loadReadableAddressBook($addressBookId);
 
-        $card = Card::query()
+        $query = Card::query()
             ->where('address_book_id', $addressBook->id)
-            ->where('uri', $cardUri)
-            ->first();
+            ->where('uri', $cardUri);
+        $card = $this->applyMirroredCardVisibilityToQuery($query)->first();
 
         if (! $card) {
             return null;
@@ -219,9 +223,11 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
     {
         $addressBook = $this->loadReadableAddressBook($addressBookId);
 
-        return Card::query()
+        $query = Card::query()
             ->where('address_book_id', $addressBook->id)
-            ->whereIn('uri', $uris)
+            ->whereIn('uri', $uris);
+
+        return $this->applyMirroredCardVisibilityToQuery($query)
             ->get()
             ->map(fn (Card $card): array => $this->transformCard($card, withData: true))
             ->all();
@@ -309,6 +315,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ->first();
 
         if (! $card) {
+            throw new NotFound(__('dav.card_not_found'));
+        }
+
+        if ($this->isMirroredCardHiddenFromCurrentClient($card)) {
             throw new NotFound(__('dav.card_not_found'));
         }
 
@@ -408,6 +418,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             return;
         }
 
+        if ($this->isMirroredCardHiddenFromCurrentClient($card)) {
+            return;
+        }
+
         $user = $this->davContext->getAuthenticatedUser();
         if ($this->mirrorService->deleteSourceFromMirroredCard($user, $card)) {
             return;
@@ -439,16 +453,19 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
     public function getChangesForAddressBook($addressBookId, $syncToken, $syncLevel, $limit = null): array
     {
         $addressBook = $this->loadReadableAddressBook($addressBookId);
+        $hiddenMirroredUris = $this->hiddenMirroredUrisForAddressBook($addressBook->id);
 
         if ($this->isInitialSyncRequest($syncToken)) {
+            $query = Card::query()
+                ->where('address_book_id', $addressBook->id)
+                ->orderBy('id');
+
             return [
                 'syncToken' => (string) $this->syncService->currentToken(
                     resourceType: ShareResourceType::AddressBook,
                     resourceId: $addressBook->id,
                 ),
-                'added' => Card::query()
-                    ->where('address_book_id', $addressBook->id)
-                    ->orderBy('id')
+                'added' => $this->applyMirroredCardVisibilityToQuery($query)
                     ->pluck('uri')
                     ->all(),
                 'modified' => [],
@@ -456,12 +473,31 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ];
         }
 
-        return $this->syncService->getChangesSince(
+        $changes = $this->syncService->getChangesSince(
             resourceType: ShareResourceType::AddressBook,
             resourceId: $addressBook->id,
             syncToken: $this->parseSyncToken($syncToken),
             limit: $limit !== null ? (int) $limit : null,
         );
+
+        if ($hiddenMirroredUris === []) {
+            return $changes;
+        }
+
+        $hiddenChangedUris = array_values(array_unique(array_intersect(
+            $hiddenMirroredUris,
+            [
+                ...$changes['added'],
+                ...$changes['modified'],
+                ...$changes['deleted'],
+            ],
+        )));
+
+        $changes['added'] = array_values(array_diff($changes['added'], $hiddenMirroredUris));
+        $changes['modified'] = array_values(array_diff($changes['modified'], $hiddenMirroredUris));
+        $changes['deleted'] = array_values(array_unique([...$changes['deleted'], ...$hiddenChangedUris]));
+
+        return $changes;
     }
 
     /**
@@ -516,6 +552,65 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         }
 
         return $data;
+    }
+
+    /**
+     * Applies mirrored card visibility policy for current DAV client.
+     */
+    private function applyMirroredCardVisibilityToQuery(Builder $query): Builder
+    {
+        if (! $this->shouldHideMirroredCardsFromCurrentClient()) {
+            return $query;
+        }
+
+        return $query->whereNotIn(
+            'cards.id',
+            AddressBookMirrorLink::query()->select('mirrored_card_id'),
+        );
+    }
+
+    /**
+     * Returns hidden mirrored URIs for an address book.
+     *
+     * @return array<int, string>
+     */
+    private function hiddenMirroredUrisForAddressBook(int $addressBookId): array
+    {
+        if (! $this->shouldHideMirroredCardsFromCurrentClient()) {
+            return [];
+        }
+
+        return Card::query()
+            ->where('address_book_id', $addressBookId)
+            ->whereIn('id', AddressBookMirrorLink::query()->select('mirrored_card_id'))
+            ->pluck('uri')
+            ->all();
+    }
+
+    /**
+     * Checks whether mirrored cards should be hidden from current client.
+     */
+    private function shouldHideMirroredCardsFromCurrentClient(): bool
+    {
+        if (! $this->davContext->isAppleContactsClient()) {
+            return false;
+        }
+
+        return ! $this->davContext->isAppleMacOsContactsClient();
+    }
+
+    /**
+     * Checks whether a mirrored card should be hidden from current client.
+     */
+    private function isMirroredCardHiddenFromCurrentClient(Card $card): bool
+    {
+        if (! $this->shouldHideMirroredCardsFromCurrentClient()) {
+            return false;
+        }
+
+        return AddressBookMirrorLink::query()
+            ->where('mirrored_card_id', $card->id)
+            ->exists();
     }
 
     /**
