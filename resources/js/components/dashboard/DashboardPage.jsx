@@ -128,6 +128,38 @@ export default function DashboardPage({
     }
   };
 
+  const deleteOwnedResource = async (type, item) => {
+    const confirmed = window.confirm(
+      t("resourcePanel.deleteConfirm", {
+        name: item.display_name,
+      }),
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const url =
+      type === "calendar"
+        ? `/api/calendars/${item.id}`
+        : `/api/address-books/${item.id}`;
+
+    try {
+      setError("");
+      await api.delete(url);
+      await loadDashboard({ withLoading: false });
+    } catch (err) {
+      setError(
+        extractError(
+          err,
+          type === "calendar"
+            ? t("errors.deleteCalendar")
+            : t("errors.deleteAddressBook"),
+        ),
+      );
+    }
+  };
+
   const createCalendar = async (event) => {
     event.preventDefault();
     try {
@@ -277,6 +309,7 @@ export default function DashboardPage({
             onRename={(id, displayName) =>
               renameOwnedResource("calendar", id, displayName)
             }
+            onDelete={(item) => deleteOwnedResource("calendar", item)}
           />
           <ResourcePanel
             title={t("resources.yourAddressBooks")}
@@ -309,6 +342,7 @@ export default function DashboardPage({
             onRename={(id, displayName) =>
               renameOwnedResource("address-book", id, displayName)
             }
+            onDelete={(item) => deleteOwnedResource("address-book", item)}
             renderOwnedItemExtra={(item) => (
               <AddressBookMilestoneControls
                 item={item}

@@ -6,6 +6,7 @@ import {
   ChevronRightIcon,
   DownloadIcon,
   PencilIcon,
+  TrashIcon,
   ResetIcon,
   TimesIcon,
 } from "./AppIcons";
@@ -15,6 +16,7 @@ describe("AppIcons", () => {
     const icons = [
       DownloadIcon,
       PencilIcon,
+      TrashIcon,
       CheckIcon,
       TimesIcon,
       ResetIcon,

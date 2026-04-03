@@ -11,6 +11,8 @@
     "exportCalendar": "Impossible d’exporter le calendrier.",
     "exportAddressBooks": "Impossible d’exporter les carnets d’adresses.",
     "exportAddressBook": "Impossible d’exporter le carnet d’adresses.",
+    "deleteCalendar": "Impossible de supprimer le calendrier.",
+    "deleteAddressBook": "Impossible de supprimer le carnet d’adresses.",
     "appleCompat": "Impossible de mettre à jour les paramètres de compatibilité Apple.",
     "milestones": "Impossible de mettre à jour les paramètres du calendrier Anniversaires/Commémorations."
   },
@@ -36,6 +38,8 @@
     "save": "Enregistrer",
     "cancel": "Annuler",
     "editNameFor": "Modifier le nom de {{name}}",
+    "deleteResource": "Supprimer {{name}}",
+    "deleteConfirm": "Supprimer {{name}} ?",
     "exportItem": "Exporter {{name}}",
     "default": "(par défaut)",
     "sharedWithYou": "Partagé avec vous",

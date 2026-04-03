@@ -11,6 +11,8 @@
     "exportCalendar": "カレンダーをエクスポートできません。",
     "exportAddressBooks": "アドレス帳をエクスポートできません。",
     "exportAddressBook": "アドレス帳をエクスポートできません。",
+    "deleteCalendar": "カレンダーを削除できません。",
+    "deleteAddressBook": "アドレス帳を削除できません。",
     "appleCompat": "Apple 互換性設定を更新できません。",
     "milestones": "誕生日/記念日のカレンダー設定を更新できません。"
   },
@@ -36,6 +38,8 @@
     "save": "保存",
     "cancel": "キャンセル",
     "editNameFor": "{{name}} の名前を編集",
+    "deleteResource": "{{name}} を削除",
+    "deleteConfirm": "{{name}} を削除しますか？",
     "exportItem": "エクスポート {{name}}",
     "default": "(デフォルト)",
     "sharedWithYou": "あなたと共有されました",

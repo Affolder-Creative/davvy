@@ -11,6 +11,8 @@
     "exportCalendar": "Não foi possível exportar o calendário.",
     "exportAddressBooks": "Não é possível exportar catálogos de endereços.",
     "exportAddressBook": "Não foi possível exportar o catálogo de endereços.",
+    "deleteCalendar": "Não foi possível excluir o calendário.",
+    "deleteAddressBook": "Não foi possível excluir o catálogo de endereços.",
     "appleCompat": "Não foi possível atualizar as configurações de compatibilidade da Apple.",
     "milestones": "Não é possível atualizar as configurações do calendário de aniversários/aniversários."
   },
@@ -36,6 +38,8 @@
     "save": "Salvar",
     "cancel": "Cancelar",
     "editNameFor": "Editar nome para {{name}}",
+    "deleteResource": "Excluir {{name}}",
+    "deleteConfirm": "Excluir {{name}}?",
     "exportItem": "Exportar {{name}}",
     "default": "(padrão)",
     "sharedWithYou": "Compartilhado com você",

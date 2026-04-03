@@ -11,6 +11,8 @@
     "exportCalendar": "Impossibile esportare il calendario.",
     "exportAddressBooks": "Impossibile esportare le rubriche.",
     "exportAddressBook": "Impossibile esportare la rubrica.",
+    "deleteCalendar": "Impossibile eliminare il calendario.",
+    "deleteAddressBook": "Impossibile eliminare la rubrica.",
     "appleCompat": "Impossibile aggiornare le impostazioni di compatibilità Apple.",
     "milestones": "Impossibile aggiornare le impostazioni del calendario compleanno/anniversario."
   },
@@ -36,6 +38,8 @@
     "save": "Salva",
     "cancel": "Annulla",
     "editNameFor": "Modifica nome per {{name}}",
+    "deleteResource": "Elimina {{name}}",
+    "deleteConfirm": "Eliminare {{name}}?",
     "exportItem": "Esporta {{name}}",
     "default": "(predefinito)",
     "sharedWithYou": "Condiviso con te",

@@ -25,7 +25,7 @@ function PermissionBadgeStub({ permission }) {
   return <span>{permission}</span>;
 }
 
-function ResourcePanelStub({ title, onToggle }) {
+function ResourcePanelStub({ title, onToggle, onDelete }) {
   return (
     <section>
       <h4>{title}</h4>
@@ -34,6 +34,12 @@ function ResourcePanelStub({ title, onToggle }) {
         onClick={() => onToggle(1, true, `${title} Resource`)}
       >
         Toggle {title}
+      </button>
+      <button
+        type="button"
+        onClick={() => onDelete({ id: 2, display_name: `${title} Resource` })}
+      >
+        Delete {title}
       </button>
     </section>
   );
@@ -181,5 +187,21 @@ describe("DashboardPage", () => {
         },
       ),
     );
+  });
+
+  it("deletes a resource only after confirmation", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    const props = buildProps();
+    render(<DashboardPage {...props} />);
+
+    await waitFor(() => expect(props.api.get).toHaveBeenCalledTimes(1));
+    await user.click(screen.getByRole("button", { name: "Delete Your Calendars" }));
+
+    await waitFor(() =>
+      expect(props.api.delete).toHaveBeenCalledWith("/api/calendars/2"),
+    );
+    expect(confirmSpy).toHaveBeenCalledWith("Delete Your Calendars Resource?");
+    confirmSpy.mockRestore();
   });
 });

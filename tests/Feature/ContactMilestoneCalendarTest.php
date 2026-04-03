@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -1284,6 +1285,62 @@ class ContactMilestoneCalendarTest extends TestCase
         $this->assertSame($dataBeforeDisable, $dataAfterDisable);
     }
 
+    public function test_deleting_milestone_calendar_disables_its_setting_until_reenabled(): void
+    {
+        $user = User::factory()->create();
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Friends',
+            'uri' => 'friends',
+        ]);
+
+        $enabled = $this->actingAs($user)
+            ->patchJson('/api/address-books/'.$addressBook->id.'/milestone-calendars', [
+                'birthdays_enabled' => true,
+                'anniversaries_enabled' => false,
+            ])
+            ->assertOk();
+
+        $birthdayCalendarId = (int) $enabled->json('milestone_calendars.birthdays.calendar_id');
+        $this->assertGreaterThan(0, $birthdayCalendarId);
+
+        $this->assertDatabaseHas('address_book_contact_milestone_calendars', [
+            'address_book_id' => $addressBook->id,
+            'milestone_type' => 'birthday',
+            'enabled' => true,
+            'calendar_id' => $birthdayCalendarId,
+        ]);
+
+        $this->actingAs($user)
+            ->deleteJson('/api/calendars/'.$birthdayCalendarId)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('calendars', ['id' => $birthdayCalendarId]);
+        $this->assertDatabaseHas('address_book_contact_milestone_calendars', [
+            'address_book_id' => $addressBook->id,
+            'milestone_type' => 'birthday',
+            'enabled' => false,
+            'calendar_id' => null,
+        ]);
+
+        $reenabled = $this->actingAs($user)
+            ->patchJson('/api/address-books/'.$addressBook->id.'/milestone-calendars', [
+                'birthdays_enabled' => true,
+            ])
+            ->assertOk();
+
+        $newBirthdayCalendarId = (int) $reenabled->json('milestone_calendars.birthdays.calendar_id');
+        $this->assertGreaterThan(0, $newBirthdayCalendarId);
+        $this->assertNotSame($birthdayCalendarId, $newBirthdayCalendarId);
+        $this->assertDatabaseHas('calendars', ['id' => $newBirthdayCalendarId]);
+        $this->assertDatabaseHas('address_book_contact_milestone_calendars', [
+            'address_book_id' => $addressBook->id,
+            'milestone_type' => 'birthday',
+            'enabled' => true,
+            'calendar_id' => $newBirthdayCalendarId,
+        ]);
+    }
+
     public function test_milestone_generation_years_setting_controls_event_count(): void
     {
         $this->travelTo(Carbon::create(2026, 1, 15, 12, 0, 0, 'UTC'));
@@ -1399,6 +1456,42 @@ class ContactMilestoneCalendarTest extends TestCase
             'permission' => SharePermission::ReadOnly,
         ]);
 
+        DB::table('dav_resource_sync_changes')->insert([
+            [
+                'resource_type' => ShareResourceType::Calendar->value,
+                'resource_id' => $birthdayCalendarId,
+                'sync_token' => 2,
+                'operation' => 'deleted',
+                'uri' => 'birthdays-cleanup.ics',
+                'created_at' => now(),
+            ],
+            [
+                'resource_type' => ShareResourceType::Calendar->value,
+                'resource_id' => $anniversaryCalendarId,
+                'sync_token' => 2,
+                'operation' => 'deleted',
+                'uri' => 'anniversaries-cleanup.ics',
+                'created_at' => now(),
+            ],
+        ]);
+
+        $this->assertDatabaseHas('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $birthdayCalendarId,
+        ]);
+        $this->assertDatabaseHas('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $anniversaryCalendarId,
+        ]);
+        $this->assertDatabaseHas('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $birthdayCalendarId,
+        ]);
+        $this->assertDatabaseHas('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $anniversaryCalendarId,
+        ]);
+
         $this->actingAs($owner)
             ->deleteJson('/api/address-books/'.$addressBook->id)
             ->assertOk();
@@ -1407,6 +1500,22 @@ class ContactMilestoneCalendarTest extends TestCase
         $this->assertDatabaseMissing('calendars', ['id' => $anniversaryCalendarId]);
         $this->assertDatabaseMissing('resource_shares', ['id' => $birthdayShare->id]);
         $this->assertDatabaseMissing('resource_shares', ['id' => $anniversaryShare->id]);
+        $this->assertDatabaseMissing('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $birthdayCalendarId,
+        ]);
+        $this->assertDatabaseMissing('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $anniversaryCalendarId,
+        ]);
+        $this->assertDatabaseMissing('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $birthdayCalendarId,
+        ]);
+        $this->assertDatabaseMissing('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $anniversaryCalendarId,
+        ]);
     }
 
     public function test_enabling_milestones_marks_admin_purge_control_as_visible(): void

@@ -11,6 +11,8 @@
     "exportCalendar": "Unable to export calendar.",
     "exportAddressBooks": "Unable to export address books.",
     "exportAddressBook": "Unable to export address book.",
+    "deleteCalendar": "Unable to delete calendar.",
+    "deleteAddressBook": "Unable to delete address book.",
     "appleCompat": "Unable to update Apple compatibility settings.",
     "milestones": "Unable to update birthday/anniversary calendar settings."
   },
@@ -36,6 +38,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "editNameFor": "Edit name for {{name}}",
+    "deleteResource": "Delete {{name}}",
+    "deleteConfirm": "Delete {{name}}?",
     "exportItem": "Export {{name}}",
     "default": "(default)",
     "sharedWithYou": "Shared with you",

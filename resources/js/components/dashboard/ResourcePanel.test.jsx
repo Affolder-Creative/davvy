@@ -46,6 +46,7 @@ function ResourcePanelHarness({
   onExportItem,
   onToggle,
   onRename,
+  onDelete,
 }) {
   const [form, setForm] = useState({
     display_name: "",
@@ -69,10 +70,12 @@ function ResourcePanelHarness({
         onExportItem={onExportItem}
         onToggle={onToggle}
         onRename={onRename}
+        onDelete={onDelete}
         CopyableResourceUri={TestCopyableResourceUri}
         PermissionBadge={TestPermissionBadge}
         DownloadIcon={TestIcon}
         PencilIcon={TestIcon}
+        TrashIcon={TestIcon}
       />
       <pre data-testid="form-state">{JSON.stringify(form)}</pre>
     </>
@@ -87,6 +90,7 @@ function renderPanel({
   onExportItem = vi.fn(),
   onToggle = vi.fn(),
   onRename = vi.fn().mockResolvedValue(undefined),
+  onDelete = vi.fn().mockResolvedValue(undefined),
 } = {}) {
   render(
     <ResourcePanelHarness
@@ -97,6 +101,7 @@ function renderPanel({
       onExportItem={onExportItem}
       onToggle={onToggle}
       onRename={onRename}
+      onDelete={onDelete}
     />,
   );
 
@@ -107,6 +112,7 @@ function renderPanel({
     onExportItem,
     onToggle,
     onRename,
+    onDelete,
   };
 }
 
@@ -176,5 +182,35 @@ describe("ResourcePanel", () => {
       expect.objectContaining({ id: 202, display_name: "Family" }),
     );
     expect(onToggle).toHaveBeenCalledWith(101, true, "Work");
+  });
+
+  it("calls delete callback for non-default owned resources", async () => {
+    const { user, onDelete } = renderPanel();
+
+    await user.click(screen.getByRole("button", { name: "Delete Work" }));
+
+    await waitFor(() =>
+      expect(onDelete).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 101, display_name: "Work" }),
+      ),
+    );
+  });
+
+  it("does not render delete button for default resources", () => {
+    renderPanel({
+      items: [
+        {
+          id: 303,
+          display_name: "Personal",
+          uri: "personal",
+          is_sharable: false,
+          is_default: true,
+        },
+      ],
+    });
+
+    expect(
+      screen.queryByRole("button", { name: "Delete Personal" }),
+    ).not.toBeInTheDocument();
   });
 });

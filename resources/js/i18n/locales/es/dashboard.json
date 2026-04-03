@@ -11,6 +11,8 @@
     "exportCalendar": "No se pudo exportar el calendario.",
     "exportAddressBooks": "No se pudieron exportar las libretas de direcciones.",
     "exportAddressBook": "No se pudo exportar la libreta de direcciones.",
+    "deleteCalendar": "No se pudo eliminar el calendario.",
+    "deleteAddressBook": "No se pudo eliminar la libreta de direcciones.",
     "appleCompat": "No se pudieron actualizar los ajustes de compatibilidad de Apple.",
     "milestones": "No se pudieron actualizar los ajustes de cumpleaños/aniversarios."
   },
@@ -36,6 +38,8 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "editNameFor": "Editar nombre de {{name}}",
+    "deleteResource": "Eliminar {{name}}",
+    "deleteConfirm": "¿Eliminar {{name}}?",
     "exportItem": "Exportar {{name}}",
     "default": "(predeterminado)",
     "sharedWithYou": "Compartido contigo",

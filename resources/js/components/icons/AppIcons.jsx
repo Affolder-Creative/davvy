@@ -50,6 +50,33 @@ export function PencilIcon({ className }) {
 }
 
 /**
+ * Renders the trash icon.
+ *
+ * @param {object} props
+ * @returns {JSX.Element}
+ */
+export function TrashIcon({ className }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 7.5h16" />
+      <path d="M9.5 3.5h5" />
+      <path d="M8 7.5V19a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V7.5" />
+      <path d="M10.5 11v6" />
+      <path d="M13.5 11v6" />
+    </svg>
+  );
+}
+
+/**
  * Renders the check icon.
  *
  * @param {object} props

@@ -12,6 +12,7 @@ import {
   DownloadIcon,
   PencilIcon,
   ResetIcon,
+  TrashIcon,
   TimesIcon,
 } from "../components/icons/AppIcons";
 import AppShellComponent from "../components/layout/AppShell";
@@ -92,6 +93,7 @@ function ResourcePanel({
   onExportItem,
   onToggle,
   onRename,
+  onDelete,
   renderOwnedItemExtra = null,
 }) {
   return (
@@ -110,11 +112,13 @@ function ResourcePanel({
       onExportItem={onExportItem}
       onToggle={onToggle}
       onRename={onRename}
+      onDelete={onDelete}
       renderOwnedItemExtra={renderOwnedItemExtra}
       CopyableResourceUri={CopyableResourceUri}
       PermissionBadge={PermissionBadge}
       DownloadIcon={DownloadIcon}
       PencilIcon={PencilIcon}
+      TrashIcon={TrashIcon}
     />
   );
 }

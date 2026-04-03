@@ -10,6 +10,7 @@ use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DashboardSharesTest extends TestCase
@@ -151,6 +152,55 @@ class DashboardSharesTest extends TestCase
         $this->assertDatabaseMissing('resource_shares', ['id' => $share->id]);
     }
 
+    public function test_deleting_calendar_via_api_removes_related_dav_sync_rows(): void
+    {
+        $owner = User::factory()->create();
+
+        $calendar = Calendar::factory()->create([
+            'owner_id' => $owner->id,
+            'is_default' => false,
+        ]);
+
+        DB::table('dav_resource_sync_states')->insert([
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $calendar->id,
+            'sync_token' => 4,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('dav_resource_sync_changes')->insert([
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $calendar->id,
+            'sync_token' => 4,
+            'operation' => 'modified',
+            'uri' => 'keep-clean.ics',
+            'created_at' => now(),
+        ]);
+
+        $this->assertDatabaseHas('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $calendar->id,
+        ]);
+        $this->assertDatabaseHas('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $calendar->id,
+        ]);
+
+        $this->actingAs($owner)
+            ->deleteJson('/api/calendars/'.$calendar->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $calendar->id,
+        ]);
+        $this->assertDatabaseMissing('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::Calendar->value,
+            'resource_id' => $calendar->id,
+        ]);
+    }
+
     public function test_deleting_address_book_via_api_removes_related_resource_shares(): void
     {
         $owner = User::factory()->create();
@@ -176,5 +226,54 @@ class DashboardSharesTest extends TestCase
 
         $this->assertDatabaseMissing('address_books', ['id' => $addressBook->id]);
         $this->assertDatabaseMissing('resource_shares', ['id' => $share->id]);
+    }
+
+    public function test_deleting_address_book_via_api_removes_related_dav_sync_rows(): void
+    {
+        $owner = User::factory()->create();
+
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'is_default' => false,
+        ]);
+
+        DB::table('dav_resource_sync_states')->insert([
+            'resource_type' => ShareResourceType::AddressBook->value,
+            'resource_id' => $addressBook->id,
+            'sync_token' => 6,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('dav_resource_sync_changes')->insert([
+            'resource_type' => ShareResourceType::AddressBook->value,
+            'resource_id' => $addressBook->id,
+            'sync_token' => 6,
+            'operation' => 'modified',
+            'uri' => 'keep-clean.vcf',
+            'created_at' => now(),
+        ]);
+
+        $this->assertDatabaseHas('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::AddressBook->value,
+            'resource_id' => $addressBook->id,
+        ]);
+        $this->assertDatabaseHas('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::AddressBook->value,
+            'resource_id' => $addressBook->id,
+        ]);
+
+        $this->actingAs($owner)
+            ->deleteJson('/api/address-books/'.$addressBook->id)
+            ->assertOk();
+
+        $this->assertDatabaseMissing('dav_resource_sync_states', [
+            'resource_type' => ShareResourceType::AddressBook->value,
+            'resource_id' => $addressBook->id,
+        ]);
+        $this->assertDatabaseMissing('dav_resource_sync_changes', [
+            'resource_type' => ShareResourceType::AddressBook->value,
+            'resource_id' => $addressBook->id,
+        ]);
     }
 }

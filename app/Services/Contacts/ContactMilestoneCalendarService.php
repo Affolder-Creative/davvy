@@ -196,6 +196,18 @@ class ContactMilestoneCalendarService
             }
         }
 
+        if ($calendarIds !== []) {
+            DB::table('dav_resource_sync_changes')
+                ->where('resource_type', ShareResourceType::Calendar->value)
+                ->whereIn('resource_id', $calendarIds)
+                ->delete();
+
+            DB::table('dav_resource_sync_states')
+                ->where('resource_type', ShareResourceType::Calendar->value)
+                ->whereIn('resource_id', $calendarIds)
+                ->delete();
+        }
+
         AddressBookContactMilestoneCalendar::query()
             ->where('address_book_id', $addressBook->id)
             ->delete();

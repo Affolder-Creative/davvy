@@ -22,16 +22,19 @@ export default function ResourcePanel({
   onExportItem,
   onToggle,
   onRename,
+  onDelete = null,
   renderOwnedItemExtra = null,
   CopyableResourceUri,
   PermissionBadge,
   DownloadIcon,
   PencilIcon,
+  TrashIcon = null,
 }) {
   const { t } = useTranslation("dashboard");
   const [editingItemId, setEditingItemId] = useState(null);
   const [nameDraft, setNameDraft] = useState("");
   const [renamingItemId, setRenamingItemId] = useState(null);
+  const [deletingItemId, setDeletingItemId] = useState(null);
 
   const startEditing = (item) => {
     setEditingItemId(item.id);
@@ -65,6 +68,21 @@ export default function ResourcePanel({
       // Errors are surfaced by DashboardPage.
     } finally {
       setRenamingItemId(null);
+    }
+  };
+
+  const submitDelete = async (item) => {
+    if (!onDelete || item.is_default) {
+      return;
+    }
+
+    setDeletingItemId(item.id);
+    try {
+      await onDelete(item);
+    } catch {
+      // Errors are surfaced by DashboardPage.
+    } finally {
+      setDeletingItemId(null);
     }
   };
 
@@ -157,24 +175,42 @@ export default function ResourcePanel({
                       <p className="truncate font-medium text-app-strong">
                         {item.display_name}
                       </p>
-                        {item.is_default ? (
-                          <span className="shrink-0 text-xs font-semibold text-app-faint">
-                            {t("resourcePanel.default")}
-                          </span>
+                      {item.is_default ? (
+                        <span className="shrink-0 text-xs font-semibold text-app-faint">
+                          {t("resourcePanel.default")}
+                        </span>
+                      ) : null}
+                      <div className="flex items-center gap-1">
+                        <button
+                          className="inline-flex h-5 w-5 items-center justify-center rounded text-app-dim transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                          type="button"
+                          onClick={() => startEditing(item)}
+                          aria-label={t("resourcePanel.editNameFor", {
+                            name: item.display_name,
+                          })}
+                          title={t("resourcePanel.editNameFor", {
+                            name: item.display_name,
+                          })}
+                        >
+                          <PencilIcon className="h-3.5 w-3.5" />
+                        </button>
+                        {!item.is_default && onDelete && TrashIcon ? (
+                          <button
+                            className="inline-flex h-5 w-5 items-center justify-center rounded text-app-dim transition hover:text-app-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 disabled:cursor-not-allowed disabled:opacity-50"
+                            type="button"
+                            onClick={() => void submitDelete(item)}
+                            disabled={deletingItemId === item.id}
+                            aria-label={t("resourcePanel.deleteResource", {
+                              name: item.display_name,
+                            })}
+                            title={t("resourcePanel.deleteResource", {
+                              name: item.display_name,
+                            })}
+                          >
+                            <TrashIcon className="h-3.5 w-3.5" />
+                          </button>
                         ) : null}
-                      <button
-                        className="inline-flex h-5 w-5 items-center justify-center rounded text-app-dim transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
-                        type="button"
-                        onClick={() => startEditing(item)}
-                        aria-label={t("resourcePanel.editNameFor", {
-                          name: item.display_name,
-                        })}
-                        title={t("resourcePanel.editNameFor", {
-                          name: item.display_name,
-                        })}
-                      >
-                        <PencilIcon className="h-3.5 w-3.5" />
-                      </button>
+                      </div>
                     </div>
                   )}
                   <CopyableResourceUri

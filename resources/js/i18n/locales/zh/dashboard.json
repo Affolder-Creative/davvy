@@ -11,6 +11,8 @@
     "exportCalendar": "无法导出日历。",
     "exportAddressBooks": "无法导出地址簿。",
     "exportAddressBook": "无法导出地址簿。",
+    "deleteCalendar": "无法删除日历。",
+    "deleteAddressBook": "无法删除地址簿。",
     "appleCompat": "无法更新 Apple 兼容性设置。",
     "milestones": "无法更新生日/周年纪念日日历设置。"
   },
@@ -36,6 +38,8 @@
     "save": "保存",
     "cancel": "取消",
     "editNameFor": "编辑{{name}} 的名称",
+    "deleteResource": "删除 {{name}}",
+    "deleteConfirm": "删除 {{name}}？",
     "exportItem": "导出{{name}}",
     "default": "（默认）",
     "sharedWithYou": "与您分享",
