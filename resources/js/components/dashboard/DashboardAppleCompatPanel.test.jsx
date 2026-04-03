@@ -9,6 +9,8 @@ function AppleCompatHarness({
   initialForm,
   onSaveAppleCompat,
   canSelectAppleCompatSources,
+  appleCompatNotice = "",
+  savingAppleCompat = false,
 }) {
   const [appleCompatForm, setAppleCompatForm] = useState(initialForm);
 
@@ -19,6 +21,8 @@ function AppleCompatHarness({
         appleCompatForm={appleCompatForm}
         setAppleCompatForm={setAppleCompatForm}
         canSelectAppleCompatSources={canSelectAppleCompatSources}
+        appleCompatNotice={appleCompatNotice}
+        savingAppleCompat={savingAppleCompat}
         onSaveAppleCompat={onSaveAppleCompat}
       />
       <pre data-testid="apple-form-state">{JSON.stringify(appleCompatForm)}</pre>
@@ -126,5 +130,30 @@ describe("DashboardAppleCompatPanel", () => {
       screen.getByRole("button", { name: "Save Apple Compatibility Settings" }),
     );
     expect(onSaveAppleCompat).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows saving state and status notice", () => {
+    render(
+      <AppleCompatHarness
+        appleCompat={{
+          target_address_book_id: 12,
+          target_display_name: "Contacts",
+          target_address_book_uri: "contacts",
+          source_options: [],
+        }}
+        initialForm={{ enabled: true, source_ids: [4] }}
+        canSelectAppleCompatSources={true}
+        appleCompatNotice="Apple compatibility settings saved."
+        savingAppleCompat={true}
+        onSaveAppleCompat={vi.fn((event) => event.preventDefault())}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Saving..." }),
+    ).toBeDisabled();
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Apple compatibility settings saved.",
+    );
   });
 });

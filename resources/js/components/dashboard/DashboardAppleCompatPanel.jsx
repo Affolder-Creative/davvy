@@ -12,6 +12,8 @@ export default function DashboardAppleCompatPanel({
   appleCompatForm,
   setAppleCompatForm,
   canSelectAppleCompatSources,
+  appleCompatNotice,
+  savingAppleCompat,
   onSaveAppleCompat,
 }) {
   const { t } = useTranslation("dashboard");
@@ -123,10 +125,15 @@ export default function DashboardAppleCompatPanel({
           <button
             className="btn"
             type="submit"
-            disabled={!appleCompat.target_address_book_id}
+            disabled={!appleCompat.target_address_book_id || savingAppleCompat}
           >
-            {t("appleCompat.save")}
+            {savingAppleCompat ? t("appleCompat.saving") : t("appleCompat.save")}
           </button>
+          {appleCompatNotice ? (
+            <p className="mt-2 text-sm text-app-accent" role="status">
+              {appleCompatNotice}
+            </p>
+          ) : null}
         </div>
       </form>
     </section>

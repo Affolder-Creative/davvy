@@ -94,7 +94,8 @@
     "enable": "Activer le miroir de compatibilité Apple",
     "sourcesTitle": "Carnets d’adresses source à refléter",
     "noSources": "Aucun carnet d’adresses détenu/partagé admissible disponible.",
-    "save": "Enregistrer les paramètres de compatibilité Apple"
+    "save": "Enregistrer les paramètres de compatibilité Apple",
+    "saving": "Enregistrement..."
   },
   "states": {
     "loadingResources": "Chargement des ressources..."
@@ -103,6 +104,7 @@
     "shareStatus": {
       "shared": "{{name}} est maintenant partagé.",
       "unshared": "{{name}} n’est plus partagé."
-    }
+    },
+    "appleCompatSaved": "Les paramètres de compatibilité Apple ont été enregistrés."
   }
 }

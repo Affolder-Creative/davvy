@@ -94,7 +94,8 @@
     "enable": "Abilita il mirroring della compatibilità Apple",
     "sourcesTitle": "Rubriche di origine da mirrorare",
     "noSources": "Nessuna rubrica posseduta/condivisa idonea disponibile.",
-    "save": "Salva le impostazioni di compatibilità Apple"
+    "save": "Salva le impostazioni di compatibilità Apple",
+    "saving": "Salvataggio..."
   },
   "states": {
     "loadingResources": "Caricamento risorse..."
@@ -103,6 +104,7 @@
     "shareStatus": {
       "shared": "{{name}} è ora condiviso.",
       "unshared": "{{name}} non è più condiviso."
-    }
+    },
+    "appleCompatSaved": "Le impostazioni di compatibilità Apple sono state salvate."
   }
 }

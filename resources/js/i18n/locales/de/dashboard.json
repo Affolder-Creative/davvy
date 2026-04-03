@@ -94,7 +94,8 @@
     "enable": "Apple-Kompatibilitätsspiegelung aktivieren",
     "sourcesTitle": "Zu spiegelnde Quelladressbücher",
     "noSources": "Keine geeigneten eigenen/geteilten Adressbücher verfügbar.",
-    "save": "Apple-Kompatibilitätseinstellungen speichern"
+    "save": "Apple-Kompatibilitätseinstellungen speichern",
+    "saving": "Speichern..."
   },
   "states": {
     "loadingResources": "Ressourcen werden geladen..."
@@ -103,6 +104,7 @@
     "shareStatus": {
       "shared": "{{name}} ist jetzt freigegeben.",
       "unshared": "{{name}} ist nicht länger freigegeben."
-    }
+    },
+    "appleCompatSaved": "Apple-Kompatibilitätseinstellungen wurden gespeichert."
   }
 }

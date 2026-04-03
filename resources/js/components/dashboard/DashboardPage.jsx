@@ -31,6 +31,8 @@ export default function DashboardPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [shareStatusNotice, setShareStatusNotice] = useState("");
+  const [appleCompatNotice, setAppleCompatNotice] = useState("");
+  const [savingAppleCompat, setSavingAppleCompat] = useState(false);
   const [data, setData] = useState({
     owned: { calendars: [], address_books: [] },
     shared: { calendars: [], address_books: [] },
@@ -97,6 +99,15 @@ export default function DashboardPage({
     const timer = window.setTimeout(() => setShareStatusNotice(""), 2200);
     return () => window.clearTimeout(timer);
   }, [shareStatusNotice]);
+
+  useEffect(() => {
+    if (!appleCompatNotice) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setAppleCompatNotice(""), 2200);
+    return () => window.clearTimeout(timer);
+  }, [appleCompatNotice]);
 
   const toggleSharable = async (type, id, next, displayName) => {
     const url =
@@ -223,12 +234,21 @@ export default function DashboardPage({
 
   const saveAppleCompat = async (event) => {
     event.preventDefault();
+    if (savingAppleCompat) {
+      return;
+    }
+
     try {
+      setAppleCompatNotice("");
       setError("");
+      setSavingAppleCompat(true);
       await api.patch("/api/address-books/apple-compat", appleCompatForm);
       await loadDashboard({ withLoading: false });
+      setAppleCompatNotice(t("notices.appleCompatSaved"));
     } catch (err) {
       setError(extractError(err, t("errors.appleCompat")));
+    } finally {
+      setSavingAppleCompat(false);
     }
   };
 
@@ -384,6 +404,8 @@ export default function DashboardPage({
           appleCompatForm={appleCompatForm}
           setAppleCompatForm={setAppleCompatForm}
           canSelectAppleCompatSources={canSelectAppleCompatSources}
+          appleCompatNotice={appleCompatNotice}
+          savingAppleCompat={savingAppleCompat}
           onSaveAppleCompat={saveAppleCompat}
         />
       ) : null}

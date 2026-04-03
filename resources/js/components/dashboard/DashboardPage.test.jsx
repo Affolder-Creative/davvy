@@ -73,6 +73,8 @@ function DashboardSharingPanelStub() {
 
 function DashboardAppleCompatPanelStub({
   setAppleCompatForm,
+  appleCompatNotice,
+  savingAppleCompat,
   onSaveAppleCompat,
 }) {
   return (
@@ -92,8 +94,11 @@ function DashboardAppleCompatPanelStub({
         type="button"
         onClick={() => onSaveAppleCompat({ preventDefault() {} })}
       >
-        Save Apple Compat
+        {savingAppleCompat ? "Saving..." : "Save Apple Compat"}
       </button>
+      {appleCompatNotice ? (
+        <p data-testid="apple-compat-notice">{appleCompatNotice}</p>
+      ) : null}
     </section>
   );
 }
@@ -200,6 +205,9 @@ describe("DashboardPage", () => {
           source_ids: [9],
         },
       ),
+    );
+    expect(screen.getByTestId("apple-compat-notice")).toHaveTextContent(
+      "Apple compatibility settings saved.",
     );
   });
 
