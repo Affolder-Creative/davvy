@@ -66,7 +66,10 @@
     "birthdays": "Anniversaires",
     "birthdaysFallback": "Anniversaires de {{name}}",
     "anniversaries": "Commémorations",
-    "anniversariesFallback": "Commémorations de {{name}}"
+    "anniversariesFallback": "Commémorations de {{name}}",
+    "syncDescription": "Lorsqu’elle est activée, Davvy maintient les événements de calendrier d’étapes générés synchronisés avec les dates de contact.",
+    "syncDescriptionExtra": "Désactiver la synchronisation ne supprime pas les calendriers, sauf si vous choisissez Supprimer.",
+    "disablePrompt": "Désactiver la synchronisation des étapes {{label}} pour {{name}} ?\n\nAppuyez sur OK pour supprimer le calendrier généré.\nAppuyez sur Annuler pour conserver le calendrier et seulement arrêter la synchronisation."
   },
   "sharing": {
     "title": "Partagez vos ressources",

@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 export default function AddressBookMilestoneControls({
   item,
   onSave,
+  onDeleteCalendar = null,
   ChevronRightIcon,
   ResetIcon,
   PencilIcon,
@@ -53,17 +54,44 @@ export default function AddressBookMilestoneControls({
     }
   };
 
-  const toggleEnabled = async (type, enabled) => {
-    if (type === "birthdays") {
-      await saveMilestone(type, {
-        birthdays_enabled: enabled,
-      });
-      return;
+  const toggleEnabled = async (type, enabled, settings, fallbackName, label) => {
+    const payload =
+      type === "birthdays"
+        ? { birthdays_enabled: enabled }
+        : { anniversaries_enabled: enabled };
+
+    if (!enabled) {
+      const calendarId = Number(settings?.calendar_id ?? 0);
+      const calendarName =
+        settings?.calendar_name ??
+        settings?.custom_name ??
+        settings?.default_name ??
+        fallbackName;
+
+      if (calendarId > 0) {
+        const deleteCalendar = window.confirm(
+          t("milestoneCalendars.disablePrompt", {
+            label,
+            name: calendarName,
+          }),
+        );
+
+        if (deleteCalendar && onDeleteCalendar) {
+          try {
+            await onDeleteCalendar({
+              id: calendarId,
+              display_name: calendarName,
+            });
+          } catch {
+            // Errors are surfaced by DashboardPage.
+          }
+
+          return;
+        }
+      }
     }
 
-    await saveMilestone(type, {
-      anniversaries_enabled: enabled,
-    });
+    await saveMilestone(type, payload);
   };
 
   const saveName = async (type) => {
@@ -146,7 +174,15 @@ export default function AddressBookMilestoneControls({
               type="checkbox"
               checked={!!settings.enabled}
               disabled={isSaving || saveInProgress}
-              onChange={(event) => toggleEnabled(type, event.target.checked)}
+              onChange={(event) =>
+                toggleEnabled(
+                  type,
+                  event.target.checked,
+                  settings,
+                  fallbackName,
+                  label,
+                )
+              }
             />
             {label}
           </label>
@@ -314,6 +350,12 @@ export default function AddressBookMilestoneControls({
             }),
             { withTopDivider: true },
           )}
+          <p className="pt-1 text-[11px] leading-tight text-app-faint">
+            {t("milestoneCalendars.syncDescription")}
+          </p>
+          <p className="pt-1 text-[11px] leading-tight italic text-app-faint">
+            {t("milestoneCalendars.syncDescriptionExtra")}
+          </p>
         </div>
       ) : null}
     </div>

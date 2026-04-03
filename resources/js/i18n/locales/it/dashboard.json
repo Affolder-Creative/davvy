@@ -66,7 +66,10 @@
     "birthdays": "Compleanni",
     "birthdaysFallback": "{{name}} Compleanni",
     "anniversaries": "Anniversari",
-    "anniversariesFallback": "{{name}} Anniversari"
+    "anniversariesFallback": "{{name}} Anniversari",
+    "syncDescription": "Quando abilitato, Davvy mantiene sincronizzati con le date dei contatti gli eventi dei calendari di traguardo generati.",
+    "syncDescriptionExtra": "Disattivare la sincronizzazione non elimina i calendari, a meno che non scegli Elimina.",
+    "disablePrompt": "Disattivare la sincronizzazione traguardi di {{label}} per {{name}}?\n\nPremi OK per eliminare il calendario generato.\nPremi Annulla per mantenere il calendario e interrompere solo la sincronizzazione."
   },
   "sharing": {
     "title": "Condividi le tue risorse",

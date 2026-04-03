@@ -66,7 +66,10 @@
     "birthdays": "生日",
     "birthdaysFallback": "{{name}} 生日",
     "anniversaries": "周年纪念日",
-    "anniversariesFallback": "{{name}} 周年纪念日"
+    "anniversariesFallback": "{{name}} 周年纪念日",
+    "syncDescription": "启用后，Davvy 会让生成的里程碑日历事件与联系人日期保持同步。",
+    "syncDescriptionExtra": "关闭同步不会删除日历，除非你选择删除。",
+    "disablePrompt": "要关闭 {{name}} 的 {{label}} 里程碑同步吗？\n\n点击“确定”将删除已生成的日历。\n点击“取消”将保留日历，仅停止同步。"
   },
   "sharing": {
     "title": "分享您的资源",

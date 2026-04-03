@@ -17,24 +17,30 @@ function createItem(overrides = {}) {
         enabled: false,
         custom_name: "",
         default_name: "Friends Birthdays",
+        calendar_id: null,
+        calendar_name: "Friends Birthdays",
       },
       anniversaries: {
         enabled: true,
         custom_name: "",
         default_name: "Friends Anniversaries",
+        calendar_id: 84,
+        calendar_name: "Friends Anniversaries",
       },
     },
     ...overrides,
   };
 }
 
-function renderControls({ item = createItem(), onSave } = {}) {
+function renderControls({ item = createItem(), onSave, onDeleteCalendar } = {}) {
   const saveHandler = onSave ?? vi.fn().mockResolvedValue(undefined);
+  const deleteHandler = onDeleteCalendar ?? vi.fn().mockResolvedValue(undefined);
 
   render(
     <AddressBookMilestoneControls
       item={item}
       onSave={saveHandler}
+      onDeleteCalendar={deleteHandler}
       ChevronRightIcon={TestIcon}
       ResetIcon={TestIcon}
       PencilIcon={TestIcon}
@@ -46,6 +52,7 @@ function renderControls({ item = createItem(), onSave } = {}) {
   return {
     user: userEvent.setup(),
     onSave: saveHandler,
+    onDeleteCalendar: deleteHandler,
   };
 }
 
@@ -117,5 +124,65 @@ describe("AddressBookMilestoneControls", () => {
         birthday_calendar_name: null,
       }),
     );
+  });
+
+  it("deletes generated milestone calendar when disabling and confirming", async () => {
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    const { user, onSave, onDeleteCalendar } = renderControls();
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand milestone calendars" }),
+    );
+    await user.click(screen.getByRole("checkbox", { name: "Anniversaries" }));
+
+    await waitFor(() =>
+      expect(onDeleteCalendar).toHaveBeenCalledWith({
+        id: 84,
+        display_name: "Friends Anniversaries",
+      }),
+    );
+    expect(onSave).not.toHaveBeenCalledWith(42, {
+      anniversaries_enabled: false,
+    });
+    expect(confirmSpy).toHaveBeenCalled();
+    confirmSpy.mockRestore();
+  });
+
+  it("keeps generated milestone calendar when disabling and cancelling deletion", async () => {
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+    const { user, onSave, onDeleteCalendar } = renderControls();
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand milestone calendars" }),
+    );
+    await user.click(screen.getByRole("checkbox", { name: "Anniversaries" }));
+
+    await waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith(42, {
+        anniversaries_enabled: false,
+      }),
+    );
+    expect(onDeleteCalendar).not.toHaveBeenCalled();
+    expect(confirmSpy).toHaveBeenCalled();
+    confirmSpy.mockRestore();
+  });
+
+  it("renders milestone sync helper copy when expanded", async () => {
+    const { user } = renderControls();
+
+    await user.click(
+      screen.getByRole("button", { name: "Expand milestone calendars" }),
+    );
+
+    expect(
+      screen.getByText(
+        "When enabled, Davvy keeps generated milestone calendar events in sync with contact dates.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Turning off sync does not delete calendars unless you choose Delete.",
+      ),
+    ).toBeInTheDocument();
   });
 });

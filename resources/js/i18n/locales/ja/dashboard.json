@@ -66,7 +66,10 @@
     "birthdays": "誕生日",
     "birthdaysFallback": "{{name}} 誕生日",
     "anniversaries": "記念日",
-    "anniversariesFallback": "{{name}} 記念日"
+    "anniversariesFallback": "{{name}} 記念日",
+    "syncDescription": "有効にすると、Davvy は生成されたマイルストーンカレンダーのイベントを連絡先の日付と同期します。",
+    "syncDescriptionExtra": "同期をオフにしても、「削除」を選択しない限りカレンダーは削除されません。",
+    "disablePrompt": "{{name}} の {{label}} マイルストーン同期をオフにしますか？\n\nOK を押すと生成済みカレンダーを削除します。\nキャンセルを押すとカレンダーを保持し、同期のみ停止します。"
   },
   "sharing": {
     "title": "リソースを共有する",

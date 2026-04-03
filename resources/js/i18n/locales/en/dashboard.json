@@ -66,7 +66,10 @@
     "birthdays": "Birthdays",
     "birthdaysFallback": "{{name}} Birthdays",
     "anniversaries": "Anniversaries",
-    "anniversariesFallback": "{{name}} Anniversaries"
+    "anniversariesFallback": "{{name}} Anniversaries",
+    "syncDescription": "When enabled, Davvy keeps generated milestone calendar events in sync with contact dates.",
+    "syncDescriptionExtra": "Turning off sync does not delete calendars unless you choose Delete.",
+    "disablePrompt": "Turn off {{label}} milestone sync for {{name}}?\n\nPress OK to delete the generated calendar.\nPress Cancel to keep the calendar and only stop sync."
   },
   "sharing": {
     "title": "Share Your Resources",

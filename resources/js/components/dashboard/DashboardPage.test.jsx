@@ -25,7 +25,13 @@ function PermissionBadgeStub({ permission }) {
   return <span>{permission}</span>;
 }
 
-function ResourcePanelStub({ title, onToggle, onDelete }) {
+function ResourcePanelStub({
+  title,
+  onToggle,
+  onDelete,
+  items = [],
+  renderOwnedItemExtra = null,
+}) {
   return (
     <section>
       <h4>{title}</h4>
@@ -41,12 +47,20 @@ function ResourcePanelStub({ title, onToggle, onDelete }) {
       >
         Delete {title}
       </button>
+      {renderOwnedItemExtra && items[0] ? renderOwnedItemExtra(items[0]) : null}
     </section>
   );
 }
 
-function AddressBookMilestoneControlsStub() {
-  return <span>Milestone</span>;
+function AddressBookMilestoneControlsStub({ onDeleteCalendar }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onDeleteCalendar({ id: 99, display_name: "Birthdays" })}
+    >
+      Delete Milestone Calendar
+    </button>
+  );
 }
 
 function DashboardOverviewCardsStub() {
@@ -202,6 +216,49 @@ describe("DashboardPage", () => {
       expect(props.api.delete).toHaveBeenCalledWith("/api/calendars/2"),
     );
     expect(confirmSpy).toHaveBeenCalledWith("Delete Your Calendars Resource?");
+    confirmSpy.mockRestore();
+  });
+
+  it("deletes milestone calendar without the resource-panel confirmation prompt", async () => {
+    const user = userEvent.setup();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    const props = buildProps({
+      api: {
+        get: vi.fn().mockResolvedValue({
+          data: baseDashboardPayload({
+            owned: {
+              calendars: [],
+              address_books: [
+                {
+                  id: 50,
+                  display_name: "Friends",
+                  uri: "friends",
+                  is_sharable: false,
+                  is_default: false,
+                  milestone_calendars: {
+                    birthdays: { enabled: true, calendar_id: 99 },
+                    anniversaries: { enabled: false, calendar_id: null },
+                  },
+                },
+              ],
+            },
+          }),
+        }),
+        patch: vi.fn().mockResolvedValue({}),
+        post: vi.fn().mockResolvedValue({}),
+        delete: vi.fn().mockResolvedValue({}),
+      },
+    });
+
+    render(<DashboardPage {...props} />);
+    await waitFor(() => expect(props.api.get).toHaveBeenCalledTimes(1));
+
+    await user.click(screen.getByRole("button", { name: "Delete Milestone Calendar" }));
+
+    await waitFor(() =>
+      expect(props.api.delete).toHaveBeenCalledWith("/api/calendars/99"),
+    );
+    expect(confirmSpy).not.toHaveBeenCalled();
     confirmSpy.mockRestore();
   });
 });

@@ -251,6 +251,17 @@ export default function DashboardPage({
     }
   };
 
+  const deleteMilestoneCalendar = async (calendar) => {
+    try {
+      setError("");
+      await api.delete(`/api/calendars/${calendar.id}`);
+      await loadDashboard({ withLoading: false });
+    } catch (err) {
+      setError(extractError(err, t("errors.deleteCalendar")));
+      throw err;
+    }
+  };
+
   const shareableResourceOptions =
     shareForm.resource_type === "calendar"
       ? data.owned.calendars.filter((item) => item.is_sharable)
@@ -347,6 +358,7 @@ export default function DashboardPage({
               <AddressBookMilestoneControls
                 item={item}
                 onSave={saveAddressBookMilestones}
+                onDeleteCalendar={deleteMilestoneCalendar}
               />
             )}
           />

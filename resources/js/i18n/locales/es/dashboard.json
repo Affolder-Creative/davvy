@@ -66,7 +66,10 @@
     "birthdays": "Cumpleaños",
     "birthdaysFallback": "Cumpleaños de {{name}}",
     "anniversaries": "Aniversarios",
-    "anniversariesFallback": "Aniversarios de {{name}}"
+    "anniversariesFallback": "Aniversarios de {{name}}",
+    "syncDescription": "Cuando está activado, Davvy mantiene los eventos de calendarios de hitos generados sincronizados con las fechas de contacto.",
+    "syncDescriptionExtra": "Desactivar la sincronización no elimina calendarios, a menos que elijas Eliminar.",
+    "disablePrompt": "¿Desactivar la sincronización de hitos de {{label}} para {{name}}?\n\nPulsa Aceptar para eliminar el calendario generado.\nPulsa Cancelar para conservar el calendario y solo detener la sincronización."
   },
   "sharing": {
     "title": "Comparte tus recursos",

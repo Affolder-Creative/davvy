@@ -66,7 +66,10 @@
     "birthdays": "Aniversários",
     "birthdaysFallback": "{{name}} Aniversários",
     "anniversaries": "Aniversários",
-    "anniversariesFallback": "{{name}} Aniversários"
+    "anniversariesFallback": "{{name}} Aniversários",
+    "syncDescription": "Quando ativado, o Davvy mantém os eventos de calendários de marcos gerados em sincronia com as datas dos contatos.",
+    "syncDescriptionExtra": "Desativar a sincronização não exclui calendários, a menos que você escolha Excluir.",
+    "disablePrompt": "Desativar a sincronização de marcos de {{label}} para {{name}}?\n\nPressione OK para excluir o calendário gerado.\nPressione Cancelar para manter o calendário e apenas parar a sincronização."
   },
   "sharing": {
     "title": "Compartilhe seus recursos",

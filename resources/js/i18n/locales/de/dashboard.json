@@ -66,7 +66,10 @@
     "birthdays": "Geburtstage",
     "birthdaysFallback": "{{name}} Geburtstage",
     "anniversaries": "Jahrestage",
-    "anniversariesFallback": "{{name}} Jahrestage"
+    "anniversariesFallback": "{{name}} Jahrestage",
+    "syncDescription": "Wenn aktiviert, hält Davvy generierte Meilenstein-Kalenderereignisse mit Kontaktdaten synchron.",
+    "syncDescriptionExtra": "Das Deaktivieren der Synchronisierung löscht Kalender nicht, es sei denn, Sie wählen „Löschen“.",
+    "disablePrompt": "Meilenstein-Synchronisierung für {{label}} bei {{name}} deaktivieren?\n\nDrücken Sie OK, um den generierten Kalender zu löschen.\nDrücken Sie Abbrechen, um den Kalender zu behalten und nur die Synchronisierung zu stoppen."
   },
   "sharing": {
     "title": "Ihre Ressourcen freigeben",

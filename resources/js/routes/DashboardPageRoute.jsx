@@ -64,11 +64,12 @@ function InfoCard({ title, value, helper, copyable = false }) {
   );
 }
 
-function AddressBookMilestoneControls({ item, onSave }) {
+function AddressBookMilestoneControls({ item, onSave, onDeleteCalendar }) {
   return (
     <AddressBookMilestoneControlsComponent
       item={item}
       onSave={onSave}
+      onDeleteCalendar={onDeleteCalendar}
       ChevronRightIcon={ChevronRightIcon}
       ResetIcon={ResetIcon}
       PencilIcon={PencilIcon}
