@@ -67,11 +67,11 @@ export function TrashIcon({ className }) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M4 7.5h16" />
-      <path d="M9.5 3.5h5" />
-      <path d="M8 7.5V19a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V7.5" />
-      <path d="M10.5 11v6" />
-      <path d="M13.5 11v6" />
+      <path d="M4 7h16" />
+      <path d="M9 4h6v3" />
+      <rect x="6.5" y="7" width="11" height="13" rx="1.5" />
+      <path d="M10 11v6" />
+      <path d="M14 11v6" />
     </svg>
   );
 }
