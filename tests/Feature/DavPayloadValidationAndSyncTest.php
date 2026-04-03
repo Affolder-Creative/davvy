@@ -13,6 +13,7 @@ use App\Services\DavRequestContext;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet;
 use Sabre\DAV\Exception\BadRequest;
 use Tests\TestCase;
 
@@ -231,6 +232,15 @@ class DavPayloadValidationAndSyncTest extends TestCase
         $this->assertNotNull($collection);
         $this->assertArrayHasKey('{http://sabredav.org/ns}sync-token', $collection);
         $this->assertArrayHasKey('{http://calendarserver.org/ns/}getctag', $collection);
+        $this->assertArrayHasKey('{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set', $collection);
+        $this->assertInstanceOf(
+            SupportedCalendarComponentSet::class,
+            $collection['{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set']
+        );
+        $this->assertSame(
+            ['VEVENT'],
+            $collection['{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set']->getValue()
+        );
         $this->assertNotSame('0', $collection['{http://sabredav.org/ns}sync-token']);
         $this->assertNotSame('0', $collection['{http://calendarserver.org/ns/}getctag']);
     }

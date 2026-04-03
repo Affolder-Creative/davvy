@@ -18,6 +18,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use Sabre\CalDAV\Backend\AbstractBackend;
 use Sabre\CalDAV\Backend\SyncSupport;
+use Sabre\CalDAV\Xml\Property\SupportedCalendarComponentSet;
 use Sabre\DAV\Exception\BadRequest;
 use Sabre\DAV\Exception\Conflict;
 use Sabre\DAV\Exception\Forbidden;
@@ -442,6 +443,7 @@ class LaravelCalendarBackend extends AbstractBackend implements SyncSupport
             'uri' => $calendar->uri,
             'principaluri' => $principalUri,
             '{DAV:}displayname' => $calendar->display_name,
+            '{urn:ietf:params:xml:ns:caldav}supported-calendar-component-set' => new SupportedCalendarComponentSet(['VEVENT']),
             '{urn:ietf:params:xml:ns:caldav}calendar-description' => $calendar->description,
             '{http://apple.com/ns/ical/}calendar-color' => $calendar->color,
             '{urn:ietf:params:xml:ns:caldav}calendar-timezone' => $calendar->timezone,
