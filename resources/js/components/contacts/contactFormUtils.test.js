@@ -63,6 +63,7 @@ describe("contactFormUtils", () => {
     expect(form.related_names[0]).toEqual(
       expect.objectContaining({ label: "other", related_contact_id: null }),
     );
+    expect(form.categories).toEqual([]);
   });
 
   it("hydrates contacts and preserves safe defaults", () => {
@@ -71,6 +72,7 @@ describe("contactFormUtils", () => {
         id: 11,
         first_name: "Alex",
         birthday: { year: 1990, month: 3, day: 5 },
+        categories: ["Family", "friends", "family"],
         related_names: [{ label: "spouse", value: "Taylor", related_contact_id: "42" }],
         dates: [{ label: "anniversary", year: "2020", month: "7", day: "9" }],
         addresses: [],
@@ -83,6 +85,7 @@ describe("contactFormUtils", () => {
     expect(hydrated.id).toBe(11);
     expect(hydrated.first_name).toBe("Alex");
     expect(hydrated.birthday).toEqual({ year: "1990", month: "03", day: "05" });
+    expect(hydrated.categories).toEqual(["Family", "friends", "family"]);
     expect(hydrated.related_names[0]).toEqual(
       expect.objectContaining({ label: "spouse", related_contact_id: 42 }),
     );
@@ -103,6 +106,7 @@ describe("contactFormUtils", () => {
     populated.company = "Example Co";
     populated.pronouns = "they/them";
     populated.phones = [{ label: "mobile", value: "555-0100", custom_label: "" }];
+    populated.categories = ["Friends"];
 
     expect(deriveContactSectionOpenState(populated)).toEqual({
       ...defaults,

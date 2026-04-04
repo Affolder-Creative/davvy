@@ -32,6 +32,14 @@ function RelatedNameEditorStub({ setRows }) {
   );
 }
 
+function CategoryTagEditorStub({ onChange }) {
+  return (
+    <button type="button" onClick={() => onChange(["Family"])}>
+      CategoryTagEditor
+    </button>
+  );
+}
+
 function buildProps(overrides = {}) {
   return {
     isOpen: true,
@@ -47,6 +55,7 @@ function buildProps(overrides = {}) {
       birthday: { month: "", day: "", year: "" },
       dates: [],
       related_names: [],
+      categories: [],
       exclude_milestone_calendars: false,
     },
     Field: FieldStub,
@@ -63,6 +72,8 @@ function buildProps(overrides = {}) {
     DateEditor: DateEditorStub,
     labelOptions: { dates: [], related_names: [] },
     RelatedNameEditor: RelatedNameEditorStub,
+    CategoryTagEditor: CategoryTagEditorStub,
+    categoryOptions: [],
     relatedNameOptions: [],
     setForm: vi.fn(),
     ...overrides,
@@ -108,6 +119,9 @@ describe("ContactEditorPersonalSection", () => {
     const setFormUpdater = props.setForm.mock.calls[0][0];
     const updated = setFormUpdater({ related_names: [] });
     expect(updated.related_names).toEqual([{ value: "Partner", label: "spouse" }]);
+
+    await user.click(screen.getByRole("button", { name: "CategoryTagEditor" }));
+    expect(props.updateFormField).toHaveBeenCalledWith("categories", ["Family"]);
   });
 
   it("renders collapsed section without body", () => {

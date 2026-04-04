@@ -48,6 +48,7 @@ export default function ContactsPage({
   LabeledValueEditor,
   AddressEditor,
   RelatedNameEditor,
+  CategoryTagEditor,
   Field,
 }) {
   const { t } = useTranslation("contacts");
@@ -103,6 +104,7 @@ export default function ContactsPage({
     visibleOptionalFields,
     setForm,
     labelOptions,
+    categoryOptions,
     relatedNameOptions,
     saveContact,
     removeContact,
@@ -301,7 +303,9 @@ export default function ContactsPage({
                 LabeledValueEditor={LabeledValueEditor}
                 AddressEditor={AddressEditor}
                 RelatedNameEditor={RelatedNameEditor}
+                CategoryTagEditor={CategoryTagEditor}
                 labelOptions={labelOptions}
+                categoryOptions={categoryOptions}
                 relatedNameOptions={relatedNameOptions}
                 setForm={setForm}
                 hiddenOptionalFields={hiddenOptionalFields}

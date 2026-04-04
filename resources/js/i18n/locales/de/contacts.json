@@ -312,6 +312,12 @@
         "read": "Das ausgewählte Bild konnte nicht gelesen werden.",
         "upload": "Kontaktfoto konnte nicht hochgeladen werden."
       }
+    },
+    "categoryTagEditor": {
+      "title": "Categories",
+      "empty": "No categories yet.",
+      "placeholder": "Add category",
+      "removeAria": "Remove {{category}}"
     }
   },
   "states": {

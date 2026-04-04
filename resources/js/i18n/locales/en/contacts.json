@@ -303,6 +303,12 @@
       "dismiss": "Dismiss",
       "customLabelPlaceholder": "Custom label"
     },
+    "categoryTagEditor": {
+      "title": "Categories",
+      "empty": "No categories yet.",
+      "placeholder": "Add category",
+      "removeAria": "Remove {{category}}"
+    },
     "rowReorderControls": {
       "moveUpAria": "Move {{rowLabel}} {{rowNumber}} up",
       "moveUp": "Move up",

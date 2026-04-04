@@ -153,6 +153,8 @@ class ContactController extends Controller
             'profile' => ['nullable', 'string', 'max:255'],
             'head_of_household' => ['sometimes', 'boolean'],
             'exclude_milestone_calendars' => ['sometimes', 'boolean'],
+            'categories' => ['nullable', 'array', 'max:50'],
+            'categories.*' => ['nullable', 'string', 'max:100'],
             'birthday' => ['nullable', 'array'],
             'birthday.year' => ['nullable', 'integer', 'between:1,9999'],
             'birthday.month' => ['nullable', 'integer', 'between:1,12'],
@@ -227,6 +229,7 @@ class ContactController extends Controller
             'profile' => $this->normalizeString($data['profile'] ?? null),
             'head_of_household' => (bool) ($data['head_of_household'] ?? false),
             'exclude_milestone_calendars' => (bool) ($data['exclude_milestone_calendars'] ?? false),
+            'categories' => $this->normalizeCategories($data['categories'] ?? []),
             'birthday' => $this->normalizeDateParts($data['birthday'] ?? []),
             'phones' => $this->normalizeValueRows($data['phones'] ?? []),
             'emails' => $this->normalizeValueRows($data['emails'] ?? []),
@@ -522,5 +525,34 @@ class ContactController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Normalizes categories with case-insensitive dedupe.
+     *
+     * @param  array<int, mixed>  $values
+     * @return array<int, string>
+     */
+    private function normalizeCategories(array $values): array
+    {
+        $normalized = [];
+        $seen = [];
+
+        foreach ($values as $value) {
+            $category = $this->normalizeString($value);
+            if ($category === null) {
+                continue;
+            }
+
+            $key = strtolower($category);
+            if (isset($seen[$key])) {
+                continue;
+            }
+
+            $seen[$key] = true;
+            $normalized[] = $category;
+        }
+
+        return $normalized;
     }
 }

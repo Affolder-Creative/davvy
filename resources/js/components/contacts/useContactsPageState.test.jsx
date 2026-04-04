@@ -11,6 +11,7 @@ function createEmptyContactForm(addressBookIds = []) {
     birthday: { month: "", day: "", year: "" },
     dates: [],
     related_names: [],
+    categories: [],
     phones: [],
     emails: [],
     urls: [],
@@ -259,6 +260,12 @@ describe("useContactsPageState", () => {
                 address_book_ids: [3],
               },
               { id: 107, company: "Aster Co", address_book_ids: [3] },
+              {
+                id: 108,
+                first_name: "Morgan",
+                categories: ["Aster Group"],
+                address_book_ids: [3],
+              },
             ],
             address_books: [{ id: 3, display_name: "Personal", uri: "personal" }],
           },
@@ -279,7 +286,7 @@ describe("useContactsPageState", () => {
     });
 
     expect(result.current.filteredContacts.map((contact) => contact.id)).toEqual([
-      101, 102, 103, 104, 105,
+      101, 102, 103, 104, 105, 108,
     ]);
   });
 });

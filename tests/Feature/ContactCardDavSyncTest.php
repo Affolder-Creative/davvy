@@ -473,6 +473,44 @@ class ContactCardDavSyncTest extends TestCase
         Storage::disk('local')->assertMissing($photoPath);
     }
 
+    public function test_carddav_categories_sync_into_managed_payload_and_round_trip_through_web_save(): void
+    {
+        $user = User::factory()->create();
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'uri' => 'categories-sync',
+        ]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($user);
+
+        app(LaravelCardDavBackend::class)->createCard(
+            $addressBook->id,
+            'categories-sync.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Category Person\nN:Person;Category;;;\nUID:category-sync-uid\nCATEGORIES:Family,Work\nCATEGORIES:work,Friends\nEND:VCARD"
+        );
+
+        $contact = Contact::query()
+            ->where('owner_id', $user->id)
+            ->where('uid', 'category-sync-uid')
+            ->firstOrFail();
+        $payload = is_array($contact->payload) ? $contact->payload : [];
+        $this->assertSame(['Family', 'Work', 'Friends'], $payload['categories'] ?? []);
+
+        $this->actingAs($user)->patchJson('/api/contacts/'.$contact->id, [
+            ...$payload,
+            'first_name' => 'Category',
+            'last_name' => 'Person',
+            'address_book_ids' => [$addressBook->id],
+        ])->assertOk();
+
+        $assignment = ContactAddressBookAssignment::query()
+            ->where('contact_id', $contact->id)
+            ->where('address_book_id', $addressBook->id)
+            ->firstOrFail();
+        $card = Card::query()->findOrFail($assignment->card_id);
+        $this->assertStringContainsString('CATEGORIES:Family,Work,Friends', (string) $card->data);
+    }
+
     public function test_related_name_synonym_label_round_trips_through_carddav(): void
     {
         $user = User::factory()->create();

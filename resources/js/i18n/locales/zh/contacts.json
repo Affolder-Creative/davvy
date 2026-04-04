@@ -312,6 +312,12 @@
         "read": "无法读取所选图片。",
         "upload": "无法上传联系人照片。"
       }
+    },
+    "categoryTagEditor": {
+      "title": "Categories",
+      "empty": "No categories yet.",
+      "placeholder": "Add category",
+      "removeAria": "Remove {{category}}"
     }
   },
   "states": {

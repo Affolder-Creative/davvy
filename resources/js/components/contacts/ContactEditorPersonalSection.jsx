@@ -20,10 +20,14 @@ export default function ContactEditorPersonalSection({
   DateEditor,
   labelOptions,
   RelatedNameEditor,
+  CategoryTagEditor,
+  categoryOptions,
   relatedNameOptions,
   setForm,
 }) {
   const { t } = useTranslation("contacts");
+  const CategoryTagsComponent =
+    typeof CategoryTagEditor === "function" ? CategoryTagEditor : null;
   return (
     <section className="rounded-2xl border border-app-edge bg-app-surface p-3">
       <button
@@ -278,6 +282,14 @@ export default function ContactEditorPersonalSection({
             contactOptions={relatedNameOptions}
             labelOptions={labelOptions.related_names}
           />
+
+          {CategoryTagsComponent ? (
+            <CategoryTagsComponent
+              categories={Array.isArray(form.categories) ? form.categories : []}
+              onChange={(categories) => updateFormField("categories", categories)}
+              suggestions={Array.isArray(categoryOptions) ? categoryOptions : []}
+            />
+          ) : null}
         </div>
       ) : null}
     </section>

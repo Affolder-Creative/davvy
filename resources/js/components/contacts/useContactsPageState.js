@@ -97,6 +97,38 @@ export default function useContactsPageState({
     [visibleOptionalFields, optionalFieldsWithLabels],
   );
 
+  const categoryOptions = useMemo(() => {
+    const seen = new Set();
+    const collected = [];
+
+    for (const contact of Array.isArray(contacts) ? contacts : []) {
+      const categories = Array.isArray(contact?.categories)
+        ? contact.categories
+        : [];
+
+      for (const value of categories) {
+        const category = String(value ?? "").trim();
+        if (!category) {
+          continue;
+        }
+
+        const key = category.toLowerCase();
+        if (seen.has(key)) {
+          continue;
+        }
+
+        seen.add(key);
+        collected.push(category);
+      }
+    }
+
+    return collected.sort((left, right) =>
+      left.localeCompare(right, undefined, {
+        sensitivity: "base",
+      }),
+    );
+  }, [contacts]);
+
   const relatedNameOptions = useMemo(() => {
     const activeContactId = normalizePositiveInt(form.id);
 
@@ -205,6 +237,13 @@ export default function useContactsPageState({
           contact.nickname,
           contact.maiden_name,
         ].some(searchValueIncludesQuery)
+      ) {
+        return true;
+      }
+
+      if (
+        Array.isArray(contact.categories) &&
+        contact.categories.some(searchValueIncludesQuery)
       ) {
         return true;
       }
@@ -685,6 +724,7 @@ export default function useContactsPageState({
     setForm,
     photoConstraints,
     labelOptions,
+    categoryOptions,
     relatedNameOptions,
     saveContact,
     removeContact,

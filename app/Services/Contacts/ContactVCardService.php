@@ -437,6 +437,12 @@ class ContactVCardService
         $this->addSimpleProperty($vCard, 'X-DAVVY-TEXT-TONE', $payload['text_tone'] ?? null);
         $this->addSimpleProperty($vCard, 'X-DAVVY-VERIFICATION-CODE', $payload['verification_code'] ?? null);
         $this->addSimpleProperty($vCard, 'X-DAVVY-PROFILE', $payload['profile'] ?? null);
+
+        $categories = $this->normalizedCategories($payload['categories'] ?? []);
+        if ($categories !== []) {
+            $vCard->add('CATEGORIES', $categories);
+        }
+
         $this->addSimpleProperty(
             $vCard,
             'X-DAVVY-HEAD-OF-HOUSEHOLD',
@@ -530,6 +536,19 @@ class ContactVCardService
             $payload['company'] = $this->cleanString($orgParts[0] ?? null);
             $payload['department'] = $this->cleanString($orgParts[1] ?? null);
         }
+
+        $categories = [];
+        foreach ($component->select('CATEGORIES') as $property) {
+            foreach ($this->propertyParts($property) as $part) {
+                $category = $this->cleanString($part);
+                if ($category === null) {
+                    continue;
+                }
+
+                $categories[] = $category;
+            }
+        }
+        $payload['categories'] = $this->normalizedCategories($categories);
 
         $birthday = $this->parseDateParts($this->firstPropertyValue($component, 'BDAY'));
         if ($birthday !== null) {
@@ -900,6 +919,7 @@ class ContactVCardService
             'profile' => null,
             'head_of_household' => false,
             'exclude_milestone_calendars' => false,
+            'categories' => [],
             'birthday' => [],
             'phones' => [],
             'emails' => [],
@@ -1438,5 +1458,37 @@ class ContactVCardService
         }
 
         return false;
+    }
+
+    /**
+     * Returns normalized categories with case-insensitive dedupe.
+     *
+     * @return array<int, string>
+     */
+    private function normalizedCategories(mixed $values): array
+    {
+        if (! is_array($values)) {
+            return [];
+        }
+
+        $normalized = [];
+        $seen = [];
+
+        foreach ($values as $value) {
+            $category = $this->cleanString($value);
+            if ($category === null) {
+                continue;
+            }
+
+            $key = strtolower($category);
+            if (isset($seen[$key])) {
+                continue;
+            }
+
+            $seen[$key] = true;
+            $normalized[] = $category;
+        }
+
+        return $normalized;
     }
 }

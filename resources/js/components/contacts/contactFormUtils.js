@@ -246,6 +246,8 @@ export function deriveContactSectionOpenState(form) {
     hasTextValue(form.profile) ||
     form.head_of_household === true ||
     form.exclude_milestone_calendars === true ||
+    (Array.isArray(form.categories) &&
+      form.categories.some((value) => hasTextValue(value))) ||
     hasTextValue(form.birthday?.month) ||
     hasTextValue(form.birthday?.day) ||
     hasTextValue(form.birthday?.year) ||
@@ -416,6 +418,7 @@ export function createEmptyContactForm(defaultAddressBookIds = []) {
     profile: "",
     head_of_household: false,
     exclude_milestone_calendars: false,
+    categories: [],
     birthday: { year: "", month: "", day: "" },
     phones: [createEmptyLabeledValue("mobile")],
     emails: [createEmptyLabeledValue("home")],
@@ -538,6 +541,11 @@ export function hydrateContactForm(contact, defaultAddressBookIds = []) {
     profile: contact.profile ?? "",
     head_of_household: !!contact.head_of_household,
     exclude_milestone_calendars: !!contact.exclude_milestone_calendars,
+    categories: Array.isArray(contact.categories)
+      ? contact.categories
+          .map((value) => String(value ?? "").trim())
+          .filter((value) => value !== "")
+      : [],
     birthday: datePartsToFormValue(contact.birthday),
     phones: nonEmptyRows(contact.phones, () =>
       createEmptyLabeledValue("mobile"),
