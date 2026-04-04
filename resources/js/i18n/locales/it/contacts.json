@@ -312,6 +312,12 @@
         "read": "Impossibile leggere l’immagine selezionata.",
         "upload": "Impossibile caricare la foto del contatto."
       }
+    },
+    "categoryTagEditor": {
+      "title": "Categories",
+      "empty": "No categories yet.",
+      "placeholder": "Add category",
+      "removeAria": "Remove {{category}}"
     }
   },
   "states": {

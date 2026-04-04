@@ -1,5 +1,6 @@
 import React from "react";
 import AddressEditorComponent from "../components/contacts/AddressEditor";
+import CategoryTagEditorComponent from "../components/contacts/CategoryTagEditor";
 import ContactEditorHideFieldModalComponent from "../components/contacts/ContactEditorHideFieldModal";
 import ContactEditorPanelComponent from "../components/contacts/ContactEditorPanel";
 import ContactsListSidebarComponent from "../components/contacts/ContactsListSidebar";
@@ -156,6 +157,16 @@ function DateEditor({ rows, setRows, labelOptions }) {
   );
 }
 
+function CategoryTagEditor({ categories, onChange, suggestions }) {
+  return (
+    <CategoryTagEditorComponent
+      categories={categories}
+      onChange={onChange}
+      suggestions={suggestions}
+    />
+  );
+}
+
 function ContactEditorPanel(props) {
   return <ContactEditorPanelComponent {...props} />;
 }
@@ -209,6 +220,7 @@ export default function ContactsPageRoute({ auth, theme }) {
       LabeledValueEditor={LabeledValueEditor}
       AddressEditor={AddressEditor}
       RelatedNameEditor={RelatedNameEditor}
+      CategoryTagEditor={CategoryTagEditor}
       Field={Field}
     />
   );

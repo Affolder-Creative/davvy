@@ -73,6 +73,7 @@ function createEmptyContactForm(addressBookIds = []) {
     birthday: { month: "", day: "", year: "" },
     dates: [],
     related_names: [],
+    categories: [],
     phones: [],
     emails: [],
     urls: [],
@@ -189,6 +190,7 @@ function buildProps(overrides = {}) {
     LabeledValueEditor: noopComponent,
     AddressEditor: noopComponent,
     RelatedNameEditor: noopComponent,
+    CategoryTagEditor: noopComponent,
     Field: FieldStub,
     ...overrides,
   };

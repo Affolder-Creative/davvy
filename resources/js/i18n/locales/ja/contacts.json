@@ -312,6 +312,12 @@
         "read": "選択した画像を読み込めませんでした。",
         "upload": "連絡先写真をアップロードできませんでした。"
       }
+    },
+    "categoryTagEditor": {
+      "title": "Categories",
+      "empty": "No categories yet.",
+      "placeholder": "Add category",
+      "removeAria": "Remove {{category}}"
     }
   },
   "states": {

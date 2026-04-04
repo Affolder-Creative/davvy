@@ -71,6 +71,7 @@ function buildProps(overrides = {}) {
     LabeledValueEditor: noopComponent("LabeledValueEditor"),
     AddressEditor: noopComponent("AddressEditor"),
     RelatedNameEditor: noopComponent("RelatedNameEditor"),
+    CategoryTagEditor: noopComponent("CategoryTagEditor"),
     labelOptions: {
       phones: [],
       emails: [],
@@ -80,6 +81,7 @@ function buildProps(overrides = {}) {
       related_names: [],
       instant_messages: [],
     },
+    categoryOptions: [],
     relatedNameOptions: [],
     setForm: vi.fn(),
     hiddenOptionalFields: [{ id: "nickname", label: "Nickname" }],

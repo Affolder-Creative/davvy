@@ -39,7 +39,9 @@ export default function ContactEditorPanel({
   LabeledValueEditor,
   AddressEditor,
   RelatedNameEditor,
+  CategoryTagEditor,
   labelOptions,
+  categoryOptions,
   relatedNameOptions,
   setForm,
   hiddenOptionalFields,
@@ -150,6 +152,8 @@ export default function ContactEditorPanel({
           DateEditor={DateEditor}
           labelOptions={labelOptions}
           RelatedNameEditor={RelatedNameEditor}
+          CategoryTagEditor={CategoryTagEditor}
+          categoryOptions={categoryOptions}
           relatedNameOptions={relatedNameOptions}
           setForm={setForm}
         />

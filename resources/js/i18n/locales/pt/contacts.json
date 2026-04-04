@@ -312,6 +312,12 @@
         "read": "Não foi possível ler a imagem selecionada.",
         "upload": "Não foi possível enviar a foto do contato."
       }
+    },
+    "categoryTagEditor": {
+      "title": "Categories",
+      "empty": "No categories yet.",
+      "placeholder": "Add category",
+      "removeAria": "Remove {{category}}"
     }
   },
   "states": {

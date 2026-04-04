@@ -146,6 +146,46 @@ class ContactManagementTest extends TestCase
         $this->assertSame($beforeModifiedCount, $afterModifiedCount);
     }
 
+    public function test_contact_categories_are_normalized_and_written_to_vcard_payloads(): void
+    {
+        $user = User::factory()->create();
+        $book = AddressBook::factory()->create(['owner_id' => $user->id, 'uri' => 'category-book']);
+
+        $created = $this->actingAs($user)->postJson('/api/contacts', $this->payload([
+            'address_book_ids' => [$book->id],
+            'categories' => [' Family ', '', 'family', 'Vendors'],
+        ]));
+        $created->assertCreated()
+            ->assertJsonPath('categories.0', 'Family')
+            ->assertJsonPath('categories.1', 'Vendors');
+
+        $contactId = (int) $created->json('id');
+        $uid = (string) $created->json('uid');
+
+        $contact = Contact::query()->findOrFail($contactId);
+        $this->assertSame(['Family', 'Vendors'], $contact->payload['categories'] ?? []);
+
+        $card = Card::query()
+            ->where('address_book_id', $book->id)
+            ->where('uid', $uid)
+            ->firstOrFail();
+        $this->assertStringContainsString('CATEGORIES:Family,Vendors', (string) $card->data);
+
+        $this->actingAs($user)->patchJson('/api/contacts/'.$contactId, $this->payload([
+            'address_book_ids' => [$book->id],
+            'categories' => ['vendors', 'Family', 'FAMILY', ''],
+        ]))
+            ->assertOk()
+            ->assertJsonPath('categories.0', 'vendors')
+            ->assertJsonPath('categories.1', 'Family');
+
+        $contact->refresh();
+        $this->assertSame(['vendors', 'Family'], $contact->payload['categories'] ?? []);
+
+        $card->refresh();
+        $this->assertStringContainsString('CATEGORIES:vendors,Family', (string) $card->data);
+    }
+
     public function test_related_name_can_link_to_existing_contact_by_id(): void
     {
         $user = User::factory()->create();
