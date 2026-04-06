@@ -179,12 +179,12 @@ export default function RelatedNameEditor({
 
   return (
     <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
           {t("editor.relatedNameEditor.title")}
         </h3>
         <button
-          className="btn-outline btn-outline-sm"
+          className="btn-outline btn-outline-sm self-start whitespace-nowrap !px-2 !py-0.5 text-[11px] sm:!px-2.5 sm:!py-1 sm:text-xs"
           type="button"
           onClick={addRow}
         >
