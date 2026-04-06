@@ -31,7 +31,7 @@ export default function RowReorderControls({
     "btn-outline btn-outline-sm !h-8 !w-8 !px-0 !py-0 hidden group-hover/row:inline-flex group-focus-within/row:inline-flex";
 
   return (
-    <div className="flex items-center justify-end gap-1.5">
+    <div className="flex items-center justify-end gap-0 sm:gap-1.5">
       {showActions ? (
         <>
           <button
@@ -83,7 +83,7 @@ export default function RowReorderControls({
             </svg>
           </button>
           <button
-            className="btn-outline btn-outline-sm inline-flex items-center gap-1.5"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-transparent bg-transparent p-0 text-app-dim transition hover:text-app-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 sm:h-auto sm:w-auto sm:rounded-xl sm:border-app-edge sm:bg-app-surface sm:px-2.5 sm:py-1 sm:text-xs sm:font-semibold sm:text-app-base"
             type="button"
             onClick={() => onRemove(rowIndex)}
             aria-label={t("editor.rowReorderControls.removeAria", {

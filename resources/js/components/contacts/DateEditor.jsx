@@ -191,7 +191,7 @@ export default function DateEditor({
                   />
                 </div>
                 <button
-                  className="btn-outline btn-outline-sm inline-flex items-center gap-1.5"
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-transparent bg-transparent p-0 text-app-dim transition hover:text-app-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 sm:h-auto sm:w-auto sm:rounded-xl sm:border sm:border-app-edge sm:bg-app-surface sm:px-2.5 sm:py-1 sm:text-xs sm:font-semibold sm:text-app-base"
                   type="button"
                   onClick={() => removeRow(index)}
                   aria-label={t("editor.dateEditor.remove")}
