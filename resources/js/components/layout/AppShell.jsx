@@ -131,16 +131,16 @@ export default function AppShell({
             </div>
           </div>
           <nav className="flex w-full flex-col gap-3 md:w-auto md:items-end">
-            <div className="order-1 flex w-full items-center gap-2 overflow-x-auto pb-1 md:order-2 md:w-auto md:justify-end md:overflow-visible md:pb-0">
+            <div className="order-1 flex w-full flex-wrap items-stretch gap-2 md:order-2 md:w-auto md:flex-nowrap md:justify-end">
               <Link
-                className={`${location.pathname === "/" ? "tab tab-active" : "tab"} shrink-0`}
+                className={`${location.pathname === "/" ? "tab tab-active" : "tab"} min-w-0 flex-1 text-center md:flex-none`}
                 to="/"
               >
                 {t("tabs.dashboard")}
               </Link>
               {auth.contactManagementEnabled ? (
                 <Link
-                  className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} shrink-0`}
+                  className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} min-w-0 flex-1 text-center md:flex-none`}
                   to="/contacts"
                 >
                   {t("tabs.contacts")}
@@ -148,10 +148,10 @@ export default function AppShell({
               ) : null}
               {auth.contactChangeModerationEnabled ? (
                 <Link
-                  className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex shrink-0 items-center gap-1.5`}
+                  className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 md:flex-none`}
                   to="/review-queue"
                 >
-                  <span>{t("tabs.reviewQueue")}</span>
+                  <span className="truncate">{t("tabs.reviewQueue")}</span>
                   {reviewQueueCount > 0 ? (
                     <span className="rounded-full border border-app-accent-edge bg-app-surface px-2 py-0.5 text-[10px] font-semibold leading-none text-app-accent">
                       {reviewQueueCountLabel}

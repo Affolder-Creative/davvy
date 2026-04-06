@@ -168,8 +168,8 @@ export default function AddressBookMilestoneControls({
         }
         key={type}
       >
-        <div className="flex items-center gap-2">
-          <label className="inline-flex shrink-0 items-center gap-2 text-xs font-semibold text-app-base">
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="inline-flex min-w-0 flex-1 items-center gap-2 text-xs font-semibold text-app-base sm:shrink-0 sm:flex-none">
             <input
               type="checkbox"
               checked={!!settings.enabled}
@@ -187,9 +187,9 @@ export default function AddressBookMilestoneControls({
             {label}
           </label>
           {isEditing ? (
-            <div className="min-w-0 flex flex-1 items-center gap-1.5">
+            <div className="min-w-0 flex w-full flex-1 items-center gap-1.5 sm:w-auto">
               <input
-                className="input h-7 min-w-[9rem] flex-1 px-2 py-1 text-sm"
+                className="input h-7 min-w-0 flex-1 px-2 py-1 text-sm sm:min-w-[9rem]"
                 value={nameDrafts[type] ?? ""}
                 onChange={(event) =>
                   setNameDrafts((prev) => ({

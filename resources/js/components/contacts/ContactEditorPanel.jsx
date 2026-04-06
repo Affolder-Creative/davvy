@@ -66,7 +66,7 @@ export default function ContactEditorPanel({
     !hasRequiredContactIdentity;
 
   return (
-    <section className="surface rounded-3xl p-6">
+    <section className="surface min-w-0 rounded-3xl p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-app-strong">
@@ -76,10 +76,10 @@ export default function ContactEditorPanel({
             {t("editor.description")}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           {form.id ? (
             <button
-              className="btn-outline btn-outline-sm text-app-danger"
+              className="btn-outline btn-outline-sm w-full text-app-danger sm:w-auto"
               type="button"
               onClick={removeContact}
               disabled={submitting}
@@ -88,7 +88,7 @@ export default function ContactEditorPanel({
             </button>
           ) : null}
           <button
-            className="btn"
+            className="btn w-full sm:w-auto"
             type="submit"
             form="contact-editor"
             disabled={saveDisabled}
@@ -194,7 +194,7 @@ export default function ContactEditorPanel({
         />
 
         <section className="sticky bottom-2 z-20 sm:bottom-3">
-          <div className="surface flex items-center justify-end gap-1.5 rounded-xl px-2.5 py-1.5 shadow-lg shadow-black/10 sm:gap-2 sm:rounded-2xl sm:px-3 sm:py-2">
+          <div className="surface flex w-full max-w-full flex-wrap items-center justify-end gap-1.5 rounded-xl px-2.5 py-1.5 shadow-lg shadow-black/10 sm:gap-2 sm:rounded-2xl sm:px-3 sm:py-2">
             {form.id ? (
               <button
                 className="btn-outline btn-outline-sm text-app-danger"

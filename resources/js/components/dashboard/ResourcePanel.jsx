@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -35,8 +35,36 @@ export default function ResourcePanel({
   const [nameDraft, setNameDraft] = useState("");
   const [renamingItemId, setRenamingItemId] = useState(null);
   const [deletingItemId, setDeletingItemId] = useState(null);
+  const [mobileActionsItemId, setMobileActionsItemId] = useState(null);
+  const mobileActionsRef = useRef(null);
+
+  const closeMobileActions = () => {
+    setMobileActionsItemId(null);
+  };
+
+  useEffect(() => {
+    if (mobileActionsItemId === null) {
+      return undefined;
+    }
+
+    const closeOnOutsidePointerDown = (event) => {
+      if (
+        mobileActionsRef.current &&
+        !mobileActionsRef.current.contains(event.target)
+      ) {
+        closeMobileActions();
+      }
+    };
+
+    window.addEventListener("pointerdown", closeOnOutsidePointerDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", closeOnOutsidePointerDown);
+    };
+  }, [mobileActionsItemId]);
 
   const startEditing = (item) => {
+    closeMobileActions();
     setEditingItemId(item.id);
     setNameDraft(item.display_name ?? "");
   };
@@ -76,6 +104,7 @@ export default function ResourcePanel({
       return;
     }
 
+    closeMobileActions();
     setDeletingItemId(item.id);
     try {
       await onDelete(item);
@@ -88,10 +117,10 @@ export default function ResourcePanel({
 
   return (
     <section className="surface rounded-3xl p-6">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-app-strong">{title}</h2>
         <button
-          className="btn-outline btn-outline-sm"
+          className="btn-outline btn-outline-sm w-full sm:w-auto"
           type="button"
           onClick={() => void onExportAll()}
         >
@@ -137,7 +166,7 @@ export default function ResourcePanel({
                 renderOwnedItemExtra ? "px-3 pb-2 pt-3" : "p-3"
               }`}
             >
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   {editingItemId === item.id ? (
                     <form
@@ -180,7 +209,7 @@ export default function ResourcePanel({
                           {t("resourcePanel.default")}
                         </span>
                       ) : null}
-                      <div className="flex items-center gap-1">
+                      <div className="hidden items-center gap-1 sm:flex">
                         <button
                           className="inline-flex h-5 w-5 items-center justify-center rounded text-app-dim transition hover:text-app-accent-strong focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                           type="button"
@@ -219,7 +248,7 @@ export default function ResourcePanel({
                     resourceUri={item.uri}
                   />
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="hidden items-center gap-4 sm:flex">
                   <button
                     className="btn-outline btn-outline-sm rounded-xl"
                     type="button"
@@ -248,6 +277,107 @@ export default function ResourcePanel({
                     {t("resourcePanel.sharable")}
                   </label>
                 </div>
+                {editingItemId !== item.id ? (
+                  <div
+                    className="relative sm:hidden"
+                    ref={mobileActionsItemId === item.id ? mobileActionsRef : null}
+                  >
+                    <button
+                      className="btn-outline btn-outline-sm rounded-xl !px-2.5"
+                      type="button"
+                      onClick={() =>
+                        setMobileActionsItemId((current) =>
+                          current === item.id ? null : item.id,
+                        )
+                      }
+                      aria-expanded={mobileActionsItemId === item.id}
+                      aria-label={t("resourcePanel.actionsFor", {
+                        name: item.display_name,
+                      })}
+                      title={t("resourcePanel.actionsFor", {
+                        name: item.display_name,
+                      })}
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <circle cx="5" cy="12" r="1.75" />
+                        <circle cx="12" cy="12" r="1.75" />
+                        <circle cx="19" cy="12" r="1.75" />
+                      </svg>
+                    </button>
+                    {mobileActionsItemId === item.id ? (
+                      <div className="absolute right-0 top-full z-20 mt-2 w-40 rounded-xl border border-app-edge bg-app-surface p-1.5 shadow-lg backdrop-blur">
+                        <button
+                          className="btn-outline btn-outline-sm w-full justify-start gap-2 rounded-lg !px-2.5 !py-1.5"
+                          type="button"
+                          onClick={() => {
+                            closeMobileActions();
+                            void onExportItem(item);
+                          }}
+                          aria-label={t("resourcePanel.exportItem", {
+                            name: item.display_name,
+                          })}
+                          title={t("resourcePanel.exportItem", {
+                            name: item.display_name,
+                          })}
+                        >
+                          <DownloadIcon className="h-3.5 w-3.5" />
+                          <span>{t("resourcePanel.export")}</span>
+                        </button>
+                        <button
+                          className="btn-outline btn-outline-sm mt-1 w-full justify-start gap-2 rounded-lg !px-2.5 !py-1.5"
+                          type="button"
+                          onClick={() => startEditing(item)}
+                          aria-label={t("resourcePanel.editNameFor", {
+                            name: item.display_name,
+                          })}
+                          title={t("resourcePanel.editNameFor", {
+                            name: item.display_name,
+                          })}
+                        >
+                          <PencilIcon className="h-3.5 w-3.5" />
+                          <span>{t("resourcePanel.rename")}</span>
+                        </button>
+                        {!item.is_default && onDelete && TrashIcon ? (
+                          <button
+                            className="btn-outline btn-outline-sm mt-1 w-full justify-start gap-2 rounded-lg !px-2.5 !py-1.5 text-app-danger"
+                            type="button"
+                            onClick={() => void submitDelete(item)}
+                            disabled={deletingItemId === item.id}
+                            aria-label={t("resourcePanel.deleteResource", {
+                              name: item.display_name,
+                            })}
+                            title={t("resourcePanel.deleteResource", {
+                              name: item.display_name,
+                            })}
+                          >
+                            <TrashIcon className="h-3.5 w-3.5" />
+                            <span>{t("resourcePanel.delete")}</span>
+                          </button>
+                        ) : null}
+                        <label className="mt-1 flex items-center justify-between gap-2 rounded-lg border border-app-edge bg-app-surface px-2.5 py-1.5 text-xs font-semibold text-app-base">
+                          <span>{t("resourcePanel.sharable")}</span>
+                          <input
+                            type="checkbox"
+                            checked={!!item.is_sharable}
+                            onChange={(event) => {
+                              onToggle(
+                                item.id,
+                                event.target.checked,
+                                item.display_name,
+                              );
+                              closeMobileActions();
+                            }}
+                          />
+                        </label>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
               </div>
               {renderOwnedItemExtra ? (
                 <div className="mt-1.5 border-t border-app-edge pt-1.5">
@@ -272,8 +402,8 @@ export default function ResourcePanel({
                 key={`${item.id}-${item.share_id}`}
                 className="rounded-xl border border-app-warn-edge bg-app-warn-surface p-3"
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
                     <p className="font-medium text-app-strong">
                       {item.display_name}
                     </p>
@@ -289,7 +419,7 @@ export default function ResourcePanel({
                       resourceUri={item.uri}
                     />
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
                     <button
                       className="btn-outline btn-outline-sm rounded-xl"
                       type="button"

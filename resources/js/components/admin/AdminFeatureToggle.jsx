@@ -12,7 +12,7 @@ export default function AdminFeatureToggle({ label, enabled, onClick }) {
   const { t } = useTranslation("admin");
   return (
     <button
-      className={`btn-outline inline-flex items-center gap-1.5 rounded-lg !px-2.5 !py-1.5 !text-sm ${
+      className={`btn-outline inline-flex w-full items-center justify-between gap-1.5 rounded-lg !px-2.5 !py-1.5 !text-sm sm:w-auto sm:justify-start ${
         enabled
           ? "border-app-accent-edge bg-app-surface text-app-strong ring-1 ring-teal-500/25 hover:border-app-accent-edge"
           : "border-app-edge bg-app-surface text-app-muted hover:border-app-edge"
@@ -29,7 +29,7 @@ export default function AdminFeatureToggle({ label, enabled, onClick }) {
             : "bg-zinc-400"
         }`}
       />
-      <span className="whitespace-nowrap text-sm">{label}</span>
+      <span className="min-w-0 text-left text-sm leading-tight">{label}</span>
       <span
         className={`rounded-full border px-1.5 py-0.5 text-[9px] leading-[12px] font-semibold uppercase tracking-wide ${
           enabled

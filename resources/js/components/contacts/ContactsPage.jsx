@@ -238,7 +238,9 @@ export default function ContactsPage({
           <div className="mt-4 grid gap-6 lg:mt-6 lg:grid-cols-[18rem_1fr]">
             <div
               className={
-                mobilePanel === "contacts" ? "block lg:block" : "hidden lg:block"
+                mobilePanel === "contacts"
+                  ? "min-w-0 block lg:block"
+                  : "min-w-0 hidden lg:block"
               }
             >
               <ContactsListSidebar
@@ -275,7 +277,9 @@ export default function ContactsPage({
 
             <div
               className={
-                mobilePanel === "editor" ? "block lg:block" : "hidden lg:block"
+                mobilePanel === "editor"
+                  ? "min-w-0 block lg:block"
+                  : "min-w-0 hidden lg:block"
               }
             >
               <ContactEditorPanel

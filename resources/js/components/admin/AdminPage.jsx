@@ -1387,8 +1387,8 @@ export default function AdminPage({
             </div>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
+          <div className="mt-3 flex flex-wrap items-stretch gap-2">
+            <span className="flex w-full max-w-full flex-wrap items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs sm:inline-flex sm:w-auto sm:flex-nowrap">
               <span className="text-app-faint">{t("backups.status")}</span>
               <span className="font-semibold text-app-strong">
                 {state.backupEnabled
@@ -1396,7 +1396,7 @@ export default function AdminPage({
                   : t("backups.disabled")}
               </span>
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
+            <span className="flex w-full max-w-full flex-wrap items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs sm:inline-flex sm:w-auto sm:flex-nowrap">
               <span className="text-app-faint">
                 {t("backups.destinations")}
               </span>
@@ -1404,13 +1404,13 @@ export default function AdminPage({
                 {backupDestinationSummary || t("backups.noDestinations")}
               </span>
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
+            <span className="flex w-full max-w-full flex-wrap items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs sm:inline-flex sm:w-auto sm:flex-nowrap">
               <span className="text-app-faint">{t("backups.schedule")}</span>
-              <span className="font-semibold text-app-strong">
+              <span className="break-all font-semibold text-app-strong sm:break-normal">
                 {backupScheduleSummary}
               </span>
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs">
+            <span className="flex w-full max-w-full flex-wrap items-center gap-1 rounded-full border border-app-edge bg-app-surface px-2.5 py-1 text-xs sm:inline-flex sm:w-auto sm:flex-nowrap">
               <span className="text-app-faint">{t("backups.retention")}</span>
               <span className="font-semibold text-app-strong">
                 {backupRetentionSummary}
