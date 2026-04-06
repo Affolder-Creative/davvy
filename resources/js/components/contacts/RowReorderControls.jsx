@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { TrashIcon } from "../icons/AppIcons";
 
 /**
  * Renders the Row Reorder Controls component.
@@ -82,7 +83,7 @@ export default function RowReorderControls({
             </svg>
           </button>
           <button
-            className="btn-outline btn-outline-sm"
+            className="btn-outline btn-outline-sm inline-flex items-center gap-1.5"
             type="button"
             onClick={() => onRemove(rowIndex)}
             aria-label={t("editor.rowReorderControls.removeAria", {
@@ -90,7 +91,10 @@ export default function RowReorderControls({
               rowNumber,
             })}
           >
-            {t("editor.rowReorderControls.remove")}
+            <TrashIcon className="h-3.5 w-3.5 sm:hidden" />
+            <span className="hidden sm:inline">
+              {t("editor.rowReorderControls.remove")}
+            </span>
           </button>
         </>
       ) : null}

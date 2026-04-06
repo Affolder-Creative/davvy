@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { TrashIcon } from "../icons/AppIcons";
 
 /**
  * Renders the Date Editor component.
@@ -190,11 +191,15 @@ export default function DateEditor({
                   />
                 </div>
                 <button
-                  className="btn-outline btn-outline-sm"
+                  className="btn-outline btn-outline-sm inline-flex items-center gap-1.5"
                   type="button"
                   onClick={() => removeRow(index)}
+                  aria-label={t("editor.dateEditor.remove")}
                 >
-                  {t("editor.dateEditor.remove")}
+                  <TrashIcon className="h-3.5 w-3.5 sm:hidden" />
+                  <span className="hidden sm:inline">
+                    {t("editor.dateEditor.remove")}
+                  </span>
                 </button>
               </div>
               {row.label === "custom" ? (
