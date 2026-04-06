@@ -131,16 +131,18 @@ export default function AppShell({
             </div>
           </div>
           <nav className="flex w-full flex-col gap-3 md:w-auto md:items-end">
-            <div className="order-1 flex w-full flex-wrap items-stretch gap-2 md:order-2 md:w-auto md:flex-nowrap md:justify-end">
+            <div className="order-1 grid w-full grid-cols-2 items-stretch gap-2 md:order-2 md:flex md:w-auto md:flex-nowrap md:justify-end">
               <Link
-                className={`${location.pathname === "/" ? "tab tab-active" : "tab"} min-w-0 flex-1 text-center md:flex-none`}
+                className={`${location.pathname === "/" ? "tab tab-active" : "tab"} ${
+                  auth.contactManagementEnabled ? "col-span-1" : "col-span-2"
+                } min-w-0 text-center md:col-auto md:flex-none`}
                 to="/"
               >
                 {t("tabs.dashboard")}
               </Link>
               {auth.contactManagementEnabled ? (
                 <Link
-                  className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} min-w-0 flex-1 text-center md:flex-none`}
+                  className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} col-span-1 min-w-0 text-center md:col-auto md:flex-none`}
                   to="/contacts"
                 >
                   {t("tabs.contacts")}
@@ -148,10 +150,12 @@ export default function AppShell({
               ) : null}
               {auth.contactChangeModerationEnabled ? (
                 <Link
-                  className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 md:flex-none`}
+                  className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex col-span-2 min-w-0 items-center justify-center gap-1.5 md:col-auto md:flex-none`}
                   to="/review-queue"
                 >
-                  <span className="truncate">{t("tabs.reviewQueue")}</span>
+                  <span className="text-center leading-tight">
+                    {t("tabs.reviewQueue")}
+                  </span>
                   {reviewQueueCount > 0 ? (
                     <span className="rounded-full border border-app-accent-edge bg-app-surface px-2 py-0.5 text-[10px] font-semibold leading-none text-app-accent">
                       {reviewQueueCountLabel}
