@@ -21,6 +21,8 @@ export default function AppShell({
   const location = useLocation();
   const onAdminPage = location.pathname === "/admin";
   const onReviewQueuePage = location.pathname === "/review-queue";
+  const onContactsPage = location.pathname === "/contacts";
+  const onProfilePage = location.pathname === "/profile";
   const [reviewQueueCount, setReviewQueueCount] = useState(0);
   const [mobileAccountMenuOpen, setMobileAccountMenuOpen] = useState(false);
   const [sponsorModalOpen, setSponsorModalOpen] = useState(false);
@@ -108,6 +110,16 @@ export default function AppShell({
 
   const reviewQueueCountLabel =
     reviewQueueCount > 99 ? "99+" : String(reviewQueueCount);
+  const mobileMenuCurrentLabel =
+    onAdminPage && auth.user.role === "admin"
+      ? t("admin.controlCenter")
+      : onProfilePage
+        ? t("tabs.profile")
+        : onReviewQueuePage && auth.contactChangeModerationEnabled
+          ? t("tabs.reviewQueue")
+          : onContactsPage && auth.contactManagementEnabled
+            ? t("tabs.contacts")
+            : t("tabs.dashboard");
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -161,6 +173,9 @@ export default function AppShell({
               ) : null}
             </div>
             <div className="order-2 md:hidden">
+              <label className="mb-1 block px-1 text-[11px] font-semibold uppercase tracking-wide text-app-faint">
+                {t("account.menuLabel")}
+              </label>
               <button
                 className="btn-outline w-full justify-between"
                 type="button"
@@ -168,7 +183,7 @@ export default function AppShell({
                 aria-expanded={mobileAccountMenuOpen}
                 aria-label={t("account.toggleMenu")}
               >
-                <span>{t("account.menuLabel")}</span>
+                <span>{mobileMenuCurrentLabel}</span>
                 <svg
                   aria-hidden="true"
                   className={`h-4 w-4 transition-transform ${
