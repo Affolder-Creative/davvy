@@ -19,29 +19,29 @@ export default function ContactEditorAddressBooksSection({
   return (
     <section className="rounded-2xl border border-app-edge bg-app-surface p-3">
       <button
-        className="flex w-full items-center justify-between gap-3 rounded-xl px-2 py-1 text-left"
+        className="flex w-full flex-col items-start gap-2 rounded-xl px-2 py-1 text-left sm:flex-row sm:items-center sm:justify-between"
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
       >
-        <span>
+        <span className="min-w-0">
           <span className="block text-sm font-semibold uppercase tracking-wide text-app-base">
             {t("editor.addressBooksSection.label")}
           </span>
-          <span className="block text-xs text-app-faint">
+          <span className="mt-0.5 block max-w-[32ch] text-xs leading-relaxed text-app-faint sm:max-w-none">
             {t("editor.addressBooksSection.description")}
           </span>
         </span>
-        <span className="flex items-center gap-2">
-          <span className="rounded-full border border-app-warn-edge bg-app-warn-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-base">
+        <span className="flex w-full items-center gap-2 sm:w-auto sm:shrink-0">
+          <span className="whitespace-nowrap rounded-full border border-app-warn-edge bg-app-warn-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-base">
             {t("editor.addressBooksSection.required")}
           </span>
-          <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-faint">
+          <span className="whitespace-nowrap rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-app-faint">
             {t("editor.addressBooksSection.totalSelected", {
               count: selectedAddressBookCount,
             })}
           </span>
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint">
+          <span className="ml-auto inline-flex h-6 w-6 items-center justify-center rounded-full border border-app-edge text-xs text-app-faint sm:ml-0">
             {isOpen ? "-" : "+"}
           </span>
         </span>
