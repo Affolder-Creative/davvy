@@ -131,18 +131,16 @@ export default function AppShell({
             </div>
           </div>
           <nav className="flex w-full flex-col gap-3 md:w-auto md:items-end">
-            <div className="order-1 grid w-full grid-cols-2 items-stretch gap-2 md:order-2 md:flex md:w-auto md:flex-nowrap md:justify-end">
+            <div className="order-1 hidden w-full items-stretch gap-2 md:order-2 md:flex md:w-auto md:flex-nowrap md:justify-end">
               <Link
-                className={`${location.pathname === "/" ? "tab tab-active" : "tab"} ${
-                  auth.contactManagementEnabled ? "col-span-1" : "col-span-2"
-                } min-w-0 text-center md:col-auto md:flex-none`}
+                className={`${location.pathname === "/" ? "tab tab-active" : "tab"} min-w-0 text-center md:flex-none`}
                 to="/"
               >
                 {t("tabs.dashboard")}
               </Link>
               {auth.contactManagementEnabled ? (
                 <Link
-                  className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} col-span-1 min-w-0 text-center md:col-auto md:flex-none`}
+                  className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} min-w-0 text-center md:flex-none`}
                   to="/contacts"
                 >
                   {t("tabs.contacts")}
@@ -150,12 +148,10 @@ export default function AppShell({
               ) : null}
               {auth.contactChangeModerationEnabled ? (
                 <Link
-                  className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex col-span-2 min-w-0 items-center justify-center gap-1.5 md:col-auto md:flex-none`}
+                  className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex min-w-0 items-center justify-center gap-1.5 md:flex-none`}
                   to="/review-queue"
                 >
-                  <span className="text-center leading-tight">
-                    {t("tabs.reviewQueue")}
-                  </span>
+                  <span>{t("tabs.reviewQueue")}</span>
                   {reviewQueueCount > 0 ? (
                     <span className="rounded-full border border-app-accent-edge bg-app-surface px-2 py-0.5 text-[10px] font-semibold leading-none text-app-accent">
                       {reviewQueueCountLabel}
@@ -172,7 +168,7 @@ export default function AppShell({
                 aria-expanded={mobileAccountMenuOpen}
                 aria-label={t("account.toggleMenu")}
               >
-                <span>{t("account.label")}</span>
+                <span>{t("account.menuLabel")}</span>
                 <svg
                   aria-hidden="true"
                   className={`h-4 w-4 transition-transform ${
@@ -190,6 +186,37 @@ export default function AppShell({
               </button>
               {mobileAccountMenuOpen ? (
                 <div className="mt-2 grid gap-2 rounded-2xl border border-app-edge bg-app-surface p-2">
+                  <Link
+                    className={`${location.pathname === "/" ? "tab tab-active" : "tab"} text-center`}
+                    to="/"
+                    onClick={() => setMobileAccountMenuOpen(false)}
+                  >
+                    {t("tabs.dashboard")}
+                  </Link>
+                  {auth.contactManagementEnabled ? (
+                    <Link
+                      className={`${location.pathname === "/contacts" ? "tab tab-active" : "tab"} text-center`}
+                      to="/contacts"
+                      onClick={() => setMobileAccountMenuOpen(false)}
+                    >
+                      {t("tabs.contacts")}
+                    </Link>
+                  ) : null}
+                  {auth.contactChangeModerationEnabled ? (
+                    <Link
+                      className={`${onReviewQueuePage ? "tab tab-active" : "tab"} inline-flex items-center justify-center gap-1.5`}
+                      to="/review-queue"
+                      onClick={() => setMobileAccountMenuOpen(false)}
+                    >
+                      <span>{t("tabs.reviewQueue")}</span>
+                      {reviewQueueCount > 0 ? (
+                        <span className="rounded-full border border-app-accent-edge bg-app-surface px-2 py-0.5 text-[10px] font-semibold leading-none text-app-accent">
+                          {reviewQueueCountLabel}
+                        </span>
+                      ) : null}
+                    </Link>
+                  ) : null}
+                  <div className="my-0.5 border-t border-app-edge" />
                   <Link
                     className={`${location.pathname === "/profile" ? "tab tab-active" : "tab"} inline-flex items-center justify-between gap-2`}
                     to="/profile"

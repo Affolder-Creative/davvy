@@ -7,7 +7,8 @@
   },
   "account": {
     "label": "Cuenta",
-    "toggleMenu": "Alternar menú de cuenta"
+    "menuLabel": "Menú",
+    "toggleMenu": "Alternar menú"
   },
   "admin": {
     "controlCenter": "Centro de control de admin",

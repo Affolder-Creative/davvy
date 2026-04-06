@@ -7,7 +7,8 @@
   },
   "account": {
     "label": "アカウント",
-    "toggleMenu": "アカウントメニューの切り替え"
+    "menuLabel": "メニュー",
+    "toggleMenu": "メニューの切り替え"
   },
   "admin": {
     "controlCenter": "管理者コントロールセンター",
