@@ -89,6 +89,7 @@ It is designed for:
 - [Deployment Guide](docs/deployment.md)
 - [Release Checklist (Core)](docs/release-checklist-core.md)
 - [Troubleshooting](docs/troubleshooting.md)
+- [Mobile Sync + Review Queue Test Script](docs/mobile-sync-review-queue-test-script.md)
 - [Release Checklist (Railway)](docs/release-checklist.md)
 - [Release Checklist (Coolify)](docs/release-checklist-coolify.md)
 

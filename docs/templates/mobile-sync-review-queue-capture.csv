@@ -1,0 +1,6 @@
+Timestamp,Device + OS + App,User,Test Case,Action Performed,Queue State,Owner Final Value,Editor Final Value,Observer Final Value,Result (Pass/Fail),Notes
+2026-04-09 10:00,iOS 17.4 Apple Contacts,owner_admin,Setup,Validated baseline contact and event,none,Phone:+1 317-555-0111 Email:rq-test-person@example.test,Phone:+1 317-555-0111 Email:rq-test-person@example.test,Phone:+1 317-555-0111 Email:rq-test-person@example.test,Pass,
+2026-04-09 10:05,Android 14 DAVx5 + Google Contacts,editor_mobile,TC1 Contact Update -> Approve,Changed phone to +1 317-555-0222,pending then applied,Phone:+1 317-555-0222,Phone:+1 317-555-0222,Phone:+1 317-555-0222,Pass,
+2026-04-09 10:12,Android 14 DAVx5 + Google Contacts,editor_mobile,TC2 Contact Update -> Deny,Changed email to rq-denied-change@example.test,pending then denied,Email:rq-test-person@example.test,Email:rq-denied-change@example.test (local unsynced),Email:rq-test-person@example.test,Pass,Record local-device post-deny behavior
+2026-04-09 10:20,Android 14 DAVx5 + Google Contacts,editor_mobile,TC3 Contact Delete -> Approve,Deleted contact,pending then applied,Contact missing,Contact missing,Contact missing,Pass,
+2026-04-09 10:28,Android 14 DAVx5 + Google Calendar,editor_mobile,TC4 Calendar Edit Control,Edited event title,none,Title updated,Title updated,Title updated,Pass,No review queue row expected for calendar edit

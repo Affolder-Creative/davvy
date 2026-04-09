@@ -21,6 +21,7 @@ Start here to find the right Davvy guide quickly.
   - [Release Checklist (Coolify)](./release-checklist-coolify.md)
 - Diagnose operational issues:
   - [Troubleshooting](./troubleshooting.md)
+  - [Mobile Sync + Review Queue Test Script](./mobile-sync-review-queue-test-script.md)
 
 ## Read by Role
 
@@ -32,6 +33,7 @@ Start here to find the right Davvy guide quickly.
   - [Configuration Reference](./configuration.md)
   - [Release Checklist (Core)](./release-checklist-core.md)
   - [Troubleshooting](./troubleshooting.md)
+  - [Mobile Sync + Review Queue Test Script](./mobile-sync-review-queue-test-script.md)
 - Integrators / developers:
   - [API Reference](./api.md)
   - [Localization Guide](./localization.md)

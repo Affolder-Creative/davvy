@@ -2,13 +2,26 @@
 
 use App\Mail\AdminUserInviteMail;
 use App\Mail\PublicRegistrationVerificationMail;
+use App\Enums\Role;
+use App\Enums\SharePermission;
+use App\Enums\ShareResourceType;
+use App\Models\AddressBook;
 use App\Models\AddressBookContactMilestoneCalendar;
+use App\Models\Calendar;
+use App\Models\CalendarObject;
+use App\Models\Card;
+use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\Backups\BackupRestoreService;
 use App\Services\Backups\BackupService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
 use App\Services\Contacts\ContactPhotoMetricsService;
 use App\Services\Contacts\ContactPhotoService;
+use App\Services\Dav\Backends\LaravelCalendarBackend;
+use App\Services\Dav\Backends\LaravelCardDavBackend;
+use App\Services\Dav\DavSyncService;
+use App\Services\DavRequestContext;
+use App\Services\RegistrationSettingsService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +32,316 @@ use Illuminate\Support\Str;
 Artisan::command('app:about', function (): void {
     $this->comment('Davvy MVP - Laravel + SabreDAV');
 });
+
+Artisan::command(
+    'app:qa:seed-mobile-review-queue
+    {--owner-name=Owner Admin : Name for owner admin account}
+    {--owner-email=owner_admin@example.test : Email for owner admin account}
+    {--owner-password=OwnerTemp!234 : Password for owner admin account}
+    {--editor-name=Editor Mobile : Name for editor account}
+    {--editor-email=editor_mobile@example.test : Email for editor account}
+    {--editor-password=EditorTemp!234 : Password for editor account}
+    {--observer-name=Observer Mobile : Name for observer account}
+    {--observer-email=observer_mobile@example.test : Email for observer account}
+    {--observer-password=ObserverTemp!234 : Password for observer account}
+    {--observer-permission=read_only : Share permission for observer (read_only|editor)}
+    {--force : Apply changes without confirmation}',
+    function (): int {
+        $requiredTables = [
+            'users',
+            'address_books',
+            'calendars',
+            'resource_shares',
+            'cards',
+            'calendar_objects',
+            'app_settings',
+            'contacts',
+            'contact_address_book_assignments',
+        ];
+
+        foreach ($requiredTables as $table) {
+            if (! Schema::hasTable($table)) {
+                $this->error(sprintf('Required table "%s" is missing. Run migrations first.', $table));
+
+                return 1;
+            }
+        }
+
+        $observerPermissionRaw = Str::lower(trim((string) $this->option('observer-permission')));
+        if (! in_array($observerPermissionRaw, [SharePermission::ReadOnly->value, SharePermission::Editor->value], true)) {
+            $this->error('--observer-permission must be either "read_only" or "editor".');
+
+            return 1;
+        }
+
+        $ownerName = trim((string) $this->option('owner-name'));
+        $ownerEmail = Str::lower(trim((string) $this->option('owner-email')));
+        $ownerPassword = (string) $this->option('owner-password');
+
+        $editorName = trim((string) $this->option('editor-name'));
+        $editorEmail = Str::lower(trim((string) $this->option('editor-email')));
+        $editorPassword = (string) $this->option('editor-password');
+
+        $observerName = trim((string) $this->option('observer-name'));
+        $observerEmail = Str::lower(trim((string) $this->option('observer-email')));
+        $observerPassword = (string) $this->option('observer-password');
+
+        if (
+            $ownerName === '' || $ownerEmail === '' || $ownerPassword === ''
+            || $editorName === '' || $editorEmail === '' || $editorPassword === ''
+            || $observerName === '' || $observerEmail === '' || $observerPassword === ''
+        ) {
+            $this->error('Names, emails, and passwords for owner/editor/observer must not be empty.');
+
+            return 1;
+        }
+
+        if (! (bool) $this->option('force')) {
+            $this->line('This command will create or update QA fixture users and shared resources:');
+            $this->line(sprintf('  owner admin: %s', $ownerEmail));
+            $this->line(sprintf('  editor:      %s', $editorEmail));
+            $this->line(sprintf('  observer:    %s (%s)', $observerEmail, $observerPermissionRaw));
+            $this->line('  address book URI: rq-shared-contacts');
+            $this->line('  calendar URI:     rq-shared-calendar');
+            $this->line('  contact card URI: rq-test-person.vcf');
+            $this->line('  event object URI: rq-calendar-control-event.ics');
+            if (! $this->confirm('Proceed with seeding/updating this fixture?', false)) {
+                $this->warn('Aborted.');
+
+                return 1;
+            }
+        }
+
+        $owner = User::query()->firstOrNew(['email' => $ownerEmail]);
+        $owner->name = $ownerName;
+        $owner->password = $ownerPassword;
+        $owner->role = Role::Admin;
+        $owner->is_approved = true;
+        $owner->approved_at = now();
+        $owner->approved_by = null;
+        if ($owner->email_verified_at === null) {
+            $owner->email_verified_at = now();
+        }
+        $owner->save();
+
+        $editor = User::query()->firstOrNew(['email' => $editorEmail]);
+        $editor->name = $editorName;
+        $editor->password = $editorPassword;
+        $editor->role = Role::Regular;
+        $editor->is_approved = true;
+        $editor->approved_at = now();
+        $editor->approved_by = $owner->id;
+        if ($editor->email_verified_at === null) {
+            $editor->email_verified_at = now();
+        }
+        $editor->save();
+
+        $observer = User::query()->firstOrNew(['email' => $observerEmail]);
+        $observer->name = $observerName;
+        $observer->password = $observerPassword;
+        $observer->role = Role::Regular;
+        $observer->is_approved = true;
+        $observer->approved_at = now();
+        $observer->approved_by = $owner->id;
+        if ($observer->email_verified_at === null) {
+            $observer->email_verified_at = now();
+        }
+        $observer->save();
+
+        /** @var RegistrationSettingsService $settings */
+        $settings = app(RegistrationSettingsService::class);
+        $settings->setOwnerShareManagementEnabled(true, $owner);
+        $settings->setContactManagementEnabled(true, $owner);
+        $settings->setContactChangeModerationEnabled(true, $owner);
+
+        $addressBook = AddressBook::query()->firstOrCreate(
+            [
+                'owner_id' => $owner->id,
+                'uri' => 'rq-shared-contacts',
+            ],
+            [
+                'display_name' => 'RQ Shared Contacts',
+                'description' => 'QA fixture address book for mobile review queue verification.',
+                'is_default' => false,
+                'is_sharable' => true,
+            ],
+        );
+        $addressBook->update([
+            'display_name' => 'RQ Shared Contacts',
+            'description' => 'QA fixture address book for mobile review queue verification.',
+            'is_sharable' => true,
+        ]);
+
+        $calendar = Calendar::query()->firstOrCreate(
+            [
+                'owner_id' => $owner->id,
+                'uri' => 'rq-shared-calendar',
+            ],
+            [
+                'display_name' => 'RQ Shared Calendar',
+                'description' => 'QA fixture calendar for mobile review queue verification.',
+                'is_default' => false,
+                'is_sharable' => true,
+            ],
+        );
+        $calendar->update([
+            'display_name' => 'RQ Shared Calendar',
+            'description' => 'QA fixture calendar for mobile review queue verification.',
+            'is_sharable' => true,
+        ]);
+
+        /** @var DavSyncService $syncService */
+        $syncService = app(DavSyncService::class);
+        $syncService->ensureResource(ShareResourceType::AddressBook, (int) $addressBook->id);
+        $syncService->ensureResource(ShareResourceType::Calendar, (int) $calendar->id);
+
+        ResourceShare::query()->updateOrCreate(
+            [
+                'resource_type' => ShareResourceType::AddressBook,
+                'resource_id' => $addressBook->id,
+                'shared_with_id' => $editor->id,
+            ],
+            [
+                'owner_id' => $owner->id,
+                'permission' => SharePermission::Editor,
+            ],
+        );
+        ResourceShare::query()->updateOrCreate(
+            [
+                'resource_type' => ShareResourceType::Calendar,
+                'resource_id' => $calendar->id,
+                'shared_with_id' => $editor->id,
+            ],
+            [
+                'owner_id' => $owner->id,
+                'permission' => SharePermission::Editor,
+            ],
+        );
+        ResourceShare::query()->updateOrCreate(
+            [
+                'resource_type' => ShareResourceType::AddressBook,
+                'resource_id' => $addressBook->id,
+                'shared_with_id' => $observer->id,
+            ],
+            [
+                'owner_id' => $owner->id,
+                'permission' => $observerPermissionRaw,
+            ],
+        );
+        ResourceShare::query()->updateOrCreate(
+            [
+                'resource_type' => ShareResourceType::Calendar,
+                'resource_id' => $calendar->id,
+                'shared_with_id' => $observer->id,
+            ],
+            [
+                'owner_id' => $owner->id,
+                'permission' => $observerPermissionRaw,
+            ],
+        );
+
+        /** @var DavRequestContext $davContext */
+        $davContext = app(DavRequestContext::class);
+        $previousActor = $davContext->getAuthenticatedUser();
+        $previousUserAgent = $davContext->getUserAgent();
+        $davContext->setAuthenticatedUser($owner);
+        $davContext->setUserAgent('davvy-qa-seeder');
+
+        try {
+            $contactCardUri = 'rq-test-person.vcf';
+            $contactUid = 'rq-test-person-uid';
+            $cardData = "BEGIN:VCARD\n"
+                ."VERSION:4.0\n"
+                ."FN:RQ Test Person\n"
+                ."N:Person;RQ;Test;;\n"
+                ."UID:{$contactUid}\n"
+                ."TEL;TYPE=CELL:+13175550111\n"
+                ."EMAIL;TYPE=INTERNET:rq-test-person@example.test\n"
+                ."END:VCARD";
+
+            /** @var LaravelCardDavBackend $cardBackend */
+            $cardBackend = app(LaravelCardDavBackend::class);
+            $cardByUri = Card::query()
+                ->where('address_book_id', $addressBook->id)
+                ->where('uri', $contactCardUri)
+                ->first();
+            $cardByUid = Card::query()
+                ->where('address_book_id', $addressBook->id)
+                ->where('uid', $contactUid)
+                ->first();
+
+            if ($cardByUri) {
+                $cardBackend->updateCard($addressBook->id, $cardByUri->uri, $cardData);
+            } elseif ($cardByUid) {
+                $cardBackend->updateCard($addressBook->id, $cardByUid->uri, $cardData);
+            } else {
+                $cardBackend->createCard($addressBook->id, $contactCardUri, $cardData);
+            }
+
+            $eventObjectUri = 'rq-calendar-control-event.ics';
+            $eventUid = 'rq-calendar-control-event-uid';
+            $dtStamp = now('UTC')->format('Ymd\\THis\\Z');
+            $dtStart = now('UTC')->addDay()->startOfDay()->addHours(15);
+            $dtEnd = (clone $dtStart)->addHour();
+            $calendarData = "BEGIN:VCALENDAR\n"
+                ."VERSION:2.0\n"
+                ."PRODID:-//Davvy//Mobile QA Fixture//EN\n"
+                ."BEGIN:VEVENT\n"
+                ."UID:{$eventUid}\n"
+                ."DTSTAMP:{$dtStamp}\n"
+                ."DTSTART:".$dtStart->format('Ymd\\THis\\Z')."\n"
+                ."DTEND:".$dtEnd->format('Ymd\\THis\\Z')."\n"
+                ."SUMMARY:RQ Calendar Control Event\n"
+                ."END:VEVENT\n"
+                ."END:VCALENDAR";
+
+            /** @var LaravelCalendarBackend $calendarBackend */
+            $calendarBackend = app(LaravelCalendarBackend::class);
+            $eventByUri = CalendarObject::query()
+                ->where('calendar_id', $calendar->id)
+                ->where('uri', $eventObjectUri)
+                ->first();
+            $eventByUid = CalendarObject::query()
+                ->where('calendar_id', $calendar->id)
+                ->where('uid', $eventUid)
+                ->first();
+
+            if ($eventByUri) {
+                $calendarBackend->updateCalendarObject($calendar->id, $eventByUri->uri, $calendarData);
+            } elseif ($eventByUid) {
+                $calendarBackend->updateCalendarObject($calendar->id, $eventByUid->uri, $calendarData);
+            } else {
+                $calendarBackend->createCalendarObject($calendar->id, $eventObjectUri, $calendarData);
+            }
+        } finally {
+            if ($previousActor) {
+                $davContext->setAuthenticatedUser($previousActor);
+            } else {
+                $davContext->clear();
+            }
+            $davContext->setUserAgent($previousUserAgent);
+        }
+
+        $this->newLine();
+        $this->info('Mobile sync + review queue QA fixture is ready.');
+        $this->line('Configured settings: owner sharing ON, contact management ON, review queue moderation ON.');
+        $this->line('');
+        $this->line('Users:');
+        $this->line(sprintf('  owner_admin    -> %s', $owner->email));
+        $this->line(sprintf('  editor_mobile  -> %s', $editor->email));
+        $this->line(sprintf('  observer_mobile-> %s (%s)', $observer->email, $observerPermissionRaw));
+        $this->line('');
+        $this->line('Resources:');
+        $this->line(sprintf('  Address Book: %s (%s)', $addressBook->display_name, $addressBook->uri));
+        $this->line(sprintf('  Calendar:     %s (%s)', $calendar->display_name, $calendar->uri));
+        $this->line('  Seed Contact Card URI: rq-test-person.vcf');
+        $this->line('  Seed Event URI:        rq-calendar-control-event.ics');
+        $this->line('');
+        $this->line('Next: open docs/mobile-sync-review-queue-test-script.md and run the test cases on devices.');
+
+        return 0;
+    },
+)->purpose('Seed or refresh a mobile iOS/Android QA fixture for review queue and sync verification');
 
 Artisan::command(
     'app:user:approve
