@@ -5,6 +5,28 @@ import DashboardOverviewCardsComponent from "./DashboardOverviewCards";
 import DashboardPrivateWorkingSetPanelComponent from "./DashboardPrivateWorkingSetPanel";
 import DashboardSharingPanelComponent from "./DashboardSharingPanel";
 
+function normalizePrivateWorkingSetFormState(form) {
+  const normalizedSourceIds = [
+    ...new Set(
+      (Array.isArray(form?.source_ids) ? form.source_ids : [])
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id) && id > 0),
+    ),
+  ].sort((left, right) => left - right);
+
+  return {
+    enabled: Boolean(form?.enabled),
+    hide_shared: Boolean(form?.hide_shared),
+    include_owned_sharable_sources: Boolean(
+      form?.include_owned_sharable_sources,
+    ),
+    require_review_for_self_promotions: Boolean(
+      form?.require_review_for_self_promotions,
+    ),
+    source_ids: normalizedSourceIds,
+  };
+}
+
 /**
  * Renders the Dashboard Page.
  *
@@ -75,13 +97,18 @@ export default function DashboardPage({
     enabled: false,
     source_ids: [],
   });
-  const [privateWorkingSetForm, setPrivateWorkingSetForm] = useState({
+  const defaultPrivateWorkingSetForm = {
     enabled: false,
     hide_shared: true,
     include_owned_sharable_sources: true,
     require_review_for_self_promotions: false,
     source_ids: [],
-  });
+  };
+  const [privateWorkingSetForm, setPrivateWorkingSetForm] = useState(
+    defaultPrivateWorkingSetForm,
+  );
+  const [privateWorkingSetFormBaseline, setPrivateWorkingSetFormBaseline] =
+    useState(normalizePrivateWorkingSetFormState(defaultPrivateWorkingSetForm));
   const [calendarForm, setCalendarForm] = useState({
     display_name: "",
     is_sharable: false,
@@ -114,7 +141,7 @@ export default function DashboardPage({
         enabled: !!payload.apple_compat?.enabled,
         source_ids: payload.apple_compat?.selected_source_ids ?? [],
       });
-      setPrivateWorkingSetForm({
+      const nextPrivateWorkingSetForm = {
         enabled: !!payload.private_working_set?.enabled,
         hide_shared: payload.private_working_set?.hide_shared ?? true,
         include_owned_sharable_sources:
@@ -125,7 +152,11 @@ export default function DashboardPage({
           payload.private_working_set?.require_review_for_self_promotions ??
           isAdminUser,
         source_ids: payload.private_working_set?.selected_source_ids ?? [],
-      });
+      };
+      setPrivateWorkingSetForm(nextPrivateWorkingSetForm);
+      setPrivateWorkingSetFormBaseline(
+        normalizePrivateWorkingSetFormState(nextPrivateWorkingSetForm),
+      );
     } catch (err) {
       setError(extractError(err, t("errors.load")));
     } finally {
@@ -468,6 +499,9 @@ export default function DashboardPage({
   const canSelectAppleCompatSources =
     !!data.apple_compat.target_address_book_id && appleCompatForm.enabled;
   const contactChangeModerationEnabled = !!auth?.contactChangeModerationEnabled;
+  const privateWorkingSetIsDirty =
+    JSON.stringify(normalizePrivateWorkingSetFormState(privateWorkingSetForm)) !==
+    JSON.stringify(privateWorkingSetFormBaseline);
 
   return (
     <AppShell auth={auth} theme={theme}>
@@ -610,6 +644,7 @@ export default function DashboardPage({
             }
           }
           privateWorkingSetForm={privateWorkingSetForm}
+          privateWorkingSetIsDirty={privateWorkingSetIsDirty}
           setPrivateWorkingSetForm={setPrivateWorkingSetForm}
           privateWorkingSetNotice={privateWorkingSetNotice}
           savingPrivateWorkingSet={savingPrivateWorkingSet}

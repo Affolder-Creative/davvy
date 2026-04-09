@@ -104,6 +104,9 @@ function DashboardAppleCompatPanelStub({
 }
 
 function DashboardPrivateWorkingSetPanelStub({
+  setPrivateWorkingSetForm,
+  privateWorkingSetIsDirty,
+  onSavePrivateWorkingSet,
   onPromotePrivateCard,
   onDismissSuggestedPromotion,
   privateWorkingSetNotice,
@@ -112,6 +115,26 @@ function DashboardPrivateWorkingSetPanelStub({
 }) {
   return (
     <section>
+      <p data-testid="private-working-set-dirty">
+        {privateWorkingSetIsDirty ? "dirty" : "clean"}
+      </p>
+      <button
+        type="button"
+        onClick={() =>
+          setPrivateWorkingSetForm((previous) => ({
+            ...previous,
+            hide_shared: !previous.hide_shared,
+          }))
+        }
+      >
+        Mutate PWS Form
+      </button>
+      <button
+        type="button"
+        onClick={() => onSavePrivateWorkingSet({ preventDefault() {} })}
+      >
+        Save PWS
+      </button>
       <button type="button" onClick={() => onPromotePrivateCard(33)}>
         Promote Private Card
       </button>
@@ -313,6 +336,36 @@ describe("DashboardPage", () => {
     );
     expect(screen.getByTestId("private-working-set-notice")).toHaveTextContent(
       "Suggestion dismissed.",
+    );
+  });
+
+  it("tracks private working set dirty baseline from load and save", async () => {
+    const user = userEvent.setup();
+    const props = buildProps();
+
+    render(<DashboardPage {...props} />);
+    await waitFor(() => expect(props.api.get).toHaveBeenCalledTimes(1));
+
+    expect(screen.getByTestId("private-working-set-dirty")).toHaveTextContent(
+      "clean",
+    );
+
+    await user.click(screen.getByRole("button", { name: "Mutate PWS Form" }));
+    expect(screen.getByTestId("private-working-set-dirty")).toHaveTextContent(
+      "dirty",
+    );
+
+    await user.click(screen.getByRole("button", { name: "Save PWS" }));
+    await waitFor(() =>
+      expect(props.api.patch).toHaveBeenCalledWith(
+        "/api/address-books/private-working-set",
+        expect.objectContaining({ hide_shared: false }),
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("private-working-set-dirty")).toHaveTextContent(
+        "clean",
+      ),
     );
   });
 });

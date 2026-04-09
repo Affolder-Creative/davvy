@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -9,14 +9,24 @@ function PrivateWorkingSetHarness({
   initialForm,
   contactChangeModerationEnabled = true,
   promotionHistory = [],
+  initialDirty = false,
+  deriveDirtyFromForm = false,
 }) {
   const [privateWorkingSetForm, setPrivateWorkingSetForm] = useState(initialForm);
+  const privateWorkingSetIsDirty = useMemo(() => {
+    if (!deriveDirtyFromForm) {
+      return initialDirty;
+    }
+
+    return JSON.stringify(privateWorkingSetForm) !== JSON.stringify(initialForm);
+  }, [deriveDirtyFromForm, initialDirty, initialForm, privateWorkingSetForm]);
 
   return (
     <>
       <DashboardPrivateWorkingSetPanel
         privateWorkingSet={privateWorkingSet}
         privateWorkingSetForm={privateWorkingSetForm}
+        privateWorkingSetIsDirty={privateWorkingSetIsDirty}
         setPrivateWorkingSetForm={setPrivateWorkingSetForm}
         privateWorkingSetNotice=""
         savingPrivateWorkingSet={false}
@@ -61,6 +71,38 @@ function basePrivateWorkingSet(overrides = {}) {
 }
 
 describe("DashboardPrivateWorkingSetPanel", () => {
+  it("disables Save while pristine and enables it after a form change", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PrivateWorkingSetHarness
+        privateWorkingSet={basePrivateWorkingSet()}
+        initialForm={{
+          enabled: true,
+          hide_shared: true,
+          include_owned_sharable_sources: true,
+          require_review_for_self_promotions: true,
+          source_ids: [],
+        }}
+        deriveDirtyFromForm={true}
+      />,
+    );
+
+    const saveButton = screen.getByRole("button", {
+      name: /Save private working set settings/i,
+    });
+    expect(saveButton).toBeDisabled();
+
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: /Use private working set for shared contacts/i,
+      }),
+    );
+
+    expect(saveButton).toBeEnabled();
+    expect(screen.getByText("You have unsaved changes.")).toBeInTheDocument();
+  });
+
   it("starts in simple mode and reveals advanced controls when expanded", async () => {
     const user = userEvent.setup();
 
@@ -85,6 +127,7 @@ describe("DashboardPrivateWorkingSetPanel", () => {
         name: /Hide selected source books in my DAV apps/i,
       }),
     ).not.toBeInTheDocument();
+    expect(screen.getByText("Selected: 0")).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /Refresh from source books/i }),
     ).toBeInTheDocument();
@@ -105,6 +148,102 @@ describe("DashboardPrivateWorkingSetPanel", () => {
       screen.getByRole("button", { name: /Reset from source books/i }),
     ).toBeInTheDocument();
     expect(screen.getByText("Last promotion results")).toBeInTheDocument();
+  });
+
+  it("updates selected source count when source selection changes", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PrivateWorkingSetHarness
+        privateWorkingSet={basePrivateWorkingSet({
+          source_options: [
+            {
+              id: 1,
+              display_name: "Family",
+              owner_name: "Admin",
+              owner_email: "admin@example.com",
+              scope: "shared",
+              can_write: true,
+            },
+            {
+              id: 2,
+              display_name: "Friends",
+              owner_name: "Admin",
+              owner_email: "admin@example.com",
+              scope: "shared",
+              can_write: true,
+            },
+          ],
+        })}
+        initialForm={{
+          enabled: true,
+          hide_shared: true,
+          include_owned_sharable_sources: true,
+          require_review_for_self_promotions: true,
+          source_ids: [1],
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Selected: 1")).toBeInTheDocument();
+
+    await user.click(screen.getByRole("checkbox", { name: /Friends/i }));
+    expect(screen.getByText("Selected: 2")).toBeInTheDocument();
+  });
+
+  it("caps source, suggested, and linked lists with internal scrolling", () => {
+    render(
+      <PrivateWorkingSetHarness
+        privateWorkingSet={basePrivateWorkingSet({
+          source_options: [
+            {
+              id: 11,
+              display_name: "Family",
+              owner_name: "Admin",
+              owner_email: "admin@example.com",
+              scope: "shared",
+              can_write: true,
+            },
+          ],
+          suggested_promotions: [
+            {
+              link_id: 21,
+              private_card_id: 31,
+              source_card_uri: "family-31",
+              display_name: "Alex",
+              suggested_fields: ["email"],
+            },
+          ],
+          linked_cards: [
+            {
+              private_card_id: 41,
+              source_card_uri: "family-41",
+              display_name: "Pat",
+            },
+          ],
+        })}
+        initialForm={{
+          enabled: true,
+          hide_shared: true,
+          include_owned_sharable_sources: true,
+          require_review_for_self_promotions: true,
+          source_ids: [],
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("pws-source-list")).toHaveClass(
+      "max-h-[32rem]",
+      "overflow-y-auto",
+    );
+    expect(screen.getByTestId("pws-suggested-list")).toHaveClass(
+      "max-h-[32rem]",
+      "overflow-y-auto",
+    );
+    expect(screen.getByTestId("pws-linked-list")).toHaveClass(
+      "max-h-[32rem]",
+      "overflow-y-auto",
+    );
   });
 
   it("hides self-review policy toggle for non-admin users and shows enforced queue note", () => {

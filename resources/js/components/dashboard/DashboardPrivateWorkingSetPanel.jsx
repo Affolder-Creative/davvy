@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 export default function DashboardPrivateWorkingSetPanel({
   privateWorkingSet,
   privateWorkingSetForm,
+  privateWorkingSetIsDirty = false,
   setPrivateWorkingSetForm,
   privateWorkingSetNotice,
   savingPrivateWorkingSet,
@@ -26,6 +27,9 @@ export default function DashboardPrivateWorkingSetPanel({
   const { t } = useTranslation("dashboard");
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const canSelectSources = privateWorkingSetForm.enabled;
+  const selectedSourceCount = Array.isArray(privateWorkingSetForm.source_ids)
+    ? privateWorkingSetForm.source_ids.length
+    : 0;
   const canManageSelfReviewPolicy = Boolean(
     privateWorkingSet.can_manage_self_review_policy,
   );
@@ -262,70 +266,82 @@ export default function DashboardPrivateWorkingSetPanel({
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-app-strong">
-            {t("privateWorkingSet.sourcesTitle")}
-          </p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-medium text-app-strong">
+              {t("privateWorkingSet.sourcesTitle")}
+            </p>
+            <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
+              {t("privateWorkingSet.selectedSourcesCount", {
+                count: selectedSourceCount,
+              })}
+            </span>
+          </div>
           <p className="text-xs text-app-faint">{t("privateWorkingSet.sourcesHint")}</p>
           {privateWorkingSet.source_options.length === 0 ? (
             <p className="text-sm text-app-faint">
               {t("privateWorkingSet.noSources")}
             </p>
           ) : (
-            privateWorkingSet.source_options.map((option) => {
-              const checked = privateWorkingSetForm.source_ids.includes(
-                option.id,
-              );
+            <div
+              className="max-h-[32rem] space-y-2 overflow-y-auto pr-1"
+              data-testid="pws-source-list"
+            >
+              {privateWorkingSet.source_options.map((option) => {
+                const checked = privateWorkingSetForm.source_ids.includes(
+                  option.id,
+                );
 
-              return (
-                <label
-                  key={option.id}
-                  className={`flex items-start gap-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm ${
-                    canSelectSources ? "" : "cursor-not-allowed opacity-60"
-                  }`}
-                  aria-disabled={!canSelectSources}
-                >
-                  <input
-                    type="checkbox"
-                    className="mt-0.5 h-4 w-4 shrink-0 self-start"
-                    checked={checked}
-                    onChange={(event) => {
-                      if (event.target.checked) {
+                return (
+                  <label
+                    key={option.id}
+                    className={`flex items-start gap-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm ${
+                      canSelectSources ? "" : "cursor-not-allowed opacity-60"
+                    }`}
+                    aria-disabled={!canSelectSources}
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-0.5 h-4 w-4 shrink-0 self-start"
+                      checked={checked}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          setPrivateWorkingSetForm({
+                            ...privateWorkingSetForm,
+                            source_ids: [
+                              ...privateWorkingSetForm.source_ids,
+                              option.id,
+                            ],
+                          });
+                          return;
+                        }
+
                         setPrivateWorkingSetForm({
                           ...privateWorkingSetForm,
-                          source_ids: [
-                            ...privateWorkingSetForm.source_ids,
-                            option.id,
-                          ],
+                          source_ids: privateWorkingSetForm.source_ids.filter(
+                            (id) => id !== option.id,
+                          ),
                         });
-                        return;
-                      }
-
-                      setPrivateWorkingSetForm({
-                        ...privateWorkingSetForm,
-                        source_ids: privateWorkingSetForm.source_ids.filter(
-                          (id) => id !== option.id,
-                        ),
-                      });
-                    }}
-                    disabled={!canSelectSources}
-                  />
-                  <span className="min-w-0">
-                    <span className="block font-medium text-app-strong">
-                      {option.display_name}
+                      }}
+                      disabled={!canSelectSources}
+                    />
+                    <span className="min-w-0">
+                      <span className="block font-medium text-app-strong">
+                        {option.display_name}
+                      </span>
+                      <span className="block text-xs text-app-faint">
+                        {option.scope === "owned"
+                          ? t("resourcePanel.scope.owned")
+                          : t("resourcePanel.scope.shared")}{" "}
+                        • {option.owner_name} ({option.owner_email}) •{" "}
+                        {option.can_write
+                          ? t("privateWorkingSet.canWrite")
+                          : t("privateWorkingSet.readOnly")}
+                      </span>
                     </span>
-                    <span className="block text-xs text-app-faint">
-                      {option.scope === "owned"
-                        ? t("resourcePanel.scope.owned")
-                        : t("resourcePanel.scope.shared")}{" "}
-                      • {option.owner_name} ({option.owner_email}) •{" "}
-                      {option.can_write
-                        ? t("privateWorkingSet.canWrite")
-                        : t("privateWorkingSet.readOnly")}
-                    </span>
-                  </span>
-                </label>
-              );
-            })
+                  </label>
+                );
+              })}
+            </div>
           )}
         </div>
 
@@ -333,7 +349,7 @@ export default function DashboardPrivateWorkingSetPanel({
           <button
             className="btn"
             type="submit"
-            disabled={savingPrivateWorkingSet}
+            disabled={savingPrivateWorkingSet || !privateWorkingSetIsDirty}
           >
             {savingPrivateWorkingSet
               ? t("privateWorkingSet.saving")
@@ -368,6 +384,11 @@ export default function DashboardPrivateWorkingSetPanel({
             </>
           ) : null}
         </div>
+        <p className="text-xs text-app-faint">
+          {privateWorkingSetIsDirty
+            ? t("privateWorkingSet.unsavedChanges")
+            : t("privateWorkingSet.noChangesToSave")}
+        </p>
         {advancedOpen ? (
           <p className="text-xs text-app-faint">
             {t("privateWorkingSet.syncActionsHint")}
@@ -438,56 +459,61 @@ export default function DashboardPrivateWorkingSetPanel({
               {t("privateWorkingSet.noSuggested")}
             </p>
           ) : (
-            (privateWorkingSet.suggested_promotions ?? []).map((row) => (
-              <div
-                key={row.link_id}
-                className="space-y-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm"
-              >
-                <span className="block min-w-0">
-                  <span className="block font-medium text-app-strong">
-                    {row.display_name}
+            <div
+              className="max-h-[32rem] space-y-2 overflow-y-auto pr-1"
+              data-testid="pws-suggested-list"
+            >
+              {(privateWorkingSet.suggested_promotions ?? []).map((row) => (
+                <div
+                  key={row.link_id}
+                  className="space-y-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm"
+                >
+                  <span className="block min-w-0">
+                    <span className="block font-medium text-app-strong">
+                      {row.display_name}
+                    </span>
+                    <span className="block text-xs text-app-faint">
+                      {t("privateWorkingSet.sourceCardHint", {
+                        uri: row.source_card_uri,
+                      })}
+                    </span>
+                    <span className="block text-xs text-app-faint">
+                      {t("privateWorkingSet.suggestedFieldsHint", {
+                        fields: (row.suggested_fields ?? []).join(", "),
+                      })}
+                    </span>
                   </span>
-                  <span className="block text-xs text-app-faint">
-                    {t("privateWorkingSet.sourceCardHint", {
-                      uri: row.source_card_uri,
-                    })}
-                  </span>
-                  <span className="block text-xs text-app-faint">
-                    {t("privateWorkingSet.suggestedFieldsHint", {
-                      fields: (row.suggested_fields ?? []).join(", "),
-                    })}
-                  </span>
-                </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    className="btn btn-secondary"
-                    type="button"
-                    disabled={
-                      !privateWorkingSetForm.enabled ||
-                      promotingPrivateCardId === row.private_card_id
-                    }
-                    onClick={() => onPromotePrivateCard(row.private_card_id)}
-                  >
-                    {promotingPrivateCardId === row.private_card_id
-                      ? t("privateWorkingSet.promoting")
-                      : t("privateWorkingSet.promote")}
-                  </button>
-                  <button
-                    className="btn btn-secondary"
-                    type="button"
-                    disabled={
-                      !privateWorkingSetForm.enabled ||
-                      dismissingSuggestionLinkId === row.link_id
-                    }
-                    onClick={() => onDismissSuggestedPromotion(row.link_id)}
-                  >
-                    {dismissingSuggestionLinkId === row.link_id
-                      ? t("privateWorkingSet.dismissing")
-                      : t("privateWorkingSet.dismiss")}
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      className="btn btn-secondary"
+                      type="button"
+                      disabled={
+                        !privateWorkingSetForm.enabled ||
+                        promotingPrivateCardId === row.private_card_id
+                      }
+                      onClick={() => onPromotePrivateCard(row.private_card_id)}
+                    >
+                      {promotingPrivateCardId === row.private_card_id
+                        ? t("privateWorkingSet.promoting")
+                        : t("privateWorkingSet.promote")}
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      type="button"
+                      disabled={
+                        !privateWorkingSetForm.enabled ||
+                        dismissingSuggestionLinkId === row.link_id
+                      }
+                      onClick={() => onDismissSuggestedPromotion(row.link_id)}
+                    >
+                      {dismissingSuggestionLinkId === row.link_id
+                        ? t("privateWorkingSet.dismissing")
+                        : t("privateWorkingSet.dismiss")}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
 
@@ -501,36 +527,41 @@ export default function DashboardPrivateWorkingSetPanel({
               {t("privateWorkingSet.noLinkedCards")}
             </p>
           ) : (
-            (privateWorkingSet.linked_cards ?? []).map((row) => (
-              <div
-                key={row.private_card_id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm"
-              >
-                <span className="min-w-0">
-                  <span className="block font-medium text-app-strong">
-                    {row.display_name}
-                  </span>
-                  <span className="block text-xs text-app-faint">
-                    {t("privateWorkingSet.sourceCardHint", {
-                      uri: row.source_card_uri,
-                    })}
-                  </span>
-                </span>
-                <button
-                  className="btn btn-secondary"
-                  type="button"
-                  disabled={
-                    !privateWorkingSetForm.enabled ||
-                    promotingPrivateCardId === row.private_card_id
-                  }
-                  onClick={() => onPromotePrivateCard(row.private_card_id)}
+            <div
+              className="max-h-[32rem] space-y-2 overflow-y-auto pr-1"
+              data-testid="pws-linked-list"
+            >
+              {(privateWorkingSet.linked_cards ?? []).map((row) => (
+                <div
+                  key={row.private_card_id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm"
                 >
-                  {promotingPrivateCardId === row.private_card_id
-                    ? t("privateWorkingSet.promoting")
-                    : t("privateWorkingSet.promote")}
-                </button>
-              </div>
-            ))
+                  <span className="min-w-0">
+                    <span className="block font-medium text-app-strong">
+                      {row.display_name}
+                    </span>
+                    <span className="block text-xs text-app-faint">
+                      {t("privateWorkingSet.sourceCardHint", {
+                        uri: row.source_card_uri,
+                      })}
+                    </span>
+                  </span>
+                  <button
+                    className="btn btn-secondary"
+                    type="button"
+                    disabled={
+                      !privateWorkingSetForm.enabled ||
+                      promotingPrivateCardId === row.private_card_id
+                    }
+                    onClick={() => onPromotePrivateCard(row.private_card_id)}
+                  >
+                    {promotingPrivateCardId === row.private_card_id
+                      ? t("privateWorkingSet.promoting")
+                      : t("privateWorkingSet.promote")}
+                  </button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </form>
