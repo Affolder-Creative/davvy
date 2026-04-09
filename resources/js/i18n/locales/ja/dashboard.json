@@ -17,7 +17,8 @@
     "milestones": "誕生日/記念日のカレンダー設定を更新できません。",
     "privateWorkingSet": "プライベート作業セットの設定を更新できませんでした。",
     "privateWorkingSetPull": "プライベート作業セットの最新ソース値を取得できませんでした。",
-    "privateWorkingSetPromote": "プライベート作業セットの変更を共有ソースへ昇格できませんでした。"
+    "privateWorkingSetPromote": "プライベート作業セットの変更を共有ソースへ昇格できませんでした。",
+    "privateWorkingSetDismiss": "プライベート作業セットの提案を却下できませんでした。"
   },
   "overview": {
     "endpointTitle": "DAV エンドポイント",
@@ -117,7 +118,8 @@
     "privateWorkingSetPulled": "共有ソースからプライベート作業セットを取り込みました。",
     "privateWorkingSetForcePulled": "共有ソースからサーバー値でプライベート作業セットを強制取り込みしました。",
     "privateWorkingSetPromoted": "プライベートカードを共有ソースへ昇格しました。",
-    "privateWorkingSetPromoteQueued": "昇格をレビューキューに送信しました。"
+    "privateWorkingSetPromoteQueued": "昇格をレビューキューに送信しました。",
+    "privateWorkingSetSuggestionDismissed": "提案を却下しました。"
   },
   "privateWorkingSet": {
     "title": "プライベート作業セット",
@@ -138,6 +140,11 @@
     "noLinkedCards": "まだリンク済みのプライベートカードはありません。",
     "sourceCardHint": "ソース URI: {{uri}}",
     "promote": "共有ソースへ昇格",
-    "promoting": "昇格中..."
+    "promoting": "昇格中...",
+    "suggestedTitle": "提案された昇格",
+    "noSuggested": "現在、提案された昇格はありません。",
+    "suggestedFieldsHint": "提案フィールド: {{fields}}",
+    "dismiss": "却下",
+    "dismissing": "却下中..."
   }
 }

@@ -15,9 +15,11 @@ export default function DashboardPrivateWorkingSetPanel({
   savingPrivateWorkingSet,
   pullingPrivateWorkingSet,
   promotingPrivateCardId,
+  dismissingSuggestionLinkId,
   onSavePrivateWorkingSet,
   onPullPrivateWorkingSet,
   onPromotePrivateCard,
+  onDismissSuggestedPromotion,
 }) {
   const { t } = useTranslation("dashboard");
   const canSelectSources = privateWorkingSetForm.enabled;
@@ -171,6 +173,68 @@ export default function DashboardPrivateWorkingSetPanel({
             {privateWorkingSetNotice}
           </p>
         ) : null}
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-app-strong">
+            {t("privateWorkingSet.suggestedTitle")}
+          </p>
+          {(privateWorkingSet.suggested_promotions ?? []).length === 0 ? (
+            <p className="text-sm text-app-faint">
+              {t("privateWorkingSet.noSuggested")}
+            </p>
+          ) : (
+            (privateWorkingSet.suggested_promotions ?? []).map((row) => (
+              <div
+                key={row.link_id}
+                className="space-y-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm"
+              >
+                <span className="block min-w-0">
+                  <span className="block font-medium text-app-strong">
+                    {row.display_name}
+                  </span>
+                  <span className="block text-xs text-app-faint">
+                    {t("privateWorkingSet.sourceCardHint", {
+                      uri: row.source_card_uri,
+                    })}
+                  </span>
+                  <span className="block text-xs text-app-faint">
+                    {t("privateWorkingSet.suggestedFieldsHint", {
+                      fields: (row.suggested_fields ?? []).join(", "),
+                    })}
+                  </span>
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    className="btn btn-secondary"
+                    type="button"
+                    disabled={
+                      !privateWorkingSetForm.enabled ||
+                      promotingPrivateCardId === row.private_card_id
+                    }
+                    onClick={() => onPromotePrivateCard(row.private_card_id)}
+                  >
+                    {promotingPrivateCardId === row.private_card_id
+                      ? t("privateWorkingSet.promoting")
+                      : t("privateWorkingSet.promote")}
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    type="button"
+                    disabled={
+                      !privateWorkingSetForm.enabled ||
+                      dismissingSuggestionLinkId === row.link_id
+                    }
+                    onClick={() => onDismissSuggestedPromotion(row.link_id)}
+                  >
+                    {dismissingSuggestionLinkId === row.link_id
+                      ? t("privateWorkingSet.dismissing")
+                      : t("privateWorkingSet.dismiss")}
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-app-strong">

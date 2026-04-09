@@ -17,7 +17,8 @@
     "milestones": "无法更新生日/周年纪念日日历设置。",
     "privateWorkingSet": "无法更新私人工作集设置。",
     "privateWorkingSetPull": "无法拉取私人工作集来源的最新值。",
-    "privateWorkingSetPromote": "无法将私人工作集变更提升到共享来源。"
+    "privateWorkingSetPromote": "无法将私人工作集变更提升到共享来源。",
+    "privateWorkingSetDismiss": "无法忽略私人工作集建议。"
   },
   "overview": {
     "endpointTitle": "DAV端点",
@@ -117,7 +118,8 @@
     "privateWorkingSetPulled": "已从共享来源拉取私人工作集。",
     "privateWorkingSetForcePulled": "已强制使用服务器值从共享来源拉取私人工作集。",
     "privateWorkingSetPromoted": "私人卡片已提升到共享来源。",
-    "privateWorkingSetPromoteQueued": "提升请求已提交到审核队列。"
+    "privateWorkingSetPromoteQueued": "提升请求已提交到审核队列。",
+    "privateWorkingSetSuggestionDismissed": "建议已忽略。"
   },
   "privateWorkingSet": {
     "title": "私人工作集",
@@ -138,6 +140,11 @@
     "noLinkedCards": "暂无已关联的私人卡片。",
     "sourceCardHint": "来源 URI：{{uri}}",
     "promote": "提升到共享来源",
-    "promoting": "提升中..."
+    "promoting": "提升中...",
+    "suggestedTitle": "建议提升",
+    "noSuggested": "当前没有建议提升。",
+    "suggestedFieldsHint": "建议字段：{{fields}}",
+    "dismiss": "忽略",
+    "dismissing": "忽略中..."
   }
 }

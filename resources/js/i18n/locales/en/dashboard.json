@@ -17,7 +17,8 @@
     "milestones": "Unable to update birthday/anniversary calendar settings.",
     "privateWorkingSet": "Unable to update private working set settings.",
     "privateWorkingSetPull": "Unable to pull latest private working set source values.",
-    "privateWorkingSetPromote": "Unable to promote private working set change."
+    "privateWorkingSetPromote": "Unable to promote private working set change.",
+    "privateWorkingSetDismiss": "Unable to dismiss private working set suggestion."
   },
   "overview": {
     "endpointTitle": "DAV Endpoint",
@@ -121,9 +122,14 @@
     "pulling": "Pulling...",
     "linkedCardsTitle": "Linked private cards",
     "noLinkedCards": "No linked private cards yet.",
+    "suggestedTitle": "Suggested Promotions",
+    "noSuggested": "No suggested promotions right now.",
+    "suggestedFieldsHint": "Suggested fields: {{fields}}",
     "sourceCardHint": "Source URI: {{uri}}",
     "promote": "Promote to Shared Source",
-    "promoting": "Promoting..."
+    "promoting": "Promoting...",
+    "dismiss": "Dismiss",
+    "dismissing": "Dismissing..."
   },
   "states": {
     "loadingResources": "Loading resources..."
@@ -138,6 +144,7 @@
     "privateWorkingSetPulled": "Private working set pulled from shared sources.",
     "privateWorkingSetForcePulled": "Private working set force-pulled from shared sources.",
     "privateWorkingSetPromoted": "Private card promoted to shared source.",
-    "privateWorkingSetPromoteQueued": "Promotion submitted to review queue."
+    "privateWorkingSetPromoteQueued": "Promotion submitted to review queue.",
+    "privateWorkingSetSuggestionDismissed": "Suggestion dismissed."
   }
 }

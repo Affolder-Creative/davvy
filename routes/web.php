@@ -97,6 +97,7 @@ Route::middleware('auth')->group(function (): void {
             Route::patch('/api/contacts/{contact}', [ContactController::class, 'update']);
             Route::delete('/api/contacts/{contact}', [ContactController::class, 'destroy']);
             Route::post('/api/address-books/private-working-set/promote/{card}', [AddressBookPrivateWorkingSetController::class, 'promote']);
+            Route::post('/api/address-books/private-working-set/suggestions/{link}/dismiss', [AddressBookPrivateWorkingSetController::class, 'dismissSuggestion']);
         });
 
         Route::get('/api/shares', [ShareController::class, 'index']);

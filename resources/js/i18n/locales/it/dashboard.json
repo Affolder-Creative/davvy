@@ -17,7 +17,8 @@
     "milestones": "Impossibile aggiornare le impostazioni del calendario compleanno/anniversario.",
     "privateWorkingSet": "Impossibile aggiornare le impostazioni del set di lavoro privato.",
     "privateWorkingSetPull": "Impossibile recuperare gli ultimi valori di origine del set di lavoro privato.",
-    "privateWorkingSetPromote": "Impossibile promuovere la modifica del set di lavoro privato."
+    "privateWorkingSetPromote": "Impossibile promuovere la modifica del set di lavoro privato.",
+    "privateWorkingSetDismiss": "Impossibile ignorare il suggerimento del set di lavoro privato."
   },
   "overview": {
     "endpointTitle": "Punto finale DAV",
@@ -117,7 +118,8 @@
     "privateWorkingSetPulled": "Set di lavoro privato aggiornato dalle origini condivise.",
     "privateWorkingSetForcePulled": "Set di lavoro privato aggiornato forzando i valori del server.",
     "privateWorkingSetPromoted": "Scheda privata promossa all'origine condivisa.",
-    "privateWorkingSetPromoteQueued": "Promozione inviata alla coda di revisione."
+    "privateWorkingSetPromoteQueued": "Promozione inviata alla coda di revisione.",
+    "privateWorkingSetSuggestionDismissed": "Suggerimento ignorato."
   },
   "privateWorkingSet": {
     "title": "Set di lavoro privato",
@@ -138,6 +140,11 @@
     "noLinkedCards": "Nessuna scheda privata collegata.",
     "sourceCardHint": "URI origine: {{uri}}",
     "promote": "Promuovi a origine condivisa",
-    "promoting": "Promozione..."
+    "promoting": "Promozione...",
+    "suggestedTitle": "Promozioni suggerite",
+    "noSuggested": "Nessuna promozione suggerita al momento.",
+    "suggestedFieldsHint": "Campi suggeriti: {{fields}}",
+    "dismiss": "Ignora",
+    "dismissing": "Ignoro..."
   }
 }

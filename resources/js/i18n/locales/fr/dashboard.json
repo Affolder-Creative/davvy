@@ -17,7 +17,8 @@
     "milestones": "Impossible de mettre à jour les paramètres du calendrier Anniversaires/Commémorations.",
     "privateWorkingSet": "Impossible de mettre à jour les paramètres de l'espace de travail privé.",
     "privateWorkingSetPull": "Impossible de récupérer les dernières valeurs source de l'espace de travail privé.",
-    "privateWorkingSetPromote": "Impossible de promouvoir la modification de l'espace de travail privé."
+    "privateWorkingSetPromote": "Impossible de promouvoir la modification de l'espace de travail privé.",
+    "privateWorkingSetDismiss": "Impossible d'ignorer la suggestion de l'espace de travail privé."
   },
   "overview": {
     "endpointTitle": "Point de terminaison DAV",
@@ -117,7 +118,8 @@
     "privateWorkingSetPulled": "L'espace de travail privé a été synchronisé depuis les sources partagées.",
     "privateWorkingSetForcePulled": "L'espace de travail privé a été synchronisé de force avec les valeurs du serveur.",
     "privateWorkingSetPromoted": "La fiche privée a été promue vers la source partagée.",
-    "privateWorkingSetPromoteQueued": "La promotion a été soumise à la file de révision."
+    "privateWorkingSetPromoteQueued": "La promotion a été soumise à la file de révision.",
+    "privateWorkingSetSuggestionDismissed": "Suggestion ignorée."
   },
   "privateWorkingSet": {
     "title": "Espace de travail privé",
@@ -138,6 +140,11 @@
     "noLinkedCards": "Aucune fiche privée liée pour le moment.",
     "sourceCardHint": "URI source : {{uri}}",
     "promote": "Promouvoir vers la source partagée",
-    "promoting": "Promotion..."
+    "promoting": "Promotion...",
+    "suggestedTitle": "Promotions suggérées",
+    "noSuggested": "Aucune promotion suggérée pour le moment.",
+    "suggestedFieldsHint": "Champs suggérés : {{fields}}",
+    "dismiss": "Ignorer",
+    "dismissing": "Ignoré..."
   }
 }
