@@ -85,6 +85,11 @@ class DashboardController extends Controller
             ])
             ->all();
 
+        $ownedCalendarLookup = collect($ownedCalendars)
+            ->keyBy(fn (array $calendar): int => (int) $calendar['id']);
+        $ownedAddressBookLookup = $ownedAddressBookModels
+            ->keyBy(fn (AddressBook $addressBook): int => (int) $addressBook->id);
+
         $shares = ResourceShare::query()
             ->with(['owner', 'calendar', 'addressBook'])
             ->where('shared_with_id', $user->id)
@@ -139,11 +144,24 @@ class DashboardController extends Controller
                 ->where('owner_id', $user->id)
                 ->orderByDesc('id')
                 ->get()
-                ->map(function (ResourceShare $share): array {
+                ->map(function (ResourceShare $share) use (
+                    $ownedCalendarLookup,
+                    $ownedAddressBookLookup,
+                ): array {
+                    $resourceId = (int) $share->resource_id;
+                    $resourceDisplayName = null;
+
+                    if ($share->resource_type === ShareResourceType::Calendar) {
+                        $resourceDisplayName = $ownedCalendarLookup->get($resourceId)['display_name'] ?? null;
+                    } elseif ($share->resource_type === ShareResourceType::AddressBook) {
+                        $resourceDisplayName = $ownedAddressBookLookup->get($resourceId)?->display_name;
+                    }
+
                     return [
                         'id' => $share->id,
                         'resource_type' => $share->resource_type->value,
-                        'resource_id' => $share->resource_id,
+                        'resource_id' => $resourceId,
+                        'resource_display_name' => $resourceDisplayName,
                         'permission' => $share->permission->value,
                         'shared_with' => [
                             'id' => $share->sharedWith?->id,

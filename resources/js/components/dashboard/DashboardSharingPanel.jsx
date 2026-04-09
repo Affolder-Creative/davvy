@@ -104,7 +104,8 @@ export default function DashboardSharingPanel({
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="font-semibold text-app-strong">
-                  {share.resource_type} #{share.resource_id}
+                  {share.resource_display_name ||
+                    `${share.resource_type} #${share.resource_id}`}
                 </p>
                 <PermissionBadge permission={share.permission} />
               </div>

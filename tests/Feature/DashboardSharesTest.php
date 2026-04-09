@@ -125,6 +125,34 @@ class DashboardSharesTest extends TestCase
         $response->assertJsonPath('sharing.outgoing', []);
     }
 
+    public function test_dashboard_outgoing_shares_include_resource_display_name(): void
+    {
+        $owner = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Family Contacts',
+            'uri' => 'family-contacts',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $addressBook->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $recipient->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        $response = $this->actingAs($owner)->getJson('/api/dashboard');
+
+        $response->assertOk();
+        $response->assertJsonPath('sharing.outgoing.0.resource_type', 'address_book');
+        $response->assertJsonPath('sharing.outgoing.0.resource_id', $addressBook->id);
+        $response->assertJsonPath('sharing.outgoing.0.resource_display_name', 'Family Contacts');
+    }
+
     public function test_deleting_calendar_via_api_removes_related_resource_shares(): void
     {
         $owner = User::factory()->create();

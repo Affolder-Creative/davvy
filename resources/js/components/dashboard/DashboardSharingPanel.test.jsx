@@ -105,6 +105,7 @@ describe("DashboardSharingPanel", () => {
             id: 99,
             resource_type: "calendar",
             resource_id: 10,
+            resource_display_name: "Team Calendar",
             permission: "editor",
             shared_with: { name: "Pat", email: "pat@example.com" },
           },
@@ -112,7 +113,7 @@ describe("DashboardSharingPanel", () => {
       />,
     );
 
-    expect(screen.getByText("calendar #10")).toBeInTheDocument();
+    expect(screen.getByText("Team Calendar")).toBeInTheDocument();
     expect(
       screen.getByText("Shared with: Pat (pat@example.com)"),
     ).toBeInTheDocument();
@@ -120,5 +121,34 @@ describe("DashboardSharingPanel", () => {
 
     await user.click(screen.getByRole("button", { name: "Revoke" }));
     expect(onDeleteShare).toHaveBeenCalledWith(99);
+  });
+
+  it("falls back to type and id when outgoing share display name is unavailable", () => {
+    render(
+      <SharingPanelHarness
+        initialForm={{
+          resource_type: "calendar",
+          resource_id: "",
+          shared_with_id: "",
+          permission: "read_only",
+        }}
+        onSaveShare={vi.fn((event) => event.preventDefault())}
+        onDeleteShare={vi.fn()}
+        shareableResourceOptions={[]}
+        targets={[]}
+        outgoing={[
+          {
+            id: 101,
+            resource_type: "address_book",
+            resource_id: 7,
+            resource_display_name: null,
+            permission: "read_only",
+            shared_with: { name: "Alex", email: "alex@example.com" },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("address_book #7")).toBeInTheDocument();
   });
 });
