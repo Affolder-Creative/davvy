@@ -396,7 +396,7 @@ describe("AdminPage", () => {
     expect(screen.getByText("John Doe")).toBeInTheDocument();
 
     await user.selectOptions(twoFactorFilter, "all");
-    await user.click(screen.getAllByRole("button", { name: "Show details" })[0]);
+    await user.click(screen.getByRole("button", { name: "Show details" }));
     expect(screen.getByText(/Role: admin \| Calendars:/)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Hide details" }));
     expect(screen.queryByText(/Role: admin \| Calendars:/)).not.toBeInTheDocument();
