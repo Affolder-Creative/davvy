@@ -1194,13 +1194,35 @@ export default function AdminPage({
     }
 
     const [beforeEmail, ...afterEmailParts] = translated.split(emailMarker);
-    const afterEmail = afterEmailParts.join(emailMarker);
+    let beforeEmailText = beforeEmail;
+    let afterEmailText = afterEmailParts.join(emailMarker);
+    let emailPrefix = "";
+    let emailSuffix = "";
+
+    if (beforeEmailText.endsWith("(") && afterEmailText.startsWith(")")) {
+      beforeEmailText = beforeEmailText.slice(0, -1);
+      afterEmailText = afterEmailText.slice(1);
+      emailPrefix = "(";
+      emailSuffix = ")";
+    } else if (
+      beforeEmailText.endsWith("（") &&
+      afterEmailText.startsWith("）")
+    ) {
+      beforeEmailText = beforeEmailText.slice(0, -1);
+      afterEmailText = afterEmailText.slice(1);
+      emailPrefix = "（";
+      emailSuffix = "）";
+    }
 
     return (
       <>
-        {beforeEmail}
-        <span className="text-xs text-app-faint">{email}</span>
-        {afterEmail}
+        {beforeEmailText}
+        <span className="text-xs text-app-faint">
+          {emailPrefix}
+          {email}
+          {emailSuffix}
+        </span>
+        {afterEmailText}
       </>
     );
   };
