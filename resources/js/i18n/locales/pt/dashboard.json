@@ -15,9 +15,9 @@
     "deleteAddressBook": "Não foi possível excluir o catálogo de endereços.",
     "appleCompat": "Não foi possível atualizar as configurações de compatibilidade da Apple.",
     "milestones": "Não é possível atualizar as configurações do calendário de aniversários/aniversários.",
-    "privateWorkingSet": "Unable to update private working set settings.",
-    "privateWorkingSetPull": "Unable to pull latest private working set source values.",
-    "privateWorkingSetPromote": "Unable to promote private working set change."
+    "privateWorkingSet": "Não foi possível atualizar as configurações do conjunto de trabalho privado.",
+    "privateWorkingSetPull": "Não foi possível buscar os valores de origem mais recentes do conjunto de trabalho privado.",
+    "privateWorkingSetPromote": "Não foi possível promover a alteração do conjunto de trabalho privado."
   },
   "overview": {
     "endpointTitle": "Ponto final DAV",
@@ -113,31 +113,31 @@
       "unshared": "{{name}} não é mais compartilhado."
     },
     "appleCompatSaved": "As configurações de compatibilidade da Apple foram salvas.",
-    "privateWorkingSetSaved": "Private working set settings saved.",
-    "privateWorkingSetPulled": "Private working set pulled from shared sources.",
-    "privateWorkingSetForcePulled": "Private working set force-pulled from shared sources.",
-    "privateWorkingSetPromoted": "Private card promoted to shared source.",
-    "privateWorkingSetPromoteQueued": "Promotion submitted to review queue."
+    "privateWorkingSetSaved": "As configurações do conjunto de trabalho privado foram salvas.",
+    "privateWorkingSetPulled": "O conjunto de trabalho privado foi atualizado a partir das fontes compartilhadas.",
+    "privateWorkingSetForcePulled": "O conjunto de trabalho privado foi atualizado forçando os valores do servidor.",
+    "privateWorkingSetPromoted": "O cartão privado foi promovido para a fonte compartilhada.",
+    "privateWorkingSetPromoteQueued": "A promoção foi enviada para a fila de revisão."
   },
   "privateWorkingSet": {
-    "title": "Private Working Set",
-    "subtitle": "Create per-user private copies of shared contacts so local edits stay private unless you explicitly promote them.",
-    "target": "Private working-set book: {{name}} (/{{uri}})",
-    "enable": "Enable private working set",
-    "hideShared": "Hide selected shared source books from DAV discovery",
-    "sourcesTitle": "Shared source address books",
-    "noSources": "No eligible shared address books available.",
-    "canWrite": "Editor/Admin share",
-    "readOnly": "Read-only share",
-    "save": "Save Private Working Set Settings",
-    "saving": "Saving...",
-    "pull": "Pull Latest (Respect Overrides)",
-    "forcePull": "Force Pull (Use Server Values)",
-    "pulling": "Pulling...",
-    "linkedCardsTitle": "Linked private cards",
-    "noLinkedCards": "No linked private cards yet.",
-    "sourceCardHint": "Source URI: {{uri}}",
-    "promote": "Promote to Shared Source",
-    "promoting": "Promoting..."
+    "title": "Conjunto de trabalho privado",
+    "subtitle": "Crie cópias privadas por usuário de contatos compartilhados para que as edições locais permaneçam privadas até você promovê-las explicitamente.",
+    "target": "Catálogo do conjunto de trabalho privado: {{name}} (/{{uri}})",
+    "enable": "Ativar conjunto de trabalho privado",
+    "hideShared": "Ocultar os catálogos de origem compartilhados selecionados da descoberta DAV",
+    "sourcesTitle": "Catálogos de origem compartilhados",
+    "noSources": "Nenhum catálogo de endereços compartilhado elegível disponível.",
+    "canWrite": "Compartilhamento Editor/Admin",
+    "readOnly": "Compartilhamento somente leitura",
+    "save": "Salvar configurações do conjunto de trabalho privado",
+    "saving": "Salvando...",
+    "pull": "Buscar mais recente (respeitar substituições)",
+    "forcePull": "Busca forçada (usar valores do servidor)",
+    "pulling": "Buscando...",
+    "linkedCardsTitle": "Cartões privados vinculados",
+    "noLinkedCards": "Ainda não há cartões privados vinculados.",
+    "sourceCardHint": "URI de origem: {{uri}}",
+    "promote": "Promover para fonte compartilhada",
+    "promoting": "Promovendo..."
   }
 }

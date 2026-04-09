@@ -208,6 +208,15 @@ Primary dashboard payload:
   - `outgoing`
 - `apple_compat`:
   - mirror target/source options and selected config
+- `private_working_set`:
+  - `enabled`
+  - `hide_shared`
+  - `private_address_book_id`
+  - `private_address_book_uri`
+  - `private_display_name`
+  - `selected_source_ids`
+  - `source_options[]` (`id`, `display_name`, `owner_name`, `owner_email`, `can_write`)
+  - `linked_cards[]` (`link_id`, `private_card_id`, `private_card_uri`, `source_address_book_id`, `source_card_uri`, `display_name`, `overridden_fields[]`)
 
 ### Calendar Endpoints
 
@@ -260,6 +269,27 @@ Configure Apple-compatibility mirroring into user's default contacts book.
 Body:
 - `enabled` (required bool)
 - `source_ids` (optional array of address-book IDs)
+
+#### `PATCH /api/address-books/private-working-set`
+Configure a per-user private working set for shared contacts.
+
+Body:
+- `enabled` (required bool)
+- `hide_shared` (optional bool, default `true`)
+- `source_ids` (optional array of shared source address-book IDs)
+
+Response:
+- `private_working_set` (same shape as `GET /api/dashboard`)
+
+#### `POST /api/address-books/private-working-set/pull`
+Pull latest selected shared source values into private working set.
+
+Body:
+- `force_server` (optional bool, default `false`)
+
+Response:
+- `private_working_set_pull.ok`
+- `private_working_set_pull.force_server`
 
 ### Export Endpoints
 
@@ -315,6 +345,21 @@ Update managed contact.
 
 #### `DELETE /api/contacts/{contact}`
 Delete managed contact.
+
+#### `POST /api/address-books/private-working-set/promote/{card}`
+Promote one linked private card back to its shared source card.
+
+Responses:
+- `200` when applied immediately:
+  - `queued: false`
+  - `applied: true`
+  - `source_address_book_id`
+  - `source_card_uri`
+- `202` when moderation queues the promotion:
+  - `queued: true`
+  - `message`
+  - `group_uuid`
+  - `request_ids`
 
 Contact write notes:
 - Must include at least one of: `first_name`, `last_name`, `company`

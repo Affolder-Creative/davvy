@@ -119,12 +119,22 @@ Fix:
 Permission is insufficient:
 - `read_only`: no writes
 - `editor`: no collection deletes
+- private working set may hide selected shared source books from DAV writes for that user
 
 ### `409 Conflict` during CardDAV updates/deletes
 Possible causes:
 - UID conflict in target address book
 - change queued for owner/admin approval
 - mirrored-card write rules in Apple compatibility flow
+
+### Private working set panel shows no source options
+Possible causes:
+- no shared address books are currently granted to the user
+- granted shared books are not marked sharable
+
+Fix:
+- share at least one address book with the user (typically `editor` for promote/write flows)
+- confirm the owner kept that address book `is_sharable=true`
 
 ### `InvalidSyncToken`
 Client sync token is stale/invalid.

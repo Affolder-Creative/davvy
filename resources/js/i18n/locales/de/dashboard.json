@@ -15,9 +15,9 @@
     "deleteAddressBook": "Adressbuch konnte nicht gelöscht werden.",
     "appleCompat": "Apple-Kompatibilitätseinstellungen konnten nicht aktualisiert werden.",
     "milestones": "Einstellungen für Geburtstags-/Jahrestagskalender konnten nicht aktualisiert werden.",
-    "privateWorkingSet": "Unable to update private working set settings.",
-    "privateWorkingSetPull": "Unable to pull latest private working set source values.",
-    "privateWorkingSetPromote": "Unable to promote private working set change."
+    "privateWorkingSet": "Einstellungen für privaten Arbeitsbereich konnten nicht aktualisiert werden.",
+    "privateWorkingSetPull": "Neueste Quellwerte des privaten Arbeitsbereichs konnten nicht abgerufen werden.",
+    "privateWorkingSetPromote": "Änderung aus privatem Arbeitsbereich konnte nicht in die gemeinsame Quelle übernommen werden."
   },
   "overview": {
     "endpointTitle": "DAV-Endpunkt",
@@ -113,31 +113,31 @@
       "unshared": "{{name}} ist nicht länger freigegeben."
     },
     "appleCompatSaved": "Apple-Kompatibilitätseinstellungen wurden gespeichert.",
-    "privateWorkingSetSaved": "Private working set settings saved.",
-    "privateWorkingSetPulled": "Private working set pulled from shared sources.",
-    "privateWorkingSetForcePulled": "Private working set force-pulled from shared sources.",
-    "privateWorkingSetPromoted": "Private card promoted to shared source.",
-    "privateWorkingSetPromoteQueued": "Promotion submitted to review queue."
+    "privateWorkingSetSaved": "Einstellungen für privaten Arbeitsbereich wurden gespeichert.",
+    "privateWorkingSetPulled": "Privater Arbeitsbereich wurde aus gemeinsamen Quellen aktualisiert.",
+    "privateWorkingSetForcePulled": "Privater Arbeitsbereich wurde mit Serverwerten aus gemeinsamen Quellen überschrieben.",
+    "privateWorkingSetPromoted": "Private Karte wurde in die gemeinsame Quelle übernommen.",
+    "privateWorkingSetPromoteQueued": "Übernahme wurde zur Prüfwarteschlange eingereicht."
   },
   "privateWorkingSet": {
-    "title": "Private Working Set",
-    "subtitle": "Create per-user private copies of shared contacts so local edits stay private unless you explicitly promote them.",
-    "target": "Private working-set book: {{name}} (/{{uri}})",
-    "enable": "Enable private working set",
-    "hideShared": "Hide selected shared source books from DAV discovery",
-    "sourcesTitle": "Shared source address books",
-    "noSources": "No eligible shared address books available.",
-    "canWrite": "Editor/Admin share",
-    "readOnly": "Read-only share",
-    "save": "Save Private Working Set Settings",
-    "saving": "Saving...",
-    "pull": "Pull Latest (Respect Overrides)",
-    "forcePull": "Force Pull (Use Server Values)",
-    "pulling": "Pulling...",
-    "linkedCardsTitle": "Linked private cards",
-    "noLinkedCards": "No linked private cards yet.",
-    "sourceCardHint": "Source URI: {{uri}}",
-    "promote": "Promote to Shared Source",
-    "promoting": "Promoting..."
+    "title": "Privater Arbeitsbereich",
+    "subtitle": "Erstellen Sie pro Benutzer private Kopien geteilter Kontakte, damit lokale Änderungen privat bleiben, bis Sie sie ausdrücklich übernehmen.",
+    "target": "Privates Arbeitsbereichs-Adressbuch: {{name}} (/{{uri}})",
+    "enable": "Privaten Arbeitsbereich aktivieren",
+    "hideShared": "Ausgewählte geteilte Quelladressbücher in der DAV-Erkennung ausblenden",
+    "sourcesTitle": "Geteilte Quelladressbücher",
+    "noSources": "Keine geeigneten geteilten Adressbücher verfügbar.",
+    "canWrite": "Editor/Admin-Freigabe",
+    "readOnly": "Nur-Lese-Freigabe",
+    "save": "Einstellungen für privaten Arbeitsbereich speichern",
+    "saving": "Speichern...",
+    "pull": "Neueste laden (Überschreibungen beibehalten)",
+    "forcePull": "Erzwungen laden (Serverwerte verwenden)",
+    "pulling": "Lädt...",
+    "linkedCardsTitle": "Verknüpfte private Karten",
+    "noLinkedCards": "Noch keine verknüpften privaten Karten.",
+    "sourceCardHint": "Quell-URI: {{uri}}",
+    "promote": "In gemeinsame Quelle übernehmen",
+    "promoting": "Übernimmt..."
   }
 }

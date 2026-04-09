@@ -68,6 +68,21 @@ Optional feature for Apple ecosystem visibility:
 - Source books can be owned or shared books you can access
 - You can enable/disable and choose mirror sources in dashboard
 
+### Private Working Set (Shared Contacts)
+
+Optional feature for per-user private edits on shared contacts:
+- Creates/uses a private address book for your account
+- Syncs selected shared source address books into private linked cards
+- Lets you keep local-only overrides (for example notes or photos) in your private set
+- Optional `Hide shared source books` removes selected shared source books from your dashboard list and DAV discovery for your account
+
+Action buttons:
+- `Pull Latest (Respect Overrides)`: refresh from source while preserving your private override fields
+- `Force Pull (Use Server Values)`: refresh from source and replace private override fields with source values
+- `Promote to Shared Source`: submit one private card back to source
+  - if review queue moderation applies, promotion is queued for owner/admin approval
+  - otherwise, promotion applies directly to source and syncs to subscribers
+
 ## 3. Contacts (When Enabled)
 
 If admin enables contact management, the `Contacts` tab appears.
@@ -87,6 +102,7 @@ Queue behavior:
 - If `Review Queue` is enabled by admin, some changes (especially cross-owner contexts) may be queued for approval
 - If `Review Queue` is disabled, cross-owner changes apply immediately (latest write wins)
 - UI shows queued notice when server returns `202`
+- Private working-set promotions follow the same moderation rules (`202` queued vs immediate apply)
 
 ## 4. Review Queue
 
