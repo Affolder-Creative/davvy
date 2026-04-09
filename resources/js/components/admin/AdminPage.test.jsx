@@ -466,7 +466,7 @@ describe("AdminPage", () => {
     );
   });
 
-  it("renders share list entries with resource display names and user identity values", async () => {
+  it("groups share list entries by resource and renders recipient rows", async () => {
     const props = buildProps({
       api: buildApi({
         resources: {
@@ -502,6 +502,22 @@ describe("AdminPage", () => {
               email: "recipient@example.com",
             },
           },
+          {
+            id: 43,
+            resource_type: "address_book",
+            resource_id: 2,
+            permission: "editor",
+            owner: {
+              id: 10,
+              name: "Jordan Owner",
+              email: "owner@example.com",
+            },
+            shared_with: {
+              id: 12,
+              name: "Morgan Editor",
+              email: "editor@example.com",
+            },
+          },
         ],
       }),
     });
@@ -512,7 +528,7 @@ describe("AdminPage", () => {
       expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
     );
 
-    expect(screen.getByText("Shared Team Contacts")).toBeInTheDocument();
+    expect(screen.getAllByText("Shared Team Contacts")).toHaveLength(1);
     expect(
       screen.getByText((_, node) => {
         const text = node?.textContent?.trim() ?? "";
@@ -525,5 +541,13 @@ describe("AdminPage", () => {
         return text === "Shared with: Avery Recipient (recipient@example.com)";
       }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText((_, node) => {
+        const text = node?.textContent?.trim() ?? "";
+        return text === "Shared with: Morgan Editor (editor@example.com)";
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("read_only")).toBeInTheDocument();
+    expect(screen.getByText("editor")).toBeInTheDocument();
   });
 });

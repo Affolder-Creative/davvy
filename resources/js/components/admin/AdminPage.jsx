@@ -1176,6 +1176,40 @@ export default function AdminPage({
 
     return `${typeLabel} #${share.resource_id}`;
   };
+  const groupedShares = useMemo(() => {
+    const grouped = [];
+    const groupsByKey = new Map();
+
+    (Array.isArray(state.shares) ? state.shares : []).forEach((share) => {
+      const resourceType =
+        share.resource_type === "address_book" ? "address_book" : "calendar";
+      const resourceId = Number(share.resource_id);
+      const key = `${resourceType}:${
+        Number.isFinite(resourceId) ? resourceId : String(share.resource_id)
+      }`;
+
+      if (!groupsByKey.has(key)) {
+        const initialGroup = {
+          key,
+          resource_type: resourceType,
+          resource_id: share.resource_id,
+          owner: share.owner,
+          shares: [],
+        };
+        groupsByKey.set(key, initialGroup);
+        grouped.push(initialGroup);
+      }
+
+      const group = groupsByKey.get(key);
+      if (!group.owner && share.owner) {
+        group.owner = share.owner;
+      }
+
+      group.shares.push(share);
+    });
+
+    return grouped;
+  }, [state.shares]);
   const renderShareIdentity = (translationKey, user) => {
     const name = String(user?.name ?? "").trim();
     const email = String(user?.email ?? "").trim();
@@ -2433,32 +2467,40 @@ export default function AdminPage({
             </form>
 
             <div className="mt-5 space-y-2">
-              {state.shares.map((share) => (
+              {groupedShares.map((shareGroup) => (
                 <div
-                  key={share.id}
+                  key={shareGroup.key}
                   className="rounded-xl border border-app-edge bg-app-surface p-3 text-sm"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <p className="font-semibold text-app-strong">
-                      {getShareResourceLabel(share)}
+                      {getShareResourceLabel(shareGroup)}
                     </p>
-                    <PermissionBadge permission={share.permission} />
                   </div>
                   <p className="text-app-muted">
-                    {renderShareIdentity("labels.share.owner", share.owner)}
+                    {renderShareIdentity("labels.share.owner", shareGroup.owner)}
                   </p>
-                  <p className="text-app-muted">
-                    {renderShareIdentity(
-                      "labels.share.sharedWith",
-                      share.shared_with,
-                    )}
-                  </p>
-                  <button
-                    className="mt-2 text-xs font-semibold text-app-danger"
-                    onClick={() => deleteShare(share.id)}
-                  >
-                    {t("labels.remove")}
-                  </button>
+                  <div className="mt-2 space-y-2">
+                    {shareGroup.shares.map((share) => (
+                      <div key={share.id} className="rounded-lg border border-app-edge px-3 py-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-app-muted">
+                            {renderShareIdentity(
+                              "labels.share.sharedWith",
+                              share.shared_with,
+                            )}
+                          </p>
+                          <PermissionBadge permission={share.permission} />
+                        </div>
+                        <button
+                          className="mt-2 text-xs font-semibold text-app-danger"
+                          onClick={() => deleteShare(share.id)}
+                        >
+                          {t("labels.remove")}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
