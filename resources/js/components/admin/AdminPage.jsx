@@ -83,6 +83,10 @@ export default function AdminPage({
     shared_with_id: "",
     permission: "read_only",
   });
+  const [shareSearchQuery, setShareSearchQuery] = useState("");
+  const [shareTypeFilter, setShareTypeFilter] = useState("all");
+  const [sharePermissionFilter, setSharePermissionFilter] = useState("all");
+  const [collapsedShareGroups, setCollapsedShareGroups] = useState({});
   const [deleteUserTarget, setDeleteUserTarget] = useState(null);
   const [deleteUserConfirmationEmail, setDeleteUserConfirmationEmail] =
     useState("");
@@ -1210,6 +1214,85 @@ export default function AdminPage({
 
     return grouped;
   }, [state.shares]);
+  useEffect(() => {
+    setCollapsedShareGroups((prev) => {
+      const groupedKeys = new Set(groupedShares.map((shareGroup) => shareGroup.key));
+      const next = {};
+      let changed = false;
+
+      Object.entries(prev).forEach(([key, value]) => {
+        if (groupedKeys.has(key)) {
+          next[key] = value;
+        } else {
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [groupedShares]);
+
+  const normalizedShareQuery = shareSearchQuery.trim().toLowerCase();
+  const filteredShareGroups = groupedShares
+    .filter((shareGroup) => {
+      if (shareTypeFilter === "all") {
+        return true;
+      }
+
+      return shareGroup.resource_type === shareTypeFilter;
+    })
+    .map((shareGroup) => {
+      let visibleShares = shareGroup.shares;
+
+      if (sharePermissionFilter !== "all") {
+        visibleShares = visibleShares.filter(
+          (share) => share.permission === sharePermissionFilter,
+        );
+      }
+
+      if (visibleShares.length === 0) {
+        return null;
+      }
+
+      if (normalizedShareQuery !== "") {
+        const groupSearchText = [
+          getShareResourceLabel(shareGroup),
+          shareGroup.owner?.name ?? "",
+          shareGroup.owner?.email ?? "",
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        if (!groupSearchText.includes(normalizedShareQuery)) {
+          visibleShares = visibleShares.filter((share) => {
+            const recipientName = String(share.shared_with?.name ?? "").toLowerCase();
+            const recipientEmail = String(share.shared_with?.email ?? "").toLowerCase();
+
+            return (
+              recipientName.includes(normalizedShareQuery) ||
+              recipientEmail.includes(normalizedShareQuery)
+            );
+          });
+        }
+      }
+
+      if (visibleShares.length === 0) {
+        return null;
+      }
+
+      return {
+        ...shareGroup,
+        visibleShares,
+      };
+    })
+    .filter(Boolean);
+
+  const toggleShareGroupCollapsed = (groupKey) => {
+    setCollapsedShareGroups((prev) => ({
+      ...prev,
+      [groupKey]: !prev[groupKey],
+    }));
+  };
   const renderShareIdentity = (translationKey, user) => {
     const name = String(user?.name ?? "").trim();
     const email = String(user?.email ?? "").trim();
@@ -2466,48 +2549,110 @@ export default function AdminPage({
               </button>
             </form>
 
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <input
+                className="input sm:col-span-2"
+                type="search"
+                value={shareSearchQuery}
+                onChange={(event) => setShareSearchQuery(event.target.value)}
+                placeholder={t("labels.share.searchPlaceholder")}
+                aria-label={t("labels.share.searchAriaLabel")}
+              />
+              <select
+                className="input"
+                value={shareTypeFilter}
+                onChange={(event) => setShareTypeFilter(event.target.value)}
+                aria-label={t("labels.share.filterTypeAriaLabel")}
+              >
+                <option value="all">{t("labels.share.allResourceTypes")}</option>
+                <option value="calendar">{t("labels.calendar")}</option>
+                <option value="address_book">{t("labels.addressBook")}</option>
+              </select>
+              <select
+                className="input"
+                value={sharePermissionFilter}
+                onChange={(event) => setSharePermissionFilter(event.target.value)}
+                aria-label={t("labels.share.filterPermissionAriaLabel")}
+              >
+                <option value="all">{t("labels.share.allPermissions")}</option>
+                <option value="read_only">
+                  {t("labels.share.permission.general")}
+                </option>
+                <option value="editor">
+                  {t("labels.share.permission.editor")}
+                </option>
+                <option value="admin">{t("labels.share.permission.admin")}</option>
+              </select>
+            </div>
+
             <div className="mt-5 space-y-2">
-              {groupedShares.map((shareGroup) => (
-                <div
-                  key={shareGroup.key}
-                  className="rounded-xl border border-app-edge bg-app-surface p-3 text-sm"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="font-semibold text-app-strong">
-                      {getShareResourceLabel(shareGroup)}
-                    </p>
-                    <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
-                      {t("labels.share.sharedWithCount", {
-                        count: shareGroup.shares.length,
-                      })}
-                    </span>
-                  </div>
-                  <p className="text-app-muted">
-                    {renderShareIdentity("labels.share.owner", shareGroup.owner)}
-                  </p>
-                  <div className="mt-2 space-y-2">
-                    {shareGroup.shares.map((share) => (
-                      <div key={share.id} className="rounded-lg border border-app-edge px-3 py-2">
-                        <div className="flex items-start justify-between gap-3">
-                          <p className="text-app-muted">
-                            {renderShareIdentity(
-                              "labels.share.sharedWith",
-                              share.shared_with,
-                            )}
-                          </p>
-                          <PermissionBadge permission={share.permission} />
+              {filteredShareGroups.length === 0 ? (
+                <p className="rounded-xl border border-app-edge bg-app-surface p-3 text-xs text-app-faint">
+                  {t("labels.share.noMatches")}
+                </p>
+              ) : (
+                filteredShareGroups.map((shareGroup) => {
+                  const groupCollapsed = collapsedShareGroups[shareGroup.key] === true;
+
+                  return (
+                    <div
+                      key={shareGroup.key}
+                      className="rounded-xl border border-app-edge bg-app-surface p-3 text-sm"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="font-semibold text-app-strong">
+                          {getShareResourceLabel(shareGroup)}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
+                            {t("labels.share.sharedWithCount", {
+                              count: shareGroup.visibleShares.length,
+                            })}
+                          </span>
+                          <button
+                            className="text-xs font-semibold text-app-muted hover:text-app-strong"
+                            type="button"
+                            onClick={() => toggleShareGroupCollapsed(shareGroup.key)}
+                          >
+                            {groupCollapsed
+                              ? t("labels.share.showRecipients")
+                              : t("labels.share.hideRecipients")}
+                          </button>
                         </div>
-                        <button
-                          className="mt-2 text-xs font-semibold text-app-danger"
-                          onClick={() => deleteShare(share.id)}
-                        >
-                          {t("labels.remove")}
-                        </button>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                      <p className="text-app-muted">
+                        {renderShareIdentity("labels.share.owner", shareGroup.owner)}
+                      </p>
+                      {groupCollapsed ? null : (
+                        <div className="mt-2 space-y-2">
+                          {shareGroup.visibleShares.map((share) => (
+                            <div
+                              key={share.id}
+                              className="rounded-lg border border-app-edge px-3 py-2"
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="text-app-muted">
+                                  {renderShareIdentity(
+                                    "labels.share.sharedWith",
+                                    share.shared_with,
+                                  )}
+                                </p>
+                                <PermissionBadge permission={share.permission} />
+                              </div>
+                              <button
+                                className="mt-2 text-xs font-semibold text-app-danger"
+                                onClick={() => deleteShare(share.id)}
+                              >
+                                {t("labels.remove")}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </section>
         </div>

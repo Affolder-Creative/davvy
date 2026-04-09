@@ -21,7 +21,16 @@
       "save": "Freigabe speichern",
       "owner": "Besitzer: {{name}} ({{email}})",
       "sharedWith": "Geteilt mit: {{name}} ({{email}})",
-      "sharedWithCount": "Geteilt mit: {{count}}"
+      "sharedWithCount": "Geteilt mit: {{count}}",
+      "searchPlaceholder": "Ressourcen, Besitzer oder Empfanger suchen",
+      "searchAriaLabel": "Freigegebene Ressourcen suchen",
+      "filterTypeAriaLabel": "Freigegebene Ressourcen nach Typ filtern",
+      "filterPermissionAriaLabel": "Freigegebene Ressourcen nach Berechtigung filtern",
+      "allResourceTypes": "Alle Ressourcentypen",
+      "allPermissions": "Alle Berechtigungen",
+      "showRecipients": "Empfanger anzeigen",
+      "hideRecipients": "Empfanger ausblenden",
+      "noMatches": "Keine freigegebenen Ressourcen entsprechen den Filtern."
     },
     "enabled": "Aktiviert",
     "disabled": "Deaktiviert",

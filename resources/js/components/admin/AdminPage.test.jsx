@@ -551,4 +551,129 @@ describe("AdminPage", () => {
     expect(screen.getByText("read_only")).toBeInTheDocument();
     expect(screen.getByText("editor")).toBeInTheDocument();
   });
+
+  it("supports share list search, filters, and collapse toggles on grouped cards", async () => {
+    const user = userEvent.setup();
+    const props = buildProps({
+      api: buildApi({
+        resources: {
+          calendars: [
+            {
+              id: 7,
+              display_name: "Engineering Calendar",
+              owner: {
+                id: 20,
+                name: "Calendar Owner",
+                email: "calendar.owner@example.com",
+              },
+            },
+          ],
+          address_books: [
+            {
+              id: 2,
+              display_name: "Shared Team Contacts",
+              owner: {
+                id: 10,
+                name: "Jordan Owner",
+                email: "owner@example.com",
+              },
+            },
+          ],
+          milestone_purge_visible: false,
+          milestone_purge_available: false,
+        },
+        shares: [
+          {
+            id: 42,
+            resource_type: "address_book",
+            resource_id: 2,
+            permission: "read_only",
+            owner: {
+              id: 10,
+              name: "Jordan Owner",
+              email: "owner@example.com",
+            },
+            shared_with: {
+              id: 11,
+              name: "Avery Recipient",
+              email: "recipient@example.com",
+            },
+          },
+          {
+            id: 43,
+            resource_type: "address_book",
+            resource_id: 2,
+            permission: "editor",
+            owner: {
+              id: 10,
+              name: "Jordan Owner",
+              email: "owner@example.com",
+            },
+            shared_with: {
+              id: 12,
+              name: "Morgan Editor",
+              email: "editor@example.com",
+            },
+          },
+          {
+            id: 44,
+            resource_type: "calendar",
+            resource_id: 7,
+            permission: "admin",
+            owner: {
+              id: 20,
+              name: "Calendar Owner",
+              email: "calendar.owner@example.com",
+            },
+            shared_with: {
+              id: 13,
+              name: "Casey Admin",
+              email: "admin@example.com",
+            },
+          },
+        ],
+      }),
+    });
+
+    renderAdminPage(props);
+
+    await waitFor(() =>
+      expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
+    );
+
+    const searchInput = screen.getByLabelText("Search shared resources");
+    const typeFilter = screen.getByLabelText(
+      "Filter shared resources by type",
+    );
+    const permissionFilter = screen.getByLabelText(
+      "Filter shared resources by permission",
+    );
+
+    await user.type(searchInput, "Morgan");
+    expect(screen.getByText("Shared Team Contacts")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Engineering Calendar"),
+    ).not.toBeInTheDocument();
+
+    await user.clear(searchInput);
+    await user.selectOptions(typeFilter, "calendar");
+    expect(screen.getByText("Engineering Calendar")).toBeInTheDocument();
+    expect(screen.queryByText("Shared Team Contacts")).not.toBeInTheDocument();
+
+    await user.selectOptions(permissionFilter, "editor");
+    expect(
+      screen.getByText("No shared resources match your filters."),
+    ).toBeInTheDocument();
+
+    await user.selectOptions(typeFilter, "all");
+    await user.selectOptions(permissionFilter, "all");
+
+    const firstHideButton = screen.getAllByRole("button", {
+      name: "Hide recipients",
+    })[0];
+    await user.click(firstHideButton);
+    expect(
+      screen.getByRole("button", { name: "Show recipients" }),
+    ).toBeInTheDocument();
+  });
 });

@@ -21,7 +21,16 @@
       "save": "共有を保存",
       "owner": "所有者: {{name}} ({{email}})",
       "sharedWith": "{{name}} ({{email}}) と共有",
-      "sharedWithCount": "共有先: {{count}}"
+      "sharedWithCount": "共有先: {{count}}",
+      "searchPlaceholder": "リソース、所有者、共有先を検索",
+      "searchAriaLabel": "共有リソースを検索",
+      "filterTypeAriaLabel": "共有リソースを種別で絞り込む",
+      "filterPermissionAriaLabel": "共有リソースを権限で絞り込む",
+      "allResourceTypes": "すべてのリソース種別",
+      "allPermissions": "すべての権限",
+      "showRecipients": "共有先を表示",
+      "hideRecipients": "共有先を非表示",
+      "noMatches": "フィルターに一致する共有リソースはありません。"
     },
     "enabled": "有効",
     "disabled": "無効",

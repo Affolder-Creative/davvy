@@ -21,7 +21,16 @@
       "save": "Save Share",
       "owner": "Owner: {{name}} ({{email}})",
       "sharedWith": "Shared with: {{name}} ({{email}})",
-      "sharedWithCount": "Shared with: {{count}}"
+      "sharedWithCount": "Shared with: {{count}}",
+      "searchPlaceholder": "Search resources, owners, or recipients",
+      "searchAriaLabel": "Search shared resources",
+      "filterTypeAriaLabel": "Filter shared resources by type",
+      "filterPermissionAriaLabel": "Filter shared resources by permission",
+      "allResourceTypes": "All resource types",
+      "allPermissions": "All permissions",
+      "showRecipients": "Show recipients",
+      "hideRecipients": "Hide recipients",
+      "noMatches": "No shared resources match your filters."
     },
     "enabled": "Enabled",
     "disabled": "Disabled",

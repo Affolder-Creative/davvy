@@ -21,7 +21,16 @@
       "save": "Guardar recurso compartido",
       "owner": "Propietario: {{name}} ({{email}})",
       "sharedWith": "Compartido con: {{name}} ({{email}})",
-      "sharedWithCount": "Compartido con: {{count}}"
+      "sharedWithCount": "Compartido con: {{count}}",
+      "searchPlaceholder": "Buscar recursos, propietarios o destinatarios",
+      "searchAriaLabel": "Buscar recursos compartidos",
+      "filterTypeAriaLabel": "Filtrar recursos compartidos por tipo",
+      "filterPermissionAriaLabel": "Filtrar recursos compartidos por permiso",
+      "allResourceTypes": "Todos los tipos de recurso",
+      "allPermissions": "Todos los permisos",
+      "showRecipients": "Mostrar destinatarios",
+      "hideRecipients": "Ocultar destinatarios",
+      "noMatches": "Ningun recurso compartido coincide con los filtros."
     },
     "enabled": "Habilitado",
     "disabled": "Deshabilitado",

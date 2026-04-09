@@ -21,7 +21,16 @@
       "save": "保存共享",
       "owner": "所有者：{{name}} ({{email}})",
       "sharedWith": "共享对象：{{name}} ({{email}})",
-      "sharedWithCount": "共享对象：{{count}}"
+      "sharedWithCount": "共享对象：{{count}}",
+      "searchPlaceholder": "搜索资源、所有者或共享对象",
+      "searchAriaLabel": "搜索共享资源",
+      "filterTypeAriaLabel": "按类型筛选共享资源",
+      "filterPermissionAriaLabel": "按权限筛选共享资源",
+      "allResourceTypes": "所有资源类型",
+      "allPermissions": "所有权限",
+      "showRecipients": "显示共享对象",
+      "hideRecipients": "隐藏共享对象",
+      "noMatches": "没有符合筛选条件的共享资源。"
     },
     "enabled": "启用",
     "disabled": "禁用",
