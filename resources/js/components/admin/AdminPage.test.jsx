@@ -514,10 +514,16 @@ describe("AdminPage", () => {
 
     expect(screen.getByText("Shared Team Contacts")).toBeInTheDocument();
     expect(
-      screen.getByText("Owner: Jordan Owner (owner@example.com)"),
+      screen.getByText((_, node) => {
+        const text = node?.textContent?.trim() ?? "";
+        return text === "Owner: Jordan Owner (owner@example.com)";
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Shared with: Avery Recipient (recipient@example.com)"),
+      screen.getByText((_, node) => {
+        const text = node?.textContent?.trim() ?? "";
+        return text === "Shared with: Avery Recipient (recipient@example.com)";
+      }),
     ).toBeInTheDocument();
   });
 });

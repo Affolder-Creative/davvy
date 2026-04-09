@@ -1176,6 +1176,34 @@ export default function AdminPage({
 
     return `${typeLabel} #${share.resource_id}`;
   };
+  const renderShareIdentity = (translationKey, user) => {
+    const name = String(user?.name ?? "").trim();
+    const email = String(user?.email ?? "").trim();
+    if (email === "") {
+      return t(translationKey, { name, email });
+    }
+
+    const emailMarker = "__DAVVY_SHARE_EMAIL__";
+    const translated = t(translationKey, {
+      name,
+      email: emailMarker,
+    });
+
+    if (!translated.includes(emailMarker)) {
+      return t(translationKey, { name, email });
+    }
+
+    const [beforeEmail, ...afterEmailParts] = translated.split(emailMarker);
+    const afterEmail = afterEmailParts.join(emailMarker);
+
+    return (
+      <>
+        {beforeEmail}
+        <span className="text-xs text-app-faint">{email}</span>
+        {afterEmail}
+      </>
+    );
+  };
   const adminConfirmationEmail = String(auth.user?.email || "").trim();
   const deleteUserTransferOptions = useMemo(() => {
     if (!deleteUserTarget) {
@@ -2395,16 +2423,13 @@ export default function AdminPage({
                     <PermissionBadge permission={share.permission} />
                   </div>
                   <p className="text-app-muted">
-                    {t("labels.share.owner", {
-                      name: share.owner.name,
-                      email: share.owner.email,
-                    })}
+                    {renderShareIdentity("labels.share.owner", share.owner)}
                   </p>
                   <p className="text-app-muted">
-                    {t("labels.share.sharedWith", {
-                      name: share.shared_with.name,
-                      email: share.shared_with.email,
-                    })}
+                    {renderShareIdentity(
+                      "labels.share.sharedWith",
+                      share.shared_with,
+                    )}
                   </p>
                   <button
                     className="mt-2 text-xs font-semibold text-app-danger"
