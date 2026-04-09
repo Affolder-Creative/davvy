@@ -896,8 +896,7 @@ class AddressBookPrivateWorkingSetService
         User $user,
         int $sourceAddressBookId,
         ?bool $includeOwnedSharableSources = null,
-    ): bool
-    {
+    ): bool {
         $canUseSharedSource = ResourceShare::query()
             ->where('resource_type', ShareResourceType::AddressBook)
             ->where('resource_id', $sourceAddressBookId)
