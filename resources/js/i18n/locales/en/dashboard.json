@@ -91,6 +91,9 @@
     "permAdmin": "Admin (full edit + delete)",
     "share": "Share",
     "noOutgoing": "No outgoing shares yet.",
+    "showRecipients": "Show recipients",
+    "hideRecipients": "Hide recipients",
+    "sharedWithCount": "Shared with: {{count}}",
     "sharedWith": "Shared with: {{name}} ({{email}})",
     "revoke": "Revoke"
   },

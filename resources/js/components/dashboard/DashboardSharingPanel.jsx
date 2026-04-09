@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -18,6 +18,93 @@ export default function DashboardSharingPanel({
   PermissionBadge,
 }) {
   const { t } = useTranslation("dashboard");
+  const [shareRecipientsExpanded, setShareRecipientsExpanded] = useState(false);
+  const groupedOutgoing = useMemo(() => {
+    const grouped = [];
+    const groupsByKey = new Map();
+
+    (Array.isArray(outgoing) ? outgoing : []).forEach((share) => {
+      const resourceType =
+        share.resource_type === "address_book" ? "address_book" : "calendar";
+      const resourceId = Number(share.resource_id);
+      const key = `${resourceType}:${
+        Number.isFinite(resourceId) ? resourceId : String(share.resource_id)
+      }`;
+
+      if (!groupsByKey.has(key)) {
+        const initialGroup = {
+          key,
+          resource_type: resourceType,
+          resource_id: share.resource_id,
+          resource_display_name: share.resource_display_name ?? null,
+          shares: [],
+        };
+        groupsByKey.set(key, initialGroup);
+        grouped.push(initialGroup);
+      }
+
+      const group = groupsByKey.get(key);
+      if (
+        (!group.resource_display_name || group.resource_display_name === "") &&
+        share.resource_display_name
+      ) {
+        group.resource_display_name = share.resource_display_name;
+      }
+
+      group.shares.push(share);
+    });
+
+    return grouped;
+  }, [outgoing]);
+
+  const resourceLabelFor = (resourceGroup) => {
+    const displayName = String(resourceGroup?.resource_display_name ?? "").trim();
+    if (displayName !== "") {
+      return displayName;
+    }
+
+    const typeLabel =
+      resourceGroup?.resource_type === "address_book"
+        ? t("sharing.resourceAddressBook")
+        : t("sharing.resourceCalendar");
+
+    return `${typeLabel} #${resourceGroup?.resource_id}`;
+  };
+
+  const renderShareIdentity = (translationKey, user) => {
+    const name = String(user?.name ?? "").trim();
+    const email = String(user?.email ?? "").trim();
+    if (email === "") {
+      return t(translationKey, { name, email });
+    }
+
+    const emailMarker = "__DAVVY_SHARE_EMAIL__";
+    const translated = t(translationKey, {
+      name,
+      email: emailMarker,
+    });
+
+    if (!translated.includes(emailMarker)) {
+      return t(translationKey, { name, email });
+    }
+
+    const [beforeEmail, ...afterEmailParts] = translated.split(emailMarker);
+    let beforeEmailText = beforeEmail;
+    let afterEmailText = afterEmailParts.join(emailMarker);
+
+    if (beforeEmailText.endsWith("(") && afterEmailText.startsWith(")")) {
+      beforeEmailText = beforeEmailText.slice(0, -1);
+      afterEmailText = afterEmailText.slice(1);
+    }
+
+    return (
+      <>
+        {beforeEmailText}
+        <span className="text-xs text-app-faint">({email})</span>
+        {afterEmailText}
+      </>
+    );
+  };
 
   return (
     <section className="surface mt-6 rounded-3xl p-6">
@@ -93,34 +180,59 @@ export default function DashboardSharingPanel({
         </div>
       </form>
 
-      <div className="mt-5 space-y-2">
-        {outgoing.length === 0 ? (
+      <div className="mt-5 flex justify-end">
+        <button
+          className="btn-outline btn-outline-sm"
+          type="button"
+          onClick={() => setShareRecipientsExpanded((prev) => !prev)}
+          disabled={groupedOutgoing.length === 0}
+        >
+          {shareRecipientsExpanded
+            ? t("sharing.hideRecipients")
+            : t("sharing.showRecipients")}
+        </button>
+      </div>
+
+      <div className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
+        {groupedOutgoing.length === 0 ? (
           <p className="text-sm text-app-faint">{t("sharing.noOutgoing")}</p>
         ) : (
-          outgoing.map((share) => (
+          groupedOutgoing.map((shareGroup) => (
             <div
-              key={share.id}
+              key={shareGroup.key}
               className="rounded-xl border border-app-edge bg-app-surface p-3 text-sm"
             >
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-start justify-between gap-3">
                 <p className="font-semibold text-app-strong">
-                  {share.resource_display_name ||
-                    `${share.resource_type} #${share.resource_id}`}
+                  {resourceLabelFor(shareGroup)}
                 </p>
-                <PermissionBadge permission={share.permission} />
+                <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
+                  {t("sharing.sharedWithCount", { count: shareGroup.shares.length })}
+                </span>
               </div>
-              <p className="text-app-muted">
-                {t("sharing.sharedWith", {
-                  name: share.shared_with?.name,
-                  email: share.shared_with?.email,
-                })}
-              </p>
-              <button
-                className="mt-2 text-xs font-semibold text-app-danger"
-                onClick={() => onDeleteShare(share.id)}
-              >
-                {t("sharing.revoke")}
-              </button>
+              {!shareRecipientsExpanded ? null : (
+                <div className="mt-2 space-y-2">
+                  {shareGroup.shares.map((share) => (
+                    <div
+                      key={share.id}
+                      className="rounded-lg border border-app-edge px-3 py-2"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-app-muted">
+                          {renderShareIdentity("sharing.sharedWith", share.shared_with)}
+                        </p>
+                        <PermissionBadge permission={share.permission} />
+                      </div>
+                      <button
+                        className="mt-2 text-xs font-semibold text-app-danger"
+                        onClick={() => onDeleteShare(share.id)}
+                      >
+                        {t("sharing.revoke")}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))
         )}

@@ -91,6 +91,9 @@
     "permAdmin": "Admin (volle Bearbeitung + Löschen)",
     "share": "Freigeben",
     "noOutgoing": "Noch keine ausgehenden Freigaben.",
+    "showRecipients": "Empfanger anzeigen",
+    "hideRecipients": "Empfanger ausblenden",
+    "sharedWithCount": "Geteilt mit: {{count}}",
     "sharedWith": "Geteilt mit: {{name}} ({{email}})",
     "revoke": "Widerrufen"
   },

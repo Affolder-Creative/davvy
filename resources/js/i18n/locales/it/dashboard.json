@@ -91,6 +91,9 @@
     "permAdmin": "Amministratore (modifica completa + eliminazione)",
     "share": "Condividi",
     "noOutgoing": "Nessuna condivisione in uscita ancora.",
+    "showRecipients": "Mostra destinatari",
+    "hideRecipients": "Nascondi destinatari",
+    "sharedWithCount": "Condiviso con: {{count}}",
     "sharedWith": "Condiviso con: {{name}} ({{email}})",
     "revoke": "Revoca"
   },

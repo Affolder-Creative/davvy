@@ -91,7 +91,10 @@
     "permAdmin": "管理员（完全编辑+删除）",
     "share": "分享",
     "noOutgoing": "还没有流出股票。",
+    "sharedWithCount": "共享对象：{{count}}",
     "sharedWith": "共享者：{{name}} ({{email}})",
+    "showRecipients": "显示共享对象",
+    "hideRecipients": "隐藏共享对象",
     "revoke": "撤销"
   },
   "appleCompat": {

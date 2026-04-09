@@ -91,7 +91,10 @@
     "permAdmin": "Administrador (edição completa + exclusão)",
     "share": "Compartilhar",
     "noOutgoing": "Ainda não há ações de saída.",
+    "sharedWithCount": "Compartilhado com: {{count}}",
     "sharedWith": "Compartilhado com: {{name}} ({{email}})",
+    "showRecipients": "Mostrar destinatários",
+    "hideRecipients": "Ocultar destinatários",
     "revoke": "Revogar"
   },
   "appleCompat": {

@@ -91,6 +91,9 @@
     "permAdmin": "管理者 (完全編集 + 削除)",
     "share": "シェアする",
     "noOutgoing": "まだ発行株式はありません。",
+    "showRecipients": "共有先を表示",
+    "hideRecipients": "共有先を非表示",
+    "sharedWithCount": "共有先: {{count}}",
     "sharedWith": "共有者: {{name}} ({{email}})",
     "revoke": "取り消し"
   },
