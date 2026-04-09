@@ -2516,41 +2516,46 @@ export default function AdminPage({
                             {user.name}
                           </p>
                           <p className="text-app-muted">{user.email}</p>
-                          <p className="text-xs text-app-faint">
-                            {t("admin.userCompactMeta", {
-                              role: user.role,
-                              two_factor: user.two_factor_enabled
-                                ? t("labels.enabled")
-                                : t("labels.disabled"),
-                            })}
-                          </p>
+                          {!userExpanded ? (
+                            <p className="text-xs text-app-faint">
+                              {t("admin.userCompactMeta", {
+                                role: user.role,
+                                two_factor: user.two_factor_enabled
+                                  ? t("labels.enabled")
+                                  : t("labels.disabled"),
+                              })}
+                            </p>
+                          ) : null}
                         </div>
-                        <div className="flex flex-wrap items-center justify-end gap-1">
-                          {!isApproved ? (
-                            <button
-                              className="btn-outline btn-outline-sm inline-flex items-center gap-1"
-                              type="button"
-                              onClick={() => approveUser(user.id)}
-                            >
-                              <span>{t("admin.approveUser")}</span>
-                              {CheckIcon ? (
-                                <CheckIcon className="h-3.5 w-3.5" />
-                              ) : null}
-                            </button>
-                          ) : null}
-                          {Number(user.id) !== Number(auth.user?.id) ? (
-                            <button
-                              className="btn-outline btn-outline-sm text-app-danger"
-                              type="button"
-                              onClick={() => openDeleteUserDialog(user)}
-                            >
-                              {t("labels.delete")}
-                            </button>
-                          ) : null}
+                        <div className="flex flex-col items-end gap-1.5">
+                          <div className="flex flex-wrap items-center justify-end gap-1">
+                            {!isApproved ? (
+                              <button
+                                className="btn-outline btn-outline-sm inline-flex items-center gap-1"
+                                type="button"
+                                onClick={() => approveUser(user.id)}
+                              >
+                                <span>{t("admin.approveUser")}</span>
+                                {CheckIcon ? (
+                                  <CheckIcon className="h-3.5 w-3.5" />
+                                ) : null}
+                              </button>
+                            ) : null}
+                            {Number(user.id) !== Number(auth.user?.id) ? (
+                              <button
+                                className="btn-outline btn-outline-sm text-app-danger"
+                                type="button"
+                                onClick={() => openDeleteUserDialog(user)}
+                              >
+                                {t("labels.delete")}
+                              </button>
+                            ) : null}
+                          </div>
                           <button
                             className="text-xs font-semibold text-app-muted hover:text-app-strong"
                             type="button"
                             onClick={() => toggleUserExpanded(user.id)}
+                            aria-expanded={userExpanded}
                           >
                             {userExpanded
                               ? t("admin.hideDetails")
