@@ -26,6 +26,44 @@ export default function DashboardPrivateWorkingSetPanel({
   const canSelectSources = privateWorkingSetForm.enabled;
   const canRequireSelfReview =
     privateWorkingSetForm.enabled && contactChangeModerationEnabled;
+  const renderButtonLabelWithQualifier = (label) => {
+    const value = String(label ?? "");
+    const patterns = [
+      { open: "(", close: ")" },
+      { open: "（", close: "）" },
+    ];
+
+    for (const pattern of patterns) {
+      const closeIndex = value.lastIndexOf(pattern.close);
+      if (closeIndex !== value.length - 1) {
+        continue;
+      }
+
+      const openIndex = value.lastIndexOf(pattern.open, closeIndex - 1);
+      if (openIndex <= 0) {
+        continue;
+      }
+
+      const baseLabel = value.slice(0, openIndex).trimEnd();
+      const qualifier = value.slice(openIndex + 1, closeIndex).trim();
+      if (baseLabel === "" || qualifier === "") {
+        continue;
+      }
+
+      return (
+        <>
+          <span>{baseLabel}</span>
+          <span className="ml-2 text-[0.85em] opacity-90">
+            {pattern.open}
+            {qualifier}
+            {pattern.close}
+          </span>
+        </>
+      );
+    }
+
+    return value;
+  };
 
   return (
     <section className="surface mt-6 rounded-3xl p-6">
@@ -221,7 +259,7 @@ export default function DashboardPrivateWorkingSetPanel({
           >
             {pullingPrivateWorkingSet
               ? t("privateWorkingSet.pulling")
-              : t("privateWorkingSet.pull")}
+              : renderButtonLabelWithQualifier(t("privateWorkingSet.pull"))}
           </button>
           <button
             className="btn btn-secondary"
@@ -231,7 +269,9 @@ export default function DashboardPrivateWorkingSetPanel({
           >
             {pullingPrivateWorkingSet
               ? t("privateWorkingSet.pulling")
-              : t("privateWorkingSet.forcePull")}
+              : renderButtonLabelWithQualifier(
+                  t("privateWorkingSet.forcePull"),
+                )}
           </button>
         </div>
 
