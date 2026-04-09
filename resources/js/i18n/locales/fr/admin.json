@@ -19,8 +19,8 @@
         "admin": "Admin (modification complète + suppression)"
       },
       "save": "Enregistrer le partage",
-      "owner": "Propriétaire : {name} ({email})",
-      "sharedWith": "Partagé avec : {name} ({email})"
+      "owner": "Propriétaire : {{name}} ({{email}})",
+      "sharedWith": "Partagé avec : {{name}} ({{email}})"
     },
     "enabled": "Activé",
     "disabled": "Désactivé",

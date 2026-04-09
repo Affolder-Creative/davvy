@@ -19,8 +19,8 @@
         "admin": "Administrador (edição completa + exclusão)"
       },
       "save": "Salvar compartilhamento",
-      "owner": "Proprietário: {name} ({email})",
-      "sharedWith": "Compartilhado com: {name} ({email})"
+      "owner": "Proprietário: {{name}} ({{email}})",
+      "sharedWith": "Compartilhado com: {{name}} ({{email}})"
     },
     "enabled": "Habilitado",
     "disabled": "Desativado",

@@ -45,7 +45,7 @@ function renderAdminPage(props) {
   );
 }
 
-function buildApi({ users } = {}) {
+function buildApi({ users, resources, shares } = {}) {
   const usersData = Array.isArray(users)
     ? users
     : [
@@ -58,6 +58,13 @@ function buildApi({ users } = {}) {
           address_books_count: 1,
         },
       ];
+  const resourcesData = resources ?? {
+    calendars: [],
+    address_books: [],
+    milestone_purge_visible: false,
+    milestone_purge_available: false,
+  };
+  const sharesData = Array.isArray(shares) ? shares : [];
 
   const get = vi.fn((url) => {
     if (url === "/api/admin/users") {
@@ -70,17 +77,12 @@ function buildApi({ users } = {}) {
 
     if (url === "/api/admin/resources") {
       return Promise.resolve({
-        data: {
-          calendars: [],
-          address_books: [],
-          milestone_purge_visible: false,
-          milestone_purge_available: false,
-        },
+        data: resourcesData,
       });
     }
 
     if (url === "/api/admin/shares") {
-      return Promise.resolve({ data: { data: [] } });
+      return Promise.resolve({ data: { data: sharesData } });
     }
 
     if (url === "/api/admin/settings/contact-change-retention") {
@@ -462,5 +464,60 @@ describe("AdminPage", () => {
         },
       }),
     );
+  });
+
+  it("renders share list entries with resource display names and user identity values", async () => {
+    const props = buildProps({
+      api: buildApi({
+        resources: {
+          calendars: [],
+          address_books: [
+            {
+              id: 2,
+              display_name: "Shared Team Contacts",
+              owner: {
+                id: 10,
+                name: "Jordan Owner",
+                email: "owner@example.com",
+              },
+            },
+          ],
+          milestone_purge_visible: false,
+          milestone_purge_available: false,
+        },
+        shares: [
+          {
+            id: 42,
+            resource_type: "address_book",
+            resource_id: 2,
+            permission: "read_only",
+            owner: {
+              id: 10,
+              name: "Jordan Owner",
+              email: "owner@example.com",
+            },
+            shared_with: {
+              id: 11,
+              name: "Avery Recipient",
+              email: "recipient@example.com",
+            },
+          },
+        ],
+      }),
+    });
+
+    renderAdminPage(props);
+
+    await waitFor(() =>
+      expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
+    );
+
+    expect(screen.getByText("Shared Team Contacts")).toBeInTheDocument();
+    expect(
+      screen.getByText("Owner: Jordan Owner (owner@example.com)"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Shared with: Avery Recipient (recipient@example.com)"),
+    ).toBeInTheDocument();
   });
 });

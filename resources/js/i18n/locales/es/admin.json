@@ -19,8 +19,8 @@
         "admin": "Administrador (edición completa + borrado)"
       },
       "save": "Guardar recurso compartido",
-      "owner": "Propietario: {name} ({email})",
-      "sharedWith": "Compartido con: {name} ({email})"
+      "owner": "Propietario: {{name}} ({{email}})",
+      "sharedWith": "Compartido con: {{name}} ({{email}})"
     },
     "enabled": "Habilitado",
     "disabled": "Deshabilitado",

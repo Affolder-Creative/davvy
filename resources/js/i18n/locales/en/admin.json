@@ -19,8 +19,8 @@
         "admin": "Admin (full edit + delete)"
       },
       "save": "Save Share",
-      "owner": "Owner: {name} ({email})",
-      "sharedWith": "Shared with: {name} ({email})"
+      "owner": "Owner: {{name}} ({{email}})",
+      "sharedWith": "Shared with: {{name}} ({{email}})"
     },
     "enabled": "Enabled",
     "disabled": "Disabled",

@@ -19,8 +19,8 @@
         "admin": "管理者 (完全編集 + 削除)"
       },
       "save": "共有を保存",
-      "owner": "所有者: {name} ({email})",
-      "sharedWith": "{name} ({email}) と共有"
+      "owner": "所有者: {{name}} ({{email}})",
+      "sharedWith": "{{name}} ({{email}}) と共有"
     },
     "enabled": "有効",
     "disabled": "無効",

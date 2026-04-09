@@ -1132,6 +1132,50 @@ export default function AdminPage({
     shareForm.resource_type === "calendar"
       ? state.resources.calendars
       : state.resources.address_books;
+  const shareResourceNames = useMemo(() => {
+    const names = new Map();
+    const appendResourceNames = (resourceType, resources) => {
+      if (!Array.isArray(resources)) {
+        return;
+      }
+
+      resources.forEach((resource) => {
+        const resourceId = Number(resource?.id);
+        if (!Number.isFinite(resourceId)) {
+          return;
+        }
+
+        const displayName = String(
+          resource?.display_name ?? resource?.name ?? resource?.uri ?? "",
+        ).trim();
+
+        if (displayName !== "") {
+          names.set(`${resourceType}:${resourceId}`, displayName);
+        }
+      });
+    };
+
+    appendResourceNames("calendar", state.resources.calendars);
+    appendResourceNames("address_book", state.resources.address_books);
+
+    return names;
+  }, [state.resources.address_books, state.resources.calendars]);
+  const getShareResourceLabel = (share) => {
+    const resourceType =
+      share.resource_type === "address_book" ? "address_book" : "calendar";
+    const resourceId = Number(share.resource_id);
+    const label = shareResourceNames.get(`${resourceType}:${resourceId}`);
+    if (label) {
+      return label;
+    }
+
+    const typeLabel =
+      resourceType === "address_book"
+        ? t("labels.addressBook")
+        : t("labels.calendar");
+
+    return `${typeLabel} #${share.resource_id}`;
+  };
   const adminConfirmationEmail = String(auth.user?.email || "").trim();
   const deleteUserTransferOptions = useMemo(() => {
     if (!deleteUserTarget) {
@@ -2346,7 +2390,7 @@ export default function AdminPage({
                 >
                   <div className="flex items-center justify-between">
                     <p className="font-semibold text-app-strong">
-                      {share.resource_type} #{share.resource_id}
+                      {getShareResourceLabel(share)}
                     </p>
                     <PermissionBadge permission={share.permission} />
                   </div>
