@@ -56,6 +56,8 @@ export default function DashboardPage({
     private_working_set: {
       enabled: false,
       hide_shared: true,
+      include_owned_sharable_sources: true,
+      require_review_for_self_promotions: false,
       private_address_book_id: null,
       private_address_book_uri: null,
       private_display_name: null,
@@ -72,6 +74,8 @@ export default function DashboardPage({
   const [privateWorkingSetForm, setPrivateWorkingSetForm] = useState({
     enabled: false,
     hide_shared: true,
+    include_owned_sharable_sources: true,
+    require_review_for_self_promotions: false,
     source_ids: [],
   });
   const [calendarForm, setCalendarForm] = useState({
@@ -97,6 +101,10 @@ export default function DashboardPage({
     try {
       const response = await api.get("/api/dashboard");
       const payload = response.data;
+      const isAdminUser =
+        String(auth?.user?.role ?? "")
+          .trim()
+          .toLowerCase() === "admin";
       setData(payload);
       setAppleCompatForm({
         enabled: !!payload.apple_compat?.enabled,
@@ -105,6 +113,11 @@ export default function DashboardPage({
       setPrivateWorkingSetForm({
         enabled: !!payload.private_working_set?.enabled,
         hide_shared: payload.private_working_set?.hide_shared ?? true,
+        include_owned_sharable_sources:
+          payload.private_working_set?.include_owned_sharable_sources ?? true,
+        require_review_for_self_promotions:
+          payload.private_working_set?.require_review_for_self_promotions ??
+          isAdminUser,
         source_ids: payload.private_working_set?.selected_source_ids ?? [],
       });
     } catch (err) {
@@ -420,6 +433,7 @@ export default function DashboardPage({
       : data.owned.address_books.filter((item) => item.is_sharable);
   const canSelectAppleCompatSources =
     !!data.apple_compat.target_address_book_id && appleCompatForm.enabled;
+  const contactChangeModerationEnabled = !!auth?.contactChangeModerationEnabled;
 
   return (
     <AppShell auth={auth} theme={theme}>
@@ -564,6 +578,7 @@ export default function DashboardPage({
           pullingPrivateWorkingSet={pullingPrivateWorkingSet}
           promotingPrivateCardId={promotingPrivateCardId}
           dismissingSuggestionLinkId={dismissingSuggestionLinkId}
+          contactChangeModerationEnabled={contactChangeModerationEnabled}
           onSavePrivateWorkingSet={savePrivateWorkingSet}
           onPullPrivateWorkingSet={pullPrivateWorkingSet}
           onPromotePrivateCard={promotePrivateCard}

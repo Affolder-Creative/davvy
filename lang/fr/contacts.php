@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => 'Accès en écriture refusé pour le carnet d\'adresses source de l\'espace de travail privé.',
     'cannot_modify_private_working_set_card' => 'Vous ne pouvez pas modifier cette fiche de l\'espace de travail privé.',
     'source_contact_no_longer_exists' => 'Le contact source n\'existe plus.',
+    'private_working_set_no_admin_reviewer_available' => 'Aucun administrateur réviseur n\'est disponible pour cette promotion de l\'espace de travail privé.',
     'milestone_calendar_schema_missing_enable' => 'Le schéma du calendrier des jalons est indisponible. Exécutez les migrations avant d\'activer les calendriers des jalons.',
     'cannot_modify_milestone_calendar_settings' => 'Vous ne pouvez pas modifier les paramètres du calendrier des jalons pour ce carnet d\'adresses.',
     'milestone_calendar_schema_missing_purge' => 'Le schéma du calendrier des jalons est indisponible. Exécutez les migrations avant de purger les calendriers des jalons.',

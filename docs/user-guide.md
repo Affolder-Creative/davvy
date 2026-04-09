@@ -72,9 +72,14 @@ Optional feature for Apple ecosystem visibility:
 
 Optional feature for per-user private edits on shared contacts:
 - Creates/uses a private address book for your account
-- Syncs selected shared source address books into private linked cards
+- Syncs selected eligible source address books into private linked cards
+- Optionally includes your own sharable address books as eligible sources
 - Lets you keep local-only overrides (for example notes or photos) in your private set
-- Optional `Hide shared source books` removes selected shared source books from your dashboard list and DAV discovery for your account
+- Optional `Hide selected source books` removes selected source books from DAV discovery for your account
+- Optional `Require review queue for self promotions` adds an approval step when promoting changes back to your own source books
+  - requires review queue moderation to be enabled
+  - admin users can approve their own queued self-promotions
+  - non-admin users cannot approve their own queued requests
 
 Action buttons:
 - `Pull Latest (Respect Overrides)`: refresh from source while preserving your private override fields

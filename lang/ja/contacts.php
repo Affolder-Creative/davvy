@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => 'プライベート作業セットのソース アドレス帳への書き込みアクセスが拒否されました。',
     'cannot_modify_private_working_set_card' => 'このプライベート作業セットカードは変更できません。',
     'source_contact_no_longer_exists' => 'ソースの連絡先はもう存在しません。',
+    'private_working_set_no_admin_reviewer_available' => 'このプライベート作業セットの昇格を確認できる管理者レビュアーがいません。',
     'milestone_calendar_schema_missing_enable' => 'マイルストーン カレンダー スキーマは使用できません。マイルストーン カレンダーを有効にする前に移行を実行します。',
     'cannot_modify_milestone_calendar_settings' => 'このアドレス帳のマイルストーン カレンダー設定は変更できません。',
     'milestone_calendar_schema_missing_purge' => 'マイルストーン カレンダー スキーマは使用できません。マイルストーン カレンダーを削除する前に移行を実行します。',

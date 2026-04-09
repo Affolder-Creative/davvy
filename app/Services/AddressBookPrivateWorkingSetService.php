@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\Role;
 use App\Enums\ShareResourceType;
 use App\Models\AddressBook;
 use App\Models\AddressBookPrivateWorkingSetConfig;
@@ -96,6 +97,7 @@ class AddressBookPrivateWorkingSetService
         private readonly ContactVCardService $vCardService,
         private readonly ManagedContactSyncService $managedContactSync,
         private readonly AddressBookMirrorService $mirrorService,
+        private readonly RegistrationSettingsService $settingsService,
     ) {}
 
     /**
@@ -108,8 +110,13 @@ class AddressBookPrivateWorkingSetService
             ->where('user_id', $user->id)
             ->first();
 
+        $includeOwnedSharableSources = $this->resolveIncludeOwnedSharableSources($user, $config);
+        $requireReviewForSelfPromotions = $this->resolveRequireReviewForSelfPromotions($user, $config);
         $privateAddressBook = $this->resolvePrivateAddressBook($user, $config);
-        $sourceOptions = $this->eligibleSharedSourceOptionsForUser($user);
+        $sourceOptions = $this->eligibleSharedSourceOptionsForUser(
+            user: $user,
+            includeOwnedSharableSources: $includeOwnedSharableSources,
+        );
         $optionIds = $sourceOptions->pluck('id')->map(fn (mixed $id): int => (int) $id)->all();
 
         $selected = collect($config?->sources ?? [])
@@ -122,6 +129,8 @@ class AddressBookPrivateWorkingSetService
         return [
             'enabled' => (bool) ($config?->enabled ?? false),
             'hide_shared' => (bool) ($config?->hide_shared ?? true),
+            'include_owned_sharable_sources' => $includeOwnedSharableSources,
+            'require_review_for_self_promotions' => $requireReviewForSelfPromotions,
             'private_address_book_id' => $privateAddressBook?->id,
             'private_address_book_uri' => $privateAddressBook?->uri,
             'private_display_name' => $privateAddressBook?->display_name,
@@ -135,9 +144,27 @@ class AddressBookPrivateWorkingSetService
     /**
      * Updates user config.
      */
-    public function updateUserConfig(User $user, bool $enabled, bool $hideShared, array $sourceIds): array
-    {
-        $sourceOptions = $this->eligibleSharedSourceOptionsForUser($user);
+    public function updateUserConfig(
+        User $user,
+        bool $enabled,
+        bool $hideShared,
+        array $sourceIds,
+        ?bool $includeOwnedSharableSources = null,
+        ?bool $requireReviewForSelfPromotions = null,
+    ): array {
+        $existingConfig = AddressBookPrivateWorkingSetConfig::query()
+            ->where('user_id', $user->id)
+            ->first();
+
+        $resolvedIncludeOwnedSharableSources = $includeOwnedSharableSources
+            ?? $this->resolveIncludeOwnedSharableSources($user, $existingConfig);
+        $resolvedRequireReviewForSelfPromotions = $requireReviewForSelfPromotions
+            ?? $this->resolveRequireReviewForSelfPromotions($user, $existingConfig);
+
+        $sourceOptions = $this->eligibleSharedSourceOptionsForUser(
+            user: $user,
+            includeOwnedSharableSources: $resolvedIncludeOwnedSharableSources,
+        );
         $sourceOptionIds = $sourceOptions->pluck('id')->map(fn (mixed $id): int => (int) $id)->all();
 
         $sanitizedSourceIds = collect($sourceIds)
@@ -158,6 +185,8 @@ class AddressBookPrivateWorkingSetService
             [
                 'enabled' => $enabled,
                 'hide_shared' => $hideShared,
+                'include_owned_sharable_sources' => $resolvedIncludeOwnedSharableSources,
+                'require_review_for_self_promotions' => $resolvedRequireReviewForSelfPromotions,
             ],
         );
 
@@ -170,6 +199,8 @@ class AddressBookPrivateWorkingSetService
 
         $config->enabled = $enabled;
         $config->hide_shared = $hideShared;
+        $config->include_owned_sharable_sources = $resolvedIncludeOwnedSharableSources;
+        $config->require_review_for_self_promotions = $resolvedRequireReviewForSelfPromotions;
         $config->save();
 
         $config->sources()
@@ -206,11 +237,18 @@ class AddressBookPrivateWorkingSetService
             return;
         }
 
+        $includeOwnedSharableSources = $this->resolveIncludeOwnedSharableSources($user, $config);
         $privateAddressBook = $this->resolvePrivateAddressBook($user, $config);
         $selectedIds = collect($config->sources)
             ->pluck('source_address_book_id')
             ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => $this->userCanUseSourceAddressBook($user, $id))
+            ->filter(
+                fn (int $id): bool => $this->userCanUseSourceAddressBook(
+                    user: $user,
+                    sourceAddressBookId: $id,
+                    includeOwnedSharableSources: $includeOwnedSharableSources,
+                )
+            )
             ->unique()
             ->values()
             ->all();
@@ -235,6 +273,7 @@ class AddressBookPrivateWorkingSetService
                 user: $user,
                 privateAddressBook: $privateAddressBook,
                 sourceAddressBookId: $sourceAddressBookId,
+                includeOwnedSharableSources: $includeOwnedSharableSources,
                 forceServer: $forceServer,
             );
         }
@@ -293,11 +332,21 @@ class AddressBookPrivateWorkingSetService
             $this->sourcePayloadFromPrivateUpdate($privateCard->data, $sourceUid),
         );
 
+        $config = AddressBookPrivateWorkingSetConfig::query()
+            ->where('user_id', $actor->id)
+            ->first();
+        $forcedQueueOwnerIds = $this->forcedQueueOwnerIdsForPromotion(
+            actor: $actor,
+            sourceAddressBook: $sourceAddressBook,
+            config: $config,
+        );
+
         $queued = $this->contactChangeRequestService()->enqueueCardDavUpdateIfNeeded(
             actor: $actor,
             addressBook: $sourceAddressBook,
             card: $sourceCard,
             normalizedCardData: $normalized['data'],
+            forcedQueueOwnerIds: $forcedQueueOwnerIds,
         );
 
         if ($queued !== null) {
@@ -427,10 +476,18 @@ class AddressBookPrivateWorkingSetService
             return [];
         }
 
+        $includeOwnedSharableSources = $this->resolveIncludeOwnedSharableSources($user, $config);
+
         return collect($config->sources)
             ->pluck('source_address_book_id')
             ->map(fn (mixed $id): int => (int) $id)
-            ->filter(fn (int $id): bool => $id > 0 && $this->userCanUseSourceAddressBook($user, $id))
+            ->filter(
+                fn (int $id): bool => $id > 0 && $this->userCanUseSourceAddressBook(
+                    user: $user,
+                    sourceAddressBookId: $id,
+                    includeOwnedSharableSources: $includeOwnedSharableSources,
+                )
+            )
             ->unique()
             ->values()
             ->all();
@@ -624,9 +681,11 @@ class AddressBookPrivateWorkingSetService
      *
      * @return Collection<int, array{id:int,uri:string,display_name:string,scope:string,owner_name:?string,owner_email:?string,permission:string,can_write:bool}>
      */
-    private function eligibleSharedSourceOptionsForUser(User $user): Collection
-    {
-        return ResourceShare::query()
+    private function eligibleSharedSourceOptionsForUser(
+        User $user,
+        bool $includeOwnedSharableSources,
+    ): Collection {
+        $shared = ResourceShare::query()
             ->with(['addressBook', 'owner'])
             ->where('resource_type', ShareResourceType::AddressBook)
             ->where('shared_with_id', $user->id)
@@ -644,10 +703,114 @@ class AddressBookPrivateWorkingSetService
                     'permission' => $share->permission->value,
                     'can_write' => $share->permission->canWrite(),
                 ];
-            })
+            });
+
+        $owned = collect();
+        if ($includeOwnedSharableSources) {
+            $owned = AddressBook::query()
+                ->where('owner_id', $user->id)
+                ->where('is_sharable', true)
+                ->orderBy('id')
+                ->get()
+                ->map(fn (AddressBook $addressBook): array => [
+                    'id' => $addressBook->id,
+                    'uri' => $addressBook->uri,
+                    'display_name' => $addressBook->display_name,
+                    'scope' => 'owned',
+                    'owner_name' => $user->name,
+                    'owner_email' => $user->email,
+                    'permission' => 'admin',
+                    'can_write' => true,
+                ]);
+        }
+
+        return $shared
+            ->concat($owned)
             ->unique('id')
             ->sortBy(fn (array $item): string => mb_strtolower($item['display_name']))
             ->values();
+    }
+
+    /**
+     * Returns default include-owned setting.
+     */
+    private function defaultIncludeOwnedSharableSources(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Returns default self-review setting.
+     */
+    private function defaultRequireReviewForSelfPromotions(User $user): bool
+    {
+        return $user->isAdmin();
+    }
+
+    /**
+     * Resolves include-owned setting from config/default.
+     */
+    private function resolveIncludeOwnedSharableSources(
+        User $user,
+        ?AddressBookPrivateWorkingSetConfig $config,
+    ): bool {
+        if ($config !== null && $config->include_owned_sharable_sources !== null) {
+            return (bool) $config->include_owned_sharable_sources;
+        }
+
+        return $this->defaultIncludeOwnedSharableSources();
+    }
+
+    /**
+     * Resolves self-review setting from config/default.
+     */
+    private function resolveRequireReviewForSelfPromotions(
+        User $user,
+        ?AddressBookPrivateWorkingSetConfig $config,
+    ): bool {
+        if ($config !== null && $config->require_review_for_self_promotions !== null) {
+            return (bool) $config->require_review_for_self_promotions;
+        }
+
+        return $this->defaultRequireReviewForSelfPromotions($user);
+    }
+
+    /**
+     * Returns forced queue owner IDs for promotion when self-review is enabled.
+     *
+     * @return array<int, int>
+     */
+    private function forcedQueueOwnerIdsForPromotion(
+        User $actor,
+        AddressBook $sourceAddressBook,
+        ?AddressBookPrivateWorkingSetConfig $config,
+    ): array {
+        if ((int) $sourceAddressBook->owner_id !== (int) $actor->id) {
+            return [];
+        }
+
+        if (! $this->settingsService->isContactChangeModerationEnabled()) {
+            return [];
+        }
+
+        if (! $this->resolveRequireReviewForSelfPromotions($actor, $config)) {
+            return [];
+        }
+
+        if ($actor->isAdmin()) {
+            return [$actor->id];
+        }
+
+        $adminReviewerId = User::query()
+            ->where('role', Role::Admin->value)
+            ->orderBy('id')
+            ->value('id');
+
+        if ($adminReviewerId === null) {
+            abort(422, __('contacts.private_working_set_no_admin_reviewer_available'));
+        }
+
+        return [(int) $adminReviewerId];
     }
 
     /**
@@ -729,12 +892,38 @@ class AddressBookPrivateWorkingSetService
     /**
      * Checks whether user can use source address book.
      */
-    private function userCanUseSourceAddressBook(User $user, int $sourceAddressBookId): bool
+    private function userCanUseSourceAddressBook(
+        User $user,
+        int $sourceAddressBookId,
+        ?bool $includeOwnedSharableSources = null,
+    ): bool
     {
-        return ResourceShare::query()
+        $canUseSharedSource = ResourceShare::query()
             ->where('resource_type', ShareResourceType::AddressBook)
             ->where('resource_id', $sourceAddressBookId)
             ->where('shared_with_id', $user->id)
+            ->exists();
+
+        if ($canUseSharedSource) {
+            return true;
+        }
+
+        $includeOwned = $includeOwnedSharableSources;
+        if ($includeOwned === null) {
+            $config = AddressBookPrivateWorkingSetConfig::query()
+                ->where('user_id', $user->id)
+                ->first();
+            $includeOwned = $this->resolveIncludeOwnedSharableSources($user, $config);
+        }
+
+        if (! $includeOwned) {
+            return false;
+        }
+
+        return AddressBook::query()
+            ->where('id', $sourceAddressBookId)
+            ->where('owner_id', $user->id)
+            ->where('is_sharable', true)
             ->exists();
     }
 
@@ -745,9 +934,16 @@ class AddressBookPrivateWorkingSetService
         User $user,
         AddressBook $privateAddressBook,
         int $sourceAddressBookId,
+        bool $includeOwnedSharableSources,
         bool $forceServer = false,
     ): void {
-        if (! $this->userCanUseSourceAddressBook($user, $sourceAddressBookId)) {
+        if (
+            ! $this->userCanUseSourceAddressBook(
+                user: $user,
+                sourceAddressBookId: $sourceAddressBookId,
+                includeOwnedSharableSources: $includeOwnedSharableSources,
+            )
+        ) {
             $this->removePrivateLinksForUser(
                 userId: $user->id,
                 sourceAddressBookIds: [$sourceAddressBookId],

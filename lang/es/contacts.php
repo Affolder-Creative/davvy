@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => 'Acceso de escritura denegado para la libreta de direcciones de origen del conjunto de trabajo privado.',
     'cannot_modify_private_working_set_card' => 'No puedes modificar esta tarjeta del conjunto de trabajo privado.',
     'source_contact_no_longer_exists' => 'El contacto de origen ya no existe.',
+    'private_working_set_no_admin_reviewer_available' => 'No hay un revisor administrador disponible para esta promoción del conjunto de trabajo privado.',
     'milestone_calendar_schema_missing_enable' => 'El esquema de calendario de hitos no está disponible. Ejecuta las migraciones antes de habilitar calendarios de hitos.',
     'cannot_modify_milestone_calendar_settings' => 'No puedes modificar la configuración del calendario de hitos para esta libreta de direcciones.',
     'milestone_calendar_schema_missing_purge' => 'El esquema de calendario de hitos no está disponible. Ejecuta las migraciones antes de purgar calendarios de hitos.',

@@ -22,6 +22,8 @@ class AddressBookPrivateWorkingSetController extends Controller
         $data = $request->validate([
             'enabled' => ['required', 'boolean'],
             'hide_shared' => ['sometimes', 'boolean'],
+            'include_owned_sharable_sources' => ['sometimes', 'boolean'],
+            'require_review_for_self_promotions' => ['sometimes', 'boolean'],
             'source_ids' => ['array'],
             'source_ids.*' => ['integer', 'min:1'],
         ]);
@@ -31,6 +33,12 @@ class AddressBookPrivateWorkingSetController extends Controller
             enabled: (bool) $data['enabled'],
             hideShared: (bool) ($data['hide_shared'] ?? true),
             sourceIds: $data['source_ids'] ?? [],
+            includeOwnedSharableSources: array_key_exists('include_owned_sharable_sources', $data)
+                ? (bool) $data['include_owned_sharable_sources']
+                : null,
+            requireReviewForSelfPromotions: array_key_exists('require_review_for_self_promotions', $data)
+                ? (bool) $data['require_review_for_self_promotions']
+                : null,
         );
 
         return response()->json([

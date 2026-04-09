@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => 'Accesso in scrittura negato per la rubrica di origine del set di lavoro privato.',
     'cannot_modify_private_working_set_card' => 'Non puoi modificare questa scheda del set di lavoro privato.',
     'source_contact_no_longer_exists' => 'Il contatto di origine non esiste più.',
+    'private_working_set_no_admin_reviewer_available' => 'Nessun amministratore revisore è disponibile per questa promozione del set di lavoro privato.',
     'milestone_calendar_schema_missing_enable' => 'Lo schema del calendario delle tappe fondamentali non è disponibile. Esegui le migrazioni prima di abilitare i calendari delle attività cardine.',
     'cannot_modify_milestone_calendar_settings' => 'Non è possibile modificare le impostazioni del calendario delle attività cardine per questa rubrica.',
     'milestone_calendar_schema_missing_purge' => 'Lo schema del calendario delle tappe fondamentali non è disponibile. Esegui le migrazioni prima di eliminare i calendari delle attività cardine.',

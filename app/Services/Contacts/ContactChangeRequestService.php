@@ -99,6 +99,7 @@ class ContactChangeRequestService
         AddressBook $addressBook,
         Card $card,
         string $normalizedCardData,
+        array $forcedQueueOwnerIds = [],
     ): ?array {
         $assignment = $card->contactAssignment()->with('contact')->first();
         $contact = $assignment?->contact;
@@ -114,7 +115,11 @@ class ContactChangeRequestService
 
         $normalizedPayload = $parsed['payload'];
         $contactAddressBookIds = $this->contactService->addressBookIdsForContact($contact);
-        if ($this->shouldQueueModeratedUpdate($actor, $contact, $contactAddressBookIds)) {
+        $normalizedForcedQueueOwnerIds = $this->normalizeAddressBookIds($forcedQueueOwnerIds);
+        if (
+            $normalizedForcedQueueOwnerIds !== []
+            || $this->shouldQueueModeratedUpdate($actor, $contact, $contactAddressBookIds)
+        ) {
             $normalizedPayload = $this->contactPhotoService->prepareCardDavPayloadForModeration(
                 contact: $contact,
                 incomingPayload: $parsed['payload'],
@@ -134,6 +139,7 @@ class ContactChangeRequestService
                 'card_id' => $card->id,
                 'card_uri' => $card->uri,
             ],
+            forcedQueueOwnerIds: $normalizedForcedQueueOwnerIds,
         );
     }
 
@@ -450,6 +456,7 @@ class ContactChangeRequestService
         ?array $proposedAddressBookIds,
         string $source,
         array $meta,
+        array $forcedQueueOwnerIds = [],
     ): ?array {
         $this->purgeExpiredTerminalRequests();
 
@@ -484,7 +491,10 @@ class ContactChangeRequestService
             ]);
         }
 
-        $queueOwnerIds = $this->queueOwnerIdsFor($actor, $impactedBooks->values());
+        $normalizedForcedQueueOwnerIds = $this->normalizeAddressBookIds($forcedQueueOwnerIds);
+        $queueOwnerIds = $normalizedForcedQueueOwnerIds !== []
+            ? $normalizedForcedQueueOwnerIds
+            : $this->queueOwnerIdsFor($actor, $impactedBooks->values());
 
         if ($queueOwnerIds === []) {
             return null;
@@ -535,12 +545,14 @@ class ContactChangeRequestService
         $rows = [];
 
         foreach ($queueOwnerIds as $ownerId) {
-            $scopeIds = $impactedBooks
-                ->filter(fn (AddressBook $book): bool => (int) $book->owner_id === $ownerId)
-                ->keys()
-                ->map(fn (mixed $id): int => (int) $id)
-                ->values()
-                ->all();
+            $scopeIds = $normalizedForcedQueueOwnerIds !== []
+                ? $impactedAddressBookIds
+                : $impactedBooks
+                    ->filter(fn (AddressBook $book): bool => (int) $book->owner_id === $ownerId)
+                    ->keys()
+                    ->map(fn (mixed $id): int => (int) $id)
+                    ->values()
+                    ->all();
 
             $rows[] = ContactChangeRequest::query()->create([
                 'group_uuid' => $groupUuid,
@@ -731,6 +743,10 @@ class ContactChangeRequestService
     {
         if ($reviewer->isAdmin()) {
             return;
+        }
+
+        if ((int) $request->requester_id === $reviewer->id) {
+            abort(403, __('contacts.cannot_review_request'));
         }
 
         if ((int) $request->approval_owner_id !== $reviewer->id) {

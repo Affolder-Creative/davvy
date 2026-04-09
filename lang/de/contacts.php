@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => 'Schreibzugriff für Quelladressbuch des privaten Arbeitsbereichs verweigert.',
     'cannot_modify_private_working_set_card' => 'Du kannst diese Karte des privaten Arbeitsbereichs nicht ändern.',
     'source_contact_no_longer_exists' => 'Quellkontakt existiert nicht mehr.',
+    'private_working_set_no_admin_reviewer_available' => 'Für diese Übernahme aus dem privaten Arbeitsbereich ist kein Admin-Prüfer verfügbar.',
     'milestone_calendar_schema_missing_enable' => 'Das Schema für Meilenstein-Kalender ist nicht verfügbar. Führe Migrationen aus, bevor du Meilenstein-Kalender aktivierst.',
     'cannot_modify_milestone_calendar_settings' => 'Du kannst die Meilenstein-Kalendereinstellungen für dieses Adressbuch nicht ändern.',
     'milestone_calendar_schema_missing_purge' => 'Das Schema für Meilenstein-Kalender ist nicht verfügbar. Führe Migrationen aus, bevor du Meilenstein-Kalender bereinigst.',

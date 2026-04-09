@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => '对私人工作集源地址簿的写入权限被拒绝。',
     'cannot_modify_private_working_set_card' => '您无法修改这张私人工作集卡片。',
     'source_contact_no_longer_exists' => '源联系人不再存在。',
+    'private_working_set_no_admin_reviewer_available' => '此私人工作集提升没有可用的管理员审核者。',
     'milestone_calendar_schema_missing_enable' => '里程碑日历架构不可用。在启用里程碑日历之前运行迁移。',
     'cannot_modify_milestone_calendar_settings' => '您无法修改此通讯簿的里程碑日历设置。',
     'milestone_calendar_schema_missing_purge' => '里程碑日历架构不可用。在清除里程碑日历之前运行迁移。',

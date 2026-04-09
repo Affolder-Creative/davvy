@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => 'Write access denied for private working set source address book.',
     'cannot_modify_private_working_set_card' => 'You cannot modify this private working set card.',
     'source_contact_no_longer_exists' => 'Source contact no longer exists.',
+    'private_working_set_no_admin_reviewer_available' => 'No admin reviewer is available for this private working set promotion.',
     'milestone_calendar_schema_missing_enable' => 'Milestone calendar schema is not available. Run migrations before enabling milestone calendars.',
     'cannot_modify_milestone_calendar_settings' => 'You cannot modify milestone calendar settings for this address book.',
     'milestone_calendar_schema_missing_purge' => 'Milestone calendar schema is not available. Run migrations before purging milestone calendars.',

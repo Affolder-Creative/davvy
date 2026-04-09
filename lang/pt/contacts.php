@@ -33,6 +33,7 @@ return [
     'write_access_denied_for_private_working_set_source_address_book' => 'Acesso de gravação negado para o catálogo de endereços de origem do conjunto de trabalho privado.',
     'cannot_modify_private_working_set_card' => 'Você não pode modificar este cartão do conjunto de trabalho privado.',
     'source_contact_no_longer_exists' => 'O contato de origem não existe mais.',
+    'private_working_set_no_admin_reviewer_available' => 'Nenhum administrador revisor está disponível para esta promoção do conjunto de trabalho privado.',
     'milestone_calendar_schema_missing_enable' => 'O esquema de calendário Milestone não está disponível. Execute migrações antes de ativar calendários de marcos.',
     'cannot_modify_milestone_calendar_settings' => 'Você não pode modificar as configurações do calendário de marcos para este catálogo de endereços.',
     'milestone_calendar_schema_missing_purge' => 'O esquema de calendário Milestone não está disponível. Execute migrações antes de limpar calendários de marcos.',

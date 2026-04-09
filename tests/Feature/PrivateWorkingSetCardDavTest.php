@@ -7,6 +7,7 @@ use App\Enums\ShareResourceType;
 use App\Models\AddressBook;
 use App\Models\AddressBookPrivateWorkingSetLink;
 use App\Models\Card;
+use App\Models\ContactChangeRequest;
 use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\Contacts\ContactVCardService;
@@ -299,6 +300,61 @@ class PrivateWorkingSetCardDavTest extends TestCase
         $this->assertSame($privateCard->id, (int) ($nextSuggestions[0]['private_card_id'] ?? 0));
     }
 
+    public function test_dashboard_includes_owned_sharable_sources_by_default(): void
+    {
+        $owner = User::factory()->create();
+
+        $ownedSharable = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Owned Sharable',
+            'uri' => 'owned-sharable',
+            'is_sharable' => true,
+        ]);
+        AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Owned Private',
+            'uri' => 'owned-private',
+            'is_sharable' => false,
+        ]);
+
+        $dashboard = $this->actingAs($owner)->getJson('/api/dashboard')->assertOk();
+        $sourceOptions = collect($dashboard->json('private_working_set.source_options') ?? []);
+
+        $ownedOption = $sourceOptions->firstWhere('id', $ownedSharable->id);
+        $this->assertIsArray($ownedOption);
+        $this->assertSame('owned', $ownedOption['scope'] ?? null);
+        $this->assertSame(true, $ownedOption['can_write'] ?? null);
+        $this->assertSame('admin', $ownedOption['permission'] ?? null);
+    }
+
+    public function test_dashboard_excludes_owned_sources_when_disabled_in_config(): void
+    {
+        $owner = User::factory()->create();
+
+        $ownedSharable = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Owned Sharable',
+            'uri' => 'owned-sharable',
+            'is_sharable' => true,
+        ]);
+
+        $this->actingAs($owner)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => false,
+            'hide_shared' => true,
+            'include_owned_sharable_sources' => false,
+            'require_review_for_self_promotions' => false,
+            'source_ids' => [],
+        ])->assertOk();
+
+        $dashboard = $this->actingAs($owner)->getJson('/api/dashboard')->assertOk();
+        $sourceOptionIds = collect($dashboard->json('private_working_set.source_options') ?? [])
+            ->pluck('id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
+
+        $this->assertNotContains($ownedSharable->id, $sourceOptionIds);
+    }
+
     public function test_dashboard_does_not_suggest_notes_only_private_overrides(): void
     {
         $owner = User::factory()->create();
@@ -539,5 +595,130 @@ class PrivateWorkingSetCardDavTest extends TestCase
             ->where('private_card_id', $privateCard->id)
             ->firstOrFail();
         $this->assertNotNull($link->dismissed_suggestion_fingerprint);
+    }
+
+    public function test_admin_self_promotion_can_queue_and_self_approve(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        app(RegistrationSettingsService::class)->setContactChangeModerationEnabled(true);
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $admin->id,
+            'display_name' => 'Admin Source',
+            'uri' => 'admin-source',
+            'is_sharable' => true,
+        ]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($admin);
+        app(LaravelCardDavBackend::class)->createCard(
+            $source->id,
+            'admin-source.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Admin Source\nN:Source;Admin;;;\nUID:admin-source-uid\nEMAIL:admin-source@example.test\nEND:VCARD",
+        );
+
+        $config = $this->actingAs($admin)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'include_owned_sharable_sources' => true,
+            'require_review_for_self_promotions' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($admin);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Admin Source\nN:Source;Admin;;;\nUID:{$privateCard->uid}\nEMAIL:admin-private@example.test\nEND:VCARD",
+        );
+
+        $promote = $this->actingAs($admin)->postJson(
+            '/api/address-books/private-working-set/promote/'.$privateCard->id,
+        );
+
+        $promote->assertStatus(202);
+        $request = ContactChangeRequest::query()
+            ->where('requester_id', $admin->id)
+            ->where('operation', 'update')
+            ->latest('id')
+            ->firstOrFail();
+        $this->assertSame($admin->id, (int) $request->approval_owner_id);
+
+        $this->actingAs($admin)
+            ->patchJson('/api/contact-change-requests/'.$request->id.'/approve')
+            ->assertOk();
+
+        $this->assertDatabaseMissing('contact_change_requests', [
+            'id' => $request->id,
+            'status' => 'pending',
+        ]);
+    }
+
+    public function test_non_admin_self_promotion_routes_review_to_admin(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $owner = User::factory()->create();
+
+        app(RegistrationSettingsService::class)->setContactChangeModerationEnabled(true);
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Owner Source',
+            'uri' => 'owner-source',
+            'is_sharable' => true,
+        ]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($owner);
+        app(LaravelCardDavBackend::class)->createCard(
+            $source->id,
+            'owner-source.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Owner Source\nN:Source;Owner;;;\nUID:owner-source-uid\nEMAIL:owner-source@example.test\nEND:VCARD",
+        );
+
+        $config = $this->actingAs($owner)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'include_owned_sharable_sources' => true,
+            'require_review_for_self_promotions' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($owner);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Owner Source\nN:Source;Owner;;;\nUID:{$privateCard->uid}\nEMAIL:owner-private@example.test\nEND:VCARD",
+        );
+
+        $promote = $this->actingAs($owner)->postJson(
+            '/api/address-books/private-working-set/promote/'.$privateCard->id,
+        );
+
+        $promote->assertStatus(202);
+        $request = ContactChangeRequest::query()
+            ->where('requester_id', $owner->id)
+            ->where('operation', 'update')
+            ->latest('id')
+            ->firstOrFail();
+        $this->assertSame($admin->id, (int) $request->approval_owner_id);
+
+        $this->actingAs($owner)
+            ->patchJson('/api/contact-change-requests/'.$request->id.'/approve')
+            ->assertForbidden();
+
+        $this->actingAs($admin)
+            ->patchJson('/api/contact-change-requests/'.$request->id.'/approve')
+            ->assertOk();
+
+        $this->assertDatabaseMissing('contact_change_requests', [
+            'id' => $request->id,
+            'status' => 'pending',
+        ]);
     }
 }

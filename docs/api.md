@@ -211,11 +211,13 @@ Primary dashboard payload:
 - `private_working_set`:
   - `enabled`
   - `hide_shared`
+  - `include_owned_sharable_sources`
+  - `require_review_for_self_promotions`
   - `private_address_book_id`
   - `private_address_book_uri`
   - `private_display_name`
   - `selected_source_ids`
-  - `source_options[]` (`id`, `display_name`, `owner_name`, `owner_email`, `can_write`)
+  - `source_options[]` (`id`, `display_name`, `owner_name`, `owner_email`, `scope`, `permission`, `can_write`)
   - `linked_cards[]` (`link_id`, `private_card_id`, `private_card_uri`, `source_address_book_id`, `source_card_uri`, `display_name`, `overridden_fields[]`)
   - `suggested_promotions[]` (`link_id`, `private_card_id`, `private_card_uri`, `source_address_book_id`, `source_card_uri`, `display_name`, `suggested_fields[]`, `fingerprint`)
 
@@ -272,12 +274,18 @@ Body:
 - `source_ids` (optional array of address-book IDs)
 
 #### `PATCH /api/address-books/private-working-set`
-Configure a per-user private working set for shared contacts.
+Configure a per-user private working set for eligible source contacts.
 
 Body:
 - `enabled` (required bool)
 - `hide_shared` (optional bool, default `true`)
-- `source_ids` (optional array of shared source address-book IDs)
+- `include_owned_sharable_sources` (optional bool; default `true`)
+- `require_review_for_self_promotions` (optional bool; default `true` for admin users, `false` for non-admin users)
+- `source_ids` (optional array of eligible source address-book IDs)
+
+Notes:
+- `require_review_for_self_promotions` only has effect when review queue moderation is enabled.
+- Admin users can approve their own queued self-promotions.
 
 Response:
 - `private_working_set` (same shape as `GET /api/dashboard`)

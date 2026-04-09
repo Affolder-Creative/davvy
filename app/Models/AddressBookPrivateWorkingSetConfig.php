@@ -16,6 +16,8 @@ class AddressBookPrivateWorkingSetConfig extends Model
         'private_address_book_id',
         'enabled',
         'hide_shared',
+        'include_owned_sharable_sources',
+        'require_review_for_self_promotions',
     ];
 
     /**
@@ -26,6 +28,8 @@ class AddressBookPrivateWorkingSetConfig extends Model
         return [
             'enabled' => 'boolean',
             'hide_shared' => 'boolean',
+            'include_owned_sharable_sources' => 'boolean',
+            'require_review_for_self_promotions' => 'boolean',
         ];
     }
 

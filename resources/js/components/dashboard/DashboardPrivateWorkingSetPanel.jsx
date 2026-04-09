@@ -16,6 +16,7 @@ export default function DashboardPrivateWorkingSetPanel({
   pullingPrivateWorkingSet,
   promotingPrivateCardId,
   dismissingSuggestionLinkId,
+  contactChangeModerationEnabled,
   onSavePrivateWorkingSet,
   onPullPrivateWorkingSet,
   onPromotePrivateCard,
@@ -23,6 +24,8 @@ export default function DashboardPrivateWorkingSetPanel({
 }) {
   const { t } = useTranslation("dashboard");
   const canSelectSources = privateWorkingSetForm.enabled;
+  const canRequireSelfReview =
+    privateWorkingSetForm.enabled && contactChangeModerationEnabled;
 
   return (
     <section className="surface mt-6 rounded-3xl p-6">
@@ -79,6 +82,58 @@ export default function DashboardPrivateWorkingSetPanel({
             />
             <span className="leading-5">{t("privateWorkingSet.hideShared")}</span>
           </label>
+
+          <label
+            className={`flex items-start gap-2 text-sm font-medium text-app-base ${
+              privateWorkingSetForm.enabled ? "" : "opacity-60"
+            }`}
+            aria-disabled={!privateWorkingSetForm.enabled}
+          >
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 shrink-0"
+              checked={privateWorkingSetForm.include_owned_sharable_sources}
+              onChange={(event) =>
+                setPrivateWorkingSetForm({
+                  ...privateWorkingSetForm,
+                  include_owned_sharable_sources: event.target.checked,
+                })
+              }
+              disabled={!privateWorkingSetForm.enabled}
+            />
+            <span className="leading-5">
+              {t("privateWorkingSet.includeOwnedSharableSources")}
+            </span>
+          </label>
+
+          <label
+            className={`flex items-start gap-2 text-sm font-medium text-app-base ${
+              canRequireSelfReview ? "" : "opacity-60"
+            }`}
+            aria-disabled={!canRequireSelfReview}
+          >
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 shrink-0"
+              checked={privateWorkingSetForm.require_review_for_self_promotions}
+              onChange={(event) =>
+                setPrivateWorkingSetForm({
+                  ...privateWorkingSetForm,
+                  require_review_for_self_promotions: event.target.checked,
+                })
+              }
+              disabled={!canRequireSelfReview}
+            />
+            <span className="leading-5">
+              {t("privateWorkingSet.requireReviewForSelfPromotions")}
+            </span>
+          </label>
+
+          {!contactChangeModerationEnabled ? (
+            <p className="text-xs text-app-faint">
+              {t("privateWorkingSet.requireSelfReviewModerationDisabled")}
+            </p>
+          ) : null}
         </div>
 
         <div className="space-y-2">
@@ -133,7 +188,10 @@ export default function DashboardPrivateWorkingSetPanel({
                       {option.display_name}
                     </span>
                     <span className="block text-xs text-app-faint">
-                      {option.owner_name} ({option.owner_email}) •{" "}
+                      {option.scope === "owned"
+                        ? t("resourcePanel.scope.owned")
+                        : t("resourcePanel.scope.shared")}{" "}
+                      • {option.owner_name} ({option.owner_email}) •{" "}
                       {option.can_write
                         ? t("privateWorkingSet.canWrite")
                         : t("privateWorkingSet.readOnly")}
