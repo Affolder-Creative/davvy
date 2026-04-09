@@ -11,6 +11,7 @@ Start here to find the right Davvy guide quickly.
   - [CalDAV/CardDAV Client Setup](./clients.md)
 - Day-to-day web UI usage:
   - [User Guide](./user-guide.md)
+  - [Private Working Set Guide](./private-working-set.md)
 - Configure runtime behavior:
   - [Configuration Reference](./configuration.md)
   - [Localization Guide](./localization.md)
@@ -27,6 +28,7 @@ Start here to find the right Davvy guide quickly.
 
 - End users:
   - [User Guide](./user-guide.md)
+  - [Private Working Set Guide](./private-working-set.md)
   - [CalDAV/CardDAV Client Setup](./clients.md)
 - Operators / admins:
   - [Deployment](./deployment.md)

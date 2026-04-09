@@ -82,6 +82,21 @@ export default function DashboardPrivateWorkingSetPanel({
         {t("privateWorkingSet.subtitle")}
       </p>
 
+      <div className="mt-3 rounded-xl border border-app-edge bg-app-surface p-3">
+        <p className="text-sm font-medium text-app-strong">
+          {t("privateWorkingSet.quickGuideTitle")}
+        </p>
+        <ol className="mt-2 space-y-1 text-xs text-app-faint">
+          <li>{t("privateWorkingSet.quickGuideStep1")}</li>
+          <li>{t("privateWorkingSet.quickGuideStep2")}</li>
+          <li>
+            {contactChangeModerationEnabled
+              ? t("privateWorkingSet.quickGuideStep3Moderated")
+              : t("privateWorkingSet.quickGuideStep3Direct")}
+          </li>
+        </ol>
+      </div>
+
       {privateWorkingSet.private_address_book_id ? (
         <p className="mt-2 text-xs text-app-faint">
           {t("privateWorkingSet.target", {
@@ -105,7 +120,9 @@ export default function DashboardPrivateWorkingSetPanel({
                 })
               }
             />
-            <span className="leading-5">{t("privateWorkingSet.enable")}</span>
+            <span className="min-w-0">
+              <span className="block leading-5">{t("privateWorkingSet.enable")}</span>
+            </span>
           </label>
 
           <label
@@ -126,7 +143,12 @@ export default function DashboardPrivateWorkingSetPanel({
               }
               disabled={!privateWorkingSetForm.enabled}
             />
-            <span className="leading-5">{t("privateWorkingSet.hideShared")}</span>
+            <span className="min-w-0">
+              <span className="block leading-5">{t("privateWorkingSet.hideShared")}</span>
+              <span className="block text-xs font-normal text-app-faint">
+                {t("privateWorkingSet.hideSharedHint")}
+              </span>
+            </span>
           </label>
 
           <label
@@ -147,8 +169,13 @@ export default function DashboardPrivateWorkingSetPanel({
               }
               disabled={!privateWorkingSetForm.enabled}
             />
-            <span className="leading-5">
-              {t("privateWorkingSet.includeOwnedSharableSources")}
+            <span className="min-w-0">
+              <span className="block leading-5">
+                {t("privateWorkingSet.includeOwnedSharableSources")}
+              </span>
+              <span className="block text-xs font-normal text-app-faint">
+                {t("privateWorkingSet.includeOwnedSharableSourcesHint")}
+              </span>
             </span>
           </label>
 
@@ -171,8 +198,13 @@ export default function DashboardPrivateWorkingSetPanel({
                 }
                 disabled={!canRequireSelfReview}
               />
-              <span className="leading-5">
-                {t("privateWorkingSet.requireReviewForSelfPromotions")}
+              <span className="min-w-0">
+                <span className="block leading-5">
+                  {t("privateWorkingSet.requireReviewForSelfPromotions")}
+                </span>
+                <span className="block text-xs font-normal text-app-faint">
+                  {t("privateWorkingSet.requireReviewForSelfPromotionsHint")}
+                </span>
               </span>
             </label>
           ) : null}
@@ -203,6 +235,7 @@ export default function DashboardPrivateWorkingSetPanel({
           <p className="text-sm font-medium text-app-strong">
             {t("privateWorkingSet.sourcesTitle")}
           </p>
+          <p className="text-xs text-app-faint">{t("privateWorkingSet.sourcesHint")}</p>
           {privateWorkingSet.source_options.length === 0 ? (
             <p className="text-sm text-app-faint">
               {t("privateWorkingSet.noSources")}
@@ -310,6 +343,7 @@ export default function DashboardPrivateWorkingSetPanel({
           <p className="text-sm font-medium text-app-strong">
             {t("privateWorkingSet.suggestedTitle")}
           </p>
+          <p className="text-xs text-app-faint">{t("privateWorkingSet.suggestedHint")}</p>
           {(privateWorkingSet.suggested_promotions ?? []).length === 0 ? (
             <p className="text-sm text-app-faint">
               {t("privateWorkingSet.noSuggested")}
@@ -372,6 +406,7 @@ export default function DashboardPrivateWorkingSetPanel({
           <p className="text-sm font-medium text-app-strong">
             {t("privateWorkingSet.linkedCardsTitle")}
           </p>
+          <p className="text-xs text-app-faint">{t("privateWorkingSet.linkedCardsHint")}</p>
           {(privateWorkingSet.linked_cards ?? []).length === 0 ? (
             <p className="text-sm text-app-faint">
               {t("privateWorkingSet.noLinkedCards")}

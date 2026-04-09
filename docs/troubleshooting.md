@@ -131,10 +131,13 @@ Possible causes:
 Possible causes:
 - no shared address books are currently granted to the user
 - granted shared books are not marked sharable
+- `Also include my own sharable address books` is off while only owned sharable books are available
+- user only has read-only access where writable promote behavior is expected
 
 Fix:
 - share at least one address book with the user (typically `editor` for promote/write flows)
 - confirm the owner kept that address book `is_sharable=true`
+- if the user should also gate their own sharable books, enable `Also include my own sharable address books`
 
 ### `InvalidSyncToken`
 Client sync token is stale/invalid.

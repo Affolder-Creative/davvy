@@ -213,6 +213,8 @@ Primary dashboard payload:
   - `hide_shared`
   - `include_owned_sharable_sources`
   - `require_review_for_self_promotions`
+  - `can_manage_self_review_policy`
+  - `effective_require_review_for_self_promotions`
   - `private_address_book_id`
   - `private_address_book_uri`
   - `private_display_name`
@@ -280,11 +282,12 @@ Body:
 - `enabled` (required bool)
 - `hide_shared` (optional bool, default `true`)
 - `include_owned_sharable_sources` (optional bool; default `true`)
-- `require_review_for_self_promotions` (optional bool; default `true` for admin users, `false` for non-admin users)
+- `require_review_for_self_promotions` (optional bool; admin-controlled)
 - `source_ids` (optional array of eligible source address-book IDs)
 
 Notes:
 - `require_review_for_self_promotions` only has effect when review queue moderation is enabled.
+- non-admin users cannot manage `require_review_for_self_promotions`; when moderation is enabled, non-admin promotions are effectively always queued.
 - Admin users can approve their own queued self-promotions.
 
 Response:

@@ -79,12 +79,12 @@ describe("DashboardPrivateWorkingSetPanel", () => {
 
     expect(
       screen.queryByRole("checkbox", {
-        name: "Require review queue for self promotions",
+        name: /Queue my own promotions for review/i,
       }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByText(
-        "When moderation is enabled, your promotions are always queued for review.",
+        "Moderation is enabled, so your promotions are always queued for review.",
       ),
     ).toBeInTheDocument();
   });
@@ -109,7 +109,7 @@ describe("DashboardPrivateWorkingSetPanel", () => {
 
     expect(
       screen.getByText(
-        "Review queue moderation is disabled globally. Your promotions apply directly.",
+        "Moderation is disabled globally, so your promotions apply directly.",
       ),
     ).toBeInTheDocument();
   });
@@ -135,7 +135,7 @@ describe("DashboardPrivateWorkingSetPanel", () => {
     );
 
     const checkbox = screen.getByRole("checkbox", {
-      name: "Require review queue for self promotions",
+      name: /Queue my own promotions for review/i,
     });
     expect(checkbox).toBeEnabled();
 
