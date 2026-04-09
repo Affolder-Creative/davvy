@@ -188,7 +188,18 @@
     "reset2fa": "Restablecer 2FA",
     "statusPendingApproval": "Estado: aprobación pendiente",
     "assignShareAccess": "Asignar acceso compartido",
-    "userDetails": "Rol: {{role}} | Calendarios: {{calendars}} | Libretas de direcciones: {{address_books}} | 2FA: {{two_factor}}"
+    "userDetails": "Rol: {{role}} | Calendarios: {{calendars}} | Libretas de direcciones: {{address_books}} | 2FA: {{two_factor}}",
+    "userSearchPlaceholder": "Search users by name or email",
+    "userSearchAriaLabel": "Search users",
+    "userRoleFilterAriaLabel": "Filter users by role",
+    "userRoleFilterAll": "All roles",
+    "userTwoFactorFilterAriaLabel": "Filter users by 2FA status",
+    "userTwoFactorFilterAll": "All 2FA states",
+    "userListMeta": "Users: {{total}} | Showing: {{shown}}",
+    "userListNoMatches": "No users match your filters.",
+    "userCompactMeta": "Role: {{role}} | 2FA: {{two_factor}}",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details"
   },
   "errors": {
     "loadingAdminData": "No se pudieron cargar los datos de administración.",

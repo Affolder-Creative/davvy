@@ -329,6 +329,79 @@ describe("AdminPage", () => {
     );
   });
 
+  it("supports user list search, role/2FA filters, and compact detail toggles", async () => {
+    const user = userEvent.setup();
+    const props = buildProps({
+      api: buildApi({
+        users: [
+          {
+            id: 2,
+            name: "Davvy Admin",
+            email: "admin@davvy.local",
+            role: "admin",
+            calendars_count: 3,
+            address_books_count: 4,
+            two_factor_enabled: true,
+          },
+          {
+            id: 3,
+            name: "John Doe",
+            email: "john.doe@davvy.local",
+            role: "regular",
+            calendars_count: 1,
+            address_books_count: 1,
+            two_factor_enabled: false,
+          },
+          {
+            id: 4,
+            name: "Jane Doe",
+            email: "jane.doe@davvy.local",
+            role: "regular",
+            calendars_count: 1,
+            address_books_count: 1,
+            two_factor_enabled: false,
+          },
+        ],
+      }),
+    });
+
+    renderAdminPage(props);
+
+    await waitFor(() =>
+      expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
+    );
+
+    expect(screen.getByText("Users: 3 | Showing: 3")).toBeInTheDocument();
+    expect(screen.queryByText(/Role: admin \| Calendars:/)).not.toBeInTheDocument();
+
+    const userSearchInput = screen.getByLabelText("Search users");
+    const roleFilter = screen.getByLabelText("Filter users by role");
+    const twoFactorFilter = screen.getByLabelText("Filter users by 2FA status");
+
+    await user.type(userSearchInput, "jane");
+    expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+    expect(screen.queryByText("John Doe")).not.toBeInTheDocument();
+    expect(screen.getByText("Users: 3 | Showing: 1")).toBeInTheDocument();
+
+    await user.clear(userSearchInput);
+    await user.selectOptions(roleFilter, "admin");
+    expect(screen.getByText("Davvy Admin")).toBeInTheDocument();
+    expect(screen.queryByText("Jane Doe")).not.toBeInTheDocument();
+    expect(screen.queryByText("John Doe")).not.toBeInTheDocument();
+
+    await user.selectOptions(roleFilter, "all");
+    await user.selectOptions(twoFactorFilter, "disabled");
+    expect(screen.queryByText("Davvy Admin")).not.toBeInTheDocument();
+    expect(screen.getByText("Jane Doe")).toBeInTheDocument();
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+
+    await user.selectOptions(twoFactorFilter, "all");
+    await user.click(screen.getAllByRole("button", { name: "Show details" })[0]);
+    expect(screen.getByText(/Role: admin \| Calendars:/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Hide details" }));
+    expect(screen.queryByText(/Role: admin \| Calendars:/)).not.toBeInTheDocument();
+  });
+
   it("optionally bulk-approves pending users when disabling registration approval", async () => {
     const user = userEvent.setup();
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);

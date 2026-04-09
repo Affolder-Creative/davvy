@@ -76,6 +76,10 @@ export default function AdminPage({
     email: "",
     role: "regular",
   });
+  const [userSearchQuery, setUserSearchQuery] = useState("");
+  const [userRoleFilter, setUserRoleFilter] = useState("all");
+  const [userTwoFactorFilter, setUserTwoFactorFilter] = useState("all");
+  const [expandedUsers, setExpandedUsers] = useState({});
   const [userInviteResult, setUserInviteResult] = useState(null);
   const [shareForm, setShareForm] = useState({
     resource_type: "calendar",
@@ -1136,6 +1140,50 @@ export default function AdminPage({
     shareForm.resource_type === "calendar"
       ? state.resources.calendars
       : state.resources.address_books;
+  useEffect(() => {
+    setExpandedUsers((prev) => {
+      const validUserIds = new Set(
+        (Array.isArray(state.users) ? state.users : []).map((user) =>
+          Number(user.id),
+        ),
+      );
+      let changed = false;
+      const next = {};
+
+      Object.entries(prev).forEach(([id, value]) => {
+        if (validUserIds.has(Number(id))) {
+          next[id] = value;
+        } else {
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [state.users]);
+  const normalizedUserQuery = userSearchQuery.trim().toLowerCase();
+  const filteredUsers = useMemo(() => {
+    return (Array.isArray(state.users) ? state.users : []).filter((user) => {
+      const searchText = `${user?.name ?? ""} ${user?.email ?? ""}`.toLowerCase();
+      const matchesSearch =
+        normalizedUserQuery === "" || searchText.includes(normalizedUserQuery);
+      const matchesRole =
+        userRoleFilter === "all" || String(user?.role ?? "") === userRoleFilter;
+      const hasTwoFactor = !!user?.two_factor_enabled;
+      const matchesTwoFactor =
+        userTwoFactorFilter === "all" ||
+        (userTwoFactorFilter === "enabled" && hasTwoFactor) ||
+        (userTwoFactorFilter === "disabled" && !hasTwoFactor);
+
+      return matchesSearch && matchesRole && matchesTwoFactor;
+    });
+  }, [normalizedUserQuery, state.users, userRoleFilter, userTwoFactorFilter]);
+  const toggleUserExpanded = (userId) => {
+    setExpandedUsers((prev) => ({
+      ...prev,
+      [userId]: !prev[userId],
+    }));
+  };
   const shareResourceNames = useMemo(() => {
     const names = new Map();
     const appendResourceNames = (resourceType, resources) => {
@@ -2410,69 +2458,137 @@ export default function AdminPage({
               </div>
             ) : null}
 
-            <div className="mt-5 space-y-2">
-              {state.users.map((user) => {
-                const isApproved = user.is_approved !== false;
-
-                return (
-                  <div
-                    key={user.id}
-                    className="rounded-xl border border-app-edge bg-app-surface p-3 text-sm"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="font-semibold text-app-strong">
-                        {user.name}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-1">
-                        {!isApproved ? (
-                          <button
-                            className="btn-outline btn-outline-sm inline-flex items-center gap-1"
-                            type="button"
-                            onClick={() => approveUser(user.id)}
-                          >
-                            <span>{t("admin.approveUser")}</span>
-                            {CheckIcon ? (
-                              <CheckIcon className="h-3.5 w-3.5" />
-                            ) : null}
-                          </button>
-                        ) : null}
-                        {Number(user.id) !== Number(auth.user?.id) ? (
-                          <button
-                            className="btn-outline btn-outline-sm text-app-danger"
-                            type="button"
-                            onClick={() => openDeleteUserDialog(user)}
-                          >
-                            {t("labels.delete")}
-                          </button>
-                        ) : null}
-                      </div>
-                    </div>
-                    <p className="text-app-muted">{user.email}</p>
-                    <p className="text-xs text-app-faint">
-                      {t("admin.userDetails", {
-                        role: user.role,
-                        calendars: user.calendars_count,
-                        address_books: user.address_books_count,
-                        two_factor: user.two_factor_enabled
-                          ? t("labels.enabled")
-                          : t("labels.disabled"),
-                      })}
-                    </p>
-                    <button
-                      className="mt-2 text-xs font-semibold text-app-danger"
-                      type="button"
-                      onClick={() => resetUserTwoFactor(user.id)}
-                    >
-                      {t("admin.reset2fa")}
-                    </button>
-                    {!isApproved ? (
-                      <p className="text-xs text-app-faint">
-                        {t("admin.statusPendingApproval")}
-                      </p>
-                    ) : null}
-                  </div>
-                );
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              <input
+                className="input sm:col-span-2"
+                type="search"
+                value={userSearchQuery}
+                onChange={(event) => setUserSearchQuery(event.target.value)}
+                placeholder={t("admin.userSearchPlaceholder")}
+                aria-label={t("admin.userSearchAriaLabel")}
+              />
+              <select
+                className="input"
+                value={userRoleFilter}
+                onChange={(event) => setUserRoleFilter(event.target.value)}
+                aria-label={t("admin.userRoleFilterAriaLabel")}
+              >
+                <option value="all">{t("admin.userRoleFilterAll")}</option>
+                <option value="regular">{t("admin.role.regular")}</option>
+                <option value="admin">{t("admin.role.admin")}</option>
+              </select>
+              <select
+                className="input"
+                value={userTwoFactorFilter}
+                onChange={(event) => setUserTwoFactorFilter(event.target.value)}
+                aria-label={t("admin.userTwoFactorFilterAriaLabel")}
+              >
+                <option value="all">{t("admin.userTwoFactorFilterAll")}</option>
+                <option value="enabled">{t("labels.enabled")}</option>
+                <option value="disabled">{t("labels.disabled")}</option>
+              </select>
+            </div>
+            <p className="mt-3 text-xs text-app-faint">
+              {t("admin.userListMeta", {
+                total: state.users.length,
+                shown: filteredUsers.length,
               })}
+            </p>
+
+            <div className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
+              {filteredUsers.length === 0 ? (
+                <p className="rounded-xl border border-app-edge bg-app-surface p-3 text-xs text-app-faint">
+                  {t("admin.userListNoMatches")}
+                </p>
+              ) : (
+                filteredUsers.map((user) => {
+                  const isApproved = user.is_approved !== false;
+                  const userExpanded = expandedUsers[user.id] === true;
+
+                  return (
+                    <div
+                      key={user.id}
+                      className="rounded-xl border border-app-edge bg-app-surface p-3 text-sm"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-app-strong">
+                            {user.name}
+                          </p>
+                          <p className="text-app-muted">{user.email}</p>
+                          <p className="text-xs text-app-faint">
+                            {t("admin.userCompactMeta", {
+                              role: user.role,
+                              two_factor: user.two_factor_enabled
+                                ? t("labels.enabled")
+                                : t("labels.disabled"),
+                            })}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-end gap-1">
+                          {!isApproved ? (
+                            <button
+                              className="btn-outline btn-outline-sm inline-flex items-center gap-1"
+                              type="button"
+                              onClick={() => approveUser(user.id)}
+                            >
+                              <span>{t("admin.approveUser")}</span>
+                              {CheckIcon ? (
+                                <CheckIcon className="h-3.5 w-3.5" />
+                              ) : null}
+                            </button>
+                          ) : null}
+                          {Number(user.id) !== Number(auth.user?.id) ? (
+                            <button
+                              className="btn-outline btn-outline-sm text-app-danger"
+                              type="button"
+                              onClick={() => openDeleteUserDialog(user)}
+                            >
+                              {t("labels.delete")}
+                            </button>
+                          ) : null}
+                          <button
+                            className="text-xs font-semibold text-app-muted hover:text-app-strong"
+                            type="button"
+                            onClick={() => toggleUserExpanded(user.id)}
+                          >
+                            {userExpanded
+                              ? t("admin.hideDetails")
+                              : t("admin.showDetails")}
+                          </button>
+                        </div>
+                      </div>
+
+                      {userExpanded ? (
+                        <div className="mt-2 border-t border-app-edge pt-2">
+                          <p className="text-xs text-app-faint">
+                            {t("admin.userDetails", {
+                              role: user.role,
+                              calendars: user.calendars_count,
+                              address_books: user.address_books_count,
+                              two_factor: user.two_factor_enabled
+                                ? t("labels.enabled")
+                                : t("labels.disabled"),
+                            })}
+                          </p>
+                          <button
+                            className="mt-2 text-xs font-semibold text-app-danger"
+                            type="button"
+                            onClick={() => resetUserTwoFactor(user.id)}
+                          >
+                            {t("admin.reset2fa")}
+                          </button>
+                          {!isApproved ? (
+                            <p className="mt-1 text-xs text-app-faint">
+                              {t("admin.statusPendingApproval")}
+                            </p>
+                          ) : null}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </section>
 
