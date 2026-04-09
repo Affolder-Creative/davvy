@@ -143,8 +143,8 @@
               <h3>Identity &amp; Access</h3>
               <p>
                 Unified account model for web dashboard and DAV clients.
-                Session-based web auth supports TOTP 2FA with backup codes.
-                DAV uses HTTP Basic auth and supports app passwords for
+                Session-based web auth supports TOTP 2FA with backup codes. DAV
+                uses HTTP Basic auth and supports app passwords for
                 non-interactive clients when 2FA is enabled. Locale-aware
                 request handling supports per-user language preferences and
                 negotiated API/DAV messaging. Two roles: admin and regular.
@@ -183,15 +183,16 @@
               <h3>Localization</h3>
               <p>
                 Localized web UI with per-user language preferences, including
-                Chinese, English, French, German, Italian, Japanese,
-                Portuguese, and Spanish.
-                Locale negotiation honors explicit request hints and browser
-                language headers, with fallback behavior for unsupported
-                locales.
+                Chinese, English, French, German, Italian, Japanese, Portuguese,
+                and Spanish. Locale negotiation honors explicit request hints
+                and browser language headers, with fallback behavior for
+                unsupported locales.
               </p>
               <div class="feature-details">
                 <span class="feature-tag">Per-user Language</span>
-                <span class="feature-tag">DE / EN / ES / FR / IT / JA / PT / ZH</span>
+                <span class="feature-tag"
+                  >DE / EN / ES / FR / IT / JA / PT / ZH</span
+                >
                 <span class="feature-tag">Accept-Language</span>
                 <span class="feature-tag">API + DAV Aware</span>
               </div>
@@ -279,16 +280,13 @@
               </div>
               <h3>Managed Contacts</h3>
               <p>
-                Optional web UI for structured contact management with
-                bi-directional vCard sync. Optional review queues support
-                owner/admin approval workflows, including manual merge
-                resolution when needed. Related-name family links are synced
-                bidirectionally with inverse mapping and pronoun-aware labels,
-                with neutral fallback when pronouns are not inferable. Private
-                working sets allow per-user private contact overrides with
-                explicit promotion back to shared sources. Suggested promotions
-                surface likely shared updates and can be dismissed until
-                relevant fields change again.
+                Optional managed contacts with bi-directional contact-to-vCard
+                sync. Family related-name links stay aligned with inverse
+                mapping, including pronoun-aware labels with neutral fallback.
+                Optional moderation queues support cross-owner review workflows.
+                Private working sets keep personal overrides while suggested
+                promotions let users promote shared updates or dismiss them
+                until data changes.
               </p>
               <div class="feature-details">
                 <span class="feature-tag">Bi-directional Sync</span>
