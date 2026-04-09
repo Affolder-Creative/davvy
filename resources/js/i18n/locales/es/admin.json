@@ -20,7 +20,8 @@
       },
       "save": "Guardar recurso compartido",
       "owner": "Propietario: {{name}} ({{email}})",
-      "sharedWith": "Compartido con: {{name}} ({{email}})"
+      "sharedWith": "Compartido con: {{name}} ({{email}})",
+      "sharedWithCount": "Compartido con: {{count}}"
     },
     "enabled": "Habilitado",
     "disabled": "Deshabilitado",

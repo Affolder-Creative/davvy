@@ -20,7 +20,8 @@
       },
       "save": "保存共享",
       "owner": "所有者：{{name}} ({{email}})",
-      "sharedWith": "共享对象：{{name}} ({{email}})"
+      "sharedWith": "共享对象：{{name}} ({{email}})",
+      "sharedWithCount": "共享对象：{{count}}"
     },
     "enabled": "启用",
     "disabled": "禁用",

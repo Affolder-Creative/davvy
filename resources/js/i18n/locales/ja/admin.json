@@ -20,7 +20,8 @@
       },
       "save": "共有を保存",
       "owner": "所有者: {{name}} ({{email}})",
-      "sharedWith": "{{name}} ({{email}}) と共有"
+      "sharedWith": "{{name}} ({{email}}) と共有",
+      "sharedWithCount": "共有先: {{count}}"
     },
     "enabled": "有効",
     "disabled": "無効",

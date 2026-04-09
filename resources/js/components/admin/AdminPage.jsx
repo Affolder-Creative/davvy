@@ -2476,6 +2476,11 @@ export default function AdminPage({
                     <p className="font-semibold text-app-strong">
                       {getShareResourceLabel(shareGroup)}
                     </p>
+                    <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
+                      {t("labels.share.sharedWithCount", {
+                        count: shareGroup.shares.length,
+                      })}
+                    </span>
                   </div>
                   <p className="text-app-muted">
                     {renderShareIdentity("labels.share.owner", shareGroup.owner)}

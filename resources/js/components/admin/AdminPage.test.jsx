@@ -529,6 +529,7 @@ describe("AdminPage", () => {
     );
 
     expect(screen.getAllByText("Shared Team Contacts")).toHaveLength(1);
+    expect(screen.getByText("Shared with: 2")).toBeInTheDocument();
     expect(
       screen.getByText((_, node) => {
         const text = node?.textContent?.trim() ?? "";

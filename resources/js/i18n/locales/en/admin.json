@@ -20,7 +20,8 @@
       },
       "save": "Save Share",
       "owner": "Owner: {{name}} ({{email}})",
-      "sharedWith": "Shared with: {{name}} ({{email}})"
+      "sharedWith": "Shared with: {{name}} ({{email}})",
+      "sharedWithCount": "Shared with: {{count}}"
     },
     "enabled": "Enabled",
     "disabled": "Disabled",
