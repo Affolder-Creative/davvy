@@ -14,7 +14,10 @@
     "deleteCalendar": "Impossibile eliminare il calendario.",
     "deleteAddressBook": "Impossibile eliminare la rubrica.",
     "appleCompat": "Impossibile aggiornare le impostazioni di compatibilità Apple.",
-    "milestones": "Impossibile aggiornare le impostazioni del calendario compleanno/anniversario."
+    "milestones": "Impossibile aggiornare le impostazioni del calendario compleanno/anniversario.",
+    "privateWorkingSet": "Impossibile aggiornare le impostazioni del set di lavoro privato.",
+    "privateWorkingSetPull": "Impossibile recuperare gli ultimi valori di origine del set di lavoro privato.",
+    "privateWorkingSetPromote": "Impossibile promuovere la modifica del set di lavoro privato."
   },
   "overview": {
     "endpointTitle": "Punto finale DAV",
@@ -109,6 +112,32 @@
       "shared": "{{name}} è ora condiviso.",
       "unshared": "{{name}} non è più condiviso."
     },
-    "appleCompatSaved": "Le impostazioni di compatibilità Apple sono state salvate."
+    "appleCompatSaved": "Le impostazioni di compatibilità Apple sono state salvate.",
+    "privateWorkingSetSaved": "Impostazioni del set di lavoro privato salvate.",
+    "privateWorkingSetPulled": "Set di lavoro privato aggiornato dalle origini condivise.",
+    "privateWorkingSetForcePulled": "Set di lavoro privato aggiornato forzando i valori del server.",
+    "privateWorkingSetPromoted": "Scheda privata promossa all'origine condivisa.",
+    "privateWorkingSetPromoteQueued": "Promozione inviata alla coda di revisione."
+  },
+  "privateWorkingSet": {
+    "title": "Set di lavoro privato",
+    "subtitle": "Crea copie private per utente dei contatti condivisi, così le modifiche locali restano private finché non le promuovi esplicitamente.",
+    "target": "Rubrica del set di lavoro privato: {{name}} (/{{uri}})",
+    "enable": "Abilita set di lavoro privato",
+    "hideShared": "Nascondi dalla rilevazione DAV le rubriche origine condivise selezionate",
+    "sourcesTitle": "Rubriche di origine condivise",
+    "noSources": "Nessuna rubrica condivisa idonea disponibile.",
+    "canWrite": "Condivisione Editor/Admin",
+    "readOnly": "Condivisione sola lettura",
+    "save": "Salva impostazioni set di lavoro privato",
+    "saving": "Salvataggio...",
+    "pull": "Recupera ultimi (rispetta le sovrascritture)",
+    "forcePull": "Recupero forzato (usa valori server)",
+    "pulling": "Recupero...",
+    "linkedCardsTitle": "Schede private collegate",
+    "noLinkedCards": "Nessuna scheda privata collegata.",
+    "sourceCardHint": "URI origine: {{uri}}",
+    "promote": "Promuovi a origine condivisa",
+    "promoting": "Promozione..."
   }
 }

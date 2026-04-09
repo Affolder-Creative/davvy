@@ -9,6 +9,7 @@ use App\Models\AddressBookMirrorLink;
 use App\Models\Card;
 use App\Models\ResourceShare;
 use App\Services\AddressBookMirrorService;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\Contacts\ContactChangeRequestService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
 use App\Services\Contacts\ManagedContactSyncService;
@@ -42,6 +43,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         private readonly VCardValidator $vCardValidator,
         private readonly DavSyncService $syncService,
         private readonly AddressBookMirrorService $mirrorService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
         private readonly ManagedContactSyncService $managedContactSync,
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
         private readonly ContactChangeRequestService $changeRequestService,
@@ -73,6 +75,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             ->where('shared_with_id', $owner->id)
             ->get()
             ->filter(fn (ResourceShare $share): bool => $share->addressBook !== null)
+            ->reject(fn (ResourceShare $share): bool => $this->privateWorkingSetService->isSharedSourceHiddenForUser(
+                $owner,
+                (int) $share->addressBook->id,
+            ))
             ->map(function (ResourceShare $share) use ($principalUri): array {
                 return $this->transformAddressBook($share->addressBook, $share->permission, $principalUri);
             })
@@ -287,6 +293,8 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
 
         $this->syncService->recordAdded(ShareResourceType::AddressBook, $addressBook->id, (string) $cardUri);
         $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
+        $this->privateWorkingSetService->handleSourceCardUpsert($addressBook, $card);
+        $this->privateWorkingSetService->handlePrivateCardUpsert($card);
         $this->syncManagedContactUpsert($addressBook, $card);
 
         return '"'.$etag.'"';
@@ -388,6 +396,8 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             'data' => $normalizedData,
         ]);
         $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
+        $this->privateWorkingSetService->handleSourceCardUpsert($addressBook, $card);
+        $this->privateWorkingSetService->handlePrivateCardUpsert($card);
         $this->syncManagedContactUpsert($addressBook, $card);
 
         return '"'.$etag.'"';
@@ -440,6 +450,8 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
 
         $this->syncService->recordDeleted(ShareResourceType::AddressBook, $addressBook->id, (string) $cardUri);
         $this->mirrorService->handleSourceCardDeleted($addressBook->id, (string) $cardUri);
+        $this->privateWorkingSetService->handleSourceCardDeleted($addressBook->id, (string) $cardUri);
+        $this->privateWorkingSetService->handlePrivateCardDeleted($card);
     }
 
     /**
@@ -643,6 +655,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         if (! $user || ! $this->accessService->userCanWriteAddressBook($user, $addressBook)) {
             throw new Forbidden(__('dav.write_access_denied_for_address_book'));
         }
+
+        if ($this->privateWorkingSetService->isSharedSourceHiddenForUser($user, $addressBook->id)) {
+            throw new Forbidden(__('contacts.write_access_denied_for_hidden_shared_address_book'));
+        }
     }
 
     /**
@@ -728,6 +744,14 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
      */
     private function syncManagedContactUpsert(AddressBook $addressBook, Card $card): void
     {
+        if ($this->privateWorkingSetService->isPrivateAddressBook($addressBook->id)) {
+            return;
+        }
+
+        if ($this->privateWorkingSetService->isPrivateManagedCard((string) $card->data)) {
+            return;
+        }
+
         try {
             $this->managedContactSync->syncCardUpsert(
                 addressBook: $addressBook,
@@ -744,6 +768,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
      */
     private function syncManagedContactDelete(Card $card): void
     {
+        if ($this->privateWorkingSetService->isPrivateManagedCard((string) $card->data)) {
+            return;
+        }
+
         try {
             $this->managedContactSync->syncCardDeleted($card);
         } catch (Throwable $exception) {

@@ -14,7 +14,10 @@
     "deleteCalendar": "カレンダーを削除できません。",
     "deleteAddressBook": "アドレス帳を削除できません。",
     "appleCompat": "Apple 互換性設定を更新できません。",
-    "milestones": "誕生日/記念日のカレンダー設定を更新できません。"
+    "milestones": "誕生日/記念日のカレンダー設定を更新できません。",
+    "privateWorkingSet": "プライベート作業セットの設定を更新できませんでした。",
+    "privateWorkingSetPull": "プライベート作業セットの最新ソース値を取得できませんでした。",
+    "privateWorkingSetPromote": "プライベート作業セットの変更を共有ソースへ昇格できませんでした。"
   },
   "overview": {
     "endpointTitle": "DAV エンドポイント",
@@ -109,6 +112,32 @@
       "shared": "{{name}} が共有されました。",
       "unshared": "{{name}} は共有されなくなりました。"
     },
-    "appleCompatSaved": "Apple 互換性設定を保存しました。"
+    "appleCompatSaved": "Apple 互換性設定を保存しました。",
+    "privateWorkingSetSaved": "プライベート作業セットの設定を保存しました。",
+    "privateWorkingSetPulled": "共有ソースからプライベート作業セットを取り込みました。",
+    "privateWorkingSetForcePulled": "共有ソースからサーバー値でプライベート作業セットを強制取り込みしました。",
+    "privateWorkingSetPromoted": "プライベートカードを共有ソースへ昇格しました。",
+    "privateWorkingSetPromoteQueued": "昇格をレビューキューに送信しました。"
+  },
+  "privateWorkingSet": {
+    "title": "プライベート作業セット",
+    "subtitle": "共有連絡先のユーザー別プライベートコピーを作成し、明示的に昇格するまでローカル編集を非公開のまま保持します。",
+    "target": "プライベート作業セット帳: {{name}} (/{{uri}})",
+    "enable": "プライベート作業セットを有効化",
+    "hideShared": "選択した共有ソース帳を DAV 検出から非表示にする",
+    "sourcesTitle": "共有ソース アドレス帳",
+    "noSources": "利用可能な共有ソース帳がありません。",
+    "canWrite": "編集者/管理者共有",
+    "readOnly": "読み取り専用共有",
+    "save": "プライベート作業セット設定を保存",
+    "saving": "保存中...",
+    "pull": "最新を取得（上書きを維持）",
+    "forcePull": "強制取得（サーバー値を使用）",
+    "pulling": "取得中...",
+    "linkedCardsTitle": "リンク済みプライベートカード",
+    "noLinkedCards": "まだリンク済みのプライベートカードはありません。",
+    "sourceCardHint": "ソース URI: {{uri}}",
+    "promote": "共有ソースへ昇格",
+    "promoting": "昇格中..."
   }
 }

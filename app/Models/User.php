@@ -122,6 +122,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Returns private working set config.
+     */
+    public function addressBookPrivateWorkingSetConfig(): HasOne
+    {
+        return $this->hasOne(AddressBookPrivateWorkingSetConfig::class);
+    }
+
+    /**
      * Returns app passwords.
      */
     public function appPasswords(): HasMany

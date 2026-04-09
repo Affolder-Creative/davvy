@@ -9,6 +9,7 @@ use App\Models\Calendar;
 use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\AddressBookMirrorService;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class ShareController extends Controller
     public function __construct(
         private readonly RegistrationSettingsService $settings,
         private readonly AddressBookMirrorService $mirrorService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
     ) {}
 
     /**
@@ -108,6 +110,7 @@ class ShareController extends Controller
 
         if ($resourceType === ShareResourceType::AddressBook) {
             $this->mirrorService->syncUserConfig($target);
+            $this->privateWorkingSetService->syncUserConfig($target);
         }
 
         return response()->json($share->fresh(), 201);
@@ -135,6 +138,7 @@ class ShareController extends Controller
 
         if ($resourceType === ShareResourceType::AddressBook && $sharedWith) {
             $this->mirrorService->syncUserConfig($sharedWith);
+            $this->privateWorkingSetService->syncUserConfig($sharedWith);
         }
 
         return response()->json(['ok' => true]);

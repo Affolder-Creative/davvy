@@ -1,10 +1,10 @@
 <?php
 
-use App\Mail\AdminUserInviteMail;
-use App\Mail\PublicRegistrationVerificationMail;
 use App\Enums\Role;
 use App\Enums\SharePermission;
 use App\Enums\ShareResourceType;
+use App\Mail\AdminUserInviteMail;
+use App\Mail\PublicRegistrationVerificationMail;
 use App\Models\AddressBook;
 use App\Models\AddressBookContactMilestoneCalendar;
 use App\Models\Calendar;
@@ -257,7 +257,7 @@ Artisan::command(
                 ."UID:{$contactUid}\n"
                 ."TEL;TYPE=CELL:+13175550111\n"
                 ."EMAIL;TYPE=INTERNET:rq-test-person@example.test\n"
-                ."END:VCARD";
+                .'END:VCARD';
 
             /** @var LaravelCardDavBackend $cardBackend */
             $cardBackend = app(LaravelCardDavBackend::class);
@@ -289,11 +289,11 @@ Artisan::command(
                 ."BEGIN:VEVENT\n"
                 ."UID:{$eventUid}\n"
                 ."DTSTAMP:{$dtStamp}\n"
-                ."DTSTART:".$dtStart->format('Ymd\\THis\\Z')."\n"
-                ."DTEND:".$dtEnd->format('Ymd\\THis\\Z')."\n"
+                .'DTSTART:'.$dtStart->format('Ymd\\THis\\Z')."\n"
+                .'DTEND:'.$dtEnd->format('Ymd\\THis\\Z')."\n"
                 ."SUMMARY:RQ Calendar Control Event\n"
                 ."END:VEVENT\n"
-                ."END:VCALENDAR";
+                .'END:VCALENDAR';
 
             /** @var LaravelCalendarBackend $calendarBackend */
             $calendarBackend = app(LaravelCalendarBackend::class);

@@ -14,7 +14,10 @@
     "deleteCalendar": "Kalender konnte nicht gelöscht werden.",
     "deleteAddressBook": "Adressbuch konnte nicht gelöscht werden.",
     "appleCompat": "Apple-Kompatibilitätseinstellungen konnten nicht aktualisiert werden.",
-    "milestones": "Einstellungen für Geburtstags-/Jahrestagskalender konnten nicht aktualisiert werden."
+    "milestones": "Einstellungen für Geburtstags-/Jahrestagskalender konnten nicht aktualisiert werden.",
+    "privateWorkingSet": "Einstellungen für privaten Arbeitsbereich konnten nicht aktualisiert werden.",
+    "privateWorkingSetPull": "Neueste Quellwerte des privaten Arbeitsbereichs konnten nicht abgerufen werden.",
+    "privateWorkingSetPromote": "Änderung aus privatem Arbeitsbereich konnte nicht in die gemeinsame Quelle übernommen werden."
   },
   "overview": {
     "endpointTitle": "DAV-Endpunkt",
@@ -109,6 +112,32 @@
       "shared": "{{name}} ist jetzt freigegeben.",
       "unshared": "{{name}} ist nicht länger freigegeben."
     },
-    "appleCompatSaved": "Apple-Kompatibilitätseinstellungen wurden gespeichert."
+    "appleCompatSaved": "Apple-Kompatibilitätseinstellungen wurden gespeichert.",
+    "privateWorkingSetSaved": "Einstellungen für privaten Arbeitsbereich wurden gespeichert.",
+    "privateWorkingSetPulled": "Privater Arbeitsbereich wurde aus gemeinsamen Quellen aktualisiert.",
+    "privateWorkingSetForcePulled": "Privater Arbeitsbereich wurde mit Serverwerten aus gemeinsamen Quellen überschrieben.",
+    "privateWorkingSetPromoted": "Private Karte wurde in die gemeinsame Quelle übernommen.",
+    "privateWorkingSetPromoteQueued": "Übernahme wurde zur Prüfwarteschlange eingereicht."
+  },
+  "privateWorkingSet": {
+    "title": "Privater Arbeitsbereich",
+    "subtitle": "Erstellen Sie pro Benutzer private Kopien geteilter Kontakte, damit lokale Änderungen privat bleiben, bis Sie sie ausdrücklich übernehmen.",
+    "target": "Privates Arbeitsbereichs-Adressbuch: {{name}} (/{{uri}})",
+    "enable": "Privaten Arbeitsbereich aktivieren",
+    "hideShared": "Ausgewählte geteilte Quelladressbücher in der DAV-Erkennung ausblenden",
+    "sourcesTitle": "Geteilte Quelladressbücher",
+    "noSources": "Keine geeigneten geteilten Adressbücher verfügbar.",
+    "canWrite": "Editor/Admin-Freigabe",
+    "readOnly": "Nur-Lese-Freigabe",
+    "save": "Einstellungen für privaten Arbeitsbereich speichern",
+    "saving": "Speichern...",
+    "pull": "Neueste laden (Überschreibungen beibehalten)",
+    "forcePull": "Erzwungen laden (Serverwerte verwenden)",
+    "pulling": "Lädt...",
+    "linkedCardsTitle": "Verknüpfte private Karten",
+    "noLinkedCards": "Noch keine verknüpften privaten Karten.",
+    "sourceCardHint": "Quell-URI: {{uri}}",
+    "promote": "In gemeinsame Quelle übernehmen",
+    "promoting": "Übernimmt..."
   }
 }

@@ -14,7 +14,10 @@
     "deleteCalendar": "No se pudo eliminar el calendario.",
     "deleteAddressBook": "No se pudo eliminar la libreta de direcciones.",
     "appleCompat": "No se pudieron actualizar los ajustes de compatibilidad de Apple.",
-    "milestones": "No se pudieron actualizar los ajustes de cumpleaños/aniversarios."
+    "milestones": "No se pudieron actualizar los ajustes de cumpleaños/aniversarios.",
+    "privateWorkingSet": "No se pudieron actualizar los ajustes del conjunto de trabajo privado.",
+    "privateWorkingSetPull": "No se pudieron obtener los valores más recientes de origen del conjunto de trabajo privado.",
+    "privateWorkingSetPromote": "No se pudo promover el cambio del conjunto de trabajo privado."
   },
   "overview": {
     "endpointTitle": "Punto de conexión DAV",
@@ -109,6 +112,32 @@
       "shared": "{{name}} ahora está compartido.",
       "unshared": "{{name}} ya no está compartido."
     },
-    "appleCompatSaved": "Se guardaron los ajustes de compatibilidad de Apple."
+    "appleCompatSaved": "Se guardaron los ajustes de compatibilidad de Apple.",
+    "privateWorkingSetSaved": "Se guardaron los ajustes del conjunto de trabajo privado.",
+    "privateWorkingSetPulled": "El conjunto de trabajo privado se actualizó desde las fuentes compartidas.",
+    "privateWorkingSetForcePulled": "El conjunto de trabajo privado se actualizó forzando los valores del servidor.",
+    "privateWorkingSetPromoted": "La tarjeta privada se promovió a la fuente compartida.",
+    "privateWorkingSetPromoteQueued": "La promoción se envió a la cola de revisión."
+  },
+  "privateWorkingSet": {
+    "title": "Conjunto de trabajo privado",
+    "subtitle": "Crea copias privadas por usuario de contactos compartidos para que los cambios locales se mantengan privados hasta que los promociones explícitamente.",
+    "target": "Libreta del conjunto de trabajo privado: {{name}} (/{{uri}})",
+    "enable": "Habilitar conjunto de trabajo privado",
+    "hideShared": "Ocultar en la detección DAV las libretas de origen compartidas seleccionadas",
+    "sourcesTitle": "Libretas de direcciones de origen compartidas",
+    "noSources": "No hay libretas compartidas elegibles disponibles.",
+    "canWrite": "Compartido Editor/Admin",
+    "readOnly": "Compartido solo lectura",
+    "save": "Guardar ajustes del conjunto de trabajo privado",
+    "saving": "Guardando...",
+    "pull": "Traer últimos (respetar sobrescrituras)",
+    "forcePull": "Traer forzado (usar valores del servidor)",
+    "pulling": "Actualizando...",
+    "linkedCardsTitle": "Tarjetas privadas vinculadas",
+    "noLinkedCards": "Aún no hay tarjetas privadas vinculadas.",
+    "sourceCardHint": "URI de origen: {{uri}}",
+    "promote": "Promover a fuente compartida",
+    "promoting": "Promoviendo..."
   }
 }

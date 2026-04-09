@@ -231,6 +231,36 @@ class ContactCardDavSyncTest extends TestCase
         $this->assertTrue((bool) ($payload['exclude_milestone_calendars'] ?? false));
     }
 
+    public function test_carddav_note_round_trips_into_managed_contact_payload(): void
+    {
+        $user = User::factory()->create();
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'uri' => 'notes-roundtrip-book',
+        ]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($user);
+
+        app(LaravelCardDavBackend::class)->createCard(
+            $addressBook->id,
+            'notes-roundtrip.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Notes Person\nN:Person;Notes;;;\nUID:notes-roundtrip-uid\nNOTE:Private local notes here\nEND:VCARD"
+        );
+
+        $contact = Contact::query()
+            ->where('owner_id', $user->id)
+            ->where('uid', 'notes-roundtrip-uid')
+            ->firstOrFail();
+        $this->assertSame('Private local notes here', $contact->payload['notes'] ?? null);
+
+        $assignment = ContactAddressBookAssignment::query()
+            ->where('contact_id', $contact->id)
+            ->where('address_book_id', $addressBook->id)
+            ->firstOrFail();
+        $card = Card::query()->findOrFail($assignment->card_id);
+        $this->assertStringContainsString('NOTE:Private local notes here', (string) $card->data);
+    }
+
     public function test_related_name_contact_id_round_trips_through_carddav(): void
     {
         $user = User::factory()->create();

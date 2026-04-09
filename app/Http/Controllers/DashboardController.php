@@ -8,6 +8,7 @@ use App\Models\Calendar;
 use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\AddressBookMirrorService;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,7 @@ class DashboardController extends Controller
     public function __construct(
         private readonly RegistrationSettingsService $settings,
         private readonly AddressBookMirrorService $mirrorService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
     ) {}
 
@@ -109,6 +111,12 @@ class DashboardController extends Controller
             ->where('resource_type', ShareResourceType::AddressBook)
             ->filter(fn (ResourceShare $share): bool => $share->addressBook !== null)
             ->values()
+            ->reject(function (ResourceShare $share) use ($user): bool {
+                return $this->privateWorkingSetService->isSharedSourceHiddenForUser(
+                    $user,
+                    (int) $share->addressBook->id,
+                );
+            })
             ->map(function (ResourceShare $share): array {
                 return [
                     'share_id' => $share->id,
@@ -174,6 +182,7 @@ class DashboardController extends Controller
                 'outgoing' => $sharesCreatedByUser,
             ],
             'apple_compat' => $this->mirrorService->dashboardDataFor($user),
+            'private_working_set' => $this->privateWorkingSetService->dashboardDataFor($user),
         ]);
     }
 }

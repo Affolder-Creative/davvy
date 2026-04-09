@@ -437,6 +437,7 @@ class ContactVCardService
         $this->addSimpleProperty($vCard, 'X-DAVVY-TEXT-TONE', $payload['text_tone'] ?? null);
         $this->addSimpleProperty($vCard, 'X-DAVVY-VERIFICATION-CODE', $payload['verification_code'] ?? null);
         $this->addSimpleProperty($vCard, 'X-DAVVY-PROFILE', $payload['profile'] ?? null);
+        $this->addSimpleProperty($vCard, 'NOTE', $payload['notes'] ?? null);
 
         $categories = $this->normalizedCategories($payload['categories'] ?? []);
         if ($categories !== []) {
@@ -523,6 +524,7 @@ class ContactVCardService
         $payload['text_tone'] = $this->firstPropertyValue($component, 'X-DAVVY-TEXT-TONE');
         $payload['verification_code'] = $this->firstPropertyValue($component, 'X-DAVVY-VERIFICATION-CODE');
         $payload['profile'] = $this->firstPropertyValue($component, 'X-DAVVY-PROFILE');
+        $payload['notes'] = $this->firstPropertyValue($component, 'NOTE');
         $payload['head_of_household'] = $this->toBoolean(
             $this->firstPropertyValue($component, 'X-DAVVY-HEAD-OF-HOUSEHOLD'),
         );
@@ -917,6 +919,7 @@ class ContactVCardService
             'maiden_name' => null,
             'verification_code' => null,
             'profile' => null,
+            'notes' => null,
             'head_of_household' => false,
             'exclude_milestone_calendars' => false,
             'categories' => [],

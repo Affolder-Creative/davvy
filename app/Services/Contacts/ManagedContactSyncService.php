@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Schema;
 
 class ManagedContactSyncService
 {
+    private const PRIVATE_SOURCE_PROPERTY = 'X-DAVVY-PRIVATE-SOURCE';
+
     public function __construct(
         private readonly ContactVCardService $vCardService,
         private readonly ContactPhotoService $contactPhotoService,
@@ -27,6 +29,10 @@ class ManagedContactSyncService
         ?User $actor = null,
     ): void {
         if (! $this->schemaAvailable()) {
+            return;
+        }
+
+        if ($this->isPrivateManagedCard((string) $card->data)) {
             return;
         }
 
@@ -220,6 +226,10 @@ class ManagedContactSyncService
             return;
         }
 
+        if ($this->isPrivateManagedCard((string) $card->data)) {
+            return;
+        }
+
         $affectedAddressBookId = null;
         $relatedAddressBookIds = [];
 
@@ -377,6 +387,14 @@ class ManagedContactSyncService
         $normalized = trim((string) ($value ?? ''));
 
         return $normalized === '' ? null : $normalized;
+    }
+
+    /**
+     * Checks whether the card is managed by private working set.
+     */
+    private function isPrivateManagedCard(string $cardData): bool
+    {
+        return stripos($cardData, self::PRIVATE_SOURCE_PROPERTY.':') !== false;
     }
 
     /**

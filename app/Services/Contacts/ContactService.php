@@ -8,6 +8,7 @@ use App\Models\AddressBook;
 use App\Models\Contact;
 use App\Models\ResourceShare;
 use App\Models\User;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\ResourceAccessService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ class ContactService
         private readonly ContactVCardService $vCardService,
         private readonly ContactPhotoService $contactPhotoService,
         private readonly ResourceAccessService $accessService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
         private readonly ContactAssignmentService $assignmentService,
         private readonly ContactRelatedNameSyncService $relatedNameSyncService,
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
@@ -58,8 +60,12 @@ class ContactService
      */
     public function writableAddressBooksFor(User $actor): Collection
     {
+        $hiddenSourceIds = $this->privateWorkingSetService->hiddenSourceAddressBookIdsForUser($actor);
+        $privateWorkingSetBookId = $this->privateWorkingSetService->privateAddressBookIdForUser($actor);
+
         $owned = AddressBook::query()
             ->where('owner_id', $actor->id)
+            ->when($privateWorkingSetBookId !== null, fn ($query) => $query->where('id', '!=', $privateWorkingSetBookId))
             ->orderBy('display_name')
             ->get()
             ->map(fn (AddressBook $book): array => [
@@ -78,6 +84,7 @@ class ContactService
             ->whereIn('permission', [SharePermission::Editor->value, SharePermission::Admin->value])
             ->get()
             ->filter(fn (ResourceShare $share): bool => $share->addressBook !== null)
+            ->reject(fn (ResourceShare $share): bool => in_array((int) $share->addressBook->id, $hiddenSourceIds, true))
             ->map(fn (ResourceShare $share): array => [
                 'id' => $share->addressBook->id,
                 'uri' => $share->addressBook->uri,

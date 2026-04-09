@@ -14,7 +14,10 @@
     "deleteCalendar": "无法删除日历。",
     "deleteAddressBook": "无法删除地址簿。",
     "appleCompat": "无法更新 Apple 兼容性设置。",
-    "milestones": "无法更新生日/周年纪念日日历设置。"
+    "milestones": "无法更新生日/周年纪念日日历设置。",
+    "privateWorkingSet": "无法更新私人工作集设置。",
+    "privateWorkingSetPull": "无法拉取私人工作集来源的最新值。",
+    "privateWorkingSetPromote": "无法将私人工作集变更提升到共享来源。"
   },
   "overview": {
     "endpointTitle": "DAV端点",
@@ -109,6 +112,32 @@
       "shared": "{{name}} 现已共享。",
       "unshared": "{{name}} 不再共享。"
     },
-    "appleCompatSaved": "Apple 兼容性设置已保存。"
+    "appleCompatSaved": "Apple 兼容性设置已保存。",
+    "privateWorkingSetSaved": "私人工作集设置已保存。",
+    "privateWorkingSetPulled": "已从共享来源拉取私人工作集。",
+    "privateWorkingSetForcePulled": "已强制使用服务器值从共享来源拉取私人工作集。",
+    "privateWorkingSetPromoted": "私人卡片已提升到共享来源。",
+    "privateWorkingSetPromoteQueued": "提升请求已提交到审核队列。"
+  },
+  "privateWorkingSet": {
+    "title": "私人工作集",
+    "subtitle": "为每位用户创建共享联系人的私人副本，使本地编辑保持私有，除非您明确将其提升。",
+    "target": "私人工作集通讯簿：{{name}} (/{{uri}})",
+    "enable": "启用私人工作集",
+    "hideShared": "在 DAV 发现中隐藏所选共享来源通讯簿",
+    "sourcesTitle": "共享来源通讯簿",
+    "noSources": "没有可用的共享来源通讯簿。",
+    "canWrite": "编辑者/管理员共享",
+    "readOnly": "只读共享",
+    "save": "保存私人工作集设置",
+    "saving": "保存中...",
+    "pull": "拉取最新（保留覆盖项）",
+    "forcePull": "强制拉取（使用服务器值）",
+    "pulling": "拉取中...",
+    "linkedCardsTitle": "已关联的私人卡片",
+    "noLinkedCards": "暂无已关联的私人卡片。",
+    "sourceCardHint": "来源 URI：{{uri}}",
+    "promote": "提升到共享来源",
+    "promoting": "提升中..."
   }
 }

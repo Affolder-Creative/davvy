@@ -3,6 +3,7 @@
 use App\Http\Controllers\AddressBookController;
 use App\Http\Controllers\AddressBookMilestoneCalendarController;
 use App\Http\Controllers\AddressBookMirrorController;
+use App\Http\Controllers\AddressBookPrivateWorkingSetController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarController;
@@ -82,6 +83,8 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/api/address-books', [AddressBookController::class, 'store']);
         Route::patch('/api/address-books/{addressBook}/milestone-calendars', [AddressBookMilestoneCalendarController::class, 'update']);
         Route::patch('/api/address-books/apple-compat', [AddressBookMirrorController::class, 'update']);
+        Route::patch('/api/address-books/private-working-set', [AddressBookPrivateWorkingSetController::class, 'update']);
+        Route::post('/api/address-books/private-working-set/pull', [AddressBookPrivateWorkingSetController::class, 'pull']);
         Route::patch('/api/address-books/{addressBook}', [AddressBookController::class, 'update']);
         Route::delete('/api/address-books/{addressBook}', [AddressBookController::class, 'destroy']);
 
@@ -93,6 +96,7 @@ Route::middleware('auth')->group(function (): void {
             Route::post('/api/contacts', [ContactController::class, 'store']);
             Route::patch('/api/contacts/{contact}', [ContactController::class, 'update']);
             Route::delete('/api/contacts/{contact}', [ContactController::class, 'destroy']);
+            Route::post('/api/address-books/private-working-set/promote/{card}', [AddressBookPrivateWorkingSetController::class, 'promote']);
         });
 
         Route::get('/api/shares', [ShareController::class, 'index']);
