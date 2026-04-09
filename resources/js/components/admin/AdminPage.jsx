@@ -2701,7 +2701,7 @@ export default function AdminPage({
               </select>
             </div>
 
-            <div className="mt-5 space-y-2">
+            <div className="mt-5 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
               {filteredShareGroups.length === 0 ? (
                 <p className="rounded-xl border border-app-edge bg-app-surface p-3 text-xs text-app-faint">
                   {t("labels.share.noMatches")}
