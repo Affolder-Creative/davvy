@@ -339,27 +339,25 @@ export default function DashboardPrivateWorkingSetPanel({
               ? t("privateWorkingSet.saving")
               : t("privateWorkingSet.save")}
           </button>
+          <button
+            className="btn btn-secondary"
+            type="button"
+            disabled={pullingPrivateWorkingSet || !privateWorkingSetForm.enabled}
+            onClick={() => onPullPrivateWorkingSet(false)}
+            title={t("privateWorkingSet.pullTooltip")}
+          >
+            {pullingPrivateWorkingSet
+              ? t("privateWorkingSet.pulling")
+              : renderButtonLabelWithQualifier(t("privateWorkingSet.pull"))}
+          </button>
           {advancedOpen ? (
             <>
               <button
                 className="btn btn-secondary"
                 type="button"
                 disabled={pullingPrivateWorkingSet || !privateWorkingSetForm.enabled}
-                onClick={() => onPullPrivateWorkingSet(false)}
-                title={t("privateWorkingSet.pullTooltip")}
-                aria-label={t("privateWorkingSet.pullTooltip")}
-              >
-                {pullingPrivateWorkingSet
-                  ? t("privateWorkingSet.pulling")
-                  : renderButtonLabelWithQualifier(t("privateWorkingSet.pull"))}
-              </button>
-              <button
-                className="btn btn-secondary"
-                type="button"
-                disabled={pullingPrivateWorkingSet || !privateWorkingSetForm.enabled}
                 onClick={() => onPullPrivateWorkingSet(true)}
                 title={t("privateWorkingSet.forcePullTooltip")}
-                aria-label={t("privateWorkingSet.forcePullTooltip")}
               >
                 {pullingPrivateWorkingSet
                   ? t("privateWorkingSet.pulling")

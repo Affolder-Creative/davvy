@@ -85,6 +85,12 @@ describe("DashboardPrivateWorkingSetPanel", () => {
         name: /Hide selected source books in my DAV apps/i,
       }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Refresh from source books/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Reset from source books/i }),
+    ).not.toBeInTheDocument();
 
     await user.click(
       screen.getByRole("button", { name: /Show advanced options/i }),
@@ -94,6 +100,9 @@ describe("DashboardPrivateWorkingSetPanel", () => {
       screen.getByRole("checkbox", {
         name: /Hide selected source books in my DAV apps/i,
       }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Reset from source books/i }),
     ).toBeInTheDocument();
     expect(screen.getByText("Last promotion results")).toBeInTheDocument();
   });
