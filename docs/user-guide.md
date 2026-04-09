@@ -86,12 +86,14 @@ Recommended flow:
 2. Edit contacts from your devices as usual.
 3. In dashboard, use `Suggested updates to share` or `Private cards linked to shared contacts`.
 4. Click `Share this update` only for changes you want everyone to receive.
+5. Use `Show advanced options` only when you need sync-policy controls.
 
 Key settings in plain language:
 - `Use private working set for shared contacts`: turns this feature on/off.
 - `Hide selected source books in my DAV apps`: reduces accidental direct edits in source books.
 - `Also include my own sharable address books`: lets your own books use the same draft/promote model.
 - `Queue my own promotions for review` (admin only): routes your own promotions through Review Queue first.
+- `Last promotion results`: shows your most recent queued/applied promotion outcomes for quick confirmation.
 
 Action buttons:
 - `Refresh from source books (keep my private edits)`: updates from source but preserves your private overrides.

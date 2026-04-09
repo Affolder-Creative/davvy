@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 /**
@@ -16,6 +16,7 @@ export default function DashboardPrivateWorkingSetPanel({
   pullingPrivateWorkingSet,
   promotingPrivateCardId,
   dismissingSuggestionLinkId,
+  privateWorkingSetPromotionHistory = [],
   contactChangeModerationEnabled,
   onSavePrivateWorkingSet,
   onPullPrivateWorkingSet,
@@ -23,6 +24,7 @@ export default function DashboardPrivateWorkingSetPanel({
   onDismissSuggestedPromotion,
 }) {
   const { t } = useTranslation("dashboard");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const canSelectSources = privateWorkingSetForm.enabled;
   const canManageSelfReviewPolicy = Boolean(
     privateWorkingSet.can_manage_self_review_policy,
@@ -125,110 +127,138 @@ export default function DashboardPrivateWorkingSetPanel({
             </span>
           </label>
 
-          <label
-            className={`flex items-start gap-2 text-sm font-medium text-app-base ${
-              privateWorkingSetForm.enabled ? "" : "opacity-60"
-            }`}
-            aria-disabled={!privateWorkingSetForm.enabled}
-          >
-            <input
-              type="checkbox"
-              className="mt-0.5 h-4 w-4 shrink-0"
-              checked={privateWorkingSetForm.hide_shared}
-              onChange={(event) =>
-                setPrivateWorkingSetForm({
-                  ...privateWorkingSetForm,
-                  hide_shared: event.target.checked,
-                })
-              }
-              disabled={!privateWorkingSetForm.enabled}
-            />
-            <span className="min-w-0">
-              <span className="block leading-5">{t("privateWorkingSet.hideShared")}</span>
-              <span className="block text-xs font-normal text-app-faint">
-                {t("privateWorkingSet.hideSharedHint")}
-              </span>
-            </span>
-          </label>
+          <p className="text-xs text-app-faint">
+            {contactChangeModerationEnabled
+              ? t("privateWorkingSet.moderationOnSummary")
+              : t("privateWorkingSet.moderationOffSummary")}
+          </p>
 
-          <label
-            className={`flex items-start gap-2 text-sm font-medium text-app-base ${
-              privateWorkingSetForm.enabled ? "" : "opacity-60"
-            }`}
-            aria-disabled={!privateWorkingSetForm.enabled}
-          >
-            <input
-              type="checkbox"
-              className="mt-0.5 h-4 w-4 shrink-0"
-              checked={privateWorkingSetForm.include_owned_sharable_sources}
-              onChange={(event) =>
-                setPrivateWorkingSetForm({
-                  ...privateWorkingSetForm,
-                  include_owned_sharable_sources: event.target.checked,
-                })
-              }
-              disabled={!privateWorkingSetForm.enabled}
-            />
-            <span className="min-w-0">
-              <span className="block leading-5">
-                {t("privateWorkingSet.includeOwnedSharableSources")}
-              </span>
-              <span className="block text-xs font-normal text-app-faint">
-                {t("privateWorkingSet.includeOwnedSharableSourcesHint")}
-              </span>
-            </span>
-          </label>
-
-          {canManageSelfReviewPolicy ? (
-            <label
-              className={`flex items-start gap-2 text-sm font-medium text-app-base ${
-                canRequireSelfReview ? "" : "opacity-60"
-              }`}
-              aria-disabled={!canRequireSelfReview}
+          <div className="flex justify-end">
+            <button
+              className="btn-outline btn-outline-sm"
+              type="button"
+              onClick={() => setAdvancedOpen((previous) => !previous)}
             >
-              <input
-                type="checkbox"
-                className="mt-0.5 h-4 w-4 shrink-0"
-                checked={privateWorkingSetForm.require_review_for_self_promotions}
-                onChange={(event) =>
-                  setPrivateWorkingSetForm({
-                    ...privateWorkingSetForm,
-                    require_review_for_self_promotions: event.target.checked,
-                  })
-                }
-                disabled={!canRequireSelfReview}
-              />
-              <span className="min-w-0">
-                <span className="block leading-5">
-                  {t("privateWorkingSet.requireReviewForSelfPromotions")}
-                </span>
-                <span className="block text-xs font-normal text-app-faint">
-                  {t("privateWorkingSet.requireReviewForSelfPromotionsHint")}
-                </span>
-              </span>
-            </label>
-          ) : null}
+              {advancedOpen
+                ? t("privateWorkingSet.hideAdvanced")
+                : t("privateWorkingSet.showAdvanced")}
+            </button>
+          </div>
 
-          {!canManageSelfReviewPolicy ? (
-            <p className="text-xs text-app-faint">
-              {contactChangeModerationEnabled
-                ? t("privateWorkingSet.nonAdminSelfReviewAlwaysQueued")
-                : t("privateWorkingSet.nonAdminSelfReviewModerationDisabled")}
-            </p>
-          ) : null}
+          {advancedOpen ? (
+            <>
+              <label
+                className={`flex items-start gap-2 text-sm font-medium text-app-base ${
+                  privateWorkingSetForm.enabled ? "" : "opacity-60"
+                }`}
+                aria-disabled={!privateWorkingSetForm.enabled}
+              >
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0"
+                  checked={privateWorkingSetForm.hide_shared}
+                  onChange={(event) =>
+                    setPrivateWorkingSetForm({
+                      ...privateWorkingSetForm,
+                      hide_shared: event.target.checked,
+                    })
+                  }
+                  disabled={!privateWorkingSetForm.enabled}
+                />
+                <span className="min-w-0">
+                  <span className="block leading-5">
+                    {t("privateWorkingSet.hideShared")}
+                  </span>
+                  <span className="block text-xs font-normal text-app-faint">
+                    {t("privateWorkingSet.hideSharedHint")}
+                  </span>
+                </span>
+              </label>
 
-          {canManageSelfReviewPolicy && !contactChangeModerationEnabled ? (
+              <label
+                className={`flex items-start gap-2 text-sm font-medium text-app-base ${
+                  privateWorkingSetForm.enabled ? "" : "opacity-60"
+                }`}
+                aria-disabled={!privateWorkingSetForm.enabled}
+              >
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0"
+                  checked={privateWorkingSetForm.include_owned_sharable_sources}
+                  onChange={(event) =>
+                    setPrivateWorkingSetForm({
+                      ...privateWorkingSetForm,
+                      include_owned_sharable_sources: event.target.checked,
+                    })
+                  }
+                  disabled={!privateWorkingSetForm.enabled}
+                />
+                <span className="min-w-0">
+                  <span className="block leading-5">
+                    {t("privateWorkingSet.includeOwnedSharableSources")}
+                  </span>
+                  <span className="block text-xs font-normal text-app-faint">
+                    {t("privateWorkingSet.includeOwnedSharableSourcesHint")}
+                  </span>
+                </span>
+              </label>
+
+              {canManageSelfReviewPolicy ? (
+                <label
+                  className={`flex items-start gap-2 text-sm font-medium text-app-base ${
+                    canRequireSelfReview ? "" : "opacity-60"
+                  }`}
+                  aria-disabled={!canRequireSelfReview}
+                >
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 shrink-0"
+                    checked={privateWorkingSetForm.require_review_for_self_promotions}
+                    onChange={(event) =>
+                      setPrivateWorkingSetForm({
+                        ...privateWorkingSetForm,
+                        require_review_for_self_promotions: event.target.checked,
+                      })
+                    }
+                    disabled={!canRequireSelfReview}
+                  />
+                  <span className="min-w-0">
+                    <span className="block leading-5">
+                      {t("privateWorkingSet.requireReviewForSelfPromotions")}
+                    </span>
+                    <span className="block text-xs font-normal text-app-faint">
+                      {t("privateWorkingSet.requireReviewForSelfPromotionsHint")}
+                    </span>
+                  </span>
+                </label>
+              ) : null}
+
+              {!canManageSelfReviewPolicy ? (
+                <p className="text-xs text-app-faint">
+                  {contactChangeModerationEnabled
+                    ? t("privateWorkingSet.nonAdminSelfReviewAlwaysQueued")
+                    : t("privateWorkingSet.nonAdminSelfReviewModerationDisabled")}
+                </p>
+              ) : null}
+
+              {canManageSelfReviewPolicy && !contactChangeModerationEnabled ? (
+                <p className="text-xs text-app-faint">
+                  {t("privateWorkingSet.requireSelfReviewModerationDisabled")}
+                </p>
+              ) : null}
+              {canManageSelfReviewPolicy &&
+              contactChangeModerationEnabled &&
+              !effectiveRequireReviewForSelfPromotions ? (
+                <p className="text-xs text-app-faint">
+                  {t("privateWorkingSet.selfReviewPolicyDirectApply")}
+                </p>
+              ) : null}
+            </>
+          ) : (
             <p className="text-xs text-app-faint">
-              {t("privateWorkingSet.requireSelfReviewModerationDisabled")}
+              {t("privateWorkingSet.advancedHiddenHint")}
             </p>
-          ) : null}
-          {canManageSelfReviewPolicy &&
-          contactChangeModerationEnabled &&
-          !effectiveRequireReviewForSelfPromotions ? (
-            <p className="text-xs text-app-faint">
-              {t("privateWorkingSet.selfReviewPolicyDirectApply")}
-            </p>
-          ) : null}
+          )}
         </div>
 
         <div className="space-y-2">
@@ -309,35 +339,96 @@ export default function DashboardPrivateWorkingSetPanel({
               ? t("privateWorkingSet.saving")
               : t("privateWorkingSet.save")}
           </button>
-          <button
-            className="btn btn-secondary"
-            type="button"
-            disabled={pullingPrivateWorkingSet || !privateWorkingSetForm.enabled}
-            onClick={() => onPullPrivateWorkingSet(false)}
-          >
-            {pullingPrivateWorkingSet
-              ? t("privateWorkingSet.pulling")
-              : renderButtonLabelWithQualifier(t("privateWorkingSet.pull"))}
-          </button>
-          <button
-            className="btn btn-secondary"
-            type="button"
-            disabled={pullingPrivateWorkingSet || !privateWorkingSetForm.enabled}
-            onClick={() => onPullPrivateWorkingSet(true)}
-          >
-            {pullingPrivateWorkingSet
-              ? t("privateWorkingSet.pulling")
-              : renderButtonLabelWithQualifier(
-                  t("privateWorkingSet.forcePull"),
-                )}
-          </button>
+          {advancedOpen ? (
+            <>
+              <button
+                className="btn btn-secondary"
+                type="button"
+                disabled={pullingPrivateWorkingSet || !privateWorkingSetForm.enabled}
+                onClick={() => onPullPrivateWorkingSet(false)}
+                title={t("privateWorkingSet.pullTooltip")}
+                aria-label={t("privateWorkingSet.pullTooltip")}
+              >
+                {pullingPrivateWorkingSet
+                  ? t("privateWorkingSet.pulling")
+                  : renderButtonLabelWithQualifier(t("privateWorkingSet.pull"))}
+              </button>
+              <button
+                className="btn btn-secondary"
+                type="button"
+                disabled={pullingPrivateWorkingSet || !privateWorkingSetForm.enabled}
+                onClick={() => onPullPrivateWorkingSet(true)}
+                title={t("privateWorkingSet.forcePullTooltip")}
+                aria-label={t("privateWorkingSet.forcePullTooltip")}
+              >
+                {pullingPrivateWorkingSet
+                  ? t("privateWorkingSet.pulling")
+                  : renderButtonLabelWithQualifier(
+                      t("privateWorkingSet.forcePull"),
+                    )}
+              </button>
+            </>
+          ) : null}
         </div>
+        {advancedOpen ? (
+          <p className="text-xs text-app-faint">
+            {t("privateWorkingSet.syncActionsHint")}
+          </p>
+        ) : null}
 
         {privateWorkingSetNotice ? (
           <p className="mt-2 text-sm text-app-accent" role="status">
             {privateWorkingSetNotice}
           </p>
         ) : null}
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-app-strong">
+            {t("privateWorkingSet.promotionHistoryTitle")}
+          </p>
+          {(privateWorkingSetPromotionHistory ?? []).length === 0 ? (
+            <p className="text-sm text-app-faint">
+              {t("privateWorkingSet.promotionHistoryEmpty")}
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {(privateWorkingSetPromotionHistory ?? []).map((row) => {
+                const timeLabel = new Date(row.occurred_at).toLocaleString();
+                const statusLabel = row.queued
+                  ? t("privateWorkingSet.promotionHistoryQueued")
+                  : t("privateWorkingSet.promotionHistoryApplied");
+
+                return (
+                  <div
+                    key={row.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-app-edge bg-app-surface px-3 py-2 text-sm"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-medium text-app-strong">
+                        {row.display_name}
+                      </span>
+                      {row.source_card_uri ? (
+                        <span className="block text-xs text-app-faint">
+                          {t("privateWorkingSet.sourceCardHint", {
+                            uri: row.source_card_uri,
+                          })}
+                        </span>
+                      ) : null}
+                      <span className="block text-xs text-app-faint">
+                        {t("privateWorkingSet.promotionHistoryAt", {
+                          time: timeLabel,
+                        })}
+                      </span>
+                    </span>
+                    <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
+                      {statusLabel}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-app-strong">

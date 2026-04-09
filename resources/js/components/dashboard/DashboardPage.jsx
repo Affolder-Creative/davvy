@@ -41,6 +41,8 @@ export default function DashboardPage({
   const [promotingPrivateCardId, setPromotingPrivateCardId] = useState(null);
   const [dismissingSuggestionLinkId, setDismissingSuggestionLinkId] =
     useState(null);
+  const [privateWorkingSetPromotionHistory, setPrivateWorkingSetPromotionHistory] =
+    useState([]);
   const [data, setData] = useState({
     owned: { calendars: [], address_books: [] },
     shared: { calendars: [], address_books: [] },
@@ -379,6 +381,20 @@ export default function DashboardPage({
       return;
     }
 
+    const candidateRows = [
+      ...(data.private_working_set?.suggested_promotions ?? []),
+      ...(data.private_working_set?.linked_cards ?? []),
+    ];
+    const matchedCard = candidateRows.find(
+      (row) => Number(row.private_card_id) === Number(privateCardId),
+    );
+    const promotionDisplayName =
+      matchedCard?.display_name ??
+      t("privateWorkingSet.promotionHistoryFallback", {
+        id: privateCardId,
+      });
+    const promotionSourceCardUri = matchedCard?.source_card_uri ?? null;
+
     try {
       setPrivateWorkingSetNotice("");
       setError("");
@@ -387,10 +403,24 @@ export default function DashboardPage({
         `/api/address-books/private-working-set/promote/${privateCardId}`,
       );
       await loadDashboard({ withLoading: false });
+      const queued = Boolean(response?.data?.queued);
       setPrivateWorkingSetNotice(
-        response?.data?.queued
+        queued
           ? t("notices.privateWorkingSetPromoteQueued")
           : t("notices.privateWorkingSetPromoted"),
+      );
+      setPrivateWorkingSetPromotionHistory((previous) =>
+        [
+          {
+            id: `${privateCardId}-${Date.now()}`,
+            display_name: promotionDisplayName,
+            source_card_uri:
+              promotionSourceCardUri ?? response?.data?.source_card_uri ?? null,
+            queued,
+            occurred_at: new Date().toISOString(),
+          },
+          ...previous,
+        ].slice(0, 5),
       );
     } catch (err) {
       setError(extractError(err, t("errors.privateWorkingSetPromote")));
@@ -586,6 +616,7 @@ export default function DashboardPage({
           pullingPrivateWorkingSet={pullingPrivateWorkingSet}
           promotingPrivateCardId={promotingPrivateCardId}
           dismissingSuggestionLinkId={dismissingSuggestionLinkId}
+          privateWorkingSetPromotionHistory={privateWorkingSetPromotionHistory}
           contactChangeModerationEnabled={contactChangeModerationEnabled}
           onSavePrivateWorkingSet={savePrivateWorkingSet}
           onPullPrivateWorkingSet={pullPrivateWorkingSet}

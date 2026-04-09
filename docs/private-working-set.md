@@ -25,6 +25,7 @@ This helps prevent accidental global changes while still letting you sync privat
 3. Select source address books to sync into your private set.
 4. (Optional) enable `Hide selected source books in my DAV apps`.
 5. Save settings.
+6. Keep the panel in simple mode by default; open `Show advanced options` only when needed.
 
 ## Settings Reference
 
@@ -49,6 +50,7 @@ This helps prevent accidental global changes while still letting you sync privat
 2. Check `Suggested updates to share` for safe field-level diffs.
 3. Use `Share this update` only for changes you want everyone to see.
 4. Use `Hide suggestion` for items you want to ignore for now.
+5. Confirm outcomes in `Last promotion results` (`Queued for review` vs `Applied`).
 
 ## Refresh vs Reset
 
