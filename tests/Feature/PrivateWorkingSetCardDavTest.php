@@ -355,6 +355,30 @@ class PrivateWorkingSetCardDavTest extends TestCase
         $this->assertNotContains($ownedSharable->id, $sourceOptionIds);
     }
 
+    public function test_non_admin_cannot_disable_self_review_policy_when_moderation_enabled(): void
+    {
+        $user = User::factory()->create();
+
+        app(RegistrationSettingsService::class)->setContactChangeModerationEnabled(true);
+
+        $response = $this->actingAs($user)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => false,
+            'hide_shared' => true,
+            'include_owned_sharable_sources' => true,
+            'require_review_for_self_promotions' => false,
+            'source_ids' => [],
+        ])->assertOk();
+
+        $response->assertJsonPath('private_working_set.require_review_for_self_promotions', true);
+        $response->assertJsonPath('private_working_set.can_manage_self_review_policy', false);
+        $response->assertJsonPath('private_working_set.effective_require_review_for_self_promotions', true);
+
+        $this->assertDatabaseHas('address_book_private_working_set_configs', [
+            'user_id' => $user->id,
+            'require_review_for_self_promotions' => true,
+        ]);
+    }
+
     public function test_dashboard_does_not_suggest_notes_only_private_overrides(): void
     {
         $owner = User::factory()->create();
@@ -461,6 +485,56 @@ class PrivateWorkingSetCardDavTest extends TestCase
 
         $dashboard = $this->actingAs($recipient)->getJson('/api/dashboard')->assertOk();
         $this->assertSame([], $dashboard->json('private_working_set.suggested_promotions'));
+    }
+
+    public function test_read_only_source_cannot_be_promoted_from_private_working_set(): void
+    {
+        $owner = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Read Only Source',
+            'uri' => 'read-only-source',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $recipient->id,
+            'permission' => SharePermission::ReadOnly,
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'readonly-promote-source.vcf',
+            'uid' => 'readonly-promote-source-uid',
+            'etag' => md5('readonly-promote-source'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Read Only Source\nN:Source;Read Only;;;\nUID:readonly-promote-source-uid\nEMAIL:readonly-promote-source@example.test\nEND:VCARD",
+        ]);
+
+        $config = $this->actingAs($recipient)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($recipient);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Read Only Source\nN:Source;Read Only;;;\nUID:{$privateCard->uid}\nEMAIL:readonly-private-promote@example.test\nEND:VCARD",
+        );
+
+        $this->actingAs($recipient)->postJson(
+            '/api/address-books/private-working-set/promote/'.$privateCard->id,
+        )->assertForbidden();
     }
 
     public function test_dismiss_suggestion_requires_link_owner(): void
@@ -682,9 +756,13 @@ class PrivateWorkingSetCardDavTest extends TestCase
             'enabled' => true,
             'hide_shared' => true,
             'include_owned_sharable_sources' => true,
-            'require_review_for_self_promotions' => true,
+            'require_review_for_self_promotions' => false,
             'source_ids' => [$source->id],
         ])->assertOk();
+
+        $config->assertJsonPath('private_working_set.require_review_for_self_promotions', true);
+        $config->assertJsonPath('private_working_set.can_manage_self_review_policy', false);
+        $config->assertJsonPath('private_working_set.effective_require_review_for_self_promotions', true);
 
         $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
         $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
@@ -720,5 +798,60 @@ class PrivateWorkingSetCardDavTest extends TestCase
             'id' => $request->id,
             'status' => 'pending',
         ]);
+    }
+
+    public function test_non_admin_self_promotion_applies_directly_when_moderation_disabled(): void
+    {
+        $owner = User::factory()->create();
+
+        app(RegistrationSettingsService::class)->setContactChangeModerationEnabled(false);
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Owner Direct Apply',
+            'uri' => 'owner-direct-apply',
+            'is_sharable' => true,
+        ]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($owner);
+        app(LaravelCardDavBackend::class)->createCard(
+            $source->id,
+            'owner-direct-apply.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Owner Direct Apply\nN:Apply;Direct;;;\nUID:owner-direct-apply-uid\nEMAIL:owner-direct-apply@example.test\nEND:VCARD",
+        );
+
+        $config = $this->actingAs($owner)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'include_owned_sharable_sources' => true,
+            'require_review_for_self_promotions' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $config->assertJsonPath('private_working_set.effective_require_review_for_self_promotions', false);
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($owner);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Owner Direct Apply\nN:Apply;Direct;;;\nUID:{$privateCard->uid}\nEMAIL:owner-direct-private@example.test\nEND:VCARD",
+        );
+
+        $promote = $this->actingAs($owner)->postJson(
+            '/api/address-books/private-working-set/promote/'.$privateCard->id,
+        );
+
+        $promote->assertOk();
+        $promote->assertJsonPath('queued', false);
+        $promote->assertJsonPath('applied', true);
+
+        $sourceCard = Card::query()
+            ->where('address_book_id', $source->id)
+            ->where('uri', 'owner-direct-apply.vcf')
+            ->firstOrFail();
+        $this->assertStringContainsString('EMAIL:owner-direct-private@example.test', $sourceCard->data);
     }
 }

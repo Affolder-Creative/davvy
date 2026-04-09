@@ -20,7 +20,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Sabre\DAV\Exception\BadRequest;
 use Sabre\DAV\Exception\Conflict;
-use Sabre\DAV\Exception\Forbidden;
 use Sabre\DAV\Exception\NotFound;
 use Sabre\VObject\Component\VCard;
 use Sabre\VObject\Reader;
@@ -112,6 +111,10 @@ class AddressBookPrivateWorkingSetService
 
         $includeOwnedSharableSources = $this->resolveIncludeOwnedSharableSources($user, $config);
         $requireReviewForSelfPromotions = $this->resolveRequireReviewForSelfPromotions($user, $config);
+        $effectiveRequireReviewForSelfPromotions = $this->effectiveRequireReviewForSelfPromotions(
+            $user,
+            $requireReviewForSelfPromotions,
+        );
         $privateAddressBook = $this->resolvePrivateAddressBook($user, $config);
         $sourceOptions = $this->eligibleSharedSourceOptionsForUser(
             user: $user,
@@ -131,6 +134,8 @@ class AddressBookPrivateWorkingSetService
             'hide_shared' => (bool) ($config?->hide_shared ?? true),
             'include_owned_sharable_sources' => $includeOwnedSharableSources,
             'require_review_for_self_promotions' => $requireReviewForSelfPromotions,
+            'can_manage_self_review_policy' => $user->isAdmin(),
+            'effective_require_review_for_self_promotions' => $effectiveRequireReviewForSelfPromotions,
             'private_address_book_id' => $privateAddressBook?->id,
             'private_address_book_uri' => $privateAddressBook?->uri,
             'private_display_name' => $privateAddressBook?->display_name,
@@ -160,6 +165,14 @@ class AddressBookPrivateWorkingSetService
             ?? $this->resolveIncludeOwnedSharableSources($user, $existingConfig);
         $resolvedRequireReviewForSelfPromotions = $requireReviewForSelfPromotions
             ?? $this->resolveRequireReviewForSelfPromotions($user, $existingConfig);
+
+        if (
+            ! $user->isAdmin()
+            && $this->settingsService->isContactChangeModerationEnabled()
+        ) {
+            // Non-admin promotions are always reviewed while moderation is enabled.
+            $resolvedRequireReviewForSelfPromotions = true;
+        }
 
         $sourceOptions = $this->eligibleSharedSourceOptionsForUser(
             user: $user,
@@ -305,7 +318,7 @@ class AddressBookPrivateWorkingSetService
             ->first();
 
         if (! $link) {
-            throw new Forbidden(__('contacts.cannot_modify_private_working_set_card'));
+            abort(403, __('contacts.cannot_modify_private_working_set_card'));
         }
 
         $sourceAddressBook = AddressBook::query()->find($link->source_address_book_id);
@@ -320,7 +333,7 @@ class AddressBookPrivateWorkingSetService
         }
 
         if (! $this->accessService->userCanWriteAddressBook($actor, $sourceAddressBook)) {
-            throw new Forbidden(__('contacts.write_access_denied_for_private_working_set_source_address_book'));
+            abort(403, __('contacts.write_access_denied_for_private_working_set_source_address_book'));
         }
 
         $sourceUid = trim((string) $sourceCard->uid);
@@ -776,6 +789,22 @@ class AddressBookPrivateWorkingSetService
     }
 
     /**
+     * Resolves the effective self-review behavior.
+     */
+    private function effectiveRequireReviewForSelfPromotions(User $user, bool $resolvedSetting): bool
+    {
+        if (! $this->settingsService->isContactChangeModerationEnabled()) {
+            return false;
+        }
+
+        if (! $user->isAdmin()) {
+            return true;
+        }
+
+        return $resolvedSetting;
+    }
+
+    /**
      * Returns forced queue owner IDs for promotion when self-review is enabled.
      *
      * @return array<int, int>
@@ -793,7 +822,10 @@ class AddressBookPrivateWorkingSetService
             return [];
         }
 
-        if (! $this->resolveRequireReviewForSelfPromotions($actor, $config)) {
+        if (! $this->effectiveRequireReviewForSelfPromotions(
+            $actor,
+            $this->resolveRequireReviewForSelfPromotions($actor, $config),
+        )) {
             return [];
         }
 

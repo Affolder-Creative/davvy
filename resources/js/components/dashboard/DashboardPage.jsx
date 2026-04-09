@@ -58,6 +58,8 @@ export default function DashboardPage({
       hide_shared: true,
       include_owned_sharable_sources: true,
       require_review_for_self_promotions: false,
+      can_manage_self_review_policy: false,
+      effective_require_review_for_self_promotions: false,
       private_address_book_id: null,
       private_address_book_uri: null,
       private_display_name: null,
@@ -116,6 +118,8 @@ export default function DashboardPage({
         include_owned_sharable_sources:
           payload.private_working_set?.include_owned_sharable_sources ?? true,
         require_review_for_self_promotions:
+          payload.private_working_set
+            ?.effective_require_review_for_self_promotions ??
           payload.private_working_set?.require_review_for_self_promotions ??
           isAdminUser,
         source_ids: payload.private_working_set?.selected_source_ids ?? [],
@@ -562,6 +566,10 @@ export default function DashboardPage({
             data.private_working_set ?? {
               enabled: false,
               hide_shared: true,
+              include_owned_sharable_sources: true,
+              require_review_for_self_promotions: false,
+              can_manage_self_review_policy: false,
+              effective_require_review_for_self_promotions: false,
               private_address_book_id: null,
               private_address_book_uri: null,
               private_display_name: null,

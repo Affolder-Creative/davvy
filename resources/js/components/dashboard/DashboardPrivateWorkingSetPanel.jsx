@@ -24,8 +24,16 @@ export default function DashboardPrivateWorkingSetPanel({
 }) {
   const { t } = useTranslation("dashboard");
   const canSelectSources = privateWorkingSetForm.enabled;
+  const canManageSelfReviewPolicy = Boolean(
+    privateWorkingSet.can_manage_self_review_policy,
+  );
+  const effectiveRequireReviewForSelfPromotions = Boolean(
+    privateWorkingSet.effective_require_review_for_self_promotions,
+  );
   const canRequireSelfReview =
-    privateWorkingSetForm.enabled && contactChangeModerationEnabled;
+    privateWorkingSetForm.enabled &&
+    contactChangeModerationEnabled &&
+    canManageSelfReviewPolicy;
   const renderButtonLabelWithQualifier = (label) => {
     const value = String(label ?? "");
     const patterns = [
@@ -144,32 +152,49 @@ export default function DashboardPrivateWorkingSetPanel({
             </span>
           </label>
 
-          <label
-            className={`flex items-start gap-2 text-sm font-medium text-app-base ${
-              canRequireSelfReview ? "" : "opacity-60"
-            }`}
-            aria-disabled={!canRequireSelfReview}
-          >
-            <input
-              type="checkbox"
-              className="mt-0.5 h-4 w-4 shrink-0"
-              checked={privateWorkingSetForm.require_review_for_self_promotions}
-              onChange={(event) =>
-                setPrivateWorkingSetForm({
-                  ...privateWorkingSetForm,
-                  require_review_for_self_promotions: event.target.checked,
-                })
-              }
-              disabled={!canRequireSelfReview}
-            />
-            <span className="leading-5">
-              {t("privateWorkingSet.requireReviewForSelfPromotions")}
-            </span>
-          </label>
+          {canManageSelfReviewPolicy ? (
+            <label
+              className={`flex items-start gap-2 text-sm font-medium text-app-base ${
+                canRequireSelfReview ? "" : "opacity-60"
+              }`}
+              aria-disabled={!canRequireSelfReview}
+            >
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 shrink-0"
+                checked={privateWorkingSetForm.require_review_for_self_promotions}
+                onChange={(event) =>
+                  setPrivateWorkingSetForm({
+                    ...privateWorkingSetForm,
+                    require_review_for_self_promotions: event.target.checked,
+                  })
+                }
+                disabled={!canRequireSelfReview}
+              />
+              <span className="leading-5">
+                {t("privateWorkingSet.requireReviewForSelfPromotions")}
+              </span>
+            </label>
+          ) : null}
 
-          {!contactChangeModerationEnabled ? (
+          {!canManageSelfReviewPolicy ? (
+            <p className="text-xs text-app-faint">
+              {contactChangeModerationEnabled
+                ? t("privateWorkingSet.nonAdminSelfReviewAlwaysQueued")
+                : t("privateWorkingSet.nonAdminSelfReviewModerationDisabled")}
+            </p>
+          ) : null}
+
+          {canManageSelfReviewPolicy && !contactChangeModerationEnabled ? (
             <p className="text-xs text-app-faint">
               {t("privateWorkingSet.requireSelfReviewModerationDisabled")}
+            </p>
+          ) : null}
+          {canManageSelfReviewPolicy &&
+          contactChangeModerationEnabled &&
+          !effectiveRequireReviewForSelfPromotions ? (
+            <p className="text-xs text-app-faint">
+              {t("privateWorkingSet.selfReviewPolicyDirectApply")}
             </p>
           ) : null}
         </div>
