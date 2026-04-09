@@ -90,7 +90,7 @@ export default function AdminPage({
   const [shareSearchQuery, setShareSearchQuery] = useState("");
   const [shareTypeFilter, setShareTypeFilter] = useState("all");
   const [sharePermissionFilter, setSharePermissionFilter] = useState("all");
-  const [collapsedShareGroups, setCollapsedShareGroups] = useState({});
+  const [shareRecipientsExpanded, setShareRecipientsExpanded] = useState(false);
   const [deleteUserTarget, setDeleteUserTarget] = useState(null);
   const [deleteUserConfirmationEmail, setDeleteUserConfirmationEmail] =
     useState("");
@@ -1268,23 +1268,6 @@ export default function AdminPage({
 
     return grouped;
   }, [state.shares]);
-  useEffect(() => {
-    setCollapsedShareGroups((prev) => {
-      const groupedKeys = new Set(groupedShares.map((shareGroup) => shareGroup.key));
-      const next = {};
-      let changed = false;
-
-      Object.entries(prev).forEach(([key, value]) => {
-        if (groupedKeys.has(key)) {
-          next[key] = value;
-        } else {
-          changed = true;
-        }
-      });
-
-      return changed ? next : prev;
-    });
-  }, [groupedShares]);
 
   const normalizedShareQuery = shareSearchQuery.trim().toLowerCase();
   const filteredShareGroups = groupedShares
@@ -1340,13 +1323,6 @@ export default function AdminPage({
       };
     })
     .filter(Boolean);
-
-  const toggleShareGroupCollapsed = (groupKey) => {
-    setCollapsedShareGroups((prev) => ({
-      ...prev,
-      [groupKey]: !prev[groupKey],
-    }));
-  };
   const renderShareIdentity = (translationKey, user) => {
     const name = String(user?.name ?? "").trim();
     const email = String(user?.email ?? "").trim();
@@ -2711,16 +2687,26 @@ export default function AdminPage({
                 <option value="admin">{t("labels.share.permission.admin")}</option>
               </select>
             </div>
+            <div className="mt-3 flex justify-end">
+              <button
+                className="btn-outline btn-outline-sm"
+                type="button"
+                onClick={() => setShareRecipientsExpanded((prev) => !prev)}
+                disabled={filteredShareGroups.length === 0}
+              >
+                {shareRecipientsExpanded
+                  ? t("labels.share.hideRecipients")
+                  : t("labels.share.showRecipients")}
+              </button>
+            </div>
 
-            <div className="mt-5 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
+            <div className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
               {filteredShareGroups.length === 0 ? (
                 <p className="rounded-xl border border-app-edge bg-app-surface p-3 text-xs text-app-faint">
                   {t("labels.share.noMatches")}
                 </p>
               ) : (
                 filteredShareGroups.map((shareGroup) => {
-                  const groupCollapsed = collapsedShareGroups[shareGroup.key] === true;
-
                   return (
                     <div
                       key={shareGroup.key}
@@ -2730,27 +2716,16 @@ export default function AdminPage({
                         <p className="font-semibold text-app-strong">
                           {getShareResourceLabel(shareGroup)}
                         </p>
-                        <div className="flex items-center gap-2">
-                          <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
-                            {t("labels.share.sharedWithCount", {
-                              count: shareGroup.visibleShares.length,
-                            })}
-                          </span>
-                          <button
-                            className="text-xs font-semibold text-app-muted hover:text-app-strong"
-                            type="button"
-                            onClick={() => toggleShareGroupCollapsed(shareGroup.key)}
-                          >
-                            {groupCollapsed
-                              ? t("labels.share.showRecipients")
-                              : t("labels.share.hideRecipients")}
-                          </button>
-                        </div>
+                        <span className="rounded-full border border-app-edge bg-app-surface px-2 py-0.5 text-xs text-app-faint">
+                          {t("labels.share.sharedWithCount", {
+                            count: shareGroup.visibleShares.length,
+                          })}
+                        </span>
                       </div>
                       <p className="text-app-muted">
                         {renderShareIdentity("labels.share.owner", shareGroup.owner)}
                       </p>
-                      {groupCollapsed ? null : (
+                      {!shareRecipientsExpanded ? null : (
                         <div className="mt-2 space-y-2">
                           {shareGroup.visibleShares.map((share) => (
                             <div

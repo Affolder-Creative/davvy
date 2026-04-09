@@ -540,6 +540,7 @@ describe("AdminPage", () => {
   });
 
   it("groups share list entries by resource and renders recipient rows", async () => {
+    const user = userEvent.setup();
     const props = buildProps({
       api: buildApi({
         resources: {
@@ -610,6 +611,10 @@ describe("AdminPage", () => {
       }),
     ).toBeInTheDocument();
     expect(
+      screen.getByRole("button", { name: "Show recipients" }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Show recipients" }));
+    expect(
       screen.getByText((_, node) => {
         const text = node?.textContent?.trim() ?? "";
         return text === "Shared with: Avery Recipient (recipient@example.com)";
@@ -625,7 +630,7 @@ describe("AdminPage", () => {
     expect(screen.getByText("editor")).toBeInTheDocument();
   });
 
-  it("supports share list search, filters, and collapse toggles on grouped cards", async () => {
+  it("supports share list search, filters, and global recipient toggle on grouped cards", async () => {
     const user = userEvent.setup();
     const props = buildProps({
       api: buildApi({
@@ -741,12 +746,22 @@ describe("AdminPage", () => {
     await user.selectOptions(typeFilter, "all");
     await user.selectOptions(permissionFilter, "all");
 
-    const firstHideButton = screen.getAllByRole("button", {
-      name: "Hide recipients",
-    })[0];
-    await user.click(firstHideButton);
+    await user.click(screen.getByRole("button", { name: "Show recipients" }));
     expect(
-      screen.getByRole("button", { name: "Show recipients" }),
+      screen.getByRole("button", { name: "Hide recipients" }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText((_, node) => {
+        const text = node?.textContent?.trim() ?? "";
+        return text === "Shared with: Avery Recipient (recipient@example.com)";
+      }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Hide recipients" }));
+    expect(
+      screen.queryByText((_, node) => {
+        const text = node?.textContent?.trim() ?? "";
+        return text === "Shared with: Avery Recipient (recipient@example.com)";
+      }),
+    ).not.toBeInTheDocument();
   });
 });
