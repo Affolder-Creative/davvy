@@ -103,6 +103,30 @@ function DashboardAppleCompatPanelStub({
   );
 }
 
+function DashboardPrivateWorkingSetPanelStub({
+  onPromotePrivateCard,
+  onDismissSuggestedPromotion,
+  privateWorkingSetNotice,
+  promotingPrivateCardId,
+  dismissingSuggestionLinkId,
+}) {
+  return (
+    <section>
+      <button type="button" onClick={() => onPromotePrivateCard(33)}>
+        Promote Private Card
+      </button>
+      <button type="button" onClick={() => onDismissSuggestedPromotion(44)}>
+        Dismiss Suggested Promotion
+      </button>
+      {promotingPrivateCardId === 33 ? <p>Promoting...</p> : null}
+      {dismissingSuggestionLinkId === 44 ? <p>Dismissing...</p> : null}
+      {privateWorkingSetNotice ? (
+        <p data-testid="private-working-set-notice">{privateWorkingSetNotice}</p>
+      ) : null}
+    </section>
+  );
+}
+
 function baseDashboardPayload(overrides = {}) {
   return {
     owned: { calendars: [], address_books: [] },
@@ -149,6 +173,7 @@ function buildProps(overrides = {}) {
     DashboardOverviewCards: DashboardOverviewCardsStub,
     DashboardSharingPanel: DashboardSharingPanelStub,
     DashboardAppleCompatPanel: DashboardAppleCompatPanelStub,
+    DashboardPrivateWorkingSetPanel: DashboardPrivateWorkingSetPanelStub,
     ...overrides,
   };
 }
@@ -268,5 +293,26 @@ describe("DashboardPage", () => {
     );
     expect(confirmSpy).not.toHaveBeenCalled();
     confirmSpy.mockRestore();
+  });
+
+  it("dismisses a private working set suggestion", async () => {
+    const user = userEvent.setup();
+    const props = buildProps();
+
+    render(<DashboardPage {...props} />);
+    await waitFor(() => expect(props.api.get).toHaveBeenCalledTimes(1));
+
+    await user.click(
+      screen.getByRole("button", { name: "Dismiss Suggested Promotion" }),
+    );
+
+    await waitFor(() =>
+      expect(props.api.post).toHaveBeenCalledWith(
+        "/api/address-books/private-working-set/suggestions/44/dismiss",
+      ),
+    );
+    expect(screen.getByTestId("private-working-set-notice")).toHaveTextContent(
+      "Suggestion dismissed.",
+    );
   });
 });

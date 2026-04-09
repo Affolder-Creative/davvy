@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AddressBookPrivateWorkingSetLink;
 use App\Models\Card;
 use App\Services\AddressBookPrivateWorkingSetService;
 use Illuminate\Http\JsonResponse;
@@ -80,6 +81,23 @@ class AddressBookPrivateWorkingSetController extends Controller
             'applied' => true,
             'source_address_book_id' => $result['source_address_book_id'] ?? null,
             'source_card_uri' => $result['source_card_uri'] ?? null,
+        ]);
+    }
+
+    /**
+     * Dismisses one suggested private-card promotion.
+     */
+    public function dismissSuggestion(
+        Request $request,
+        AddressBookPrivateWorkingSetLink $link,
+    ): JsonResponse {
+        $result = $this->privateWorkingSetService->dismissSuggestedPromotion(
+            actor: $request->user(),
+            link: $link,
+        );
+
+        return response()->json([
+            'suggested_promotion_dismissed' => $result,
         ]);
     }
 }

@@ -217,6 +217,7 @@ Primary dashboard payload:
   - `selected_source_ids`
   - `source_options[]` (`id`, `display_name`, `owner_name`, `owner_email`, `can_write`)
   - `linked_cards[]` (`link_id`, `private_card_id`, `private_card_uri`, `source_address_book_id`, `source_card_uri`, `display_name`, `overridden_fields[]`)
+  - `suggested_promotions[]` (`link_id`, `private_card_id`, `private_card_uri`, `source_address_book_id`, `source_card_uri`, `display_name`, `suggested_fields[]`, `fingerprint`)
 
 ### Calendar Endpoints
 
@@ -360,6 +361,13 @@ Responses:
   - `message`
   - `group_uuid`
   - `request_ids`
+
+#### `POST /api/address-books/private-working-set/suggestions/{link}/dismiss`
+Dismiss one current suggested promotion for a linked private card.
+
+Response:
+- `suggested_promotion_dismissed.dismissed` (bool)
+- `suggested_promotion_dismissed.fingerprint` (nullable string)
 
 Contact write notes:
 - Must include at least one of: `first_name`, `last_name`, `company`

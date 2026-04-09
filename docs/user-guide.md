@@ -82,6 +82,9 @@ Action buttons:
 - `Promote to Shared Source`: submit one private card back to source
   - if review queue moderation applies, promotion is queued for owner/admin approval
   - otherwise, promotion applies directly to source and syncs to subscribers
+- `Suggested Promotions` section:
+  - shows conservative promote-worthy field differences for writable shared sources
+  - `Dismiss` hides a suggestion until the next relevant source/private change
 
 ## 3. Contacts (When Enabled)
 

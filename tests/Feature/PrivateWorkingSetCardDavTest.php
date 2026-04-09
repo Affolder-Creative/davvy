@@ -226,6 +226,244 @@ class PrivateWorkingSetCardDavTest extends TestCase
         $this->assertSame([], $linkAfterForcePull->overridden_fields ?? []);
     }
 
+    public function test_dashboard_suggests_promotions_and_dismiss_reappears_after_next_change(): void
+    {
+        $owner = User::factory()->create();
+        $editor = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Suggestions',
+            'uri' => 'shared-suggestions',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $editor->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'suggestion-source.vcf',
+            'uid' => 'suggestion-source-uid',
+            'etag' => md5('suggestion-source'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Suggestion Source\nN:Source;Suggestion;;;\nUID:suggestion-source-uid\nEMAIL:suggestion-source@example.test\nEND:VCARD",
+        ]);
+
+        $config = $this->actingAs($editor)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($editor);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Suggestion Source\nN:Source;Suggestion;;;\nUID:{$privateCard->uid}\nEMAIL:private-suggestion@example.test\nEND:VCARD",
+        );
+
+        $dashboard = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $suggestions = $dashboard->json('private_working_set.suggested_promotions') ?? [];
+        $this->assertCount(1, $suggestions);
+        $this->assertSame($privateCard->id, (int) ($suggestions[0]['private_card_id'] ?? 0));
+        $linkId = (int) ($suggestions[0]['link_id'] ?? 0);
+        $this->assertGreaterThan(0, $linkId);
+
+        $this->actingAs($editor)
+            ->postJson('/api/address-books/private-working-set/suggestions/'.$linkId.'/dismiss')
+            ->assertOk()
+            ->assertJsonPath('suggested_promotion_dismissed.dismissed', true);
+
+        $afterDismiss = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $this->assertSame([], $afterDismiss->json('private_working_set.suggested_promotions'));
+
+        app(DavRequestContext::class)->setAuthenticatedUser($editor);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Suggestion Source\nN:Source;Suggestion;;;\nUID:{$privateCard->uid}\nEMAIL:private-suggestion-next@example.test\nEND:VCARD",
+        );
+
+        $afterNextChange = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $nextSuggestions = $afterNextChange->json('private_working_set.suggested_promotions') ?? [];
+        $this->assertCount(1, $nextSuggestions);
+        $this->assertSame($privateCard->id, (int) ($nextSuggestions[0]['private_card_id'] ?? 0));
+    }
+
+    public function test_dashboard_does_not_suggest_notes_only_private_overrides(): void
+    {
+        $owner = User::factory()->create();
+        $editor = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Notes',
+            'uri' => 'shared-notes',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $editor->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'notes-source.vcf',
+            'uid' => 'notes-source-uid',
+            'etag' => md5('notes-source'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Notes Source\nN:Source;Notes;;;\nUID:notes-source-uid\nEMAIL:notes-source@example.test\nEND:VCARD",
+        ]);
+
+        $config = $this->actingAs($editor)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($editor);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Notes Source\nN:Source;Notes;;;\nUID:{$privateCard->uid}\nEMAIL:notes-source@example.test\nNOTE:Buy birthday gift idea\nEND:VCARD",
+        );
+
+        $link = AddressBookPrivateWorkingSetLink::query()
+            ->where('private_card_id', $privateCard->id)
+            ->firstOrFail();
+        $this->assertContains('notes', $link->overridden_fields ?? []);
+
+        $dashboard = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $this->assertSame([], $dashboard->json('private_working_set.suggested_promotions'));
+    }
+
+    public function test_dashboard_excludes_suggestions_for_read_only_source_shares(): void
+    {
+        $owner = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Read Only',
+            'uri' => 'shared-read-only',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $recipient->id,
+            'permission' => SharePermission::ReadOnly,
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'readonly-source.vcf',
+            'uid' => 'readonly-source-uid',
+            'etag' => md5('readonly-source'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Read Only Source\nN:Source;Read Only;;;\nUID:readonly-source-uid\nEMAIL:readonly-source@example.test\nEND:VCARD",
+        ]);
+
+        $config = $this->actingAs($recipient)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($recipient);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Read Only Source\nN:Source;Read Only;;;\nUID:{$privateCard->uid}\nEMAIL:readonly-private@example.test\nEND:VCARD",
+        );
+
+        $link = AddressBookPrivateWorkingSetLink::query()
+            ->where('private_card_id', $privateCard->id)
+            ->firstOrFail();
+        $this->assertContains('emails', $link->overridden_fields ?? []);
+
+        $dashboard = $this->actingAs($recipient)->getJson('/api/dashboard')->assertOk();
+        $this->assertSame([], $dashboard->json('private_working_set.suggested_promotions'));
+    }
+
+    public function test_dismiss_suggestion_requires_link_owner(): void
+    {
+        $owner = User::factory()->create();
+        $editor = User::factory()->create();
+        $intruder = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Ownership',
+            'uri' => 'shared-ownership',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $editor->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'ownership-source.vcf',
+            'uid' => 'ownership-source-uid',
+            'etag' => md5('ownership-source'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Ownership Source\nN:Source;Ownership;;;\nUID:ownership-source-uid\nEMAIL:ownership-source@example.test\nEND:VCARD",
+        ]);
+
+        $config = $this->actingAs($editor)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        app(DavRequestContext::class)->setAuthenticatedUser($editor);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Ownership Source\nN:Source;Ownership;;;\nUID:{$privateCard->uid}\nEMAIL:ownership-private@example.test\nEND:VCARD",
+        );
+
+        $dashboard = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $suggestions = $dashboard->json('private_working_set.suggested_promotions') ?? [];
+        $this->assertNotEmpty($suggestions);
+        $linkId = (int) ($suggestions[0]['link_id'] ?? 0);
+        $this->assertGreaterThan(0, $linkId);
+
+        $this->actingAs($intruder)
+            ->postJson('/api/address-books/private-working-set/suggestions/'.$linkId.'/dismiss')
+            ->assertForbidden();
+    }
+
     public function test_promote_private_card_queues_review_when_moderation_enabled(): void
     {
         $owner = User::factory()->create();
@@ -271,6 +509,10 @@ class PrivateWorkingSetCardDavTest extends TestCase
             "BEGIN:VCARD\nVERSION:4.0\nFN:Promote Source\nN:Source;Promote;;;\nUID:{$privateCard->uid}\nEMAIL:private-promote@example.test\nEND:VCARD",
         );
 
+        $beforePromote = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $beforePromoteSuggestions = $beforePromote->json('private_working_set.suggested_promotions') ?? [];
+        $this->assertNotEmpty($beforePromoteSuggestions);
+
         $promote = $this->actingAs($editor)->postJson(
             '/api/address-books/private-working-set/promote/'.$privateCard->id,
         );
@@ -289,5 +531,13 @@ class PrivateWorkingSetCardDavTest extends TestCase
             ->where('uri', 'promote-source.vcf')
             ->firstOrFail();
         $this->assertStringContainsString('EMAIL:promote-source@example.test', $sourceCard->data);
+
+        $afterPromote = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $this->assertSame([], $afterPromote->json('private_working_set.suggested_promotions'));
+
+        $link = AddressBookPrivateWorkingSetLink::query()
+            ->where('private_card_id', $privateCard->id)
+            ->firstOrFail();
+        $this->assertNotNull($link->dismissed_suggestion_fingerprint);
     }
 }

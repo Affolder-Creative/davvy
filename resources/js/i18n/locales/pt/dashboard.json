@@ -17,7 +17,8 @@
     "milestones": "Não é possível atualizar as configurações do calendário de aniversários/aniversários.",
     "privateWorkingSet": "Não foi possível atualizar as configurações do conjunto de trabalho privado.",
     "privateWorkingSetPull": "Não foi possível buscar os valores de origem mais recentes do conjunto de trabalho privado.",
-    "privateWorkingSetPromote": "Não foi possível promover a alteração do conjunto de trabalho privado."
+    "privateWorkingSetPromote": "Não foi possível promover a alteração do conjunto de trabalho privado.",
+    "privateWorkingSetDismiss": "Não foi possível dispensar a sugestão do conjunto de trabalho privado."
   },
   "overview": {
     "endpointTitle": "Ponto final DAV",
@@ -117,7 +118,8 @@
     "privateWorkingSetPulled": "O conjunto de trabalho privado foi atualizado a partir das fontes compartilhadas.",
     "privateWorkingSetForcePulled": "O conjunto de trabalho privado foi atualizado forçando os valores do servidor.",
     "privateWorkingSetPromoted": "O cartão privado foi promovido para a fonte compartilhada.",
-    "privateWorkingSetPromoteQueued": "A promoção foi enviada para a fila de revisão."
+    "privateWorkingSetPromoteQueued": "A promoção foi enviada para a fila de revisão.",
+    "privateWorkingSetSuggestionDismissed": "Sugestão dispensada."
   },
   "privateWorkingSet": {
     "title": "Conjunto de trabalho privado",
@@ -138,6 +140,11 @@
     "noLinkedCards": "Ainda não há cartões privados vinculados.",
     "sourceCardHint": "URI de origem: {{uri}}",
     "promote": "Promover para fonte compartilhada",
-    "promoting": "Promovendo..."
+    "promoting": "Promovendo...",
+    "suggestedTitle": "Promoções sugeridas",
+    "noSuggested": "Nenhuma promoção sugerida no momento.",
+    "suggestedFieldsHint": "Campos sugeridos: {{fields}}",
+    "dismiss": "Dispensar",
+    "dismissing": "Dispensando..."
   }
 }

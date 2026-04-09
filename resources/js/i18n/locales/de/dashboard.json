@@ -17,7 +17,8 @@
     "milestones": "Einstellungen für Geburtstags-/Jahrestagskalender konnten nicht aktualisiert werden.",
     "privateWorkingSet": "Einstellungen für privaten Arbeitsbereich konnten nicht aktualisiert werden.",
     "privateWorkingSetPull": "Neueste Quellwerte des privaten Arbeitsbereichs konnten nicht abgerufen werden.",
-    "privateWorkingSetPromote": "Änderung aus privatem Arbeitsbereich konnte nicht in die gemeinsame Quelle übernommen werden."
+    "privateWorkingSetPromote": "Änderung aus privatem Arbeitsbereich konnte nicht in die gemeinsame Quelle übernommen werden.",
+    "privateWorkingSetDismiss": "Vorschlag aus privatem Arbeitsbereich konnte nicht verworfen werden."
   },
   "overview": {
     "endpointTitle": "DAV-Endpunkt",
@@ -117,7 +118,8 @@
     "privateWorkingSetPulled": "Privater Arbeitsbereich wurde aus gemeinsamen Quellen aktualisiert.",
     "privateWorkingSetForcePulled": "Privater Arbeitsbereich wurde mit Serverwerten aus gemeinsamen Quellen überschrieben.",
     "privateWorkingSetPromoted": "Private Karte wurde in die gemeinsame Quelle übernommen.",
-    "privateWorkingSetPromoteQueued": "Übernahme wurde zur Prüfwarteschlange eingereicht."
+    "privateWorkingSetPromoteQueued": "Übernahme wurde zur Prüfwarteschlange eingereicht.",
+    "privateWorkingSetSuggestionDismissed": "Vorschlag verworfen."
   },
   "privateWorkingSet": {
     "title": "Privater Arbeitsbereich",
@@ -138,6 +140,11 @@
     "noLinkedCards": "Noch keine verknüpften privaten Karten.",
     "sourceCardHint": "Quell-URI: {{uri}}",
     "promote": "In gemeinsame Quelle übernehmen",
-    "promoting": "Übernimmt..."
+    "promoting": "Übernimmt...",
+    "suggestedTitle": "Vorgeschlagene Übernahmen",
+    "noSuggested": "Derzeit keine vorgeschlagenen Übernahmen.",
+    "suggestedFieldsHint": "Vorgeschlagene Felder: {{fields}}",
+    "dismiss": "Verwerfen",
+    "dismissing": "Wird verworfen..."
   }
 }

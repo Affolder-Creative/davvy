@@ -69,6 +69,26 @@ class AddressBookPrivateWorkingSetService
         'photo',
     ];
 
+    /**
+     * @var array<int, string>
+     */
+    private const SUGGESTABLE_PROMOTION_FIELDS = [
+        'prefix',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'suffix',
+        'nickname',
+        'company',
+        'job_title',
+        'department',
+        'birthday',
+        'phones',
+        'emails',
+        'urls',
+        'addresses',
+    ];
+
     public function __construct(
         private readonly DavSyncService $syncService,
         private readonly ResourceAccessService $accessService,
@@ -108,6 +128,7 @@ class AddressBookPrivateWorkingSetService
             'selected_source_ids' => $selected,
             'source_options' => $sourceOptions->all(),
             'linked_cards' => $this->dashboardLinkedCardsFor($user),
+            'suggested_promotions' => $this->dashboardSuggestedPromotionsFor($user),
         ];
     }
 
@@ -280,6 +301,8 @@ class AddressBookPrivateWorkingSetService
         );
 
         if ($queued !== null) {
+            $this->dismissCurrentSuggestion($link);
+
             return [
                 'queued' => true,
                 'group_uuid' => $queued['group_uuid'],
@@ -334,12 +357,57 @@ class AddressBookPrivateWorkingSetService
             $this->handleSourceCardUpsert($sourceAddressBook, $sourceCard);
         }
 
+        $this->dismissCurrentSuggestion($link);
+
         return [
             'queued' => false,
             'applied' => true,
             'source_address_book_id' => $sourceAddressBook->id,
             'source_card_uri' => $sourceCard->uri,
             'source_card_etag' => $sourceCard->etag,
+        ];
+    }
+
+    /**
+     * Dismisses one suggested promotion for actor.
+     *
+     * @return array<string, mixed>
+     */
+    public function dismissSuggestedPromotion(User $actor, AddressBookPrivateWorkingSetLink $link): array
+    {
+        if ((int) $link->user_id !== (int) $actor->id) {
+            abort(403, __('contacts.cannot_modify_private_working_set_card'));
+        }
+
+        $state = $this->suggestionStateForLink($link);
+        if (! is_array($state)) {
+            $link->update([
+                'dismissed_suggestion_fingerprint' => null,
+                'dismissed_suggestion_at' => now(),
+            ]);
+
+            return [
+                'dismissed' => false,
+                'fingerprint' => null,
+            ];
+        }
+
+        $fingerprint = (string) ($state['fingerprint'] ?? '');
+        if ($fingerprint === '') {
+            return [
+                'dismissed' => false,
+                'fingerprint' => null,
+            ];
+        }
+
+        $link->update([
+            'dismissed_suggestion_fingerprint' => $fingerprint,
+            'dismissed_suggestion_at' => now(),
+        ]);
+
+        return [
+            'dismissed' => true,
+            'fingerprint' => $fingerprint,
         ];
     }
 
@@ -1205,6 +1273,193 @@ class AddressBookPrivateWorkingSetService
         sort($normalized);
 
         return $normalized;
+    }
+
+    /**
+     * Returns suggested promotion rows for dashboard.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function dashboardSuggestedPromotionsFor(User $user): array
+    {
+        $links = AddressBookPrivateWorkingSetLink::query()
+            ->with('privateCard')
+            ->where('user_id', $user->id)
+            ->orderByDesc('id')
+            ->limit(200)
+            ->get();
+
+        if ($links->isEmpty()) {
+            return [];
+        }
+
+        $sourceAddressBooks = AddressBook::query()
+            ->whereIn('id', $links->pluck('source_address_book_id')->unique()->values()->all())
+            ->get()
+            ->keyBy('id');
+
+        $rows = [];
+        foreach ($links as $link) {
+            $sourceAddressBook = $sourceAddressBooks->get((int) $link->source_address_book_id);
+            if (! $sourceAddressBook || ! $this->accessService->userCanWriteAddressBook($user, $sourceAddressBook)) {
+                continue;
+            }
+
+            $state = $this->suggestionStateForLink($link);
+            if (! is_array($state)) {
+                continue;
+            }
+
+            $fingerprint = (string) ($state['fingerprint'] ?? '');
+            if ($fingerprint === '') {
+                continue;
+            }
+
+            $dismissedFingerprint = trim((string) ($link->dismissed_suggestion_fingerprint ?? ''));
+            if ($dismissedFingerprint !== '' && hash_equals($dismissedFingerprint, $fingerprint)) {
+                continue;
+            }
+
+            $rows[] = $state;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Returns current suggestion state for one link.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function suggestionStateForLink(AddressBookPrivateWorkingSetLink $link): ?array
+    {
+        $privateCard = $link->privateCard ?? Card::query()->find($link->private_card_id);
+        if (! $privateCard) {
+            return null;
+        }
+
+        $privateParsed = $this->vCardService->parse($privateCard->data);
+        $privatePayload = is_array($privateParsed) && is_array($privateParsed['payload'] ?? null)
+            ? $privateParsed['payload']
+            : null;
+        if (! is_array($privatePayload)) {
+            return null;
+        }
+
+        $sourcePayload = is_array($link->source_payload) ? $link->source_payload : null;
+        if (! is_array($sourcePayload)) {
+            $sourceCard = Card::query()
+                ->where('address_book_id', $link->source_address_book_id)
+                ->where('uri', $link->source_card_uri)
+                ->first();
+            if (! $sourceCard) {
+                return null;
+            }
+
+            $sourceParsed = $this->vCardService->parse($sourceCard->data);
+            $sourcePayload = is_array($sourceParsed) && is_array($sourceParsed['payload'] ?? null)
+                ? $sourceParsed['payload']
+                : null;
+        }
+
+        if (! is_array($sourcePayload)) {
+            return null;
+        }
+
+        $suggestedFields = $this->suggestedPromotionFields($link->overridden_fields ?? []);
+        if ($suggestedFields === []) {
+            return null;
+        }
+
+        $fingerprint = $this->suggestionFingerprint(
+            suggestedFields: $suggestedFields,
+            sourcePayload: $sourcePayload,
+            privatePayload: $privatePayload,
+            sourceAddressBookId: (int) $link->source_address_book_id,
+            sourceCardUri: (string) $link->source_card_uri,
+        );
+
+        $displayName = $this->vCardService->displayName($privatePayload);
+
+        return [
+            'link_id' => $link->id,
+            'private_card_id' => $link->private_card_id,
+            'private_card_uri' => $privateCard->uri,
+            'source_address_book_id' => $link->source_address_book_id,
+            'source_card_uri' => $link->source_card_uri,
+            'display_name' => $displayName,
+            'suggested_fields' => $suggestedFields,
+            'fingerprint' => $fingerprint,
+        ];
+    }
+
+    /**
+     * Returns conservative suggestable promotion fields from overrides.
+     *
+     * @return array<int, string>
+     */
+    private function suggestedPromotionFields(mixed $value): array
+    {
+        $overridden = $this->sanitizeOverrideFields($value);
+        if ($overridden === []) {
+            return [];
+        }
+
+        $allowlist = array_fill_keys(self::SUGGESTABLE_PROMOTION_FIELDS, true);
+
+        return collect($overridden)
+            ->filter(fn (string $field): bool => isset($allowlist[$field]))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Builds deterministic suggestion fingerprint for current state.
+     *
+     * @param  array<int, string>  $suggestedFields
+     * @param  array<string, mixed>  $sourcePayload
+     * @param  array<string, mixed>  $privatePayload
+     */
+    private function suggestionFingerprint(
+        array $suggestedFields,
+        array $sourcePayload,
+        array $privatePayload,
+        int $sourceAddressBookId,
+        string $sourceCardUri,
+    ): string {
+        $normalized = [
+            'source_address_book_id' => $sourceAddressBookId,
+            'source_card_uri' => $sourceCardUri,
+            'fields' => [],
+        ];
+
+        foreach ($suggestedFields as $field) {
+            $normalized['fields'][$field] = [
+                'source' => $sourcePayload[$field] ?? null,
+                'private' => $privatePayload[$field] ?? null,
+            ];
+        }
+
+        $encoded = json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        return hash('sha256', $encoded !== false ? $encoded : serialize($normalized));
+    }
+
+    /**
+     * Marks current link suggestion as dismissed.
+     */
+    private function dismissCurrentSuggestion(AddressBookPrivateWorkingSetLink $link): void
+    {
+        $state = $this->suggestionStateForLink($link);
+        $fingerprint = is_array($state) ? (string) ($state['fingerprint'] ?? '') : '';
+        if ($fingerprint === '') {
+            return;
+        }
+
+        $link->update([
+            'dismissed_suggestion_fingerprint' => $fingerprint,
+            'dismissed_suggestion_at' => now(),
+        ]);
     }
 
     /**

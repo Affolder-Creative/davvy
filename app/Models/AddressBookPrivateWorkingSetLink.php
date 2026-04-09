@@ -17,6 +17,8 @@ class AddressBookPrivateWorkingSetLink extends Model
         'source_card_uid',
         'source_payload',
         'overridden_fields',
+        'dismissed_suggestion_fingerprint',
+        'dismissed_suggestion_at',
         'private_address_book_id',
         'private_card_id',
     ];
@@ -29,6 +31,7 @@ class AddressBookPrivateWorkingSetLink extends Model
         return [
             'source_payload' => 'array',
             'overridden_fields' => 'array',
+            'dismissed_suggestion_at' => 'datetime',
         ];
     }
 

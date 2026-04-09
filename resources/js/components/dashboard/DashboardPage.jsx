@@ -39,6 +39,8 @@ export default function DashboardPage({
   const [savingPrivateWorkingSet, setSavingPrivateWorkingSet] = useState(false);
   const [pullingPrivateWorkingSet, setPullingPrivateWorkingSet] = useState(false);
   const [promotingPrivateCardId, setPromotingPrivateCardId] = useState(null);
+  const [dismissingSuggestionLinkId, setDismissingSuggestionLinkId] =
+    useState(null);
   const [data, setData] = useState({
     owned: { calendars: [], address_books: [] },
     shared: { calendars: [], address_books: [] },
@@ -60,6 +62,7 @@ export default function DashboardPage({
       selected_source_ids: [],
       source_options: [],
       linked_cards: [],
+      suggested_promotions: [],
     },
   });
   const [appleCompatForm, setAppleCompatForm] = useState({
@@ -379,6 +382,27 @@ export default function DashboardPage({
     }
   };
 
+  const dismissSuggestedPromotion = async (linkId) => {
+    if (!linkId || dismissingSuggestionLinkId === linkId) {
+      return;
+    }
+
+    try {
+      setPrivateWorkingSetNotice("");
+      setError("");
+      setDismissingSuggestionLinkId(linkId);
+      await api.post(
+        `/api/address-books/private-working-set/suggestions/${linkId}/dismiss`,
+      );
+      await loadDashboard({ withLoading: false });
+      setPrivateWorkingSetNotice(t("notices.privateWorkingSetSuggestionDismissed"));
+    } catch (err) {
+      setError(extractError(err, t("errors.privateWorkingSetDismiss")));
+    } finally {
+      setDismissingSuggestionLinkId(null);
+    }
+  };
+
   const deleteMilestoneCalendar = async (calendar) => {
     try {
       setError("");
@@ -530,6 +554,7 @@ export default function DashboardPage({
               selected_source_ids: [],
               source_options: [],
               linked_cards: [],
+              suggested_promotions: [],
             }
           }
           privateWorkingSetForm={privateWorkingSetForm}
@@ -538,9 +563,11 @@ export default function DashboardPage({
           savingPrivateWorkingSet={savingPrivateWorkingSet}
           pullingPrivateWorkingSet={pullingPrivateWorkingSet}
           promotingPrivateCardId={promotingPrivateCardId}
+          dismissingSuggestionLinkId={dismissingSuggestionLinkId}
           onSavePrivateWorkingSet={savePrivateWorkingSet}
           onPullPrivateWorkingSet={pullPrivateWorkingSet}
           onPromotePrivateCard={promotePrivateCard}
+          onDismissSuggestedPromotion={dismissSuggestedPromotion}
         />
       ) : null}
     </AppShell>
