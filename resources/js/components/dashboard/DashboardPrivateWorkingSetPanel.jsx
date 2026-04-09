@@ -43,34 +43,43 @@ export default function DashboardPrivateWorkingSetPanel({
       ) : null}
 
       <form className="mt-4 space-y-4" onSubmit={onSavePrivateWorkingSet}>
-        <label className="inline-flex items-center gap-2 text-sm font-medium text-app-base">
-          <input
-            type="checkbox"
-            checked={privateWorkingSetForm.enabled}
-            onChange={(event) =>
-              setPrivateWorkingSetForm({
-                ...privateWorkingSetForm,
-                enabled: event.target.checked,
-              })
-            }
-          />
-          {t("privateWorkingSet.enable")}
-        </label>
+        <div className="space-y-2 rounded-xl border border-app-edge bg-app-surface p-3">
+          <label className="flex items-start gap-2 text-sm font-medium text-app-base">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 shrink-0"
+              checked={privateWorkingSetForm.enabled}
+              onChange={(event) =>
+                setPrivateWorkingSetForm({
+                  ...privateWorkingSetForm,
+                  enabled: event.target.checked,
+                })
+              }
+            />
+            <span className="leading-5">{t("privateWorkingSet.enable")}</span>
+          </label>
 
-        <label className="inline-flex items-center gap-2 text-sm font-medium text-app-base">
-          <input
-            type="checkbox"
-            checked={privateWorkingSetForm.hide_shared}
-            onChange={(event) =>
-              setPrivateWorkingSetForm({
-                ...privateWorkingSetForm,
-                hide_shared: event.target.checked,
-              })
-            }
-            disabled={!privateWorkingSetForm.enabled}
-          />
-          {t("privateWorkingSet.hideShared")}
-        </label>
+          <label
+            className={`flex items-start gap-2 text-sm font-medium text-app-base ${
+              privateWorkingSetForm.enabled ? "" : "opacity-60"
+            }`}
+            aria-disabled={!privateWorkingSetForm.enabled}
+          >
+            <input
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 shrink-0"
+              checked={privateWorkingSetForm.hide_shared}
+              onChange={(event) =>
+                setPrivateWorkingSetForm({
+                  ...privateWorkingSetForm,
+                  hide_shared: event.target.checked,
+                })
+              }
+              disabled={!privateWorkingSetForm.enabled}
+            />
+            <span className="leading-5">{t("privateWorkingSet.hideShared")}</span>
+          </label>
+        </div>
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-app-strong">
