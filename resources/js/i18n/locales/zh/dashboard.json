@@ -14,7 +14,10 @@
     "deleteCalendar": "无法删除日历。",
     "deleteAddressBook": "无法删除地址簿。",
     "appleCompat": "无法更新 Apple 兼容性设置。",
-    "milestones": "无法更新生日/周年纪念日日历设置。"
+    "milestones": "无法更新生日/周年纪念日日历设置。",
+    "privateWorkingSet": "Unable to update private working set settings.",
+    "privateWorkingSetPull": "Unable to pull latest private working set source values.",
+    "privateWorkingSetPromote": "Unable to promote private working set change."
   },
   "overview": {
     "endpointTitle": "DAV端点",
@@ -109,6 +112,32 @@
       "shared": "{{name}} 现已共享。",
       "unshared": "{{name}} 不再共享。"
     },
-    "appleCompatSaved": "Apple 兼容性设置已保存。"
+    "appleCompatSaved": "Apple 兼容性设置已保存。",
+    "privateWorkingSetSaved": "Private working set settings saved.",
+    "privateWorkingSetPulled": "Private working set pulled from shared sources.",
+    "privateWorkingSetForcePulled": "Private working set force-pulled from shared sources.",
+    "privateWorkingSetPromoted": "Private card promoted to shared source.",
+    "privateWorkingSetPromoteQueued": "Promotion submitted to review queue."
+  },
+  "privateWorkingSet": {
+    "title": "Private Working Set",
+    "subtitle": "Create per-user private copies of shared contacts so local edits stay private unless you explicitly promote them.",
+    "target": "Private working-set book: {{name}} (/{{uri}})",
+    "enable": "Enable private working set",
+    "hideShared": "Hide selected shared source books from DAV discovery",
+    "sourcesTitle": "Shared source address books",
+    "noSources": "No eligible shared address books available.",
+    "canWrite": "Editor/Admin share",
+    "readOnly": "Read-only share",
+    "save": "Save Private Working Set Settings",
+    "saving": "Saving...",
+    "pull": "Pull Latest (Respect Overrides)",
+    "forcePull": "Force Pull (Use Server Values)",
+    "pulling": "Pulling...",
+    "linkedCardsTitle": "Linked private cards",
+    "noLinkedCards": "No linked private cards yet.",
+    "sourceCardHint": "Source URI: {{uri}}",
+    "promote": "Promote to Shared Source",
+    "promoting": "Promoting..."
   }
 }

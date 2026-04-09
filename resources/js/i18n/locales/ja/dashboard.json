@@ -14,7 +14,10 @@
     "deleteCalendar": "カレンダーを削除できません。",
     "deleteAddressBook": "アドレス帳を削除できません。",
     "appleCompat": "Apple 互換性設定を更新できません。",
-    "milestones": "誕生日/記念日のカレンダー設定を更新できません。"
+    "milestones": "誕生日/記念日のカレンダー設定を更新できません。",
+    "privateWorkingSet": "Unable to update private working set settings.",
+    "privateWorkingSetPull": "Unable to pull latest private working set source values.",
+    "privateWorkingSetPromote": "Unable to promote private working set change."
   },
   "overview": {
     "endpointTitle": "DAV エンドポイント",
@@ -109,6 +112,32 @@
       "shared": "{{name}} が共有されました。",
       "unshared": "{{name}} は共有されなくなりました。"
     },
-    "appleCompatSaved": "Apple 互換性設定を保存しました。"
+    "appleCompatSaved": "Apple 互換性設定を保存しました。",
+    "privateWorkingSetSaved": "Private working set settings saved.",
+    "privateWorkingSetPulled": "Private working set pulled from shared sources.",
+    "privateWorkingSetForcePulled": "Private working set force-pulled from shared sources.",
+    "privateWorkingSetPromoted": "Private card promoted to shared source.",
+    "privateWorkingSetPromoteQueued": "Promotion submitted to review queue."
+  },
+  "privateWorkingSet": {
+    "title": "Private Working Set",
+    "subtitle": "Create per-user private copies of shared contacts so local edits stay private unless you explicitly promote them.",
+    "target": "Private working-set book: {{name}} (/{{uri}})",
+    "enable": "Enable private working set",
+    "hideShared": "Hide selected shared source books from DAV discovery",
+    "sourcesTitle": "Shared source address books",
+    "noSources": "No eligible shared address books available.",
+    "canWrite": "Editor/Admin share",
+    "readOnly": "Read-only share",
+    "save": "Save Private Working Set Settings",
+    "saving": "Saving...",
+    "pull": "Pull Latest (Respect Overrides)",
+    "forcePull": "Force Pull (Use Server Values)",
+    "pulling": "Pulling...",
+    "linkedCardsTitle": "Linked private cards",
+    "noLinkedCards": "No linked private cards yet.",
+    "sourceCardHint": "Source URI: {{uri}}",
+    "promote": "Promote to Shared Source",
+    "promoting": "Promoting..."
   }
 }

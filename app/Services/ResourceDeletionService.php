@@ -13,6 +13,7 @@ class ResourceDeletionService
 {
     public function __construct(
         private readonly AddressBookMirrorService $mirrorService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
         private readonly ManagedContactSyncService $managedContactSync,
         private readonly ResourceShareCleanupService $shareCleanup,
@@ -25,6 +26,7 @@ class ResourceDeletionService
     {
         $this->milestoneCalendarService->handleAddressBookDeleted($addressBook);
         $this->mirrorService->handleSourceAddressBookDeleted($addressBook->id);
+        $this->privateWorkingSetService->handleSourceAddressBookDeleted($addressBook->id);
         $this->managedContactSync->syncAddressBookDeleted($addressBook);
         $this->shareCleanup->deleteAddressBookShares($addressBook->id);
 

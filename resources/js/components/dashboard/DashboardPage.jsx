@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import DashboardAppleCompatPanelComponent from "./DashboardAppleCompatPanel";
 import DashboardOverviewCardsComponent from "./DashboardOverviewCards";
+import DashboardPrivateWorkingSetPanelComponent from "./DashboardPrivateWorkingSetPanel";
 import DashboardSharingPanelComponent from "./DashboardSharingPanel";
 
 /**
@@ -26,6 +27,7 @@ export default function DashboardPage({
   DashboardOverviewCards = DashboardOverviewCardsComponent,
   DashboardSharingPanel = DashboardSharingPanelComponent,
   DashboardAppleCompatPanel = DashboardAppleCompatPanelComponent,
+  DashboardPrivateWorkingSetPanel = DashboardPrivateWorkingSetPanelComponent,
 }) {
   const { t } = useTranslation("dashboard");
   const [loading, setLoading] = useState(true);
@@ -33,6 +35,10 @@ export default function DashboardPage({
   const [shareStatusNotice, setShareStatusNotice] = useState("");
   const [appleCompatNotice, setAppleCompatNotice] = useState("");
   const [savingAppleCompat, setSavingAppleCompat] = useState(false);
+  const [privateWorkingSetNotice, setPrivateWorkingSetNotice] = useState("");
+  const [savingPrivateWorkingSet, setSavingPrivateWorkingSet] = useState(false);
+  const [pullingPrivateWorkingSet, setPullingPrivateWorkingSet] = useState(false);
+  const [promotingPrivateCardId, setPromotingPrivateCardId] = useState(null);
   const [data, setData] = useState({
     owned: { calendars: [], address_books: [] },
     shared: { calendars: [], address_books: [] },
@@ -45,9 +51,24 @@ export default function DashboardPage({
       selected_source_ids: [],
       source_options: [],
     },
+    private_working_set: {
+      enabled: false,
+      hide_shared: true,
+      private_address_book_id: null,
+      private_address_book_uri: null,
+      private_display_name: null,
+      selected_source_ids: [],
+      source_options: [],
+      linked_cards: [],
+    },
   });
   const [appleCompatForm, setAppleCompatForm] = useState({
     enabled: false,
+    source_ids: [],
+  });
+  const [privateWorkingSetForm, setPrivateWorkingSetForm] = useState({
+    enabled: false,
+    hide_shared: true,
     source_ids: [],
   });
   const [calendarForm, setCalendarForm] = useState({
@@ -77,6 +98,11 @@ export default function DashboardPage({
       setAppleCompatForm({
         enabled: !!payload.apple_compat?.enabled,
         source_ids: payload.apple_compat?.selected_source_ids ?? [],
+      });
+      setPrivateWorkingSetForm({
+        enabled: !!payload.private_working_set?.enabled,
+        hide_shared: payload.private_working_set?.hide_shared ?? true,
+        source_ids: payload.private_working_set?.selected_source_ids ?? [],
       });
     } catch (err) {
       setError(extractError(err, t("errors.load")));
@@ -108,6 +134,15 @@ export default function DashboardPage({
     const timer = window.setTimeout(() => setAppleCompatNotice(""), 2200);
     return () => window.clearTimeout(timer);
   }, [appleCompatNotice]);
+
+  useEffect(() => {
+    if (!privateWorkingSetNotice) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setPrivateWorkingSetNotice(""), 2200);
+    return () => window.clearTimeout(timer);
+  }, [privateWorkingSetNotice]);
 
   const toggleSharable = async (type, id, next, displayName) => {
     const url =
@@ -271,6 +306,79 @@ export default function DashboardPage({
     }
   };
 
+  const savePrivateWorkingSet = async (event) => {
+    event.preventDefault();
+    if (savingPrivateWorkingSet) {
+      return;
+    }
+
+    try {
+      setPrivateWorkingSetNotice("");
+      setError("");
+      setSavingPrivateWorkingSet(true);
+      await api.patch(
+        "/api/address-books/private-working-set",
+        privateWorkingSetForm,
+      );
+      await loadDashboard({ withLoading: false });
+      setPrivateWorkingSetNotice(t("notices.privateWorkingSetSaved"));
+    } catch (err) {
+      setError(extractError(err, t("errors.privateWorkingSet")));
+    } finally {
+      setSavingPrivateWorkingSet(false);
+    }
+  };
+
+  const pullPrivateWorkingSet = async (forceServer) => {
+    if (pullingPrivateWorkingSet) {
+      return;
+    }
+
+    try {
+      setPrivateWorkingSetNotice("");
+      setError("");
+      setPullingPrivateWorkingSet(true);
+      await api.post("/api/address-books/private-working-set/pull", {
+        force_server: !!forceServer,
+      });
+      await loadDashboard({ withLoading: false });
+      setPrivateWorkingSetNotice(
+        forceServer
+          ? t("notices.privateWorkingSetForcePulled")
+          : t("notices.privateWorkingSetPulled"),
+      );
+    } catch (err) {
+      setError(extractError(err, t("errors.privateWorkingSetPull")));
+    } finally {
+      setPullingPrivateWorkingSet(false);
+    }
+  };
+
+  const promotePrivateCard = async (privateCardId) => {
+    if (!privateCardId || promotingPrivateCardId === privateCardId) {
+      return;
+    }
+
+    try {
+      setPrivateWorkingSetNotice("");
+      setError("");
+      setPromotingPrivateCardId(privateCardId);
+      const response = await api.post(
+        `/api/address-books/private-working-set/promote/${privateCardId}`,
+      );
+      await loadDashboard({ withLoading: false });
+      setPrivateWorkingSetNotice(
+        response?.data?.queued
+          ? t("notices.privateWorkingSetPromoteQueued")
+          : t("notices.privateWorkingSetPromoted"),
+      );
+    } catch (err) {
+      setError(extractError(err, t("errors.privateWorkingSetPromote")));
+    } finally {
+      setPromotingPrivateCardId(null);
+    }
+  };
+
   const deleteMilestoneCalendar = async (calendar) => {
     try {
       setError("");
@@ -407,6 +515,32 @@ export default function DashboardPage({
           appleCompatNotice={appleCompatNotice}
           savingAppleCompat={savingAppleCompat}
           onSaveAppleCompat={saveAppleCompat}
+        />
+      ) : null}
+
+      {!loading ? (
+        <DashboardPrivateWorkingSetPanel
+          privateWorkingSet={
+            data.private_working_set ?? {
+              enabled: false,
+              hide_shared: true,
+              private_address_book_id: null,
+              private_address_book_uri: null,
+              private_display_name: null,
+              selected_source_ids: [],
+              source_options: [],
+              linked_cards: [],
+            }
+          }
+          privateWorkingSetForm={privateWorkingSetForm}
+          setPrivateWorkingSetForm={setPrivateWorkingSetForm}
+          privateWorkingSetNotice={privateWorkingSetNotice}
+          savingPrivateWorkingSet={savingPrivateWorkingSet}
+          pullingPrivateWorkingSet={pullingPrivateWorkingSet}
+          promotingPrivateCardId={promotingPrivateCardId}
+          onSavePrivateWorkingSet={savePrivateWorkingSet}
+          onPullPrivateWorkingSet={pullPrivateWorkingSet}
+          onPromotePrivateCard={promotePrivateCard}
         />
       ) : null}
     </AppShell>

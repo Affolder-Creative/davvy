@@ -1,10 +1,10 @@
 <?php
 
-use App\Mail\AdminUserInviteMail;
-use App\Mail\PublicRegistrationVerificationMail;
 use App\Enums\Role;
 use App\Enums\SharePermission;
 use App\Enums\ShareResourceType;
+use App\Mail\AdminUserInviteMail;
+use App\Mail\PublicRegistrationVerificationMail;
 use App\Models\AddressBook;
 use App\Models\AddressBookContactMilestoneCalendar;
 use App\Models\Calendar;

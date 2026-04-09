@@ -8,6 +8,7 @@ use App\Models\Card;
 use App\Models\Contact;
 use App\Models\ContactAddressBookAssignment;
 use App\Services\AddressBookMirrorService;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\Dav\DavSyncService;
 use App\Services\Dav\VCardValidator;
 use Illuminate\Support\Collection;
@@ -21,6 +22,7 @@ class ContactAssignmentService
         private readonly VCardValidator $vCardValidator,
         private readonly DavSyncService $syncService,
         private readonly AddressBookMirrorService $mirrorService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
     ) {}
 
     /**
@@ -135,6 +137,8 @@ class ContactAssignmentService
 
         $this->syncService->recordAdded(ShareResourceType::AddressBook, $addressBook->id, $card->uri);
         $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
+        $this->privateWorkingSetService->handleSourceCardUpsert($addressBook, $card);
+        $this->privateWorkingSetService->handlePrivateCardUpsert($card);
 
         $contact->assignments()->create([
             'address_book_id' => $addressBook->id,
@@ -176,6 +180,8 @@ class ContactAssignmentService
 
             $this->syncService->recordAdded(ShareResourceType::AddressBook, $addressBook->id, $card->uri);
             $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
+            $this->privateWorkingSetService->handleSourceCardUpsert($addressBook, $card);
+            $this->privateWorkingSetService->handlePrivateCardUpsert($card);
 
             return;
         }
@@ -205,6 +211,8 @@ class ContactAssignmentService
                 'data' => $cardData,
             ]);
             $this->mirrorService->handleSourceCardUpsert($addressBook, $card);
+            $this->privateWorkingSetService->handleSourceCardUpsert($addressBook, $card);
+            $this->privateWorkingSetService->handlePrivateCardUpsert($card);
         }
 
         if ($assignment->card_uri !== $card->uri) {
@@ -228,6 +236,8 @@ class ContactAssignmentService
 
         $this->syncService->recordDeleted(ShareResourceType::AddressBook, $assignment->address_book_id, $card->uri);
         $this->mirrorService->handleSourceCardDeleted($assignment->address_book_id, $card->uri);
+        $this->privateWorkingSetService->handleSourceCardDeleted($assignment->address_book_id, $card->uri);
+        $this->privateWorkingSetService->handlePrivateCardDeleted($card);
     }
 
     /**
