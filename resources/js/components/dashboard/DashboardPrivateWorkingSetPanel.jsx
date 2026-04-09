@@ -133,7 +133,7 @@ export default function DashboardPrivateWorkingSetPanel({
               : t("privateWorkingSet.moderationOffSummary")}
           </p>
 
-          <div className="flex justify-end">
+          <div className="flex justify-start">
             <button
               className="btn-outline btn-outline-sm"
               type="button"
