@@ -2,6 +2,18 @@
 
 This guide explains Private Working Set (PWS) in plain language.
 
+## Global Admin Toggle
+
+PWS is globally controlled by admins in `Admin Control Center`.
+
+- When ON: PWS behavior in this guide works normally.
+- When OFF (quarantine mode):
+  - PWS panel is hidden from user dashboard.
+  - PWS API actions (update/pull/promote/dismiss) return `403`.
+  - Existing PWS config/private data is preserved and becomes dormant.
+  - PWS-only private books are hidden from dashboard lists and DAV discovery.
+  - Source-book hiding from PWS config no longer applies while disabled.
+
 ## Mental Model
 
 Treat PWS as a personal draft layer for shared contacts:

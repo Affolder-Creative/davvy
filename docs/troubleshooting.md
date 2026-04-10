@@ -139,6 +139,20 @@ Fix:
 - confirm the owner kept that address book `is_sharable=true`
 - if the user should also gate their own sharable books, enable `Also include my own sharable address books`
 
+### Private working set panel is missing from Dashboard
+Most common cause:
+- an admin has disabled PWS globally in `Admin Control Center`.
+
+Fix:
+- ask an admin to enable `Private working set` feature toggle.
+
+### `403` on `/api/address-books/private-working-set*`
+Most common cause:
+- global PWS is disabled by admin (quarantine mode).
+
+Fix:
+- enable global `Private working set` from admin settings, then retry.
+
 ### `InvalidSyncToken`
 Client sync token is stale/invalid.
 

@@ -68,6 +68,9 @@ Think of this as a personal draft layer for shared contacts:
 - Davvy keeps those edits in your private copy first.
 - You explicitly choose what to share back to shared address books.
 
+Availability note:
+- This section appears only when an admin enables `Private working set` globally in Admin Control Center.
+
 What it does:
 - Creates/uses a private address book for your account
 - Copies selected source address books into linked private cards
@@ -180,12 +183,12 @@ Admins can:
   - DAV compatibility mode
   - contact management
   - review queue moderation (off by default)
+  - private working set (global on/off)
   - 2FA enforcement (with grace period rollout)
 - Create users with role selection
 - Reset a user's 2FA enrollment and revoke their DAV app passwords (emergency recovery)
 - Delete users with typed admin-email confirmation
 - Optionally transfer ownership of calendars, address books, and contacts to another user before deleting an account
-- Reset a user's 2FA enrollment and revoke their DAV app passwords (emergency recovery)
 - Manage cross-user share assignments globally
 - Set contact change queue history retention (days)
 - Configure automated backups:
