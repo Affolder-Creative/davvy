@@ -61,13 +61,6 @@ Anniversary generation behavior:
 - If either contact has an anniversary year, the combined title includes an ordinal (for example, `13th`). If neither contact has a year, the title omits the ordinal.
 - Contacts that do not match a mutual pair still generate individual anniversary events.
 
-### Apple Contacts Compatibility
-
-Optional feature for Apple ecosystem visibility:
-- Mirrors selected source address books into your default `contacts` address book
-- Source books can be owned or shared books you can access
-- You can enable/disable and choose mirror sources in dashboard
-
 ### Private Working Set (Shared Contacts)
 
 Think of this as a personal draft layer for shared contacts:
@@ -111,6 +104,13 @@ Moderation behavior:
   - can self-approve queued self-promotions
 
 For a focused walkthrough and FAQ, see [Private Working Set Guide](./private-working-set.md).
+
+### Apple Contacts Compatibility
+
+Optional feature for Apple ecosystem visibility:
+- Mirrors selected source address books into your default `contacts` address book
+- Source books can be owned or shared books you can access
+- You can enable/disable and choose mirror sources in dashboard
 
 ## 3. Contacts (When Enabled)
 

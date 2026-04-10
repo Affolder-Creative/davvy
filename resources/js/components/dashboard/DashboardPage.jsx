@@ -613,18 +613,6 @@ export default function DashboardPage({
         />
       ) : null}
 
-      {!loading ? (
-        <DashboardAppleCompatPanel
-          appleCompat={data.apple_compat}
-          appleCompatForm={appleCompatForm}
-          setAppleCompatForm={setAppleCompatForm}
-          canSelectAppleCompatSources={canSelectAppleCompatSources}
-          appleCompatNotice={appleCompatNotice}
-          savingAppleCompat={savingAppleCompat}
-          onSaveAppleCompat={saveAppleCompat}
-        />
-      ) : null}
-
       {!loading && privateWorkingSetEnabled ? (
         <DashboardPrivateWorkingSetPanel
           privateWorkingSet={
@@ -658,6 +646,18 @@ export default function DashboardPage({
           onPullPrivateWorkingSet={pullPrivateWorkingSet}
           onPromotePrivateCard={promotePrivateCard}
           onDismissSuggestedPromotion={dismissSuggestedPromotion}
+        />
+      ) : null}
+
+      {!loading ? (
+        <DashboardAppleCompatPanel
+          appleCompat={data.apple_compat}
+          appleCompatForm={appleCompatForm}
+          setAppleCompatForm={setAppleCompatForm}
+          canSelectAppleCompatSources={canSelectAppleCompatSources}
+          appleCompatNotice={appleCompatNotice}
+          savingAppleCompat={savingAppleCompat}
+          onSaveAppleCompat={saveAppleCompat}
         />
       ) : null}
     </AppShell>
