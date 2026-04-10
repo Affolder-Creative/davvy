@@ -158,7 +158,7 @@ docker build --target ci-test -t davvy-ci-test .
 docker run --rm davvy-ci-test
 ```
 
-## AI-Assisted Pull Request Reviews 🤖
+<!--## AI-Assisted Pull Request Reviews 🤖
 
 Davvy uses an automated AI reviewer to help surface potential issues in pull requests.  
 It analyzes the PR diff and related repository context and may leave inline comments for things like:
@@ -175,7 +175,7 @@ Maintainers and contributors can re-run the review on a pull request by commenti
 ```
 /ai review
 ```
-See [AI-Assisted PR Reviews](docs/ai-pr-review.md) for details.
+See [AI-Assisted PR Reviews](docs/ai-pr-review.md) for details.-->
 
 ## Deployment 🚢
 
