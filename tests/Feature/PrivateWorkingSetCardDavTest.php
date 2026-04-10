@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\SharePermission;
 use App\Enums\ShareResourceType;
 use App\Models\AddressBook;
+use App\Models\AddressBookMirrorLink;
 use App\Models\AddressBookPrivateWorkingSetLink;
 use App\Models\Card;
 use App\Models\ContactChangeRequest;
@@ -144,6 +145,162 @@ class PrivateWorkingSetCardDavTest extends TestCase
             'shared-person.vcf',
             "BEGIN:VCARD\nVERSION:4.0\nFN:Shared Person Updated\nN:Updated;Shared;;;\nUID:shared-person-uid\nEMAIL:shared.updated@example.test\nEND:VCARD",
         );
+    }
+
+    public function test_mirrored_card_update_syncs_private_working_set_when_both_features_enabled(): void
+    {
+        $owner = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Mirror Update Source',
+            'uri' => 'shared-mirror-update-source',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $recipient->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'mirror-pws-update-source.vcf',
+            'uid' => 'mirror-pws-update-source-uid',
+            'etag' => md5('mirror-pws-update-source'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Mirror PWS Update Source\nN:Source;Mirror PWS Update;;;\nUID:mirror-pws-update-source-uid\nEMAIL:source-before@example.test\nEND:VCARD",
+        ]);
+
+        $config = $this->actingAs($recipient)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateLink = AddressBookPrivateWorkingSetLink::query()
+            ->where('user_id', $recipient->id)
+            ->where('source_address_book_id', $source->id)
+            ->where('source_card_uri', 'mirror-pws-update-source.vcf')
+            ->firstOrFail();
+        $privateCardId = (int) $privateLink->private_card_id;
+
+        $this->actingAs($recipient)->patchJson('/api/address-books/apple-compat', [
+            'enabled' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $mirrorLink = AddressBookMirrorLink::query()
+            ->where('user_id', $recipient->id)
+            ->where('source_address_book_id', $source->id)
+            ->where('source_card_uri', 'mirror-pws-update-source.vcf')
+            ->firstOrFail();
+        $mirroredCard = Card::query()->findOrFail($mirrorLink->mirrored_card_id);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($recipient);
+        app(LaravelCardDavBackend::class)->updateCard(
+            $mirroredCard->address_book_id,
+            $mirroredCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Mirror PWS Update Source\nN:Source;Mirror PWS Update;;;\nUID:{$mirroredCard->uid}\nEMAIL:source-updated@example.test\nEND:VCARD",
+        );
+
+        $sourceCardAfter = Card::query()
+            ->where('address_book_id', $source->id)
+            ->where('uri', 'mirror-pws-update-source.vcf')
+            ->firstOrFail();
+        $this->assertStringContainsString('EMAIL:source-updated@example.test', $sourceCardAfter->data);
+
+        $privateCardAfter = Card::query()->findOrFail($privateCardId);
+        $this->assertSame($privateAddressBookId, (int) $privateCardAfter->address_book_id);
+        $this->assertStringContainsString('EMAIL:source-updated@example.test', $privateCardAfter->data);
+
+        $privateLinkAfter = AddressBookPrivateWorkingSetLink::query()->findOrFail($privateLink->id);
+        $this->assertSame([], $privateLinkAfter->overridden_fields ?? []);
+        $this->assertSame(
+            'source-updated@example.test',
+            $privateLinkAfter->source_payload['emails'][0]['value'] ?? null,
+        );
+    }
+
+    public function test_mirrored_card_delete_cleans_private_working_set_when_both_features_enabled(): void
+    {
+        $owner = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Mirror Delete Source',
+            'uri' => 'shared-mirror-delete-source',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $recipient->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'mirror-pws-delete-source.vcf',
+            'uid' => 'mirror-pws-delete-source-uid',
+            'etag' => md5('mirror-pws-delete-source'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Mirror PWS Delete Source\nN:Source;Mirror PWS Delete;;;\nUID:mirror-pws-delete-source-uid\nEMAIL:source-delete@example.test\nEND:VCARD",
+        ]);
+
+        $this->actingAs($recipient)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $this->actingAs($recipient)->patchJson('/api/address-books/apple-compat', [
+            'enabled' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateLink = AddressBookPrivateWorkingSetLink::query()
+            ->where('user_id', $recipient->id)
+            ->where('source_address_book_id', $source->id)
+            ->where('source_card_uri', 'mirror-pws-delete-source.vcf')
+            ->firstOrFail();
+        $mirrorLink = AddressBookMirrorLink::query()
+            ->where('user_id', $recipient->id)
+            ->where('source_address_book_id', $source->id)
+            ->where('source_card_uri', 'mirror-pws-delete-source.vcf')
+            ->firstOrFail();
+        $mirroredCard = Card::query()->findOrFail($mirrorLink->mirrored_card_id);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($recipient);
+        app(LaravelCardDavBackend::class)->deleteCard(
+            $mirroredCard->address_book_id,
+            $mirroredCard->uri,
+        );
+
+        $this->assertDatabaseMissing('cards', [
+            'address_book_id' => $source->id,
+            'uri' => 'mirror-pws-delete-source.vcf',
+        ]);
+        $this->assertDatabaseMissing('address_book_mirror_links', [
+            'id' => $mirrorLink->id,
+        ]);
+        $this->assertDatabaseMissing('address_book_private_working_set_links', [
+            'id' => $privateLink->id,
+        ]);
+        $this->assertDatabaseMissing('cards', [
+            'id' => (int) $mirrorLink->mirrored_card_id,
+        ]);
+        $this->assertDatabaseMissing('cards', [
+            'id' => (int) $privateLink->private_card_id,
+        ]);
     }
 
     public function test_private_override_wins_and_force_pull_rebases_back_to_source(): void

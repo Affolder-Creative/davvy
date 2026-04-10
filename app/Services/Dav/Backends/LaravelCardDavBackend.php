@@ -332,6 +332,7 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             throw new NotFound(__('dav.card_not_found'));
         }
 
+        $mirroredSourceCoordinates = $this->sourceCoordinatesForMirroredCard($card);
         $user = $this->davContext->getAuthenticatedUser();
         $mirroredEtag = $this->mirrorService->updateSourceFromMirroredCard(
             actor: $user,
@@ -339,6 +340,8 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             incomingCardData: (string) $cardData,
         );
         if ($mirroredEtag !== null) {
+            $this->reconcilePrivateWorkingSetAfterMirroredSourceUpsert($mirroredSourceCoordinates);
+
             return '"'.$mirroredEtag.'"';
         }
 
@@ -434,8 +437,11 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             return;
         }
 
+        $mirroredSourceCoordinates = $this->sourceCoordinatesForMirroredCard($card);
         $user = $this->davContext->getAuthenticatedUser();
         if ($this->mirrorService->deleteSourceFromMirroredCard($user, $card)) {
+            $this->reconcilePrivateWorkingSetAfterMirroredSourceDelete($mirroredSourceCoordinates);
+
             return;
         }
 
@@ -625,6 +631,86 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         return AddressBookMirrorLink::query()
             ->where('mirrored_card_id', $card->id)
             ->exists();
+    }
+
+    /**
+     * Returns source coordinates for a mirrored card.
+     *
+     * @return array{source_address_book_id:int,source_card_uri:string}|null
+     */
+    private function sourceCoordinatesForMirroredCard(Card $card): ?array
+    {
+        $link = AddressBookMirrorLink::query()
+            ->where('mirrored_card_id', $card->id)
+            ->first(['source_address_book_id', 'source_card_uri']);
+
+        if (! $link) {
+            return null;
+        }
+
+        $sourceAddressBookId = (int) $link->source_address_book_id;
+        $sourceCardUri = trim((string) $link->source_card_uri);
+        if ($sourceAddressBookId <= 0 || $sourceCardUri === '') {
+            return null;
+        }
+
+        return [
+            'source_address_book_id' => $sourceAddressBookId,
+            'source_card_uri' => $sourceCardUri,
+        ];
+    }
+
+    /**
+     * Reconciles private working-set links after mirrored source upsert.
+     *
+     * @param  array{source_address_book_id:int,source_card_uri:string}|null  $sourceCoordinates
+     */
+    private function reconcilePrivateWorkingSetAfterMirroredSourceUpsert(?array $sourceCoordinates): void
+    {
+        if (! is_array($sourceCoordinates)) {
+            return;
+        }
+
+        $sourceAddressBookId = (int) ($sourceCoordinates['source_address_book_id'] ?? 0);
+        $sourceCardUri = trim((string) ($sourceCoordinates['source_card_uri'] ?? ''));
+        if ($sourceAddressBookId <= 0 || $sourceCardUri === '') {
+            return;
+        }
+
+        $sourceAddressBook = AddressBook::query()->find($sourceAddressBookId);
+        if (! $sourceAddressBook) {
+            return;
+        }
+
+        $sourceCard = Card::query()
+            ->where('address_book_id', $sourceAddressBookId)
+            ->where('uri', $sourceCardUri)
+            ->first();
+        if (! $sourceCard) {
+            return;
+        }
+
+        $this->privateWorkingSetService->handleSourceCardUpsert($sourceAddressBook, $sourceCard);
+    }
+
+    /**
+     * Reconciles private working-set links after mirrored source delete.
+     *
+     * @param  array{source_address_book_id:int,source_card_uri:string}|null  $sourceCoordinates
+     */
+    private function reconcilePrivateWorkingSetAfterMirroredSourceDelete(?array $sourceCoordinates): void
+    {
+        if (! is_array($sourceCoordinates)) {
+            return;
+        }
+
+        $sourceAddressBookId = (int) ($sourceCoordinates['source_address_book_id'] ?? 0);
+        $sourceCardUri = trim((string) ($sourceCoordinates['source_card_uri'] ?? ''));
+        if ($sourceAddressBookId <= 0 || $sourceCardUri === '') {
+            return;
+        }
+
+        $this->privateWorkingSetService->handleSourceCardDeleted($sourceAddressBookId, $sourceCardUri);
     }
 
     /**
