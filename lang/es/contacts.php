@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => 'La gestión de contactos está deshabilitada actualmente por los administradores.',
     'review_queue_disabled_by_admins' => 'La cola de revisión está deshabilitada actualmente por los administradores.',
+    'private_working_set_disabled_by_admins' => 'El conjunto de trabajo privado está deshabilitado actualmente por los administradores.',
     'default_address_books_cannot_be_deleted' => 'Las libretas de direcciones predeterminadas no se pueden eliminar.',
     'cannot_modify_address_book' => 'No puedes modificar esta libreta de direcciones.',
     'default_calendars_cannot_be_deleted' => 'Los calendarios predeterminados no se pueden eliminar.',

@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => 'O gerenciamento de contatos está atualmente desativado pelos administradores.',
     'review_queue_disabled_by_admins' => 'A fila de revisão está atualmente desativada pelos administradores.',
+    'private_working_set_disabled_by_admins' => 'O conjunto de trabalho privado está atualmente desativado pelos administradores.',
     'default_address_books_cannot_be_deleted' => 'Os catálogos de endereços padrão não podem ser excluídos.',
     'cannot_modify_address_book' => 'Você não pode modificar este catálogo de endereços.',
     'default_calendars_cannot_be_deleted' => 'Os calendários padrão não podem ser excluídos.',

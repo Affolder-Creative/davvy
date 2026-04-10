@@ -83,8 +83,10 @@ Route::middleware('auth')->group(function (): void {
         Route::post('/api/address-books', [AddressBookController::class, 'store']);
         Route::patch('/api/address-books/{addressBook}/milestone-calendars', [AddressBookMilestoneCalendarController::class, 'update']);
         Route::patch('/api/address-books/apple-compat', [AddressBookMirrorController::class, 'update']);
-        Route::patch('/api/address-books/private-working-set', [AddressBookPrivateWorkingSetController::class, 'update']);
-        Route::post('/api/address-books/private-working-set/pull', [AddressBookPrivateWorkingSetController::class, 'pull']);
+        Route::middleware('private-working-set')->group(function (): void {
+            Route::patch('/api/address-books/private-working-set', [AddressBookPrivateWorkingSetController::class, 'update']);
+            Route::post('/api/address-books/private-working-set/pull', [AddressBookPrivateWorkingSetController::class, 'pull']);
+        });
         Route::patch('/api/address-books/{addressBook}', [AddressBookController::class, 'update']);
         Route::delete('/api/address-books/{addressBook}', [AddressBookController::class, 'destroy']);
 
@@ -96,8 +98,10 @@ Route::middleware('auth')->group(function (): void {
             Route::post('/api/contacts', [ContactController::class, 'store']);
             Route::patch('/api/contacts/{contact}', [ContactController::class, 'update']);
             Route::delete('/api/contacts/{contact}', [ContactController::class, 'destroy']);
-            Route::post('/api/address-books/private-working-set/promote/{card}', [AddressBookPrivateWorkingSetController::class, 'promote']);
-            Route::post('/api/address-books/private-working-set/suggestions/{link}/dismiss', [AddressBookPrivateWorkingSetController::class, 'dismissSuggestion']);
+            Route::middleware('private-working-set')->group(function (): void {
+                Route::post('/api/address-books/private-working-set/promote/{card}', [AddressBookPrivateWorkingSetController::class, 'promote']);
+                Route::post('/api/address-books/private-working-set/suggestions/{link}/dismiss', [AddressBookPrivateWorkingSetController::class, 'dismissSuggestion']);
+            });
         });
 
         Route::get('/api/shares', [ShareController::class, 'index']);
@@ -126,6 +130,7 @@ Route::middleware('auth')->group(function (): void {
             Route::patch('/api/admin/settings/dav-compatibility-mode', [AdminController::class, 'setDavCompatibilityModeSetting']);
             Route::patch('/api/admin/settings/contact-management', [AdminController::class, 'setContactManagementSetting']);
             Route::patch('/api/admin/settings/contact-change-moderation', [AdminController::class, 'setContactChangeModerationSetting']);
+            Route::patch('/api/admin/settings/private-working-set', [AdminController::class, 'setPrivateWorkingSetSetting']);
             Route::patch('/api/admin/settings/two-factor-enforcement', [AdminController::class, 'setTwoFactorEnforcementSetting']);
             Route::get('/api/admin/settings/contact-change-retention', [AdminController::class, 'contactChangeRequestRetentionSetting']);
             Route::patch('/api/admin/settings/contact-change-retention', [AdminController::class, 'setContactChangeRequestRetentionSetting']);

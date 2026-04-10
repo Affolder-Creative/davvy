@@ -499,6 +499,7 @@ export default function DashboardPage({
   const canSelectAppleCompatSources =
     !!data.apple_compat.target_address_book_id && appleCompatForm.enabled;
   const contactChangeModerationEnabled = !!auth?.contactChangeModerationEnabled;
+  const privateWorkingSetEnabled = !!auth?.privateWorkingSetEnabled;
   const privateWorkingSetIsDirty =
     JSON.stringify(normalizePrivateWorkingSetFormState(privateWorkingSetForm)) !==
     JSON.stringify(privateWorkingSetFormBaseline);
@@ -624,7 +625,7 @@ export default function DashboardPage({
         />
       ) : null}
 
-      {!loading ? (
+      {!loading && privateWorkingSetEnabled ? (
         <DashboardPrivateWorkingSetPanel
           privateWorkingSet={
             data.private_working_set ?? {

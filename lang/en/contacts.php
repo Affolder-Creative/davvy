@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => 'Contact management is currently disabled by admins.',
     'review_queue_disabled_by_admins' => 'Review queue is currently disabled by admins.',
+    'private_working_set_disabled_by_admins' => 'Private working set is currently disabled by admins.',
     'default_address_books_cannot_be_deleted' => 'Default address books cannot be deleted.',
     'cannot_modify_address_book' => 'You cannot modify this address book.',
     'default_calendars_cannot_be_deleted' => 'Default calendars cannot be deleted.',

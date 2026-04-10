@@ -73,6 +73,7 @@
       "davCompatibilityMode": "DAV互換モード",
       "contactManagement": "連絡先管理",
       "reviewQueue": "レビューキュー",
+      "privateWorkingSet": "プライベート作業セット",
       "2faEnforcement": "2FAの施行"
     },
     "queueRetention": "キュー保持期間 (日)",
@@ -215,6 +216,7 @@
     "unableToUpdateDavCompatibilityModeSetting": "DAV互換モード設定を更新できません。",
     "unableToUpdateContactManagementSetting": "連絡先管理設定を更新できません。",
     "unableToUpdateContactChangeModerationSetting": "連絡先変更モデレーション設定を更新できません。",
+    "unableToUpdatePrivateWorkingSetSetting": "プライベート作業セット設定を更新できません。",
     "unableToUpdate2faEnforcementSetting": "2FA 強制設定を更新できません。",
     "unableToResetUser2fa": "ユーザー 2FA をリセットできません。",
     "unableToPurgeGeneratedMilestoneCalendars": "生成されたマイルストーン カレンダーを消去できません。",

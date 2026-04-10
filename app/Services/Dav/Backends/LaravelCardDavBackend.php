@@ -66,6 +66,8 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
         $own = AddressBook::query()
             ->where('owner_id', $owner->id)
             ->get()
+            ->reject(fn (AddressBook $addressBook): bool => $this->privateWorkingSetService
+                ->isQuarantinedPrivateAddressBookForUser($owner, (int) $addressBook->id))
             ->map(fn (AddressBook $addressBook): array => $this->transformAddressBook($addressBook, SharePermission::Admin, $principalUri))
             ->all();
 
@@ -642,6 +644,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
             throw new Forbidden(__('dav.read_access_denied_for_address_book'));
         }
 
+        if ($this->privateWorkingSetService->isQuarantinedPrivateAddressBookForUser($user, $addressBook->id)) {
+            throw new Forbidden(__('contacts.private_working_set_disabled_by_admins'));
+        }
+
         return $addressBook;
     }
 
@@ -654,6 +660,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
 
         if (! $user || ! $this->accessService->userCanWriteAddressBook($user, $addressBook)) {
             throw new Forbidden(__('dav.write_access_denied_for_address_book'));
+        }
+
+        if ($this->privateWorkingSetService->isQuarantinedPrivateAddressBookForUser($user, $addressBook->id)) {
+            throw new Forbidden(__('contacts.private_working_set_disabled_by_admins'));
         }
 
         if ($this->privateWorkingSetService->isSharedSourceHiddenForUser($user, $addressBook->id)) {
@@ -670,6 +680,10 @@ class LaravelCardDavBackend extends AbstractBackend implements SyncSupport
 
         if (! $user || ! $this->accessService->userCanDeleteAddressBook($user, $addressBook)) {
             throw new Forbidden(__('dav.delete_access_denied_for_address_book'));
+        }
+
+        if ($this->privateWorkingSetService->isQuarantinedPrivateAddressBookForUser($user, $addressBook->id)) {
+            throw new Forbidden(__('contacts.private_working_set_disabled_by_admins'));
         }
     }
 

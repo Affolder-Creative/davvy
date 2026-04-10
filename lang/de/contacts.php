@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => 'Die Kontaktverwaltung ist derzeit durch Administratoren deaktiviert.',
     'review_queue_disabled_by_admins' => 'Die Prüfwarteschlange ist derzeit durch Administratoren deaktiviert.',
+    'private_working_set_disabled_by_admins' => 'Der private Arbeitsbereich ist derzeit durch Administratoren deaktiviert.',
     'default_address_books_cannot_be_deleted' => 'Standard-Adressbücher können nicht gelöscht werden.',
     'cannot_modify_address_book' => 'Du kannst dieses Adressbuch nicht ändern.',
     'default_calendars_cannot_be_deleted' => 'Standardkalender können nicht gelöscht werden.',

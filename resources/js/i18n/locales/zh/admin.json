@@ -73,6 +73,7 @@
       "davCompatibilityMode": "DAV兼容模式",
       "contactManagement": "联系人管理",
       "reviewQueue": "审核队列",
+      "privateWorkingSet": "私人工作集",
       "2faEnforcement": "2FA 执行"
     },
     "queueRetention": "队列保留（天）",
@@ -215,6 +216,7 @@
     "unableToUpdateDavCompatibilityModeSetting": "无法更新 DAV 兼容模式设置。",
     "unableToUpdateContactManagementSetting": "无法更新联系人管理设置。",
     "unableToUpdateContactChangeModerationSetting": "无法更新联系人更改审核设置。",
+    "unableToUpdatePrivateWorkingSetSetting": "无法更新私人工作集设置。",
     "unableToUpdate2faEnforcementSetting": "无法更新 2FA 强制设置。",
     "unableToResetUser2fa": "无法重置用户 2FA。",
     "unableToPurgeGeneratedMilestoneCalendars": "无法清除生成的里程碑日历。",

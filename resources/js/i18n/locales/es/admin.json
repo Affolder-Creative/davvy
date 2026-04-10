@@ -73,6 +73,7 @@
       "davCompatibilityMode": "Modo de compatibilidad DAV",
       "contactManagement": "Gestión de contactos",
       "reviewQueue": "Cola de revisión",
+      "privateWorkingSet": "Conjunto de trabajo privado",
       "2faEnforcement": "Aplicación obligatoria de 2FA"
     },
     "queueRetention": "Retención de cola (días)",
@@ -215,6 +216,7 @@
     "unableToUpdateDavCompatibilityModeSetting": "No se pudo actualizar la configuración del modo de compatibilidad DAV.",
     "unableToUpdateContactManagementSetting": "No se pudo actualizar la configuración de gestión de contactos.",
     "unableToUpdateContactChangeModerationSetting": "No se pudo actualizar la configuración de moderación de cambios de contacto.",
+    "unableToUpdatePrivateWorkingSetSetting": "No se pudo actualizar la configuración del conjunto de trabajo privado.",
     "unableToUpdate2faEnforcementSetting": "No se pudo actualizar la configuración de aplicación obligatoria de 2FA.",
     "unableToResetUser2fa": "No se pudo restablecer el 2FA del usuario.",
     "unableToPurgeGeneratedMilestoneCalendars": "No se pudieron depurar los calendarios de hitos generados.",

@@ -7,6 +7,7 @@ use App\Models\AddressBook;
 use App\Models\Calendar;
 use App\Models\ResourceShare;
 use App\Models\User;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\ResourceAccessService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -20,7 +21,10 @@ use ZipArchive;
 
 class ExportController extends Controller
 {
-    public function __construct(private readonly ResourceAccessService $accessService) {}
+    public function __construct(
+        private readonly ResourceAccessService $accessService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
+    ) {}
 
     /**
      * Returns export all calendars.
@@ -114,6 +118,10 @@ class ExportController extends Controller
     {
         $user = $request->user();
 
+        if ($this->privateWorkingSetService->isQuarantinedPrivateAddressBookForUser($user, (int) $addressBook->id)) {
+            abort(403, __('contacts.private_working_set_disabled_by_admins'));
+        }
+
         if (! $this->accessService->userCanReadAddressBook($user, $addressBook)) {
             abort(403, __('contacts.cannot_access_address_book'));
         }
@@ -158,12 +166,19 @@ class ExportController extends Controller
             ->where('shared_with_id', $user->id)
             ->where('resource_type', ShareResourceType::AddressBook->value);
 
-        return AddressBook::query()
+        $query = AddressBook::query()
             ->where(function (Builder $query) use ($user, $sharedAddressBookIds): void {
                 $query
                     ->where('owner_id', $user->id)
                     ->orWhereIn('id', $sharedAddressBookIds);
             });
+
+        $quarantinedPrivateIds = $this->privateWorkingSetService->quarantinedPrivateAddressBookIdsForUser($user);
+        if ($quarantinedPrivateIds !== []) {
+            $query->whereNotIn('id', $quarantinedPrivateIds);
+        }
+
+        return $query;
     }
 
     /**

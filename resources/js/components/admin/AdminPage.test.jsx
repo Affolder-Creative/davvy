@@ -159,6 +159,10 @@ function buildApi({ users, resources, shares } = {}) {
       });
     }
 
+    if (url === "/api/admin/settings/private-working-set") {
+      return Promise.resolve({ data: { enabled: !!payload.enabled } });
+    }
+
     return Promise.resolve({ data: {} });
   });
 
@@ -184,6 +188,7 @@ function buildProps(overrides = {}) {
     davCompatibilityModeEnabled: false,
     contactManagementEnabled: true,
     contactChangeModerationEnabled: true,
+    privateWorkingSetEnabled: false,
     twoFactorEnforcementEnabled: false,
     setAuth: vi.fn(),
   };
@@ -284,6 +289,17 @@ describe("AdminPage", () => {
       expect(props.api.patch).toHaveBeenCalledWith(
         "/api/admin/settings/registration-approval",
         { enabled: false },
+      ),
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: /private working set/i }),
+    );
+
+    await waitFor(() =>
+      expect(props.api.patch).toHaveBeenCalledWith(
+        "/api/admin/settings/private-working-set",
+        { enabled: true },
       ),
     );
 
@@ -419,6 +435,7 @@ describe("AdminPage", () => {
         davCompatibilityModeEnabled: false,
         contactManagementEnabled: true,
         contactChangeModerationEnabled: true,
+        privateWorkingSetEnabled: false,
         setAuth: vi.fn(),
       },
       api: buildApi({

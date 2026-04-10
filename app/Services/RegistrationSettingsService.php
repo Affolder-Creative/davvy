@@ -132,6 +132,25 @@ class RegistrationSettingsService
     }
 
     /**
+     * Checks whether private working set is enabled.
+     */
+    public function isPrivateWorkingSetEnabled(): bool
+    {
+        return AppSetting::privateWorkingSetEnabled();
+    }
+
+    /**
+     * Sets private working set enabled.
+     */
+    public function setPrivateWorkingSetEnabled(bool $enabled, ?User $actor = null): void
+    {
+        AppSetting::query()->updateOrCreate(
+            ['key' => 'private_working_set_enabled'],
+            ['value' => $enabled ? 'true' : 'false', 'updated_by' => $actor?->id]
+        );
+    }
+
+    /**
      * Returns contact change request retention days.
      */
     public function contactChangeRequestRetentionDays(): int

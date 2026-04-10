@@ -82,6 +82,17 @@ class RegistrationSettingsServiceTest extends TestCase
         $this->assertTrue($service->isContactChangeModerationEnabled());
     }
 
+    public function test_private_working_set_setting_can_be_toggled(): void
+    {
+        $service = app(RegistrationSettingsService::class);
+
+        $this->assertFalse($service->isPrivateWorkingSetEnabled());
+
+        $service->setPrivateWorkingSetEnabled(true);
+
+        $this->assertTrue($service->isPrivateWorkingSetEnabled());
+    }
+
     public function test_contact_change_request_retention_days_setting_can_be_updated(): void
     {
         $service = app(RegistrationSettingsService::class);

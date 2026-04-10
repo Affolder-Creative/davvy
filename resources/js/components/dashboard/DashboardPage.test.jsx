@@ -174,6 +174,7 @@ function buildProps(overrides = {}) {
         id: 10,
         role: "admin",
       },
+      privateWorkingSetEnabled: true,
     },
     theme: {},
     api: {
@@ -367,5 +368,27 @@ describe("DashboardPage", () => {
         "clean",
       ),
     );
+  });
+
+  it("hides private working set panel when feature is globally disabled", async () => {
+    const props = buildProps({
+      auth: {
+        user: {
+          id: 10,
+          role: "admin",
+        },
+        privateWorkingSetEnabled: false,
+      },
+    });
+
+    render(<DashboardPage {...props} />);
+
+    await waitFor(() =>
+      expect(props.api.get).toHaveBeenCalledWith("/api/dashboard"),
+    );
+
+    expect(
+      screen.queryByTestId("private-working-set-dirty"),
+    ).not.toBeInTheDocument();
   });
 });

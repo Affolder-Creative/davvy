@@ -51,7 +51,10 @@ class DashboardController extends Controller
         $ownedAddressBookModels = AddressBook::query()
             ->where('owner_id', $user->id)
             ->orderBy('display_name')
-            ->get();
+            ->get()
+            ->reject(fn (AddressBook $addressBook): bool => $this->privateWorkingSetService
+                ->isQuarantinedPrivateAddressBookForUser($user, (int) $addressBook->id))
+            ->values();
 
         $milestoneCalendarSettings = $this->milestoneCalendarService
             ->settingsIndexForAddressBooks($ownedAddressBookModels);

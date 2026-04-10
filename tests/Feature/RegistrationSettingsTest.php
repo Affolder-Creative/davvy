@@ -200,6 +200,16 @@ class RegistrationSettingsTest extends TestCase
         $response->assertJsonPath('contact_change_moderation_enabled', true);
     }
 
+    public function test_public_config_includes_private_working_set_setting(): void
+    {
+        app(RegistrationSettingsService::class)->setPrivateWorkingSetEnabled(true);
+
+        $response = $this->getJson('/api/public/config');
+
+        $response->assertOk();
+        $response->assertJsonPath('private_working_set_enabled', true);
+    }
+
     public function test_public_config_includes_two_factor_enforcement_setting(): void
     {
         app(TwoFactorSettingsService::class)->setEnforced(true);
@@ -242,6 +252,17 @@ class RegistrationSettingsTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('contact_change_moderation_enabled', true);
+    }
+
+    public function test_authenticated_me_payload_includes_private_working_set_setting(): void
+    {
+        $user = User::factory()->create();
+        app(RegistrationSettingsService::class)->setPrivateWorkingSetEnabled(true);
+
+        $response = $this->actingAs($user)->getJson('/api/auth/me');
+
+        $response->assertOk();
+        $response->assertJsonPath('private_working_set_enabled', true);
     }
 
     public function test_public_config_includes_sponsorship_links_from_funding_file(): void

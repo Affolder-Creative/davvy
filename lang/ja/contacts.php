@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => '現在、連絡先管理は管理者によって無効にされています。',
     'review_queue_disabled_by_admins' => 'レビューキューは現在管理者によって無効にされています。',
+    'private_working_set_disabled_by_admins' => 'プライベート作業セットは現在、管理者によって無効化されています。',
     'default_address_books_cannot_be_deleted' => 'デフォルトのアドレス帳は削除できません。',
     'cannot_modify_address_book' => 'このアドレス帳は変更できません。',
     'default_calendars_cannot_be_deleted' => 'デフォルトのカレンダーは削除できません。',

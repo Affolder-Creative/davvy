@@ -73,6 +73,7 @@
       "davCompatibilityMode": "DAV compatibility mode",
       "contactManagement": "Contact management",
       "reviewQueue": "Review queue",
+      "privateWorkingSet": "Private working set",
       "2faEnforcement": "2FA enforcement"
     },
     "queueRetention": "Queue retention (days)",
@@ -215,6 +216,7 @@
     "unableToUpdateDavCompatibilityModeSetting": "Unable to update DAV compatibility mode setting.",
     "unableToUpdateContactManagementSetting": "Unable to update contact management setting.",
     "unableToUpdateContactChangeModerationSetting": "Unable to update contact change moderation setting.",
+    "unableToUpdatePrivateWorkingSetSetting": "Unable to update private working set setting.",
     "unableToUpdate2faEnforcementSetting": "Unable to update 2FA enforcement setting.",
     "unableToResetUser2fa": "Unable to reset user 2FA.",
     "unableToPurgeGeneratedMilestoneCalendars": "Unable to purge generated milestone calendars.",

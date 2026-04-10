@@ -14,6 +14,7 @@ describe("useAuthState", () => {
           dav_compatibility_mode_enabled: true,
           contact_management_enabled: true,
           contact_change_moderation_enabled: false,
+          private_working_set_enabled: true,
           sponsorship: {
             enabled: true,
             links: [{ name: "GitHub", url: "https://example.com" }],
@@ -39,6 +40,7 @@ describe("useAuthState", () => {
         davCompatibilityModeEnabled: true,
         contactManagementEnabled: true,
         contactChangeModerationEnabled: false,
+        privateWorkingSetEnabled: true,
         sponsorship: {
           enabled: true,
           links: [{ name: "GitHub", url: "https://example.com" }],
@@ -66,6 +68,7 @@ describe("useAuthState", () => {
             dav_compatibility_mode_enabled: true,
             contact_management_enabled: false,
             contact_change_moderation_enabled: true,
+            private_working_set_enabled: false,
             sponsorship: { enabled: false, links: [] },
           },
         }),
@@ -87,6 +90,7 @@ describe("useAuthState", () => {
         davCompatibilityModeEnabled: true,
         contactManagementEnabled: false,
         contactChangeModerationEnabled: true,
+        privateWorkingSetEnabled: false,
         sponsorship: {
           enabled: false,
           links: [],
@@ -114,6 +118,7 @@ describe("useAuthState", () => {
         davCompatibilityModeEnabled: false,
         contactManagementEnabled: false,
         contactChangeModerationEnabled: false,
+        privateWorkingSetEnabled: false,
         sponsorship: {
           enabled: false,
           links: [],

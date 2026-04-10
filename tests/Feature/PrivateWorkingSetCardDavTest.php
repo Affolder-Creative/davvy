@@ -27,6 +27,7 @@ class PrivateWorkingSetCardDavTest extends TestCase
         parent::setUp();
 
         app(RegistrationSettingsService::class)->setContactManagementEnabled(true);
+        app(RegistrationSettingsService::class)->setPrivateWorkingSetEnabled(true);
     }
 
     public function test_enabling_private_working_set_clones_shared_source_and_hides_source_from_discovery(): void
@@ -853,5 +854,141 @@ class PrivateWorkingSetCardDavTest extends TestCase
             ->where('uri', 'owner-direct-apply.vcf')
             ->firstOrFail();
         $this->assertStringContainsString('EMAIL:owner-direct-private@example.test', $sourceCard->data);
+    }
+
+    public function test_private_working_set_endpoints_are_forbidden_when_feature_disabled(): void
+    {
+        $owner = User::factory()->create();
+        $editor = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Endpoint Guard',
+            'uri' => 'shared-endpoint-guard',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $editor->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($owner);
+        app(LaravelCardDavBackend::class)->createCard(
+            $source->id,
+            'endpoint-guard-source.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Endpoint Guard Source\nN:Source;Endpoint Guard;;;\nUID:endpoint-guard-source-uid\nEMAIL:endpoint-guard-source@example.test\nEND:VCARD",
+        );
+
+        $config = $this->actingAs($editor)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $config->json('private_working_set.private_address_book_id');
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+        $link = AddressBookPrivateWorkingSetLink::query()
+            ->where('private_card_id', $privateCard->id)
+            ->firstOrFail();
+
+        app(RegistrationSettingsService::class)->setPrivateWorkingSetEnabled(false);
+
+        $this->actingAs($editor)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertForbidden();
+
+        $this->actingAs($editor)->postJson('/api/address-books/private-working-set/pull', [
+            'force_server' => false,
+        ])->assertForbidden();
+
+        $this->actingAs($editor)->postJson(
+            '/api/address-books/private-working-set/promote/'.$privateCard->id,
+        )->assertForbidden();
+
+        $this->actingAs($editor)
+            ->postJson('/api/address-books/private-working-set/suggestions/'.$link->id.'/dismiss')
+            ->assertForbidden();
+    }
+
+    public function test_disabling_private_working_set_quarantines_private_books_but_keeps_shared_sources_visible(): void
+    {
+        $owner = User::factory()->create();
+        $editor = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $owner->id,
+            'display_name' => 'Shared Quarantine Source',
+            'uri' => 'shared-quarantine-source',
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => ShareResourceType::AddressBook,
+            'resource_id' => $source->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $editor->id,
+            'permission' => SharePermission::Editor,
+        ]);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($owner);
+        app(LaravelCardDavBackend::class)->createCard(
+            $source->id,
+            'quarantine-source.vcf',
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Quarantine Source\nN:Source;Quarantine;;;\nUID:quarantine-source-uid\nEMAIL:quarantine-source@example.test\nEND:VCARD",
+        );
+
+        $response = $this->actingAs($editor)->patchJson('/api/address-books/private-working-set', [
+            'enabled' => true,
+            'hide_shared' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $privateAddressBookId = (int) $response->json('private_working_set.private_address_book_id');
+        $this->assertGreaterThan(0, $privateAddressBookId);
+
+        $this->assertTrue(
+            app(\App\Services\AddressBookPrivateWorkingSetService::class)
+                ->isSharedSourceHiddenForUser($editor, (int) $source->id)
+        );
+
+        app(RegistrationSettingsService::class)->setPrivateWorkingSetEnabled(false);
+
+        $dashboard = $this->actingAs($editor)->getJson('/api/dashboard')->assertOk();
+        $sharedAddressBookIds = collect($dashboard->json('shared.address_books') ?? [])
+            ->pluck('id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
+        $ownedAddressBookIds = collect($dashboard->json('owned.address_books') ?? [])
+            ->pluck('id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
+
+        $this->assertContains((int) $source->id, $sharedAddressBookIds);
+        $this->assertNotContains($privateAddressBookId, $ownedAddressBookIds);
+
+        app(DavRequestContext::class)->setAuthenticatedUser($editor);
+        $backend = app(LaravelCardDavBackend::class);
+        $discoveredAddressBookIds = collect($backend->getAddressBooksForUser($editor->principalUri()))
+            ->pluck('id')
+            ->map(fn (mixed $id): int => (int) $id)
+            ->all();
+
+        $this->assertContains((int) $source->id, $discoveredAddressBookIds);
+        $this->assertNotContains($privateAddressBookId, $discoveredAddressBookIds);
+
+        $privateCard = Card::query()->where('address_book_id', $privateAddressBookId)->firstOrFail();
+
+        $this->expectException(Forbidden::class);
+        $backend->updateCard(
+            $privateAddressBookId,
+            $privateCard->uri,
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Quarantine Source\nN:Source;Quarantine;;;\nUID:{$privateCard->uid}\nEMAIL:quarantine-private@example.test\nEND:VCARD",
+        );
     }
 }
