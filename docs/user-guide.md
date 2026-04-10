@@ -61,35 +61,59 @@ Anniversary generation behavior:
 - If either contact has an anniversary year, the combined title includes an ordinal (for example, `13th`). If neither contact has a year, the title omits the ordinal.
 - Contacts that do not match a mutual pair still generate individual anniversary events.
 
+### Private Working Set (Shared Contacts)
+
+Think of this as a personal draft layer for shared contacts:
+- You edit contacts on your own devices.
+- Davvy keeps those edits in your private copy first.
+- You explicitly choose what to share back to shared address books.
+
+Availability note:
+- This section appears only when an admin enables `Private working set` globally in Admin Control Center.
+
+What it does:
+- Creates/uses a private address book for your account
+- Copies selected source address books into linked private cards
+- Keeps local-only overrides (for example personal notes/photos) in your private set until you promote
+- Optionally includes your own sharable address books as source books too
+
+Recommended flow:
+1. Enable Private Working Set and select source address books.
+2. Edit contacts from your devices as usual.
+3. In dashboard, use `Suggested updates to share` or `Private cards linked to shared contacts`.
+4. Click `Share this update` only for changes you want everyone to receive.
+5. Use `Show advanced options` only when you need sync-policy controls.
+
+Key settings in plain language:
+- `Use private working set for shared contacts`: turns this feature on/off.
+- `Hide selected source books in my DAV apps`: reduces accidental direct edits in source books.
+- `Also include my own sharable address books`: lets your own books use the same draft/promote model.
+- `Queue my own promotions for review` (admin only): routes your own promotions through Review Queue first.
+- `Last promotion results`: shows your most recent queued/applied promotion outcomes for quick confirmation.
+
+Action buttons:
+- `Refresh from source books (keep my private edits)`: updates from source but preserves your private overrides.
+- `Reset from source books (replace my private edits)`: updates from source and replaces private overrides.
+- `Share this update`: sends one linked private card back to source.
+  - with moderation enabled: queued for review
+  - with moderation disabled: applied immediately
+
+Moderation behavior:
+- Non-admin users:
+  - if moderation is enabled, promotions are always queued (including self-owned sharable sources)
+  - if moderation is disabled, promotions apply directly when permissions allow
+- Admin users:
+  - can choose whether self-promotions queue (when moderation is enabled)
+  - can self-approve queued self-promotions
+
+For a focused walkthrough and FAQ, see [Private Working Set Guide](./private-working-set.md).
+
 ### Apple Contacts Compatibility
 
 Optional feature for Apple ecosystem visibility:
 - Mirrors selected source address books into your default `contacts` address book
 - Source books can be owned or shared books you can access
 - You can enable/disable and choose mirror sources in dashboard
-
-### Private Working Set (Shared Contacts)
-
-Optional feature for per-user private edits on shared contacts:
-- Creates/uses a private address book for your account
-- Syncs selected eligible source address books into private linked cards
-- Optionally includes your own sharable address books as eligible sources
-- Lets you keep local-only overrides (for example notes or photos) in your private set
-- Optional `Hide selected source books` removes selected source books from DAV discovery for your account
-- Optional `Require review queue for self promotions` adds an approval step when promoting changes back to your own source books
-  - requires review queue moderation to be enabled
-  - admin users can approve their own queued self-promotions
-  - non-admin users cannot approve their own queued requests
-
-Action buttons:
-- `Pull Latest (Respect Overrides)`: refresh from source while preserving your private override fields
-- `Force Pull (Use Server Values)`: refresh from source and replace private override fields with source values
-- `Promote to Shared Source`: submit one private card back to source
-  - if review queue moderation applies, promotion is queued for owner/admin approval
-  - otherwise, promotion applies directly to source and syncs to subscribers
-- `Suggested Promotions` section:
-  - shows conservative promote-worthy field differences for writable shared sources
-  - `Dismiss` hides a suggestion until the next relevant source/private change
 
 ## 3. Contacts (When Enabled)
 
@@ -159,12 +183,12 @@ Admins can:
   - DAV compatibility mode
   - contact management
   - review queue moderation (off by default)
+  - private working set (global on/off)
   - 2FA enforcement (with grace period rollout)
 - Create users with role selection
 - Reset a user's 2FA enrollment and revoke their DAV app passwords (emergency recovery)
 - Delete users with typed admin-email confirmation
 - Optionally transfer ownership of calendars, address books, and contacts to another user before deleting an account
-- Reset a user's 2FA enrollment and revoke their DAV app passwords (emergency recovery)
 - Manage cross-user share assignments globally
 - Set contact change queue history retention (days)
 - Configure automated backups:

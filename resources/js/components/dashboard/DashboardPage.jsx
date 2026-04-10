@@ -5,6 +5,28 @@ import DashboardOverviewCardsComponent from "./DashboardOverviewCards";
 import DashboardPrivateWorkingSetPanelComponent from "./DashboardPrivateWorkingSetPanel";
 import DashboardSharingPanelComponent from "./DashboardSharingPanel";
 
+function normalizePrivateWorkingSetFormState(form) {
+  const normalizedSourceIds = [
+    ...new Set(
+      (Array.isArray(form?.source_ids) ? form.source_ids : [])
+        .map((id) => Number(id))
+        .filter((id) => Number.isFinite(id) && id > 0),
+    ),
+  ].sort((left, right) => left - right);
+
+  return {
+    enabled: Boolean(form?.enabled),
+    hide_shared: Boolean(form?.hide_shared),
+    include_owned_sharable_sources: Boolean(
+      form?.include_owned_sharable_sources,
+    ),
+    require_review_for_self_promotions: Boolean(
+      form?.require_review_for_self_promotions,
+    ),
+    source_ids: normalizedSourceIds,
+  };
+}
+
 /**
  * Renders the Dashboard Page.
  *
@@ -41,6 +63,8 @@ export default function DashboardPage({
   const [promotingPrivateCardId, setPromotingPrivateCardId] = useState(null);
   const [dismissingSuggestionLinkId, setDismissingSuggestionLinkId] =
     useState(null);
+  const [privateWorkingSetPromotionHistory, setPrivateWorkingSetPromotionHistory] =
+    useState([]);
   const [data, setData] = useState({
     owned: { calendars: [], address_books: [] },
     shared: { calendars: [], address_books: [] },
@@ -58,6 +82,8 @@ export default function DashboardPage({
       hide_shared: true,
       include_owned_sharable_sources: true,
       require_review_for_self_promotions: false,
+      can_manage_self_review_policy: false,
+      effective_require_review_for_self_promotions: false,
       private_address_book_id: null,
       private_address_book_uri: null,
       private_display_name: null,
@@ -71,13 +97,18 @@ export default function DashboardPage({
     enabled: false,
     source_ids: [],
   });
-  const [privateWorkingSetForm, setPrivateWorkingSetForm] = useState({
+  const defaultPrivateWorkingSetForm = {
     enabled: false,
     hide_shared: true,
     include_owned_sharable_sources: true,
     require_review_for_self_promotions: false,
     source_ids: [],
-  });
+  };
+  const [privateWorkingSetForm, setPrivateWorkingSetForm] = useState(
+    defaultPrivateWorkingSetForm,
+  );
+  const [privateWorkingSetFormBaseline, setPrivateWorkingSetFormBaseline] =
+    useState(normalizePrivateWorkingSetFormState(defaultPrivateWorkingSetForm));
   const [calendarForm, setCalendarForm] = useState({
     display_name: "",
     is_sharable: false,
@@ -110,16 +141,22 @@ export default function DashboardPage({
         enabled: !!payload.apple_compat?.enabled,
         source_ids: payload.apple_compat?.selected_source_ids ?? [],
       });
-      setPrivateWorkingSetForm({
+      const nextPrivateWorkingSetForm = {
         enabled: !!payload.private_working_set?.enabled,
         hide_shared: payload.private_working_set?.hide_shared ?? true,
         include_owned_sharable_sources:
           payload.private_working_set?.include_owned_sharable_sources ?? true,
         require_review_for_self_promotions:
+          payload.private_working_set
+            ?.effective_require_review_for_self_promotions ??
           payload.private_working_set?.require_review_for_self_promotions ??
           isAdminUser,
         source_ids: payload.private_working_set?.selected_source_ids ?? [],
-      });
+      };
+      setPrivateWorkingSetForm(nextPrivateWorkingSetForm);
+      setPrivateWorkingSetFormBaseline(
+        normalizePrivateWorkingSetFormState(nextPrivateWorkingSetForm),
+      );
     } catch (err) {
       setError(extractError(err, t("errors.load")));
     } finally {
@@ -375,6 +412,20 @@ export default function DashboardPage({
       return;
     }
 
+    const candidateRows = [
+      ...(data.private_working_set?.suggested_promotions ?? []),
+      ...(data.private_working_set?.linked_cards ?? []),
+    ];
+    const matchedCard = candidateRows.find(
+      (row) => Number(row.private_card_id) === Number(privateCardId),
+    );
+    const promotionDisplayName =
+      matchedCard?.display_name ??
+      t("privateWorkingSet.promotionHistoryFallback", {
+        id: privateCardId,
+      });
+    const promotionSourceCardUri = matchedCard?.source_card_uri ?? null;
+
     try {
       setPrivateWorkingSetNotice("");
       setError("");
@@ -383,10 +434,24 @@ export default function DashboardPage({
         `/api/address-books/private-working-set/promote/${privateCardId}`,
       );
       await loadDashboard({ withLoading: false });
+      const queued = Boolean(response?.data?.queued);
       setPrivateWorkingSetNotice(
-        response?.data?.queued
+        queued
           ? t("notices.privateWorkingSetPromoteQueued")
           : t("notices.privateWorkingSetPromoted"),
+      );
+      setPrivateWorkingSetPromotionHistory((previous) =>
+        [
+          {
+            id: `${privateCardId}-${Date.now()}`,
+            display_name: promotionDisplayName,
+            source_card_uri:
+              promotionSourceCardUri ?? response?.data?.source_card_uri ?? null,
+            queued,
+            occurred_at: new Date().toISOString(),
+          },
+          ...previous,
+        ].slice(0, 5),
       );
     } catch (err) {
       setError(extractError(err, t("errors.privateWorkingSetPromote")));
@@ -434,6 +499,10 @@ export default function DashboardPage({
   const canSelectAppleCompatSources =
     !!data.apple_compat.target_address_book_id && appleCompatForm.enabled;
   const contactChangeModerationEnabled = !!auth?.contactChangeModerationEnabled;
+  const privateWorkingSetEnabled = !!auth?.privateWorkingSetEnabled;
+  const privateWorkingSetIsDirty =
+    JSON.stringify(normalizePrivateWorkingSetFormState(privateWorkingSetForm)) !==
+    JSON.stringify(privateWorkingSetFormBaseline);
 
   return (
     <AppShell auth={auth} theme={theme}>
@@ -544,24 +613,16 @@ export default function DashboardPage({
         />
       ) : null}
 
-      {!loading ? (
-        <DashboardAppleCompatPanel
-          appleCompat={data.apple_compat}
-          appleCompatForm={appleCompatForm}
-          setAppleCompatForm={setAppleCompatForm}
-          canSelectAppleCompatSources={canSelectAppleCompatSources}
-          appleCompatNotice={appleCompatNotice}
-          savingAppleCompat={savingAppleCompat}
-          onSaveAppleCompat={saveAppleCompat}
-        />
-      ) : null}
-
-      {!loading ? (
+      {!loading && privateWorkingSetEnabled ? (
         <DashboardPrivateWorkingSetPanel
           privateWorkingSet={
             data.private_working_set ?? {
               enabled: false,
               hide_shared: true,
+              include_owned_sharable_sources: true,
+              require_review_for_self_promotions: false,
+              can_manage_self_review_policy: false,
+              effective_require_review_for_self_promotions: false,
               private_address_book_id: null,
               private_address_book_uri: null,
               private_display_name: null,
@@ -572,17 +633,31 @@ export default function DashboardPage({
             }
           }
           privateWorkingSetForm={privateWorkingSetForm}
+          privateWorkingSetIsDirty={privateWorkingSetIsDirty}
           setPrivateWorkingSetForm={setPrivateWorkingSetForm}
           privateWorkingSetNotice={privateWorkingSetNotice}
           savingPrivateWorkingSet={savingPrivateWorkingSet}
           pullingPrivateWorkingSet={pullingPrivateWorkingSet}
           promotingPrivateCardId={promotingPrivateCardId}
           dismissingSuggestionLinkId={dismissingSuggestionLinkId}
+          privateWorkingSetPromotionHistory={privateWorkingSetPromotionHistory}
           contactChangeModerationEnabled={contactChangeModerationEnabled}
           onSavePrivateWorkingSet={savePrivateWorkingSet}
           onPullPrivateWorkingSet={pullPrivateWorkingSet}
           onPromotePrivateCard={promotePrivateCard}
           onDismissSuggestedPromotion={dismissSuggestedPromotion}
+        />
+      ) : null}
+
+      {!loading ? (
+        <DashboardAppleCompatPanel
+          appleCompat={data.apple_compat}
+          appleCompatForm={appleCompatForm}
+          setAppleCompatForm={setAppleCompatForm}
+          canSelectAppleCompatSources={canSelectAppleCompatSources}
+          appleCompatNotice={appleCompatNotice}
+          savingAppleCompat={savingAppleCompat}
+          onSaveAppleCompat={saveAppleCompat}
         />
       ) : null}
     </AppShell>

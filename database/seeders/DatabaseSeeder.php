@@ -41,6 +41,10 @@ class DatabaseSeeder extends Seeder
             enabled: (bool) env('ENABLE_CONTACT_CHANGE_MODERATION', false),
             actor: null
         );
+        $settings->setPrivateWorkingSetEnabled(
+            enabled: (bool) env('ENABLE_PRIVATE_WORKING_SET', false),
+            actor: null
+        );
 
         AppSetting::query()->updateOrCreate(['key' => 'public_registration_enabled'], ['value' => 'false']);
         AppSetting::query()->updateOrCreate(
@@ -54,6 +58,10 @@ class DatabaseSeeder extends Seeder
         AppSetting::query()->updateOrCreate(
             ['key' => 'contact_change_moderation_enabled'],
             ['value' => env('ENABLE_CONTACT_CHANGE_MODERATION', false) ? 'true' : 'false']
+        );
+        AppSetting::query()->updateOrCreate(
+            ['key' => 'private_working_set_enabled'],
+            ['value' => env('ENABLE_PRIVATE_WORKING_SET', false) ? 'true' : 'false']
         );
         AppSetting::query()->updateOrCreate(
             ['key' => 'two_factor_enforcement_enabled'],

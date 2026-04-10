@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\EnsureContactChangeModerationEnabled;
 use App\Http\Middleware\EnsureContactManagementEnabled;
+use App\Http\Middleware\EnsurePrivateWorkingSetEnabled;
 use App\Http\Middleware\EnsureTwoFactorEnrollmentComplete;
 use App\Http\Middleware\SetRequestLocale;
 use App\Http\Middleware\ThrottleDavAuthentication;
@@ -41,6 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureAdmin::class,
             'contact-management' => EnsureContactManagementEnabled::class,
             'contact-change-moderation' => EnsureContactChangeModerationEnabled::class,
+            'private-working-set' => EnsurePrivateWorkingSetEnabled::class,
             '2fa-enrolled' => EnsureTwoFactorEnrollmentComplete::class,
             'dav-auth-throttle' => ThrottleDavAuthentication::class,
         ]);

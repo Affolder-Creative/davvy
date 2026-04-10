@@ -131,10 +131,27 @@ Possible causes:
 Possible causes:
 - no shared address books are currently granted to the user
 - granted shared books are not marked sharable
+- `Also include my own sharable address books` is off while only owned sharable books are available
+- user only has read-only access where writable promote behavior is expected
 
 Fix:
 - share at least one address book with the user (typically `editor` for promote/write flows)
 - confirm the owner kept that address book `is_sharable=true`
+- if the user should also gate their own sharable books, enable `Also include my own sharable address books`
+
+### Private working set panel is missing from Dashboard
+Most common cause:
+- an admin has disabled PWS globally in `Admin Control Center`.
+
+Fix:
+- ask an admin to enable `Private working set` feature toggle.
+
+### `403` on `/api/address-books/private-working-set*`
+Most common cause:
+- global PWS is disabled by admin (quarantine mode).
+
+Fix:
+- enable global `Private working set` from admin settings, then retry.
 
 ### `InvalidSyncToken`
 Client sync token is stale/invalid.

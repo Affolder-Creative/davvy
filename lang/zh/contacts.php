@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => '联系人管理当前已被管理员禁用。',
     'review_queue_disabled_by_admins' => '审核队列当前已被管理员禁用。',
+    'private_working_set_disabled_by_admins' => '私人工作集当前已被管理员禁用。',
     'default_address_books_cannot_be_deleted' => '默认地址簿无法删除。',
     'cannot_modify_address_book' => '您无法修改此地址簿。',
     'default_calendars_cannot_be_deleted' => '默认日历无法删除。',

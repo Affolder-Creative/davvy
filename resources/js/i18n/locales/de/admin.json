@@ -73,6 +73,7 @@
       "davCompatibilityMode": "DAV-Kompatibilitätsmodus",
       "contactManagement": "Kontaktverwaltung",
       "reviewQueue": "Prüfwarteschlange",
+      "privateWorkingSet": "Privater Arbeitsbereich",
       "2faEnforcement": "2FA-Erzwingung"
     },
     "queueRetention": "Aufbewahrung der Warteschlange (Tage)",
@@ -215,6 +216,7 @@
     "unableToUpdateDavCompatibilityModeSetting": "Einstellung für DAV-Kompatibilitätsmodus konnte nicht aktualisiert werden.",
     "unableToUpdateContactManagementSetting": "Einstellung für Kontaktverwaltung konnte nicht aktualisiert werden.",
     "unableToUpdateContactChangeModerationSetting": "Einstellung für Kontaktänderungsmoderation konnte nicht aktualisiert werden.",
+    "unableToUpdatePrivateWorkingSetSetting": "Einstellung für privaten Arbeitsbereich konnte nicht aktualisiert werden.",
     "unableToUpdate2faEnforcementSetting": "Einstellung für 2FA-Erzwingung konnte nicht aktualisiert werden.",
     "unableToResetUser2fa": "2FA des Benutzers konnte nicht zurückgesetzt werden.",
     "unableToPurgeGeneratedMilestoneCalendars": "Generierte Meilensteinkalender konnten nicht gelöscht werden.",

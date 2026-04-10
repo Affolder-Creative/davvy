@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => 'La gestion des contacts est actuellement désactivée par les administrateurs.',
     'review_queue_disabled_by_admins' => 'La file de révision est actuellement désactivée par les administrateurs.',
+    'private_working_set_disabled_by_admins' => 'L\'espace de travail privé est actuellement désactivé par les administrateurs.',
     'default_address_books_cannot_be_deleted' => 'Les carnets d\'adresses par défaut ne peuvent pas être supprimés.',
     'cannot_modify_address_book' => 'Vous ne pouvez pas modifier ce carnet d\'adresses.',
     'default_calendars_cannot_be_deleted' => 'Les calendriers par défaut ne peuvent pas être supprimés.',

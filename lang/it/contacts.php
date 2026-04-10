@@ -3,6 +3,7 @@
 return [
     'management_disabled_by_admins' => 'La gestione dei contatti è attualmente disabilitata dagli amministratori.',
     'review_queue_disabled_by_admins' => 'La coda di revisione è attualmente disabilitata dagli amministratori.',
+    'private_working_set_disabled_by_admins' => 'Il set di lavoro privato è attualmente disabilitato dagli amministratori.',
     'default_address_books_cannot_be_deleted' => 'Le rubriche predefinite non possono essere eliminate.',
     'cannot_modify_address_book' => 'Non è possibile modificare questa rubrica.',
     'default_calendars_cannot_be_deleted' => 'I calendari predefiniti non possono essere eliminati.',

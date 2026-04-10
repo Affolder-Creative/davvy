@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ShareResourceType;
 use App\Models\AddressBook;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
 use App\Services\Dav\DavSyncService;
 use App\Services\ResourceDeletionService;
@@ -15,6 +16,7 @@ class AddressBookController extends Controller
 {
     public function __construct(
         private readonly DavSyncService $syncService,
+        private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
         private readonly ResourceUriService $resourceUriService,
         private readonly ResourceDeletionService $resourceDeletion,
@@ -97,6 +99,10 @@ class AddressBookController extends Controller
 
         if ($addressBook->owner_id !== $user->id && ! $user->isAdmin()) {
             abort(403, __('contacts.cannot_modify_address_book'));
+        }
+
+        if ($this->privateWorkingSetService->isQuarantinedPrivateAddressBookForUser($user, (int) $addressBook->id)) {
+            abort(403, __('contacts.private_working_set_disabled_by_admins'));
         }
     }
 }

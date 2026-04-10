@@ -579,6 +579,20 @@ class AdminUserManagementTest extends TestCase
         $response->assertJsonPath('enabled', true);
     }
 
+    public function test_admin_can_toggle_private_working_set_setting(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $response = $this
+            ->actingAs($admin)
+            ->patchJson('/api/admin/settings/private-working-set', [
+                'enabled' => true,
+            ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('enabled', true);
+    }
+
     public function test_admin_can_toggle_two_factor_enforcement_setting(): void
     {
         $admin = User::factory()->admin()->create();

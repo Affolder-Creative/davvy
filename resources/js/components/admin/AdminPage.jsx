@@ -46,6 +46,7 @@ export default function AdminPage({
     davCompatibilityModeEnabled: auth.davCompatibilityModeEnabled,
     contactManagementEnabled: auth.contactManagementEnabled,
     contactChangeModerationEnabled: auth.contactChangeModerationEnabled,
+    privateWorkingSetEnabled: auth.privateWorkingSetEnabled,
     twoFactorEnforcementEnabled: auth.twoFactorEnforcementEnabled,
     contactChangeRetentionDays: 90,
     milestoneGenerationYears: 3,
@@ -714,6 +715,35 @@ export default function AdminPage({
         error: extractError(
           err,
           t("errors.unableToUpdateContactChangeModerationSetting"),
+        ),
+      }));
+    }
+  };
+
+  const togglePrivateWorkingSet = async () => {
+    const next = !state.privateWorkingSetEnabled;
+
+    try {
+      const response = await api.patch(
+        "/api/admin/settings/private-working-set",
+        {
+          enabled: next,
+        },
+      );
+      setState((prev) => ({
+        ...prev,
+        privateWorkingSetEnabled: !!response.data.enabled,
+      }));
+      auth.setAuth((prev) => ({
+        ...prev,
+        privateWorkingSetEnabled: !!response.data.enabled,
+      }));
+    } catch (err) {
+      setState((prev) => ({
+        ...prev,
+        error: extractError(
+          err,
+          t("errors.unableToUpdatePrivateWorkingSetSetting"),
         ),
       }));
     }
@@ -1484,6 +1514,11 @@ export default function AdminPage({
             label={t("controlPanel.toggle.reviewQueue")}
             enabled={state.contactChangeModerationEnabled}
             onClick={toggleContactChangeModeration}
+          />
+          <AdminFeatureToggle
+            label={t("controlPanel.toggle.privateWorkingSet")}
+            enabled={state.privateWorkingSetEnabled}
+            onClick={togglePrivateWorkingSet}
           />
           <AdminFeatureToggle
             label={t("controlPanel.toggle.2faEnforcement")}

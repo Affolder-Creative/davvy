@@ -105,20 +105,65 @@ describe("DashboardSharingPanel", () => {
             id: 99,
             resource_type: "calendar",
             resource_id: 10,
+            resource_display_name: "Team Calendar",
             permission: "editor",
             shared_with: { name: "Pat", email: "pat@example.com" },
+          },
+          {
+            id: 100,
+            resource_type: "calendar",
+            resource_id: 10,
+            resource_display_name: "Team Calendar",
+            permission: "read_only",
+            shared_with: { name: "Alex", email: "alex@example.com" },
           },
         ]}
       />,
     );
 
-    expect(screen.getByText("calendar #10")).toBeInTheDocument();
-    expect(
-      screen.getByText("Shared with: Pat (pat@example.com)"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Team Calendar")).toBeInTheDocument();
+    expect(screen.getByText("Shared with: 2")).toBeInTheDocument();
+    expect(screen.queryByText("Shared with: Pat")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Show recipients" }));
+
+    expect(screen.getByText("Shared with: Pat")).toBeInTheDocument();
+    expect(screen.getByText(/\(pat@example\.com\)/i)).toBeInTheDocument();
+    expect(screen.getByText("Shared with: Alex")).toBeInTheDocument();
+    expect(screen.getByText(/\(alex@example\.com\)/i)).toBeInTheDocument();
     expect(screen.getByTestId("permission-editor")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Revoke" }));
+    const revokeButtons = screen.getAllByRole("button", { name: "Revoke" });
+    await user.click(revokeButtons[0]);
     expect(onDeleteShare).toHaveBeenCalledWith(99);
+  });
+
+  it("falls back to type and id when outgoing share display name is unavailable", () => {
+    render(
+      <SharingPanelHarness
+        initialForm={{
+          resource_type: "calendar",
+          resource_id: "",
+          shared_with_id: "",
+          permission: "read_only",
+        }}
+        onSaveShare={vi.fn((event) => event.preventDefault())}
+        onDeleteShare={vi.fn()}
+        shareableResourceOptions={[]}
+        targets={[]}
+        outgoing={[
+          {
+            id: 101,
+            resource_type: "address_book",
+            resource_id: 7,
+            resource_display_name: null,
+            permission: "read_only",
+            shared_with: { name: "Alex", email: "alex@example.com" },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Address Book #7")).toBeInTheDocument();
   });
 });

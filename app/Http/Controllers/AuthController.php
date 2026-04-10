@@ -619,6 +619,7 @@ class AuthController extends Controller
             'dav_compatibility_mode_enabled' => $this->registrationSettings->isDavCompatibilityModeEnabled(),
             'contact_management_enabled' => $this->registrationSettings->isContactManagementEnabled(),
             'contact_change_moderation_enabled' => $this->registrationSettings->isContactChangeModerationEnabled(),
+            'private_working_set_enabled' => $this->registrationSettings->isPrivateWorkingSetEnabled(),
             'two_factor_enforcement_enabled' => $this->twoFactorSettings->isEnforced(),
             'two_factor_grace_period_days' => $this->twoFactorSettings->gracePeriodDays(),
             'sponsorship' => $this->sponsorshipLinks->publicConfig(),

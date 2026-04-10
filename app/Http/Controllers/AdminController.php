@@ -407,6 +407,25 @@ class AdminController extends Controller
     }
 
     /**
+     * Enable or disable private working set features.
+     */
+    public function setPrivateWorkingSetSetting(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'enabled' => ['required', 'boolean'],
+        ]);
+
+        $this->registrationSettings->setPrivateWorkingSetEnabled(
+            enabled: (bool) $data['enabled'],
+            actor: $request->user()
+        );
+
+        return response()->json([
+            'enabled' => $this->registrationSettings->isPrivateWorkingSetEnabled(),
+        ]);
+    }
+
+    /**
      * Update two-factor enforcement settings.
      */
     public function setTwoFactorEnforcementSetting(Request $request): JsonResponse

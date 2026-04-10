@@ -67,6 +67,14 @@ class AppSetting extends Model
         );
     }
 
+    public static function privateWorkingSetEnabled(): bool
+    {
+        return self::booleanSetting(
+            key: 'private_working_set_enabled',
+            default: (bool) config('services.contacts.private_working_set_enabled', false),
+        );
+    }
+
     public static function twoFactorEnforcementEnabled(): bool
     {
         return self::booleanSetting(

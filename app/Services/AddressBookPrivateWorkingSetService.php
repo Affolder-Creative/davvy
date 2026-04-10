@@ -20,7 +20,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Sabre\DAV\Exception\BadRequest;
 use Sabre\DAV\Exception\Conflict;
-use Sabre\DAV\Exception\Forbidden;
 use Sabre\DAV\Exception\NotFound;
 use Sabre\VObject\Component\VCard;
 use Sabre\VObject\Reader;
@@ -101,6 +100,14 @@ class AddressBookPrivateWorkingSetService
     ) {}
 
     /**
+     * Checks whether private working set features are globally enabled.
+     */
+    public function isEnabledGlobally(): bool
+    {
+        return $this->settingsService->isPrivateWorkingSetEnabled();
+    }
+
+    /**
      * Returns dashboard data.
      */
     public function dashboardDataFor(User $user): array
@@ -110,8 +117,33 @@ class AddressBookPrivateWorkingSetService
             ->where('user_id', $user->id)
             ->first();
 
+        if (! $this->isEnabledGlobally()) {
+            $includeOwnedSharableSources = $this->resolveIncludeOwnedSharableSources($user, $config);
+            $requireReviewForSelfPromotions = $this->resolveRequireReviewForSelfPromotions($user, $config);
+
+            return [
+                'enabled' => false,
+                'hide_shared' => (bool) ($config?->hide_shared ?? true),
+                'include_owned_sharable_sources' => $includeOwnedSharableSources,
+                'require_review_for_self_promotions' => $requireReviewForSelfPromotions,
+                'can_manage_self_review_policy' => $user->isAdmin(),
+                'effective_require_review_for_self_promotions' => false,
+                'private_address_book_id' => null,
+                'private_address_book_uri' => null,
+                'private_display_name' => null,
+                'selected_source_ids' => [],
+                'source_options' => [],
+                'linked_cards' => [],
+                'suggested_promotions' => [],
+            ];
+        }
+
         $includeOwnedSharableSources = $this->resolveIncludeOwnedSharableSources($user, $config);
         $requireReviewForSelfPromotions = $this->resolveRequireReviewForSelfPromotions($user, $config);
+        $effectiveRequireReviewForSelfPromotions = $this->effectiveRequireReviewForSelfPromotions(
+            $user,
+            $requireReviewForSelfPromotions,
+        );
         $privateAddressBook = $this->resolvePrivateAddressBook($user, $config);
         $sourceOptions = $this->eligibleSharedSourceOptionsForUser(
             user: $user,
@@ -131,6 +163,8 @@ class AddressBookPrivateWorkingSetService
             'hide_shared' => (bool) ($config?->hide_shared ?? true),
             'include_owned_sharable_sources' => $includeOwnedSharableSources,
             'require_review_for_self_promotions' => $requireReviewForSelfPromotions,
+            'can_manage_self_review_policy' => $user->isAdmin(),
+            'effective_require_review_for_self_promotions' => $effectiveRequireReviewForSelfPromotions,
             'private_address_book_id' => $privateAddressBook?->id,
             'private_address_book_uri' => $privateAddressBook?->uri,
             'private_display_name' => $privateAddressBook?->display_name,
@@ -152,6 +186,10 @@ class AddressBookPrivateWorkingSetService
         ?bool $includeOwnedSharableSources = null,
         ?bool $requireReviewForSelfPromotions = null,
     ): array {
+        if (! $this->isEnabledGlobally()) {
+            abort(403, __('contacts.private_working_set_disabled_by_admins'));
+        }
+
         $existingConfig = AddressBookPrivateWorkingSetConfig::query()
             ->where('user_id', $user->id)
             ->first();
@@ -160,6 +198,14 @@ class AddressBookPrivateWorkingSetService
             ?? $this->resolveIncludeOwnedSharableSources($user, $existingConfig);
         $resolvedRequireReviewForSelfPromotions = $requireReviewForSelfPromotions
             ?? $this->resolveRequireReviewForSelfPromotions($user, $existingConfig);
+
+        if (
+            ! $user->isAdmin()
+            && $this->settingsService->isContactChangeModerationEnabled()
+        ) {
+            // Non-admin promotions are always reviewed while moderation is enabled.
+            $resolvedRequireReviewForSelfPromotions = true;
+        }
 
         $sourceOptions = $this->eligibleSharedSourceOptionsForUser(
             user: $user,
@@ -228,6 +274,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function syncUserConfig(User $user, bool $forceServer = false): void
     {
+        if (! $this->isEnabledGlobally()) {
+            return;
+        }
+
         $config = AddressBookPrivateWorkingSetConfig::query()
             ->with('sources')
             ->where('user_id', $user->id)
@@ -284,6 +334,13 @@ class AddressBookPrivateWorkingSetService
      */
     public function pullLatest(User $user, bool $forceServer = false): array
     {
+        if (! $this->isEnabledGlobally()) {
+            return [
+                'ok' => true,
+                'force_server' => $forceServer,
+            ];
+        }
+
         $this->syncUserConfig($user, forceServer: $forceServer);
 
         return [
@@ -299,13 +356,17 @@ class AddressBookPrivateWorkingSetService
      */
     public function promotePrivateCard(User $actor, Card $privateCard): array
     {
+        if (! $this->isEnabledGlobally()) {
+            abort(403, __('contacts.private_working_set_disabled_by_admins'));
+        }
+
         $link = AddressBookPrivateWorkingSetLink::query()
             ->where('private_card_id', $privateCard->id)
             ->where('user_id', $actor->id)
             ->first();
 
         if (! $link) {
-            throw new Forbidden(__('contacts.cannot_modify_private_working_set_card'));
+            abort(403, __('contacts.cannot_modify_private_working_set_card'));
         }
 
         $sourceAddressBook = AddressBook::query()->find($link->source_address_book_id);
@@ -320,7 +381,7 @@ class AddressBookPrivateWorkingSetService
         }
 
         if (! $this->accessService->userCanWriteAddressBook($actor, $sourceAddressBook)) {
-            throw new Forbidden(__('contacts.write_access_denied_for_private_working_set_source_address_book'));
+            abort(403, __('contacts.write_access_denied_for_private_working_set_source_address_book'));
         }
 
         $sourceUid = trim((string) $sourceCard->uid);
@@ -424,6 +485,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function dismissSuggestedPromotion(User $actor, AddressBookPrivateWorkingSetLink $link): array
     {
+        if (! $this->isEnabledGlobally()) {
+            abort(403, __('contacts.private_working_set_disabled_by_admins'));
+        }
+
         if ((int) $link->user_id !== (int) $actor->id) {
             abort(403, __('contacts.cannot_modify_private_working_set_card'));
         }
@@ -467,6 +532,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function hiddenSourceAddressBookIdsForUser(User $user): array
     {
+        if (! $this->isEnabledGlobally()) {
+            return [];
+        }
+
         $config = AddressBookPrivateWorkingSetConfig::query()
             ->with('sources')
             ->where('user_id', $user->id)
@@ -499,6 +568,41 @@ class AddressBookPrivateWorkingSetService
     public function isSharedSourceHiddenForUser(User $user, int $addressBookId): bool
     {
         return in_array($addressBookId, $this->hiddenSourceAddressBookIdsForUser($user), true);
+    }
+
+    /**
+     * Returns private working-set address books that are quarantined for the user.
+     *
+     * @return array<int, int>
+     */
+    public function quarantinedPrivateAddressBookIdsForUser(User $user): array
+    {
+        if ($this->isEnabledGlobally()) {
+            return [];
+        }
+
+        $config = AddressBookPrivateWorkingSetConfig::query()
+            ->where('user_id', $user->id)
+            ->first();
+        $resolvedPrivateAddressBookId = $this->resolvePrivateAddressBook($user, $config)?->id;
+
+        return collect([
+            $config?->private_address_book_id,
+            $resolvedPrivateAddressBookId,
+        ])
+            ->map(fn (mixed $id): int => (int) $id)
+            ->filter(fn (int $id): bool => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Checks whether a private working-set address book is quarantined for the user.
+     */
+    public function isQuarantinedPrivateAddressBookForUser(User $user, int $addressBookId): bool
+    {
+        return in_array($addressBookId, $this->quarantinedPrivateAddressBookIdsForUser($user), true);
     }
 
     /**
@@ -540,6 +644,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function handleSourceCardUpsert(AddressBook $sourceAddressBook, Card $sourceCard): void
     {
+        if (! $this->isEnabledGlobally()) {
+            return;
+        }
+
         if ($this->isPrivateManagedCard($sourceCard->data)) {
             return;
         }
@@ -585,6 +693,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function handleSourceCardDeleted(int $sourceAddressBookId, string $sourceCardUri): void
     {
+        if (! $this->isEnabledGlobally()) {
+            return;
+        }
+
         $links = AddressBookPrivateWorkingSetLink::query()
             ->where('source_address_book_id', $sourceAddressBookId)
             ->where('source_card_uri', $sourceCardUri)
@@ -600,6 +712,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function handleSourceAddressBookDeleted(int $sourceAddressBookId): void
     {
+        if (! $this->isEnabledGlobally()) {
+            return;
+        }
+
         $links = AddressBookPrivateWorkingSetLink::query()
             ->where('source_address_book_id', $sourceAddressBookId)
             ->get();
@@ -614,6 +730,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function handlePrivateCardUpsert(Card $privateCard): void
     {
+        if (! $this->isEnabledGlobally()) {
+            return;
+        }
+
         $link = AddressBookPrivateWorkingSetLink::query()
             ->where('private_card_id', $privateCard->id)
             ->first();
@@ -671,6 +791,10 @@ class AddressBookPrivateWorkingSetService
      */
     public function handlePrivateCardDeleted(Card $privateCard): void
     {
+        if (! $this->isEnabledGlobally()) {
+            return;
+        }
+
         AddressBookPrivateWorkingSetLink::query()
             ->where('private_card_id', $privateCard->id)
             ->delete();
@@ -776,6 +900,22 @@ class AddressBookPrivateWorkingSetService
     }
 
     /**
+     * Resolves the effective self-review behavior.
+     */
+    private function effectiveRequireReviewForSelfPromotions(User $user, bool $resolvedSetting): bool
+    {
+        if (! $this->settingsService->isContactChangeModerationEnabled()) {
+            return false;
+        }
+
+        if (! $user->isAdmin()) {
+            return true;
+        }
+
+        return $resolvedSetting;
+    }
+
+    /**
      * Returns forced queue owner IDs for promotion when self-review is enabled.
      *
      * @return array<int, int>
@@ -793,7 +933,10 @@ class AddressBookPrivateWorkingSetService
             return [];
         }
 
-        if (! $this->resolveRequireReviewForSelfPromotions($actor, $config)) {
+        if (! $this->effectiveRequireReviewForSelfPromotions(
+            $actor,
+            $this->resolveRequireReviewForSelfPromotions($actor, $config),
+        )) {
             return [];
         }
 

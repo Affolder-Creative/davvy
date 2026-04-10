@@ -90,6 +90,7 @@ Onboarding flow behavior:
 | `ENABLE_DAV_COMPATIBILITY_MODE` | `false` | Strict DAV validation is default |
 | `ENABLE_CONTACT_MANAGEMENT` | `false` | Enables managed contacts UI/API |
 | `ENABLE_CONTACT_CHANGE_MODERATION` | `false` | Enables Review Queue workflow for cross-owner contact edits (recommended for families/teams, optional for personal use) |
+| `ENABLE_PRIVATE_WORKING_SET` | `false` | Enables Private Working Set (PWS) globally; when `false`, PWS enters quarantine mode and user PWS controls are hidden |
 | `CONTACT_CHANGE_REQUEST_RETENTION_DAYS` | `90` | Purge horizon for applied/denied queue history |
 | `MILESTONE_BIRTHDAY_INCLUDE_LAST_NAME` | `true` | When `true`, birthday milestone titles include last names (`Ben Williams` vs `Ben`) |
 | `MILESTONE_BIRTHDAY_PRIORITIZE_NICKNAME` | `true` | When `true`, birthday titles prefer nickname over first name (`Jon Doe` vs `Jonathan Doe`) |
@@ -171,6 +172,7 @@ User recovery tooling:
   - owner share management
   - DAV compatibility mode
   - contact change moderation
+  - private working set
 
 Because settings are persisted, environment defaults may no longer be authoritative after seeding/admin toggles.
 
@@ -182,6 +184,7 @@ Admin Control Center toggles map to these settings keys:
 - `dav_compatibility_mode_enabled`
 - `contact_management_enabled`
 - `contact_change_moderation_enabled`
+- `private_working_set_enabled`
 - `two_factor_enforcement_enabled`
 - `two_factor_enforcement_started_at`
 - `contact_change_request_retention_days`

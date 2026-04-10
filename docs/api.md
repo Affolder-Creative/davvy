@@ -52,10 +52,12 @@ Response:
 - feature flags:
   - `registration_enabled`
   - `registration_approval_required`
+  - `email_verification_required`
   - `owner_share_management_enabled`
   - `dav_compatibility_mode_enabled`
   - `contact_management_enabled`
   - `contact_change_moderation_enabled`
+  - `private_working_set_enabled`
   - `two_factor_enforcement_enabled`
   - `two_factor_grace_period_days`
   - `two_factor_enabled` (authenticated response only)
@@ -101,6 +103,7 @@ Response includes:
 - `dav_compatibility_mode_enabled`
 - `contact_management_enabled`
 - `contact_change_moderation_enabled`
+- `private_working_set_enabled`
 - `two_factor_enforcement_enabled`
 - `two_factor_grace_period_days`
 - locale payload:
@@ -121,6 +124,7 @@ Includes:
   - `locale`
   - `supported_locales`
   - `fallback_locale`
+- same feature flags returned by `POST /api/auth/login` (including `private_working_set_enabled`)
 
 #### `POST /api/auth/logout`
 Destroy current session.
@@ -213,6 +217,8 @@ Primary dashboard payload:
   - `hide_shared`
   - `include_owned_sharable_sources`
   - `require_review_for_self_promotions`
+  - `can_manage_self_review_policy`
+  - `effective_require_review_for_self_promotions`
   - `private_address_book_id`
   - `private_address_book_uri`
   - `private_display_name`
@@ -276,15 +282,18 @@ Body:
 #### `PATCH /api/address-books/private-working-set`
 Configure a per-user private working set for eligible source contacts.
 
+This endpoint returns `403` when global PWS is disabled by admin.
+
 Body:
 - `enabled` (required bool)
 - `hide_shared` (optional bool, default `true`)
 - `include_owned_sharable_sources` (optional bool; default `true`)
-- `require_review_for_self_promotions` (optional bool; default `true` for admin users, `false` for non-admin users)
+- `require_review_for_self_promotions` (optional bool; admin-controlled)
 - `source_ids` (optional array of eligible source address-book IDs)
 
 Notes:
 - `require_review_for_self_promotions` only has effect when review queue moderation is enabled.
+- non-admin users cannot manage `require_review_for_self_promotions`; when moderation is enabled, non-admin promotions are effectively always queued.
 - Admin users can approve their own queued self-promotions.
 
 Response:
@@ -292,6 +301,8 @@ Response:
 
 #### `POST /api/address-books/private-working-set/pull`
 Pull latest selected shared source values into private working set.
+
+This endpoint returns `403` when global PWS is disabled by admin.
 
 Body:
 - `force_server` (optional bool, default `false`)
@@ -358,6 +369,8 @@ Delete managed contact.
 #### `POST /api/address-books/private-working-set/promote/{card}`
 Promote one linked private card back to its shared source card.
 
+This endpoint returns `403` when global PWS is disabled by admin.
+
 Responses:
 - `200` when applied immediately:
   - `queued: false`
@@ -372,6 +385,8 @@ Responses:
 
 #### `POST /api/address-books/private-working-set/suggestions/{link}/dismiss`
 Dismiss one current suggested promotion for a linked private card.
+
+This endpoint returns `403` when global PWS is disabled by admin.
 
 Response:
 - `suggested_promotion_dismissed.dismissed` (bool)
@@ -528,6 +543,15 @@ Toggle review queue moderation for cross-owner contact changes.
 
 Disable guard:
 - returns `422` if unresolved queue requests still exist
+
+#### `PATCH /api/admin/settings/private-working-set`
+Toggle global Private Working Set availability.
+
+Body:
+- `enabled` (required bool)
+
+Response:
+- `enabled`
 
 #### `PATCH /api/admin/settings/two-factor-enforcement`
 Toggle global 2FA enforcement with grace-period rollout.
