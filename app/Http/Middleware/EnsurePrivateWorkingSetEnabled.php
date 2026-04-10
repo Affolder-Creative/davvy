@@ -25,4 +25,3 @@ class EnsurePrivateWorkingSetEnabled
         return $next($request);
     }
 }
-

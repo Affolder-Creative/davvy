@@ -10,6 +10,7 @@ use App\Models\Card;
 use App\Models\ContactChangeRequest;
 use App\Models\ResourceShare;
 use App\Models\User;
+use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\Contacts\ContactVCardService;
 use App\Services\Dav\Backends\LaravelCardDavBackend;
 use App\Services\DavRequestContext;
@@ -953,7 +954,7 @@ class PrivateWorkingSetCardDavTest extends TestCase
         $this->assertGreaterThan(0, $privateAddressBookId);
 
         $this->assertTrue(
-            app(\App\Services\AddressBookPrivateWorkingSetService::class)
+            app(AddressBookPrivateWorkingSetService::class)
                 ->isSharedSourceHiddenForUser($editor, (int) $source->id)
         );
 
