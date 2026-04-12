@@ -15,7 +15,7 @@ export default function AuthShell({
   themeControlPlacement = "inline",
 }) {
   return (
-    <main className="mx-auto flex min-h-screen max-w-md items-center px-4 py-10">
+    <main className="auth-shell-safe-top mx-auto flex min-h-screen max-w-md items-center px-4 py-10">
       <section className="surface fade-up w-full rounded-3xl p-8">
         <h1 className="text-3xl font-bold text-app-strong">{title}</h1>
         <p className="mt-2 text-sm text-app-muted">{subtitle}</p>

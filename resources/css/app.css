@@ -20,6 +20,10 @@
   --bg-end: #eff3ea;
   --bg-glow-1: #d8f2ee;
   --bg-glow-2: #ffeecf;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
   --surface: #ffffffcc;
   --surface-solid: #ffffff;
   --ink: #0b1c1a;
@@ -84,6 +88,7 @@ input[type="radio"] {
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   font-family:
     "Space Grotesk",
     ui-sans-serif,
@@ -98,8 +103,25 @@ body {
     linear-gradient(160deg, var(--bg-start), var(--bg-end));
 }
 
+html {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 10% 20%, var(--bg-glow-1) 0%, transparent 44%),
+    radial-gradient(circle at 80% 0%, var(--bg-glow-2) 0%, transparent 38%),
+    linear-gradient(160deg, var(--bg-start), var(--bg-end));
+}
+
 #app {
   min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.shell-safe-top {
+  padding-top: calc(1.5rem + var(--safe-area-top));
+}
+
+.auth-shell-safe-top {
+  padding-top: calc(2.5rem + var(--safe-area-top));
 }
 
 .theme-control {
@@ -117,8 +139,8 @@ body {
 
 .theme-control-window-bottom-right {
   position: fixed;
-  right: 1rem;
-  bottom: 1rem;
+  right: calc(1rem + var(--safe-area-right));
+  bottom: calc(1rem + var(--safe-area-bottom));
   z-index: 40;
 }
 
@@ -531,8 +553,8 @@ body {
   }
 
   .theme-control-window-bottom-right {
-    right: 0.75rem;
-    bottom: 0.75rem;
+    right: calc(0.75rem + var(--safe-area-right));
+    bottom: calc(0.75rem + var(--safe-area-bottom));
   }
 }
 

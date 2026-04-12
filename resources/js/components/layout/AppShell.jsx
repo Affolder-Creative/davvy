@@ -122,7 +122,7 @@ export default function AppShell({
             : t("tabs.dashboard");
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <main className="shell-safe-top mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <header className="surface fade-up rounded-3xl p-5">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
