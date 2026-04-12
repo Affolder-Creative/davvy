@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DashboardPrivateWorkingSetPanel from "./DashboardPrivateWorkingSetPanel";
@@ -71,6 +71,10 @@ function basePrivateWorkingSet(overrides = {}) {
 }
 
 describe("DashboardPrivateWorkingSetPanel", () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   it("disables Save while pristine and enables it after a form change", async () => {
     const user = userEvent.setup();
 
@@ -101,6 +105,67 @@ describe("DashboardPrivateWorkingSetPanel", () => {
 
     expect(saveButton).toBeEnabled();
     expect(screen.getByText("You have unsaved changes.")).toBeInTheDocument();
+  });
+
+  it("allows dismissing and restoring the quick guide", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PrivateWorkingSetHarness
+        privateWorkingSet={basePrivateWorkingSet()}
+        initialForm={{
+          enabled: true,
+          hide_shared: true,
+          include_owned_sharable_sources: true,
+          require_review_for_self_promotions: true,
+          source_ids: [],
+        }}
+      />,
+    );
+
+    expect(screen.getByText("How it works")).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Close How it works",
+      }),
+    );
+    expect(screen.queryByText("How it works")).not.toBeInTheDocument();
+    expect(
+      window.localStorage.getItem("davvy-dashboard-pws-quick-guide-dismissed"),
+    ).toBe("1");
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Show How it works",
+      }),
+    );
+    expect(screen.getByText("How it works")).toBeInTheDocument();
+    expect(
+      window.localStorage.getItem("davvy-dashboard-pws-quick-guide-dismissed"),
+    ).toBeNull();
+  });
+
+  it("keeps the quick guide hidden when dismissal was persisted", () => {
+    window.localStorage.setItem("davvy-dashboard-pws-quick-guide-dismissed", "1");
+
+    render(
+      <PrivateWorkingSetHarness
+        privateWorkingSet={basePrivateWorkingSet()}
+        initialForm={{
+          enabled: true,
+          hide_shared: true,
+          include_owned_sharable_sources: true,
+          require_review_for_self_promotions: true,
+          source_ids: [],
+        }}
+      />,
+    );
+
+    expect(screen.queryByText("How it works")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Show How it works" }),
+    ).toBeInTheDocument();
   });
 
   it("starts in simple mode and reveals advanced controls when expanded", async () => {
@@ -148,6 +213,50 @@ describe("DashboardPrivateWorkingSetPanel", () => {
       screen.getByRole("button", { name: /Reset from source books/i }),
     ).toBeInTheDocument();
     expect(screen.getByText("Last promotion results")).toBeInTheDocument();
+  });
+
+  it("hides dependent sync and promotion sections while private mode is unchecked", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <PrivateWorkingSetHarness
+        privateWorkingSet={basePrivateWorkingSet()}
+        initialForm={{
+          enabled: false,
+          hide_shared: true,
+          include_owned_sharable_sources: true,
+          require_review_for_self_promotions: true,
+          source_ids: [],
+        }}
+      />,
+    );
+
+    expect(
+      screen.queryByText("Source address books to sync"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Refresh from source books/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Last promotion results"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Suggested updates to share"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Private cards linked to shared contacts"),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(/Enable private working set to review/i)).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: /Use private working set for shared contacts/i,
+      }),
+    );
+    expect(screen.getByText("Source address books to sync")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Refresh from source books/i }),
+    ).toBeInTheDocument();
   });
 
   it("updates selected source count when source selection changes", async () => {
