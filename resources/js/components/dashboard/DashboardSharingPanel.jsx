@@ -196,7 +196,7 @@ export default function DashboardSharingPanel({
 
       <div className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
         {groupedOutgoing.length === 0 ? (
-          <p className="text-sm text-app-faint">{t("sharing.noOutgoing")}</p>
+          <p className="text-xs text-app-faint">{t("sharing.noOutgoing")}</p>
         ) : (
           groupedOutgoing.map((shareGroup) => (
             <div
