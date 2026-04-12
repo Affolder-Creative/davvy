@@ -2,17 +2,12 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/icons/favicon-32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/icons/favicon-16.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}"> --}}
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
-
-    <meta name="theme-color" content="#00786f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="{{ __('common.app_title') }}">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <!-- iOS home screen icon -->
     <link rel="apple-touch-icon" href="{{ asset('images/icons/apple-touch-icon-180.png') }}">
     {{-- <link rel="apple-touch-icon" sizes="40x40" href="{{ asset('images/icons/ios/Icon-40x40.png') }}">
     <link rel="apple-touch-icon" sizes="58x58" href="{{ asset('images/icons/ios/Icon-58x58.png') }}">
@@ -29,10 +24,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/icons/ios/Icon-180x180.png') }}">
     <link rel="apple-touch-icon" sizes="192x192" href="{{ asset('images/icons/ios/Icon-192x192.png') }}">
     <link rel="apple-touch-icon" sizes="1024x1024" href="{{ asset('images/icons/ios/Icon-1024x1024.png') }}"> --}}
-    {{-- <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/icons/favicon-32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/icons/favicon-16.png') }}">
-    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}"> --}}
-    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+
+    <meta name="theme-color" content="#00786f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="{{ __('common.app_title') }}">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ __('common.app_title') }}</title>
 
     <script>
         (function () {
@@ -54,7 +54,6 @@
             }
         })();
     </script>
-    <title>{{ __('common.app_title') }}</title>
     @viteReactRefresh
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 </head>
