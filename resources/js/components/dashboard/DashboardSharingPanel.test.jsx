@@ -84,6 +84,28 @@ describe("DashboardSharingPanel", () => {
     expect(onSaveShare).toHaveBeenCalledTimes(1);
   });
 
+  it("hides the recipients toggle when there are no outgoing shares", () => {
+    render(
+      <SharingPanelHarness
+        initialForm={{
+          resource_type: "calendar",
+          resource_id: "",
+          shared_with_id: "",
+          permission: "read_only",
+        }}
+        onSaveShare={vi.fn((event) => event.preventDefault())}
+        onDeleteShare={vi.fn()}
+        shareableResourceOptions={[]}
+        targets={[]}
+        outgoing={[]}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Show recipients" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("renders outgoing share entries and revokes by id", async () => {
     const user = userEvent.setup();
     const onDeleteShare = vi.fn();

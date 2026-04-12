@@ -556,6 +556,24 @@ describe("AdminPage", () => {
     );
   });
 
+  it("hides the recipients toggle when no shares exist", async () => {
+    const props = buildProps({
+      api: buildApi({
+        shares: [],
+      }),
+    });
+
+    renderAdminPage(props);
+
+    await waitFor(() =>
+      expect(props.api.get).toHaveBeenCalledWith("/api/admin/users"),
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Show recipients" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("groups share list entries by resource and renders recipient rows", async () => {
     const user = userEvent.setup();
     const props = buildProps({

@@ -2722,18 +2722,20 @@ export default function AdminPage({
                 <option value="admin">{t("labels.share.permission.admin")}</option>
               </select>
             </div>
-            <div className="mt-3 flex justify-end">
-              <button
-                className="btn-outline btn-outline-sm"
-                type="button"
-                onClick={() => setShareRecipientsExpanded((prev) => !prev)}
-                disabled={filteredShareGroups.length === 0}
-              >
-                {shareRecipientsExpanded
-                  ? t("labels.share.hideRecipients")
-                  : t("labels.share.showRecipients")}
-              </button>
-            </div>
+            {groupedShares.length > 0 ? (
+              <div className="mt-3 flex justify-end">
+                <button
+                  className="btn-outline btn-outline-sm"
+                  type="button"
+                  onClick={() => setShareRecipientsExpanded((prev) => !prev)}
+                  disabled={filteredShareGroups.length === 0}
+                >
+                  {shareRecipientsExpanded
+                    ? t("labels.share.hideRecipients")
+                    : t("labels.share.showRecipients")}
+                </button>
+              </div>
+            ) : null}
 
             <div className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
               {filteredShareGroups.length === 0 ? (

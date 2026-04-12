@@ -180,18 +180,19 @@ export default function DashboardSharingPanel({
         </div>
       </form>
 
-      <div className="mt-5 flex justify-end">
-        <button
-          className="btn-outline btn-outline-sm"
-          type="button"
-          onClick={() => setShareRecipientsExpanded((prev) => !prev)}
-          disabled={groupedOutgoing.length === 0}
-        >
-          {shareRecipientsExpanded
-            ? t("sharing.hideRecipients")
-            : t("sharing.showRecipients")}
-        </button>
-      </div>
+      {groupedOutgoing.length > 0 ? (
+        <div className="mt-5 flex justify-end">
+          <button
+            className="btn-outline btn-outline-sm"
+            type="button"
+            onClick={() => setShareRecipientsExpanded((prev) => !prev)}
+          >
+            {shareRecipientsExpanded
+              ? t("sharing.hideRecipients")
+              : t("sharing.showRecipients")}
+          </button>
+        </div>
+      ) : null}
 
       <div className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
         {groupedOutgoing.length === 0 ? (
