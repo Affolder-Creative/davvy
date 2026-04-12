@@ -494,6 +494,12 @@ export default function DashboardPrivateWorkingSetPanel({
             {t("privateWorkingSet.syncActionsHint")}
           </p>
         ) : null}
+        {isPrivateWorkingSetEnabled ? (
+          <div
+            className="border-t border-dashed border-app-edge opacity-60 pt-1"
+            aria-hidden="true"
+          />
+        ) : null}
 
         {privateWorkingSetNotice ? (
           <p className="mt-2 text-sm text-app-accent" role="status">
