@@ -558,6 +558,15 @@ html {
   }
 }
 
+/* Keep iOS from auto-zooming focused form fields with sub-16px text. */
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    .input {
+      font-size: 16px;
+    }
+  }
+}
+
 @keyframes fadeUp {
   from {
     opacity: 0;
