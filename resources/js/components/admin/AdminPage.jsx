@@ -546,10 +546,7 @@ export default function AdminPage({
     } catch (err) {
       setState((prev) => ({
         ...prev,
-        error: extractError(
-          err,
-          t("errors.unableToUpdateRegistrationSetting"),
-        ),
+        error: extractError(err, t("errors.unableToUpdateRegistrationSetting")),
       }));
     }
   };
@@ -1194,7 +1191,8 @@ export default function AdminPage({
   const normalizedUserQuery = userSearchQuery.trim().toLowerCase();
   const filteredUsers = useMemo(() => {
     return (Array.isArray(state.users) ? state.users : []).filter((user) => {
-      const searchText = `${user?.name ?? ""} ${user?.email ?? ""}`.toLowerCase();
+      const searchText =
+        `${user?.name ?? ""} ${user?.email ?? ""}`.toLowerCase();
       const matchesSearch =
         normalizedUserQuery === "" || searchText.includes(normalizedUserQuery);
       const matchesRole =
@@ -1332,8 +1330,12 @@ export default function AdminPage({
 
         if (!groupSearchText.includes(normalizedShareQuery)) {
           visibleShares = visibleShares.filter((share) => {
-            const recipientName = String(share.shared_with?.name ?? "").toLowerCase();
-            const recipientEmail = String(share.shared_with?.email ?? "").toLowerCase();
+            const recipientName = String(
+              share.shared_with?.name ?? "",
+            ).toLowerCase();
+            const recipientEmail = String(
+              share.shared_with?.email ?? "",
+            ).toLowerCase();
 
             return (
               recipientName.includes(normalizedShareQuery) ||
@@ -1731,9 +1733,7 @@ export default function AdminPage({
                 : t("backups.purge.purgeGeneratedMilestoneCalendars")}
             </button>
             <p className="text-xs text-app-faint">
-              {t(
-                "backups.purge.deletesGeneratedBirthdayAnniversaryCalendars",
-              )}
+              {t("backups.purge.deletesGeneratedBirthdayAnniversaryCalendars")}
             </p>
           </div>
         ) : null}
@@ -2702,14 +2702,18 @@ export default function AdminPage({
                 onChange={(event) => setShareTypeFilter(event.target.value)}
                 aria-label={t("labels.share.filterTypeAriaLabel")}
               >
-                <option value="all">{t("labels.share.allResourceTypes")}</option>
+                <option value="all">
+                  {t("labels.share.allResourceTypes")}
+                </option>
                 <option value="calendar">{t("labels.calendar")}</option>
                 <option value="address_book">{t("labels.addressBook")}</option>
               </select>
               <select
                 className="input"
                 value={sharePermissionFilter}
-                onChange={(event) => setSharePermissionFilter(event.target.value)}
+                onChange={(event) =>
+                  setSharePermissionFilter(event.target.value)
+                }
                 aria-label={t("labels.share.filterPermissionAriaLabel")}
               >
                 <option value="all">{t("labels.share.allPermissions")}</option>
@@ -2719,7 +2723,9 @@ export default function AdminPage({
                 <option value="editor">
                   {t("labels.share.permission.editor")}
                 </option>
-                <option value="admin">{t("labels.share.permission.admin")}</option>
+                <option value="admin">
+                  {t("labels.share.permission.admin")}
+                </option>
               </select>
             </div>
             {groupedShares.length > 0 ? (
@@ -2739,7 +2745,7 @@ export default function AdminPage({
 
             <div className="mt-3 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
               {filteredShareGroups.length === 0 ? (
-                <p className="rounded-xl border border-app-edge bg-app-surface p-3 text-xs text-app-faint">
+                <p className="text-sm text-app-faint">
                   {t("labels.share.noMatches")}
                 </p>
               ) : (
@@ -2760,7 +2766,10 @@ export default function AdminPage({
                         </span>
                       </div>
                       <p className="text-app-muted">
-                        {renderShareIdentity("labels.share.owner", shareGroup.owner)}
+                        {renderShareIdentity(
+                          "labels.share.owner",
+                          shareGroup.owner,
+                        )}
                       </p>
                       {!shareRecipientsExpanded ? null : (
                         <div className="mt-2 space-y-2">
@@ -2776,7 +2785,9 @@ export default function AdminPage({
                                     share.shared_with,
                                   )}
                                 </p>
-                                <PermissionBadge permission={share.permission} />
+                                <PermissionBadge
+                                  permission={share.permission}
+                                />
                               </div>
                               <button
                                 className="mt-2 text-xs font-semibold text-app-danger"
