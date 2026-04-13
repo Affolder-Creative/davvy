@@ -682,7 +682,7 @@ class BackupManagementTest extends TestCase
 
         $zip->addFromString(
             'calendars/user-999/999-oversized.ics',
-            str_repeat("A", 2048)
+            str_repeat('A', 2048)
         );
         $zip->close();
 
