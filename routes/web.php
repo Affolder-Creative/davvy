@@ -140,6 +140,7 @@ Route::middleware('auth')->group(function (): void {
             Route::patch('/api/admin/settings/backups', [AdminController::class, 'setBackupSettings']);
             Route::post('/api/admin/backups/run', [AdminController::class, 'runBackupNow']);
             Route::post('/api/admin/backups/restore', [AdminController::class, 'restoreBackup']);
+            Route::get('/api/admin/backups/restore/status', [AdminController::class, 'backupRestoreStatus']);
             Route::post('/api/admin/contact-milestones/purge-generated-calendars', [AdminController::class, 'purgeGeneratedMilestoneCalendars']);
 
             Route::get('/api/admin/shares', [ShareController::class, 'index']);

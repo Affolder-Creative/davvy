@@ -62,6 +62,7 @@ return [
         'restore_max_entry_uncompressed_bytes' => (int) env('BACKUPS_RESTORE_MAX_ENTRY_UNCOMPRESSED_BYTES', 64 * 1024 * 1024),
         'restore_max_total_uncompressed_bytes' => (int) env('BACKUPS_RESTORE_MAX_TOTAL_UNCOMPRESSED_BYTES', 512 * 1024 * 1024),
         'restore_max_compression_ratio' => (int) env('BACKUPS_RESTORE_MAX_COMPRESSION_RATIO', 200),
+        'restore_lock_seconds' => (int) env('BACKUPS_RESTORE_LOCK_SECONDS', 3600),
     ],
     'sponsorship' => [
         'funding_file' => base_path('.github/FUNDING.yml'),

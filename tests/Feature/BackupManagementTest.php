@@ -126,6 +126,10 @@ class BackupManagementTest extends TestCase
                 'dry_run' => '1',
             ])
             ->assertForbidden();
+
+        $this->actingAs($user)
+            ->getJson('/api/admin/backups/restore/status')
+            ->assertForbidden();
     }
 
     public function test_admin_can_run_backup_now_and_receive_manifest_archive(): void
@@ -352,16 +356,18 @@ class BackupManagementTest extends TestCase
             (string) file_get_contents($archivePath),
         );
 
-        $this->actingAs($admin)
-            ->post('/api/admin/backups/restore', [
-                'backup' => $upload,
+        $result = $this->dispatchAdminRestoreAndWait(
+            admin: $admin,
+            upload: $upload,
+            payload: [
                 'mode' => 'merge',
                 'dry_run' => '0',
-            ])
-            ->assertOk()
-            ->assertJsonPath('status', 'success')
-            ->assertJsonPath('mode', 'merge')
-            ->assertJsonPath('dry_run', false);
+            ],
+        );
+
+        $this->assertSame('success', $result['status'] ?? null);
+        $this->assertSame('merge', $result['mode'] ?? null);
+        $this->assertFalse((bool) ($result['dry_run'] ?? true));
 
         $this->assertGreaterThan(0, Calendar::query()->count());
         $this->assertGreaterThan(0, AddressBook::query()->count());
@@ -397,16 +403,18 @@ class BackupManagementTest extends TestCase
             (string) file_get_contents($archivePath),
         );
 
-        $this->actingAs($admin)
-            ->post('/api/admin/backups/restore', [
-                'backup' => $upload,
+        $result = $this->dispatchAdminRestoreAndWait(
+            admin: $admin,
+            upload: $upload,
+            payload: [
                 'mode' => 'merge',
                 'dry_run' => '0',
                 'fallback_owner_id' => null,
-            ])
-            ->assertOk()
-            ->assertJsonPath('status', 'success')
-            ->assertJsonPath('summary.fallback_owner_id', $admin->id);
+            ],
+        );
+
+        $this->assertSame('success', $result['status'] ?? null);
+        $this->assertSame($admin->id, $result['summary']['fallback_owner_id'] ?? null);
 
         $this->assertGreaterThan(0, Calendar::query()->where('owner_id', $admin->id)->count());
         $this->assertGreaterThan(0, AddressBook::query()->where('owner_id', $admin->id)->count());
@@ -456,15 +464,17 @@ class BackupManagementTest extends TestCase
             (string) file_get_contents($archivePath),
         );
 
-        $this->actingAs($admin)
-            ->post('/api/admin/backups/restore', [
-                'backup' => $upload,
+        $result = $this->dispatchAdminRestoreAndWait(
+            admin: $admin,
+            upload: $upload,
+            payload: [
                 'mode' => 'replace',
                 'dry_run' => '0',
-            ])
-            ->assertOk()
-            ->assertJsonPath('status', 'success')
-            ->assertJsonPath('mode', 'replace');
+            ],
+        );
+
+        $this->assertSame('success', $result['status'] ?? null);
+        $this->assertSame('replace', $result['mode'] ?? null);
 
         $this->assertDatabaseMissing('address_books', ['id' => $extraAddressBook->id]);
         $this->assertDatabaseMissing('contacts', ['id' => $extraContactId]);
@@ -594,18 +604,21 @@ class BackupManagementTest extends TestCase
             (string) file_get_contents($archivePath),
         );
 
-        $this->actingAs($admin)
-            ->post('/api/admin/backups/restore', [
-                'backup' => $upload,
+        $result = $this->dispatchAdminRestoreAndWait(
+            admin: $admin,
+            upload: $upload,
+            payload: [
                 'mode' => 'merge',
                 'dry_run' => '0',
-            ])
-            ->assertOk()
-            ->assertJsonPath('status', 'success')
-            ->assertJsonPath('summary.calendars_created', 0)
-            ->assertJsonPath('summary.address_books_created', 0)
-            ->assertJsonPath('summary.calendar_objects_created', 0)
-            ->assertJsonPath('summary.cards_created', 0);
+            ],
+        );
+
+        $summary = is_array($result['summary'] ?? null) ? $result['summary'] : [];
+        $this->assertSame('success', $result['status'] ?? null);
+        $this->assertSame(0, $summary['calendars_created'] ?? null);
+        $this->assertSame(0, $summary['address_books_created'] ?? null);
+        $this->assertSame(0, $summary['calendar_objects_created'] ?? null);
+        $this->assertSame(0, $summary['cards_created'] ?? null);
 
         $this->assertSame($initialCalendarCount, Calendar::query()->count());
         $this->assertSame($initialAddressBookCount, AddressBook::query()->count());
@@ -632,16 +645,19 @@ class BackupManagementTest extends TestCase
             (string) file_get_contents($archivePath),
         );
 
-        $this->actingAs($admin)
-            ->post('/api/admin/backups/restore', [
-                'backup' => $upload,
+        $result = $this->dispatchAdminRestoreAndWait(
+            admin: $admin,
+            upload: $upload,
+            payload: [
                 'mode' => 'merge',
                 'dry_run' => '0',
-            ])
-            ->assertOk()
-            ->assertJsonPath('status', 'success')
-            ->assertJsonPath('summary.calendars_created', 0)
-            ->assertJsonPath('summary.address_books_created', 0);
+            ],
+        );
+
+        $summary = is_array($result['summary'] ?? null) ? $result['summary'] : [];
+        $this->assertSame('success', $result['status'] ?? null);
+        $this->assertSame(0, $summary['calendars_created'] ?? null);
+        $this->assertSame(0, $summary['address_books_created'] ?? null);
 
         $this->assertSame($initialCalendarCount, Calendar::query()->count());
         $this->assertSame($initialAddressBookCount, AddressBook::query()->count());
@@ -675,20 +691,74 @@ class BackupManagementTest extends TestCase
             (string) file_get_contents($archivePath),
         );
 
-        $response = $this->actingAs($admin)
-            ->post('/api/admin/backups/restore', [
-                'backup' => $upload,
+        $result = $this->dispatchAdminRestoreAndWait(
+            admin: $admin,
+            upload: $upload,
+            payload: [
                 'mode' => 'merge',
                 'dry_run' => '0',
-            ]);
+            ],
+        );
 
-        $response->assertStatus(422)
-            ->assertJsonPath('status', 'failed');
-
+        $this->assertSame('failed', $result['status'] ?? null);
         $this->assertStringContainsString(
             'maximum allowed uncompressed size',
-            (string) $response->json('reason', '')
+            (string) ($result['reason'] ?? '')
         );
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
+    private function dispatchAdminRestoreAndWait(User $admin, UploadedFile $upload, array $payload): array
+    {
+        $requestPayload = array_merge($payload, ['backup' => $upload]);
+
+        $queued = $this->actingAs($admin)
+            ->post('/api/admin/backups/restore', $requestPayload)
+            ->assertStatus(202)
+            ->assertJsonPath('status', 'queued')
+            ->json();
+
+        $operationId = (string) ($queued['operation_id'] ?? '');
+        $this->assertNotSame('', $operationId, 'Expected queued restore response to include operation_id.');
+
+        return $this->waitForRestoreStatus($admin, $operationId);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function waitForRestoreStatus(User $admin, string $operationId): array
+    {
+        $finalPayload = [];
+
+        for ($attempt = 0; $attempt < 40; $attempt++) {
+            $response = $this->actingAs($admin)->getJson(
+                '/api/admin/backups/restore/status?operation_id='.urlencode($operationId)
+            )->assertOk();
+
+            $finalPayload = $response->json();
+            $status = strtolower((string) ($finalPayload['status'] ?? ''));
+
+            if (! in_array($status, ['queued', 'running'], true)) {
+                break;
+            }
+
+            usleep(100000);
+        }
+
+        $finalStatus = strtolower((string) ($finalPayload['status'] ?? ''));
+        $this->assertTrue(
+            in_array($finalStatus, ['success', 'failed'], true),
+            sprintf('Backup restore did not complete, final status was "%s".', $finalStatus)
+        );
+
+        $result = $finalPayload['result'] ?? null;
+        $this->assertIsArray($result);
+
+        return $result;
     }
 
     private function seedBackupData(): void

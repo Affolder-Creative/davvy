@@ -121,6 +121,7 @@ export default function AdminPage({
   const backupConfigOpenFrameRef = useRef(null);
   const backupRestoreOpenFrameRef = useRef(null);
   const backupConfigSnapshotRef = useRef(null);
+  const backupRestorePollingTimerRef = useRef(null);
 
   const captureBackupConfigSnapshot = () => ({
     backupEnabled: state.backupEnabled,
@@ -186,6 +187,79 @@ export default function AdminPage({
     }
 
     setBackupRestoreOpen(false);
+  };
+
+  const clearBackupRestorePolling = () => {
+    if (backupRestorePollingTimerRef.current !== null) {
+      window.clearTimeout(backupRestorePollingTimerRef.current);
+      backupRestorePollingTimerRef.current = null;
+    }
+  };
+
+  const normalizeBackupRestoreResult = (payload) => {
+    if (payload && typeof payload.result === "object" && payload.result !== null) {
+      return payload.result;
+    }
+
+    return {
+      status:
+        typeof payload?.status === "string" && payload.status !== ""
+          ? payload.status
+          : "failed",
+      reason: typeof payload?.reason === "string" ? payload.reason : "",
+      summary: null,
+      warnings: [],
+    };
+  };
+
+  const pollBackupRestoreStatus = async (operationId, dryRun) => {
+    try {
+      const response = await api.get("/api/admin/backups/restore/status", {
+        params: {
+          operation_id: operationId,
+        },
+      });
+      const payload = response.data ?? {};
+      const status = String(payload.status || "").toLowerCase();
+      const result = normalizeBackupRestoreResult(payload);
+
+      setBackupRestoreResult(result);
+
+      if (status === "queued" || status === "running") {
+        setBackupRestoring(true);
+        clearBackupRestorePolling();
+        backupRestorePollingTimerRef.current = window.setTimeout(() => {
+          pollBackupRestoreStatus(operationId, dryRun);
+        }, 1500);
+
+        return;
+      }
+
+      clearBackupRestorePolling();
+      setBackupRestoring(false);
+
+      const completionStatus = String(result.status || status || "success");
+      showToast({
+        status: completionStatus,
+        message: result.reason || t("notices.backupRestoreCompleted"),
+      });
+
+      if (!dryRun && completionStatus.toLowerCase() === "success") {
+        await load();
+      }
+    } catch (err) {
+      clearBackupRestorePolling();
+      setBackupRestoring(false);
+      const message = extractError(err, t("errors.backupRestoreBroken"));
+      setState((prev) => ({
+        ...prev,
+        error: message,
+      }));
+      showToast({
+        status: "failed",
+        message,
+      });
+    }
   };
 
   const openBackupConfigDrawer = () => {
@@ -352,6 +426,9 @@ export default function AdminPage({
       }
       if (backupRestoreOpenFrameRef.current !== null) {
         window.cancelAnimationFrame(backupRestoreOpenFrameRef.current);
+      }
+      if (backupRestorePollingTimerRef.current !== null) {
+        window.clearTimeout(backupRestorePollingTimerRef.current);
       }
 
       backupConfigSnapshotRef.current = null;
@@ -1126,11 +1203,14 @@ export default function AdminPage({
     setBackupRestoreResult(null);
     setState((prev) => ({ ...prev, error: "" }));
 
+    let pollingStarted = false;
+    const requestedDryRun = backupRestoreDryRun;
+
     try {
       const form = new FormData();
       form.append("backup", backupRestoreFile);
       form.append("mode", backupRestoreMode);
-      form.append("dry_run", backupRestoreDryRun ? "1" : "0");
+      form.append("dry_run", requestedDryRun ? "1" : "0");
 
       const response = await api.post("/api/admin/backups/restore", form, {
         headers: {
@@ -1138,17 +1218,34 @@ export default function AdminPage({
         },
       });
       const result = response.data ?? {};
+      const normalizedResult = normalizeBackupRestoreResult(result);
+      setBackupRestoreResult(normalizedResult);
 
-      setBackupRestoreResult(result);
-      showToast({
-        status: result.status || "success",
-        message: result.reason || t("notices.backupRestoreCompleted"),
-      });
+      const operationId =
+        typeof result.operation_id === "string" ? result.operation_id : "";
+      const queuedStatus = String(result.status || "").toLowerCase();
 
-      if (!backupRestoreDryRun) {
-        await load();
+      if (
+        operationId !== "" &&
+        (queuedStatus === "queued" || queuedStatus === "running")
+      ) {
+        pollingStarted = true;
+        clearBackupRestorePolling();
+        backupRestorePollingTimerRef.current = window.setTimeout(() => {
+          pollBackupRestoreStatus(operationId, requestedDryRun);
+        }, 200);
+      } else {
+        showToast({
+          status: normalizedResult.status || "success",
+          message: normalizedResult.reason || t("notices.backupRestoreCompleted"),
+        });
+
+        if (!requestedDryRun) {
+          await load();
+        }
       }
     } catch (err) {
+      clearBackupRestorePolling();
       const message = extractError(err, t("errors.backupRestoreBroken"));
       setState((prev) => ({
         ...prev,
@@ -1159,7 +1256,9 @@ export default function AdminPage({
         message,
       });
     } finally {
-      setBackupRestoring(false);
+      if (!pollingStarted) {
+        setBackupRestoring(false);
+      }
     }
   };
 
@@ -1462,10 +1561,20 @@ export default function AdminPage({
   const backupRunNowButtonClass = backupRunNowDisabled
     ? "inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-400"
     : "btn btn-outline-sm";
+  const backupRestoreStatus = String(backupRestoreResult?.status || "").toLowerCase();
   const backupRestoreSummary = backupRestoreResult?.summary ?? null;
   const backupRestoreWarnings = Array.isArray(backupRestoreResult?.warnings)
     ? backupRestoreResult.warnings
     : [];
+  const backupRestoreMessage =
+    typeof backupRestoreResult?.reason === "string" &&
+    backupRestoreResult.reason.trim() !== ""
+      ? backupRestoreResult.reason
+      : backupRestoreStatus === "queued" || backupRestoreStatus === "running"
+        ? t("backups.restore.running")
+        : backupRestoreStatus === "failed"
+          ? t("errors.backupRestoreBroken")
+          : t("backups.restore.success");
   const backupRestoreRunDisabled = backupRestoring || !backupRestoreFile;
   const backupRestoreRunButtonClass = backupRestoreRunDisabled
     ? "btn-outline btn-outline-sm"
@@ -2267,6 +2376,7 @@ export default function AdminPage({
                     className="input"
                     type="file"
                     accept=".zip,application/zip"
+                    disabled={backupRestoring}
                     onChange={(event) => {
                       const nextFile = event.target.files?.[0] ?? null;
                       setBackupRestoreFile(nextFile);
@@ -2277,6 +2387,7 @@ export default function AdminPage({
                   <select
                     className="input"
                     value={backupRestoreMode}
+                    disabled={backupRestoring}
                     onChange={(event) =>
                       setBackupRestoreMode(event.target.value)
                     }
@@ -2301,6 +2412,7 @@ export default function AdminPage({
                 <input
                   type="checkbox"
                   checked={backupRestoreDryRun}
+                  disabled={backupRestoring}
                   onChange={(event) =>
                     setBackupRestoreDryRun(!!event.target.checked)
                   }
@@ -2321,7 +2433,7 @@ export default function AdminPage({
                   {t("backups.restore.result")}
                 </p>
                 <p className="mt-1 text-sm text-app-strong">
-                  {backupRestoreResult.reason || t("backups.restore.success")}
+                  {backupRestoreMessage}
                 </p>
 
                 {backupRestoreSummary ? (

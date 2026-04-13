@@ -10,7 +10,7 @@ use App\Models\AppSetting;
 use App\Models\Calendar;
 use App\Models\ContactChangeRequest;
 use App\Models\User;
-use App\Services\Backups\BackupRestoreService;
+use App\Services\Backups\BackupRestoreDispatchService;
 use App\Services\Backups\BackupService;
 use App\Services\Backups\BackupSettingsService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
@@ -35,7 +35,7 @@ class AdminController extends Controller
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
         private readonly BackupSettingsService $backupSettings,
         private readonly BackupService $backupService,
-        private readonly BackupRestoreService $backupRestoreService,
+        private readonly BackupRestoreDispatchService $backupRestoreDispatchService,
         private readonly TwoFactorSettingsService $twoFactorSettings,
         private readonly TwoFactorService $twoFactor,
         private readonly UserOnboardingService $onboarding,
@@ -643,11 +643,12 @@ class AdminController extends Controller
             : (int) $request->user()->id;
 
         try {
-            $result = $this->backupRestoreService->restoreFromArchive(
+            $queued = $this->backupRestoreDispatchService->start(
                 archivePath: $archivePath,
                 mode: $mode,
                 dryRun: (bool) $dryRun,
                 fallbackOwnerId: $fallbackOwnerId,
+                requestedByUserId: (int) $request->user()->id,
                 trigger: 'manual-admin',
             );
         } catch (Throwable $throwable) {
@@ -659,6 +660,20 @@ class AdminController extends Controller
             ], 422);
         }
 
-        return response()->json($result);
+        return response()->json($queued, 202);
+    }
+
+    /**
+     * Return current backup restore status.
+     */
+    public function backupRestoreStatus(Request $request): JsonResponse
+    {
+        $operationId = trim((string) $request->query('operation_id', ''));
+
+        return response()->json(
+            $this->backupRestoreDispatchService->status(
+                $operationId === '' ? null : $operationId
+            )
+        );
     }
 }
