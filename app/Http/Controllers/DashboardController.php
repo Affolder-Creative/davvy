@@ -140,8 +140,13 @@ class DashboardController extends Controller
 
         $sharesCreatedByUser = [];
         $shareTargets = [];
+        $shareTargetPagination = null;
 
         if ($canManageShares) {
+            $targetSearch = trim((string) $request->query('share_target_search', ''));
+            $targetPerPage = max(1, min(200, (int) $request->query('share_target_per_page', 100)));
+            $targetPage = max(1, (int) $request->query('share_target_page', 1));
+
             $sharesCreatedByUser = ResourceShare::query()
                 ->with('sharedWith')
                 ->where('owner_id', $user->id)
@@ -175,16 +180,41 @@ class DashboardController extends Controller
                 })
                 ->all();
 
-            $shareTargets = User::query()
+            $shareTargetQuery = User::query()
                 ->where('id', '!=', $user->id)
-                ->orderBy('name')
-                ->get(['id', 'name', 'email'])
+                ->orderBy('name');
+
+            if ($targetSearch !== '') {
+                $shareTargetQuery->where(function ($builder) use ($targetSearch): void {
+                    $builder
+                        ->where('name', 'like', '%'.$targetSearch.'%')
+                        ->orWhere('email', 'like', '%'.$targetSearch.'%');
+                });
+            }
+
+            $shareTargetPaginator = $shareTargetQuery
+                ->paginate($targetPerPage, ['id', 'name', 'email'], 'share_target_page', $targetPage)
+                ->appends($request->query());
+
+            $shareTargets = $shareTargetPaginator
+                ->getCollection()
                 ->map(fn (User $target): array => [
                     'id' => $target->id,
                     'name' => $target->name,
                     'email' => $target->email,
                 ])
                 ->all();
+
+            $shareTargetPagination = [
+                'current_page' => $shareTargetPaginator->currentPage(),
+                'per_page' => $shareTargetPaginator->perPage(),
+                'total' => $shareTargetPaginator->total(),
+                'last_page' => $shareTargetPaginator->lastPage(),
+                'from' => $shareTargetPaginator->firstItem(),
+                'to' => $shareTargetPaginator->lastItem(),
+                'has_more_pages' => $shareTargetPaginator->hasMorePages(),
+                'search' => $targetSearch === '' ? null : $targetSearch,
+            ];
         }
 
         return response()->json([
@@ -200,6 +230,7 @@ class DashboardController extends Controller
                 'owner_share_management_enabled' => $ownerShareManagementEnabled,
                 'can_manage' => $canManageShares,
                 'targets' => $shareTargets,
+                'target_pagination' => $shareTargetPagination,
                 'outgoing' => $sharesCreatedByUser,
             ],
             'apple_compat' => $this->mirrorService->dashboardDataFor($user),

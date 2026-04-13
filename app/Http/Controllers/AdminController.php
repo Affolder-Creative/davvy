@@ -45,12 +45,60 @@ class AdminController extends Controller
     /**
      * Return users for the admin dashboard.
      */
-    public function users(): JsonResponse
+    public function users(Request $request): JsonResponse
     {
-        $users = User::query()
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:255'],
+            'role' => ['nullable', 'in:all,admin,regular'],
+            'two_factor' => ['nullable', 'in:all,enabled,disabled'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:200'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $search = trim((string) ($filters['q'] ?? ''));
+        $roleFilter = (string) ($filters['role'] ?? 'all');
+        $twoFactorFilter = (string) ($filters['two_factor'] ?? 'all');
+        $perPage = (int) ($filters['per_page'] ?? 100);
+        $page = (int) ($filters['page'] ?? 1);
+
+        $query = User::query()
             ->withCount(['calendars', 'addressBooks'])
-            ->orderBy('id')
-            ->get()
+            ->orderBy('id');
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search): void {
+                $builder
+                    ->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%');
+            });
+        }
+
+        if ($roleFilter === 'admin') {
+            $query->where('role', Role::Admin->value);
+        } elseif ($roleFilter === 'regular') {
+            $query->where('role', Role::Regular->value);
+        }
+
+        if ($twoFactorFilter === 'enabled') {
+            $query
+                ->whereNotNull('two_factor_enabled_at')
+                ->whereNotNull('two_factor_secret')
+                ->where('two_factor_secret', '!=', '');
+        } elseif ($twoFactorFilter === 'disabled') {
+            $query->where(function ($builder): void {
+                $builder
+                    ->whereNull('two_factor_enabled_at')
+                    ->orWhereNull('two_factor_secret')
+                    ->orWhere('two_factor_secret', '');
+            });
+        }
+
+        $paginator = $query
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->appends($request->query());
+
+        $users = $paginator
+            ->getCollection()
             ->map(function (User $user): array {
                 $payload = $user->toArray();
                 $payload['two_factor_enabled'] = $user->hasTwoFactorEnabled();
@@ -60,7 +108,23 @@ class AdminController extends Controller
             ->values()
             ->all();
 
-        return response()->json(['data' => $users]);
+        return response()->json([
+            'data' => $users,
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+                'has_more_pages' => $paginator->hasMorePages(),
+            ],
+            'filters' => [
+                'q' => $search === '' ? null : $search,
+                'role' => $roleFilter,
+                'two_factor' => $twoFactorFilter,
+            ],
+        ]);
     }
 
     /**

@@ -28,6 +28,28 @@ class ShareController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:255'],
+            'resource_type' => ['nullable', 'in:all,calendar,address_book'],
+            'permission' => ['nullable', 'in:all,read_only,editor,admin'],
+            'owner_id' => ['nullable', 'integer', 'exists:users,id'],
+            'shared_with_id' => ['nullable', 'integer', 'exists:users,id'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:200'],
+            'page' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $search = trim((string) ($filters['q'] ?? ''));
+        $resourceTypeFilter = (string) ($filters['resource_type'] ?? 'all');
+        $permissionFilter = (string) ($filters['permission'] ?? 'all');
+        $ownerIdFilter = array_key_exists('owner_id', $filters)
+            ? (int) $filters['owner_id']
+            : null;
+        $sharedWithIdFilter = array_key_exists('shared_with_id', $filters)
+            ? (int) $filters['shared_with_id']
+            : null;
+        $perPage = (int) ($filters['per_page'] ?? 100);
+        $page = (int) ($filters['page'] ?? 1);
+
         $query = ResourceShare::query()
             ->with(['owner', 'sharedWith'])
             ->orderByDesc('id');
@@ -35,9 +57,46 @@ class ShareController extends Controller
         if (! $user->isAdmin()) {
             $this->assertOwnerShareManagementAllowed();
             $query->where('owner_id', $user->id);
+        } elseif ($ownerIdFilter !== null) {
+            $query->where('owner_id', $ownerIdFilter);
         }
 
-        $shares = $query->get()
+        if ($resourceTypeFilter === 'calendar') {
+            $query->where('resource_type', ShareResourceType::Calendar->value);
+        } elseif ($resourceTypeFilter === 'address_book') {
+            $query->where('resource_type', ShareResourceType::AddressBook->value);
+        }
+
+        if ($permissionFilter !== 'all') {
+            $query->where('permission', $permissionFilter);
+        }
+
+        if ($sharedWithIdFilter !== null) {
+            $query->where('shared_with_id', $sharedWithIdFilter);
+        }
+
+        if ($search !== '') {
+            $query->where(function ($builder) use ($search): void {
+                $builder
+                    ->whereHas('owner', function ($ownerQuery) use ($search): void {
+                        $ownerQuery
+                            ->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('email', 'like', '%'.$search.'%');
+                    })
+                    ->orWhereHas('sharedWith', function ($sharedWithQuery) use ($search): void {
+                        $sharedWithQuery
+                            ->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('email', 'like', '%'.$search.'%');
+                    });
+            });
+        }
+
+        $paginator = $query
+            ->paginate($perPage, ['*'], 'page', $page)
+            ->appends($request->query());
+
+        $shares = $paginator
+            ->getCollection()
             ->map(function (ResourceShare $share): array {
                 return [
                     'id' => $share->id,
@@ -58,7 +117,25 @@ class ShareController extends Controller
             })
             ->all();
 
-        return response()->json(['data' => $shares]);
+        return response()->json([
+            'data' => $shares,
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+                'has_more_pages' => $paginator->hasMorePages(),
+            ],
+            'filters' => [
+                'q' => $search === '' ? null : $search,
+                'resource_type' => $resourceTypeFilter,
+                'permission' => $permissionFilter,
+                'owner_id' => $ownerIdFilter,
+                'shared_with_id' => $sharedWithIdFilter,
+            ],
+        ]);
     }
 
     /**

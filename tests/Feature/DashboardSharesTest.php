@@ -153,6 +153,38 @@ class DashboardSharesTest extends TestCase
         $response->assertJsonPath('sharing.outgoing.0.resource_display_name', 'Family Contacts');
     }
 
+    public function test_dashboard_share_targets_support_search_and_pagination(): void
+    {
+        app(RegistrationSettingsService::class)->setOwnerShareManagementEnabled(true);
+
+        $owner = User::factory()->create();
+        User::factory()->create([
+            'name' => 'Alice Doe',
+            'email' => 'alice.doe@example.com',
+        ]);
+        User::factory()->create([
+            'name' => 'Bob Doe',
+            'email' => 'bob.doe@example.com',
+        ]);
+        User::factory()->create([
+            'name' => 'Charlie Other',
+            'email' => 'charlie.other@example.com',
+        ]);
+
+        $response = $this->actingAs($owner)->getJson(
+            '/api/dashboard?share_target_search=doe&share_target_per_page=1&share_target_page=1'
+        );
+
+        $response->assertOk()
+            ->assertJsonPath('sharing.can_manage', true)
+            ->assertJsonCount(1, 'sharing.targets')
+            ->assertJsonPath('sharing.targets.0.name', 'Alice Doe')
+            ->assertJsonPath('sharing.target_pagination.current_page', 1)
+            ->assertJsonPath('sharing.target_pagination.per_page', 1)
+            ->assertJsonPath('sharing.target_pagination.total', 2)
+            ->assertJsonPath('sharing.target_pagination.search', 'doe');
+    }
+
     public function test_deleting_calendar_via_api_removes_related_resource_shares(): void
     {
         $owner = User::factory()->create();

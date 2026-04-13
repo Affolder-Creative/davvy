@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\Role;
 use App\Models\Calendar;
+use App\Models\ResourceShare;
 use App\Models\User;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -121,5 +122,56 @@ class OwnerShareManagementTest extends TestCase
             'resource_id' => $calendar->id,
             'permission' => 'editor',
         ]);
+    }
+
+    public function test_admin_share_index_supports_search_filters_and_pagination(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $owner = User::factory()->create([
+            'name' => 'Owner Example',
+            'email' => 'owner@example.com',
+        ]);
+        $alice = User::factory()->create([
+            'name' => 'Alice Recipient',
+            'email' => 'alice.recipient@example.com',
+        ]);
+        $bob = User::factory()->create([
+            'name' => 'Bob Recipient',
+            'email' => 'bob.recipient@example.com',
+        ]);
+
+        $calendar = Calendar::factory()->create([
+            'owner_id' => $owner->id,
+            'is_sharable' => true,
+        ]);
+
+        ResourceShare::query()->create([
+            'resource_type' => 'calendar',
+            'resource_id' => $calendar->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $alice->id,
+            'permission' => 'read_only',
+        ]);
+        ResourceShare::query()->create([
+            'resource_type' => 'calendar',
+            'resource_id' => $calendar->id,
+            'owner_id' => $owner->id,
+            'shared_with_id' => $bob->id,
+            'permission' => 'editor',
+        ]);
+
+        $response = $this->actingAs($admin)->getJson(
+            '/api/admin/shares?q=alice&permission=read_only&per_page=1&page=1'
+        );
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.shared_with.id', $alice->id)
+            ->assertJsonPath('data.0.permission', 'read_only')
+            ->assertJsonPath('pagination.current_page', 1)
+            ->assertJsonPath('pagination.per_page', 1)
+            ->assertJsonPath('pagination.total', 1)
+            ->assertJsonPath('filters.q', 'alice')
+            ->assertJsonPath('filters.permission', 'read_only');
     }
 }

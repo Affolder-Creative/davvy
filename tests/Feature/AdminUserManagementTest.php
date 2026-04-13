@@ -105,6 +105,47 @@ class AdminUserManagementTest extends TestCase
         $duplicate->assertJsonValidationErrors(['email']);
     }
 
+    public function test_admin_users_endpoint_supports_search_filters_and_pagination(): void
+    {
+        $admin = User::factory()->admin()->create([
+            'name' => 'Root Admin',
+            'email' => 'root.admin@example.com',
+        ]);
+        User::factory()->create([
+            'name' => 'Alice Alpha',
+            'email' => 'alice.alpha@example.com',
+            'role' => 'regular',
+            'two_factor_enabled_at' => now(),
+            'two_factor_secret' => 'enabled-secret',
+        ]);
+        User::factory()->create([
+            'name' => 'Alice Beta',
+            'email' => 'alice.beta@example.com',
+            'role' => 'regular',
+            'two_factor_enabled_at' => null,
+            'two_factor_secret' => null,
+        ]);
+        User::factory()->admin()->create([
+            'name' => 'Charlie Admin',
+            'email' => 'charlie.admin@example.com',
+        ]);
+
+        $response = $this->actingAs($admin)->getJson(
+            '/api/admin/users?q=alice&role=regular&two_factor=enabled&per_page=1&page=1'
+        );
+
+        $response->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.name', 'Alice Alpha')
+            ->assertJsonPath('data.0.two_factor_enabled', true)
+            ->assertJsonPath('pagination.current_page', 1)
+            ->assertJsonPath('pagination.per_page', 1)
+            ->assertJsonPath('pagination.total', 1)
+            ->assertJsonPath('filters.q', 'alice')
+            ->assertJsonPath('filters.role', 'regular')
+            ->assertJsonPath('filters.two_factor', 'enabled');
+    }
+
     public function test_admin_can_delete_user_without_transfer_and_owned_data_is_removed(): void
     {
         $admin = User::factory()->admin()->create();
