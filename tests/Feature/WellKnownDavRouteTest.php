@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class WellKnownDavRouteTest extends TestCase
@@ -42,6 +43,42 @@ class WellKnownDavRouteTest extends TestCase
 
         $this->assertSame(401, $response->getStatusCode());
         $this->assertStringContainsString('Basic', (string) $response->headers->get('WWW-Authenticate'));
+    }
+
+    public function test_client_traffic_logging_omits_raw_dav_payloads(): void
+    {
+        Log::spy();
+        config()->set('dav.log_client_traffic', true);
+
+        $user = User::factory()->create([
+            'email' => 'dav-log-payload@example.test',
+            'password' => 'password1234',
+        ]);
+
+        $requestBody = '<?xml version="1.0" encoding="utf-8"?><d:propfind xmlns:d="DAV:"><d:prop><d:current-user-principal/></d:prop></d:propfind>';
+
+        $response = $this->call(
+            method: 'PROPFIND',
+            uri: '/dav',
+            server: [
+                'HTTP_AUTHORIZATION' => 'Basic '.base64_encode($user->email.':password1234'),
+                'HTTP_DEPTH' => '0',
+                'HTTP_USER_AGENT' => 'AddressBookCore/2820 CFNetwork/1496.0.7 Darwin/23.6.0',
+                'CONTENT_TYPE' => 'application/xml; charset=utf-8',
+            ],
+            content: $requestBody,
+        );
+
+        $response->assertStatus(207);
+
+        Log::shouldHaveReceived('debug')->withArgs(
+            fn (string $message, array $context): bool => $message === 'DAV client request/response'
+                && ! array_key_exists('request_body', $context)
+                && ! array_key_exists('response_body', $context)
+                && (int) ($context['request_body_bytes'] ?? 0) > 0
+                && array_key_exists('response_body_bytes', $context)
+                && ! str_contains(json_encode($context), 'current-user-principal')
+        )->atLeast()->once();
     }
 
     public function test_authenticated_root_propfind_returns_id_based_current_user_principal(): void

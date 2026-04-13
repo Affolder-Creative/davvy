@@ -83,15 +83,17 @@ class DavController extends Controller
         }
 
         if ($shouldLogClientDavTraffic) {
+            $responseBody = $sabreResponse->getBodyAsString();
             Log::debug('DAV client request/response', [
                 'method' => $request->method(),
                 'path' => $request->getPathInfo(),
                 'user_agent' => $request->userAgent(),
                 'depth' => $request->header('Depth'),
                 'content_type' => $request->header('Content-Type'),
-                'request_body' => $rawBody,
                 'response_status' => $sabreResponse->getStatus(),
-                'response_body' => $sabreResponse->getBodyAsString(),
+                // Never log raw DAV payload content to avoid leaking contact/calendar PII.
+                'request_body_bytes' => strlen($rawBody),
+                'response_body_bytes' => strlen($responseBody),
             ]);
         }
 
