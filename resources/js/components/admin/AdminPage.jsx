@@ -443,11 +443,31 @@ export default function AdminPage({
       const submittedEmail = userForm.email;
       const response = await api.post("/api/admin/users", userForm);
       const created = response?.data ?? {};
+      const createdUserId = Number(created?.id);
       const targetEmail =
         typeof created?.email === "string" && created.email
           ? created.email
           : submittedEmail;
       setUserForm({ name: "", email: "", role: "regular" });
+      if (Number.isFinite(createdUserId) && createdUserId > 0) {
+        setState((previous) => ({
+          ...previous,
+          error: "",
+          users: [
+            ...(Array.isArray(previous.users) ? previous.users : []).filter(
+              (candidate) => Number(candidate?.id) !== createdUserId,
+            ),
+            {
+              ...created,
+              id: createdUserId,
+              calendars_count: Number(created?.calendars_count ?? 0),
+              address_books_count: Number(created?.address_books_count ?? 0),
+              two_factor_enabled: !!created?.two_factor_enabled,
+              is_approved: created?.is_approved !== false,
+            },
+          ].sort((left, right) => Number(left?.id) - Number(right?.id)),
+        }));
+      }
       setUserInviteResult({
         message: created?.invitation_sent
           ? t("notices.invitationSent", { targetEmail })
@@ -459,7 +479,6 @@ export default function AdminPage({
             ? created.invitation_url
             : "",
       });
-      await load();
     } catch (err) {
       setState((prev) => ({
         ...prev,
@@ -470,8 +489,22 @@ export default function AdminPage({
 
   const approveUser = async (userId) => {
     try {
-      await api.patch(`/api/admin/users/${userId}/approve`);
-      await load();
+      const response = await api.patch(`/api/admin/users/${userId}/approve`);
+      const approvedUser = response?.data ?? {};
+      setState((previous) => ({
+        ...previous,
+        error: "",
+        users: (Array.isArray(previous.users) ? previous.users : []).map((user) =>
+          Number(user?.id) === Number(userId)
+            ? {
+                ...user,
+                ...approvedUser,
+                id: Number(userId),
+                is_approved: true,
+              }
+            : user,
+        ),
+      }));
     } catch (err) {
       setState((prev) => ({
         ...prev,
@@ -541,6 +574,7 @@ export default function AdminPage({
       const transferredAddressBooks = Number(transferred.address_books ?? 0);
       const transferredContacts = Number(transferred.contacts ?? 0);
       const deletedUserName = deleteUserTarget.name;
+      const deletedUserId = Number(response.data?.deleted_user_id ?? deleteUserTarget.id);
       const transferTargetName = transferOwnerId
         ? state.users.find(
             (candidate) => Number(candidate.id) === transferOwnerId,
@@ -563,7 +597,23 @@ export default function AdminPage({
           : t("notices.deletedUser", { deletedUserName }),
       });
 
-      await load();
+      setState((previous) => ({
+        ...previous,
+        error: "",
+        users: (Array.isArray(previous.users) ? previous.users : []).filter(
+          (candidate) => Number(candidate?.id) !== deletedUserId,
+        ),
+      }));
+      setShareForm((previous) => {
+        if (Number(previous.shared_with_id) === deletedUserId) {
+          return {
+            ...previous,
+            shared_with_id: "",
+          };
+        }
+
+        return previous;
+      });
     } catch (err) {
       setState((prev) => ({
         ...prev,
@@ -665,11 +715,21 @@ export default function AdminPage({
           "/api/admin/users/approve-pending",
         );
         const approvedCount = Number(bulkApproval.data?.approved_count ?? 0);
+        if (approvedCount > 0) {
+          setState((previous) => ({
+            ...previous,
+            users: (Array.isArray(previous.users) ? previous.users : []).map(
+              (user) => ({
+                ...user,
+                is_approved: true,
+              }),
+            ),
+          }));
+        }
         showToast({
           status: "success",
           message: t("notices.approvedPending", { approvedCount }),
         });
-        await load();
       }
     } catch (err) {
       setState((prev) => ({
@@ -862,7 +922,18 @@ export default function AdminPage({
       await api.post(`/api/admin/users/${userId}/two-factor/reset`, {
         revoke_app_passwords: true,
       });
-      await load();
+      setState((previous) => ({
+        ...previous,
+        error: "",
+        users: (Array.isArray(previous.users) ? previous.users : []).map((user) =>
+          Number(user?.id) === Number(userId)
+            ? {
+                ...user,
+                two_factor_enabled: false,
+              }
+            : user,
+        ),
+      }));
     } catch (err) {
       setState((prev) => ({
         ...prev,

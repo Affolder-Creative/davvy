@@ -202,12 +202,41 @@ export default function DashboardPage({
       type === "calendar" ? `/api/calendars/${id}` : `/api/address-books/${id}`;
     try {
       await api.patch(url, { is_sharable: next });
+      const key = type === "calendar" ? "calendars" : "address_books";
+      const shareType = type === "calendar" ? "calendar" : "address_book";
+
+      setData((previous) => ({
+        ...previous,
+        owned: {
+          ...previous.owned,
+          [key]: (Array.isArray(previous.owned?.[key])
+            ? previous.owned[key]
+            : []
+          ).map((item) =>
+            Number(item?.id) === Number(id) ? { ...item, is_sharable: next } : item,
+          ),
+        },
+      }));
+      if (!next) {
+        setShareForm((previous) => {
+          if (
+            previous.resource_type === shareType &&
+            Number(previous.resource_id) === Number(id)
+          ) {
+            return {
+              ...previous,
+              resource_id: "",
+            };
+          }
+
+          return previous;
+        });
+      }
       setShareStatusNotice(
         next
           ? t("notices.shareStatus.shared", { name: displayName })
           : t("notices.shareStatus.unshared", { name: displayName }),
       );
-      await loadDashboard({ withLoading: false });
     } catch (err) {
       setError(extractError(err, t("errors.updateShareStatus")));
     }
