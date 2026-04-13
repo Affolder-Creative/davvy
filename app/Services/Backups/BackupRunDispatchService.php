@@ -2,38 +2,34 @@
 
 namespace App\Services\Backups;
 
-use App\Jobs\Backups\RunBackupRestoreOperationJob;
+use App\Jobs\Backups\RunBackupOperationJob;
 use App\Models\AppSetting;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use RuntimeException;
 use Throwable;
 
-class BackupRestoreDispatchService
+class BackupRunDispatchService
 {
-    private const LOCK_NAME = 'davvy-backup-restore-run';
+    private const LOCK_NAME = 'davvy-backup-admin-run-dispatch';
 
     /** @var array<string, string> */
     private const SETTING_KEYS = [
-        'operation_id' => 'backup_restore_operation_id',
-        'status' => 'backup_restore_status',
-        'reason' => 'backup_restore_reason',
-        'mode' => 'backup_restore_mode',
-        'dry_run' => 'backup_restore_dry_run',
-        'queued_at_utc' => 'backup_restore_queued_at',
-        'started_at_utc' => 'backup_restore_started_at',
-        'finished_at_utc' => 'backup_restore_finished_at',
-        'result_json' => 'backup_restore_result_json',
+        'operation_id' => 'backup_run_operation_id',
+        'status' => 'backup_run_status',
+        'reason' => 'backup_run_reason',
+        'queued_at_utc' => 'backup_run_queued_at',
+        'started_at_utc' => 'backup_run_started_at',
+        'finished_at_utc' => 'backup_run_finished_at',
+        'result_json' => 'backup_run_result_json',
     ];
 
-    public function __construct(private readonly BackupRestoreService $backupRestoreService) {}
+    public function __construct(private readonly BackupService $backupService) {}
 
     /**
      * @return array{
      *   status:'queued',
      *   operation_id:string,
-     *   mode:'merge'|'replace',
-     *   dry_run:bool,
      *   reason:string,
      *   queued_at_utc:string,
      *   started_at_utc:null,
@@ -41,35 +37,26 @@ class BackupRestoreDispatchService
      *   result:null
      * }
      */
-    public function start(
-        string $archivePath,
-        string $mode,
-        bool $dryRun,
-        int $fallbackOwnerId,
-        int $requestedByUserId,
-        string $trigger = 'manual-admin',
-    ): array {
-        $lock = Cache::lock(self::LOCK_NAME, $this->restoreLockSeconds());
+    public function start(int $requestedByUserId, string $trigger = 'manual-admin'): array
+    {
+        $lock = Cache::lock(self::LOCK_NAME, $this->dispatchLockSeconds());
         if (! $lock->get()) {
-            throw new RuntimeException('A backup restore is already in progress.');
+            throw new RuntimeException('A backup run is already in progress.');
         }
         $lockOwner = (string) $lock->owner();
         if ($lockOwner === '') {
             $lock->release();
 
-            throw new RuntimeException('Unable to acquire backup restore lock owner token.');
+            throw new RuntimeException('Unable to acquire backup run lock owner token.');
         }
 
         $operationId = (string) Str::uuid();
-        $stagedArchivePath = $this->stageArchive($archivePath, $operationId);
         $queuedAtUtc = now('UTC')->toIso8601String();
 
         $queuedPayload = [
             'status' => 'queued',
             'operation_id' => $operationId,
-            'mode' => $mode,
-            'dry_run' => $dryRun,
-            'reason' => 'Backup restore queued and waiting to start.',
+            'reason' => 'Backup run queued and waiting to start.',
             'queued_at_utc' => $queuedAtUtc,
             'started_at_utc' => null,
             'finished_at_utc' => null,
@@ -79,22 +66,14 @@ class BackupRestoreDispatchService
         $this->persistStatus($queuedPayload, $requestedByUserId);
 
         try {
-            RunBackupRestoreOperationJob::dispatch(
-                stagedArchivePath: $stagedArchivePath,
+            RunBackupOperationJob::dispatch(
                 operationId: $operationId,
                 queuedAtUtc: $queuedAtUtc,
-                mode: $mode,
-                dryRun: $dryRun,
-                fallbackOwnerId: $fallbackOwnerId,
                 requestedByUserId: $requestedByUserId,
                 trigger: $trigger,
                 lockOwner: $lockOwner,
             );
         } catch (Throwable $throwable) {
-            if (is_file($stagedArchivePath)) {
-                @unlink($stagedArchivePath);
-            }
-
             $lock->release();
 
             throw $throwable;
@@ -107,8 +86,6 @@ class BackupRestoreDispatchService
      * @return array{
      *   status:string,
      *   operation_id?:string,
-     *   mode?:string,
-     *   dry_run?:bool,
      *   reason?:string,
      *   queued_at_utc?:?string,
      *   started_at_utc?:?string,
@@ -127,7 +104,7 @@ class BackupRestoreDispatchService
             return [
                 'status' => 'not_found',
                 'operation_id' => $operationId,
-                'reason' => 'Backup restore operation was not found.',
+                'reason' => 'Backup run operation was not found.',
                 'result' => null,
             ];
         }
@@ -136,12 +113,8 @@ class BackupRestoreDispatchService
     }
 
     public function runQueuedOperation(
-        string $stagedArchivePath,
         string $operationId,
         string $queuedAtUtc,
-        string $mode,
-        bool $dryRun,
-        int $fallbackOwnerId,
         int $requestedByUserId,
         string $trigger,
         string $lockOwner,
@@ -152,9 +125,7 @@ class BackupRestoreDispatchService
         $this->persistStatus([
             'status' => 'running',
             'operation_id' => $operationId,
-            'mode' => $mode,
-            'dry_run' => $dryRun,
-            'reason' => 'Backup restore is running.',
+            'reason' => 'Backup run is running.',
             'queued_at_utc' => $queuedAtUtc,
             'started_at_utc' => $startedAtUtc,
             'finished_at_utc' => null,
@@ -162,21 +133,13 @@ class BackupRestoreDispatchService
         ], $requestedByUserId);
 
         try {
-            $result = $this->backupRestoreService->restoreFromArchive(
-                archivePath: $stagedArchivePath,
-                mode: $mode,
-                dryRun: $dryRun,
-                fallbackOwnerId: $fallbackOwnerId,
-                trigger: $trigger,
-            );
+            $result = $this->backupService->run(force: true, trigger: $trigger);
             $finishedAtUtc = now('UTC')->toIso8601String();
 
             $this->persistStatus([
                 'status' => (string) ($result['status'] ?? 'success'),
                 'operation_id' => $operationId,
-                'mode' => $mode,
-                'dry_run' => $dryRun,
-                'reason' => (string) ($result['reason'] ?? 'Backup restore completed.'),
+                'reason' => (string) ($result['reason'] ?? 'Backup run completed.'),
                 'queued_at_utc' => $queuedAtUtc,
                 'started_at_utc' => $startedAtUtc,
                 'finished_at_utc' => $finishedAtUtc,
@@ -186,13 +149,11 @@ class BackupRestoreDispatchService
             report($throwable);
 
             $finishedAtUtc = now('UTC')->toIso8601String();
-            $failedReason = __('backups.restore_failed_reason', ['reason' => $throwable->getMessage()]);
+            $failedReason = __('backups.backup_failed_reason', ['reason' => $throwable->getMessage()]);
 
             $this->persistStatus([
                 'status' => 'failed',
                 'operation_id' => $operationId,
-                'mode' => $mode,
-                'dry_run' => $dryRun,
                 'reason' => $failedReason,
                 'queued_at_utc' => $queuedAtUtc,
                 'started_at_utc' => $startedAtUtc,
@@ -200,20 +161,22 @@ class BackupRestoreDispatchService
                 'result' => [
                     'status' => 'failed',
                     'trigger' => $trigger,
-                    'mode' => $mode,
-                    'dry_run' => $dryRun,
                     'reason' => $failedReason,
+                    'timezone' => AppSetting::backupTimezone(),
                     'executed_at_utc' => $finishedAtUtc,
-                    'manifest' => null,
-                    'summary' => null,
-                    'warnings' => [],
+                    'executed_at_local' => $finishedAtUtc,
+                    'tiers' => [],
+                    'artifact_count' => 0,
+                    'artifacts' => [],
+                    'resource_counts' => [
+                        'calendars' => 0,
+                        'address_books' => 0,
+                        'calendar_objects' => 0,
+                        'cards' => 0,
+                    ],
                 ],
             ], $requestedByUserId);
         } finally {
-            if (is_file($stagedArchivePath)) {
-                @unlink($stagedArchivePath);
-            }
-
             try {
                 $lock->release();
             } catch (Throwable) {
@@ -222,29 +185,10 @@ class BackupRestoreDispatchService
         }
     }
 
-    private function stageArchive(string $archivePath, string $operationId): string
-    {
-        $directory = storage_path('app/backups/restore-jobs');
-        if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
-            throw new RuntimeException(__('backups.unable_to_access_uploaded_archive'));
-        }
-
-        $stagedArchivePath = $directory.'/'.$operationId.'.zip';
-        @unlink($stagedArchivePath);
-
-        if (! @copy($archivePath, $stagedArchivePath) || ! is_file($stagedArchivePath)) {
-            throw new RuntimeException(__('backups.unable_to_access_uploaded_archive'));
-        }
-
-        return $stagedArchivePath;
-    }
-
     /**
      * @param  array{
      *   status:string,
      *   operation_id:string,
-     *   mode:string,
-     *   dry_run:bool,
      *   reason:string,
      *   queued_at_utc:?string,
      *   started_at_utc:?string,
@@ -265,8 +209,6 @@ class BackupRestoreDispatchService
         $this->setStatusValue(self::SETTING_KEYS['operation_id'], $payload['operation_id'], $requestedByUserId);
         $this->setStatusValue(self::SETTING_KEYS['status'], $payload['status'], $requestedByUserId);
         $this->setStatusValue(self::SETTING_KEYS['reason'], $payload['reason'], $requestedByUserId);
-        $this->setStatusValue(self::SETTING_KEYS['mode'], $payload['mode'], $requestedByUserId);
-        $this->setStatusValue(self::SETTING_KEYS['dry_run'], $payload['dry_run'] ? 'true' : 'false', $requestedByUserId);
         $this->setStatusValue(self::SETTING_KEYS['queued_at_utc'], $payload['queued_at_utc'], $requestedByUserId);
         $this->setStatusValue(self::SETTING_KEYS['started_at_utc'], $payload['started_at_utc'], $requestedByUserId);
         $this->setStatusValue(self::SETTING_KEYS['finished_at_utc'], $payload['finished_at_utc'], $requestedByUserId);
@@ -277,8 +219,6 @@ class BackupRestoreDispatchService
      * @return array{
      *   status:string,
      *   operation_id:string,
-     *   mode:string,
-     *   dry_run:bool,
      *   reason:string,
      *   queued_at_utc:?string,
      *   started_at_utc:?string,
@@ -310,11 +250,6 @@ class BackupRestoreDispatchService
         return [
             'status' => $status,
             'operation_id' => (string) ($settingValues[self::SETTING_KEYS['operation_id']] ?? ''),
-            'mode' => (string) ($settingValues[self::SETTING_KEYS['mode']] ?? ''),
-            'dry_run' => filter_var(
-                $settingValues[self::SETTING_KEYS['dry_run']] ?? 'false',
-                FILTER_VALIDATE_BOOLEAN,
-            ),
             'reason' => (string) ($settingValues[self::SETTING_KEYS['reason']] ?? ''),
             'queued_at_utc' => $this->nullableString($settingValues[self::SETTING_KEYS['queued_at_utc']] ?? null),
             'started_at_utc' => $this->nullableString($settingValues[self::SETTING_KEYS['started_at_utc']] ?? null),
@@ -342,7 +277,7 @@ class BackupRestoreDispatchService
         return $trimmed === '' ? null : $trimmed;
     }
 
-    private function restoreLockSeconds(): int
+    private function dispatchLockSeconds(): int
     {
         return max(60, (int) config('services.backups.restore_lock_seconds', 3600));
     }

@@ -616,15 +616,32 @@ Validation rules:
 Run backup immediately (manual trigger, admin only).
 
 Response:
-- `status`: `success` | `skipped` | `failed`
+- HTTP `202`
+- `status`: `queued`
+- `operation_id`
 - `reason`
-- `tiers[]`
-- `artifact_count`
-- `artifacts[]` (`tier`, `period`, `file_name`, `local_path`, `s3_path`)
-- `resource_counts` (`calendars`, `address_books`, `calendar_objects`, `cards`)
+- `queued_at_utc`
+- `started_at_utc` (`null` while queued)
+- `finished_at_utc` (`null` while queued)
+- `result` (`null` while queued)
 
 Period behavior:
 - each tier keeps one snapshot per period key (manual reruns replace the same period artifact instead of creating duplicates).
+
+#### `GET /api/admin/backups/run/status`
+Read status for queued/running/completed admin backup run.
+
+Query params:
+- `operation_id` (optional)
+
+Response:
+- `status`: `idle` | `queued` | `running` | `success` | `skipped` | `failed` | `not_found`
+- `operation_id`
+- `reason`
+- `queued_at_utc`
+- `started_at_utc`
+- `finished_at_utc`
+- `result` (final backup payload when complete)
 
 #### `POST /api/admin/backups/restore`
 Restore calendars and address books from an uploaded backup ZIP archive (admin only).
@@ -636,18 +653,45 @@ Multipart form body:
 - `fallback_owner_id` (optional int): remap unresolved owner IDs to an existing user (defaults to current admin user when omitted)
 
 Response:
-- `status`: `success` | `failed`
+- HTTP `202`
+- `status`: `queued`
+- `operation_id`
 - `mode`: `merge` | `replace`
 - `dry_run` (bool)
 - `reason`
-- `executed_at_utc`
-- `manifest` (if present in ZIP)
-- `summary`:
-  - `files_total`, `files_processed`, `files_skipped`
-  - `owners_total`, `owners_resolved`, `owners_missing`, `fallback_owner_id`
-  - created/updated/deleted counters for calendars, address books, and objects/cards
-  - `resources_skipped_invalid`, `resources_skipped_owner`
-- `warnings[]`
+- `queued_at_utc`
+- `started_at_utc` (`null` while queued)
+- `finished_at_utc` (`null` while queued)
+- `result` (`null` while queued)
+
+#### `GET /api/admin/backups/restore/status`
+Read status for queued/running/completed admin restore.
+
+Query params:
+- `operation_id` (optional)
+
+Response:
+- `status`: `idle` | `queued` | `running` | `success` | `failed` | `not_found`
+- `operation_id`
+- `mode`: `merge` | `replace`
+- `dry_run` (bool)
+- `reason`
+- `queued_at_utc`
+- `started_at_utc`
+- `finished_at_utc`
+- `result` (final restore payload when complete):
+  - `status`: `success` | `failed`
+  - `mode`: `merge` | `replace`
+  - `dry_run` (bool)
+  - `reason`
+  - `executed_at_utc`
+  - `manifest` (if present in ZIP)
+  - `summary`:
+    - `files_total`, `files_processed`, `files_skipped`
+    - `owners_total`, `owners_resolved`, `owners_missing`, `fallback_owner_id`
+    - created/updated/deleted counters for calendars, address books, and objects/cards
+    - `resources_skipped_invalid`, `resources_skipped_owner`
+  - `warnings[]`
 
 ### Admin Share Management
 

@@ -160,6 +160,7 @@ Runtime toggles are read from `app_settings` (with env defaults if unset):
 - Preflight command (`app:preflight`) enforces production safety checks.
 - Startup DB bootstrap on PostgreSQL uses advisory lock for replica-safe migrations/seeding.
 - Runtime can start Laravel scheduler worker (`RUN_SCHEDULER=true`) for periodic jobs.
+- Runtime can start Laravel queue worker (`RUN_QUEUE_WORKER=true`) for queued jobs.
 
 ## Notable Design Choices
 

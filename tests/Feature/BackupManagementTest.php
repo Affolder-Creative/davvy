@@ -120,6 +120,10 @@ class BackupManagementTest extends TestCase
             ->assertForbidden();
 
         $this->actingAs($user)
+            ->getJson('/api/admin/backups/run/status')
+            ->assertForbidden();
+
+        $this->actingAs($user)
             ->post('/api/admin/backups/restore', [
                 'backup' => $upload,
                 'mode' => 'merge',
@@ -157,13 +161,11 @@ class BackupManagementTest extends TestCase
             'backup_retention_yearly' => '0',
         ]);
 
-        $response = $this->actingAs($admin)
-            ->postJson('/api/admin/backups/run')
-            ->assertOk();
+        $result = $this->dispatchAdminBackupRunAndWait($admin);
 
-        $response->assertJsonPath('status', 'success');
-        $response->assertJsonPath('artifact_count', 1);
-        $response->assertJsonPath('tiers.0', 'daily');
+        $this->assertSame('success', $result['status'] ?? null);
+        $this->assertSame(1, $result['artifact_count'] ?? null);
+        $this->assertSame('daily', $result['tiers'][0] ?? null);
 
         $dailyFiles = glob($localRoot.'/daily/*.zip');
         $this->assertIsArray($dailyFiles);
@@ -705,6 +707,57 @@ class BackupManagementTest extends TestCase
             'maximum allowed uncompressed size',
             (string) ($result['reason'] ?? '')
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function dispatchAdminBackupRunAndWait(User $admin): array
+    {
+        $queued = $this->actingAs($admin)
+            ->postJson('/api/admin/backups/run')
+            ->assertStatus(202)
+            ->assertJsonPath('status', 'queued')
+            ->json();
+
+        $operationId = (string) ($queued['operation_id'] ?? '');
+        $this->assertNotSame('', $operationId, 'Expected queued backup response to include operation_id.');
+
+        return $this->waitForBackupRunStatus($admin, $operationId);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function waitForBackupRunStatus(User $admin, string $operationId): array
+    {
+        $finalPayload = [];
+
+        for ($attempt = 0; $attempt < 40; $attempt++) {
+            $response = $this->actingAs($admin)->getJson(
+                '/api/admin/backups/run/status?operation_id='.urlencode($operationId)
+            )->assertOk();
+
+            $finalPayload = $response->json();
+            $status = strtolower((string) ($finalPayload['status'] ?? ''));
+
+            if (! in_array($status, ['queued', 'running'], true)) {
+                break;
+            }
+
+            usleep(100000);
+        }
+
+        $finalStatus = strtolower((string) ($finalPayload['status'] ?? ''));
+        $this->assertTrue(
+            in_array($finalStatus, ['success', 'skipped', 'failed'], true),
+            sprintf('Backup run did not complete, final status was "%s".', $finalStatus)
+        );
+
+        $result = $finalPayload['result'] ?? null;
+        $this->assertIsArray($result);
+
+        return $result;
     }
 
     /**

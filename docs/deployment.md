@@ -97,6 +97,8 @@ Note on `ENABLE_PUBLIC_REGISTRATION`:
 Backup scheduler note:
 - When `RUN_SCHEDULER=true` (default), the container runs `php artisan schedule:work` for periodic jobs (automated backups + milestone horizon roll-forward sync).
 - If you set `RUN_SCHEDULER=false`, you must run `php artisan schedule:run` externally every minute.
+- When `RUN_QUEUE_WORKER=true` (default), the container runs `php artisan queue:work` for queued jobs (including admin backup run/restore operations).
+- If you set `RUN_QUEUE_WORKER=false` with `QUEUE_CONNECTION != sync`, run queue workers externally.
 
 Onboarding mailer note:
 - If onboarding should deliver real email links, configure a working mail transport (`MAIL_MAILER=smtp` plus SMTP credentials or another non-`log` mailer) and set `ONBOARDING_SEND_EMAILS=true`.

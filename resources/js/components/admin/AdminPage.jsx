@@ -121,6 +121,7 @@ export default function AdminPage({
   const backupConfigOpenFrameRef = useRef(null);
   const backupRestoreOpenFrameRef = useRef(null);
   const backupConfigSnapshotRef = useRef(null);
+  const backupRunPollingTimerRef = useRef(null);
   const backupRestorePollingTimerRef = useRef(null);
 
   const captureBackupConfigSnapshot = () => ({
@@ -196,6 +197,28 @@ export default function AdminPage({
     }
   };
 
+  const clearBackupRunPolling = () => {
+    if (backupRunPollingTimerRef.current !== null) {
+      window.clearTimeout(backupRunPollingTimerRef.current);
+      backupRunPollingTimerRef.current = null;
+    }
+  };
+
+  const normalizeBackupRunResult = (payload) => {
+    if (payload && typeof payload.result === "object" && payload.result !== null) {
+      return payload.result;
+    }
+
+    return {
+      status:
+        typeof payload?.status === "string" && payload.status !== ""
+          ? payload.status
+          : "failed",
+      reason: typeof payload?.reason === "string" ? payload.reason : "",
+      executed_at_utc: null,
+    };
+  };
+
   const normalizeBackupRestoreResult = (payload) => {
     if (payload && typeof payload.result === "object" && payload.result !== null) {
       return payload.result;
@@ -254,6 +277,62 @@ export default function AdminPage({
       setState((prev) => ({
         ...prev,
         error: message,
+      }));
+      showToast({
+        status: "failed",
+        message,
+      });
+    }
+  };
+
+  const pollBackupRunStatus = async (operationId) => {
+    try {
+      const response = await api.get("/api/admin/backups/run/status", {
+        params: {
+          operation_id: operationId,
+        },
+      });
+      const payload = response.data ?? {};
+      const status = String(payload.status || "").toLowerCase();
+      const result = normalizeBackupRunResult(payload);
+
+      if (status === "queued" || status === "running") {
+        setBackupRunning(true);
+        clearBackupRunPolling();
+        backupRunPollingTimerRef.current = window.setTimeout(() => {
+          pollBackupRunStatus(operationId);
+        }, 1500);
+
+        return;
+      }
+
+      clearBackupRunPolling();
+      setBackupRunning(false);
+
+      const nextStatus = String(result.status || status || "success");
+      const nextMessage = result.reason || t("notices.backupRunSuccess");
+
+      setState((prev) => ({
+        ...prev,
+        backupLastRunAt: result.executed_at_utc || prev.backupLastRunAt,
+        backupLastRunStatus: nextStatus,
+        backupLastRunMessage: nextMessage,
+      }));
+      showToast({
+        status: nextStatus,
+        message: nextMessage,
+      });
+
+      await load();
+    } catch (err) {
+      clearBackupRunPolling();
+      setBackupRunning(false);
+      const message = extractError(err, t("errors.backupRunFailed"));
+      setState((prev) => ({
+        ...prev,
+        error: message,
+        backupLastRunStatus: "failed",
+        backupLastRunMessage: message,
       }));
       showToast({
         status: "failed",
@@ -429,6 +508,9 @@ export default function AdminPage({
       }
       if (backupRestorePollingTimerRef.current !== null) {
         window.clearTimeout(backupRestorePollingTimerRef.current);
+      }
+      if (backupRunPollingTimerRef.current !== null) {
+        window.clearTimeout(backupRunPollingTimerRef.current);
       }
 
       backupConfigSnapshotRef.current = null;
@@ -1212,26 +1294,44 @@ export default function AdminPage({
 
     setBackupRunning(true);
     setState((prev) => ({ ...prev, error: "" }));
+    let pollingStarted = false;
 
     try {
       const response = await api.post("/api/admin/backups/run");
       const result = response.data ?? {};
-      const nextStatus = result.status || "success";
-      const nextMessage = result.reason || t("notices.backupRunSuccess");
+      const operationId =
+        typeof result.operation_id === "string" ? result.operation_id : "";
+      const queuedStatus = String(result.status || "").toLowerCase();
 
-      setState((prev) => ({
-        ...prev,
-        backupLastRunAt: result.executed_at_utc || prev.backupLastRunAt,
-        backupLastRunStatus: nextStatus,
-        backupLastRunMessage: nextMessage,
-      }));
-      showToast({
-        status: nextStatus,
-        message: nextMessage,
-      });
+      if (
+        operationId !== "" &&
+        (queuedStatus === "queued" || queuedStatus === "running")
+      ) {
+        pollingStarted = true;
+        clearBackupRunPolling();
+        backupRunPollingTimerRef.current = window.setTimeout(() => {
+          pollBackupRunStatus(operationId);
+        }, 200);
+      } else {
+        const normalizedResult = normalizeBackupRunResult(result);
+        const nextStatus = normalizedResult.status || "success";
+        const nextMessage = normalizedResult.reason || t("notices.backupRunSuccess");
 
-      await load();
+        setState((prev) => ({
+          ...prev,
+          backupLastRunAt: normalizedResult.executed_at_utc || prev.backupLastRunAt,
+          backupLastRunStatus: nextStatus,
+          backupLastRunMessage: nextMessage,
+        }));
+        showToast({
+          status: nextStatus,
+          message: nextMessage,
+        });
+
+        await load();
+      }
     } catch (err) {
+      clearBackupRunPolling();
       const message = extractError(err, t("errors.backupRunFailed"));
       setState((prev) => ({
         ...prev,
@@ -1244,7 +1344,9 @@ export default function AdminPage({
         message,
       });
     } finally {
-      setBackupRunning(false);
+      if (!pollingStarted) {
+        setBackupRunning(false);
+      }
     }
   };
 

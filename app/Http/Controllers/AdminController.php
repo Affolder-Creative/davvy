@@ -10,8 +10,8 @@ use App\Models\AppSetting;
 use App\Models\Calendar;
 use App\Models\ContactChangeRequest;
 use App\Models\User;
+use App\Services\Backups\BackupRunDispatchService;
 use App\Services\Backups\BackupRestoreDispatchService;
-use App\Services\Backups\BackupService;
 use App\Services\Backups\BackupSettingsService;
 use App\Services\Contacts\ContactMilestoneCalendarService;
 use App\Services\RegistrationSettingsService;
@@ -34,7 +34,7 @@ class AdminController extends Controller
         private readonly RegistrationSettingsService $registrationSettings,
         private readonly ContactMilestoneCalendarService $milestoneCalendarService,
         private readonly BackupSettingsService $backupSettings,
-        private readonly BackupService $backupService,
+        private readonly BackupRunDispatchService $backupRunDispatchService,
         private readonly BackupRestoreDispatchService $backupRestoreDispatchService,
         private readonly TwoFactorSettingsService $twoFactorSettings,
         private readonly TwoFactorService $twoFactor,
@@ -662,19 +662,37 @@ class AdminController extends Controller
     /**
      * Run a backup immediately from the admin panel.
      */
-    public function runBackupNow(): JsonResponse
+    public function runBackupNow(Request $request): JsonResponse
     {
-        $result = $this->backupService->run(force: true, trigger: 'manual');
+        try {
+            $queued = $this->backupRunDispatchService->start(
+                requestedByUserId: (int) $request->user()->id,
+                trigger: 'manual-admin',
+            );
+        } catch (Throwable $throwable) {
+            report($throwable);
 
-        if ($result['status'] === 'failed') {
-            return response()->json($result, 500);
+            return response()->json([
+                'status' => 'failed',
+                'reason' => __('backups.backup_failed_reason', ['reason' => $throwable->getMessage()]),
+            ], 422);
         }
 
-        if ($result['status'] === 'skipped') {
-            return response()->json($result, 422);
-        }
+        return response()->json($queued, 202);
+    }
 
-        return response()->json($result);
+    /**
+     * Return current backup-run status.
+     */
+    public function backupRunStatus(Request $request): JsonResponse
+    {
+        $operationId = trim((string) $request->query('operation_id', ''));
+
+        return response()->json(
+            $this->backupRunDispatchService->status(
+                $operationId === '' ? null : $operationId
+            )
+        );
     }
 
     /**

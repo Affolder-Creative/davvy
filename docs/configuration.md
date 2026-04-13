@@ -144,6 +144,8 @@ Backup period semantics:
 Backup restore tooling:
 - CLI command: `php artisan app:backup:restore {archive} [--mode=merge|replace] [--dry-run] [--fallback-owner-id=...]`
 - Admin import endpoint: `POST /api/admin/backups/restore`
+- Admin restore status endpoint: `GET /api/admin/backups/restore/status`
+- Admin manual backup status endpoint: `GET /api/admin/backups/run/status`
 - Restore is destination-agnostic; it reads a ZIP archive and writes resources back into the database.
 
 User recovery tooling:
@@ -160,6 +162,7 @@ User recovery tooling:
 | `RUN_DB_MIGRATIONS` | `true` | Runs migrations on startup |
 | `RUN_DB_SEED` | `false` | Runs seeder on startup |
 | `RUN_SCHEDULER` | `true` | Runs `php artisan schedule:work` in the container for scheduled tasks (including backups and milestone horizon roll-forward sync) |
+| `RUN_QUEUE_WORKER` | `true` | Runs `php artisan queue:work` in the container for queued jobs (including admin backup/restore runs) |
 | `DEFAULT_ADMIN_EMAIL` | _(empty)_ | Used by seeder when seeding enabled |
 | `DEFAULT_ADMIN_PASSWORD` | _(empty)_ | Used by seeder when seeding enabled |
 

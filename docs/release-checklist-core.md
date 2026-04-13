@@ -68,6 +68,7 @@ Set these in your app service environment.
 | `BACKUPS_RETENTION_MONTHLY` | `12` | Monthly snapshots retained |
 | `BACKUPS_RETENTION_YEARLY` | `3` | Yearly snapshots retained |
 | `RUN_SCHEDULER` | `true` | Runs Laravel scheduler worker in container |
+| `RUN_QUEUE_WORKER` | `true` | Runs Laravel queue worker in container |
 | `DAV_LOG_CLIENT_TRAFFIC` | `false` | Optional targeted DAV traffic debug logging |
 | `RUN_DB_MIGRATIONS` | `true` | Recommended; set `false` only if migrations run out-of-band |
 | `RUN_DB_SEED` | `false` | Secure default; opt-in only for bootstrap |

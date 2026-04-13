@@ -6,6 +6,8 @@ LOCAL_DEV_APP_KEY='base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI='
 RUN_DB_MIGRATIONS_VALUE="${RUN_DB_MIGRATIONS:-true}"
 RUN_DB_SEED_VALUE="${RUN_DB_SEED:-false}"
 RUN_SCHEDULER_VALUE="${RUN_SCHEDULER:-true}"
+RUN_QUEUE_WORKER_VALUE="${RUN_QUEUE_WORKER:-true}"
+QUEUE_WORKER_TIMEOUT_VALUE="${QUEUE_WORKER_TIMEOUT:-3600}"
 
 # Ensure config reflects current runtime environment.
 php artisan config:clear --no-interaction >/dev/null 2>&1 || true
@@ -122,9 +124,18 @@ if [ "${RUN_SCHEDULER_VALUE}" = "true" ]; then
   scheduler_pid=$!
 fi
 
+queue_worker_pid=""
+if [ "${RUN_QUEUE_WORKER_VALUE}" = "true" ] && [ "${QUEUE_CONNECTION:-sync}" != "sync" ]; then
+  php artisan queue:work --no-interaction --sleep=1 --tries=1 --timeout="${QUEUE_WORKER_TIMEOUT_VALUE}" &
+  queue_worker_pid=$!
+fi
+
 shutdown() {
   if [ -n "${scheduler_pid}" ]; then
     kill -TERM "${scheduler_pid}" 2>/dev/null || true
+  fi
+  if [ -n "${queue_worker_pid}" ]; then
+    kill -TERM "${queue_worker_pid}" 2>/dev/null || true
   fi
 
   kill -TERM "${php_fpm_pid}" "${nginx_pid}" 2>/dev/null || true
@@ -136,12 +147,21 @@ while kill -0 "${php_fpm_pid}" 2>/dev/null && kill -0 "${nginx_pid}" 2>/dev/null
   if [ -n "${scheduler_pid}" ] && ! kill -0 "${scheduler_pid}" 2>/dev/null; then
     break
   fi
+  if [ -n "${queue_worker_pid}" ] && ! kill -0 "${queue_worker_pid}" 2>/dev/null; then
+    break
+  fi
 
   sleep 1
 done
 
 if [ -n "${scheduler_pid}" ] && ! kill -0 "${scheduler_pid}" 2>/dev/null; then
   if wait "${scheduler_pid}"; then
+    exit_code=0
+  else
+    exit_code=$?
+  fi
+elif [ -n "${queue_worker_pid}" ] && ! kill -0 "${queue_worker_pid}" 2>/dev/null; then
+  if wait "${queue_worker_pid}"; then
     exit_code=0
   else
     exit_code=$?
@@ -163,6 +183,9 @@ fi
 shutdown
 if [ -n "${scheduler_pid}" ]; then
   wait "${scheduler_pid}" 2>/dev/null || true
+fi
+if [ -n "${queue_worker_pid}" ]; then
+  wait "${queue_worker_pid}" 2>/dev/null || true
 fi
 wait "${php_fpm_pid}" 2>/dev/null || true
 wait "${nginx_pid}" 2>/dev/null || true
