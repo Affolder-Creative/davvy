@@ -32,9 +32,25 @@ class BackupArchiveReader
             throw new RuntimeException(__('backups.unable_to_open_backup_archive'));
         }
 
+        $maxEntries = max(1, (int) config('services.backups.restore_max_entries', 10000));
+        $maxEntryUncompressedBytes = max(
+            1,
+            (int) config('services.backups.restore_max_entry_uncompressed_bytes', 64 * 1024 * 1024)
+        );
+        $maxTotalUncompressedBytes = max(
+            1,
+            (int) config('services.backups.restore_max_total_uncompressed_bytes', 512 * 1024 * 1024)
+        );
+        $maxCompressionRatio = max(
+            1,
+            (int) config('services.backups.restore_max_compression_ratio', 200)
+        );
+
         $entries = [];
         $ownerIds = [];
         $manifest = null;
+        $restorableEntryCount = 0;
+        $restorableUncompressedBytes = 0;
 
         try {
             for ($index = 0; $index < $zip->numFiles; $index++) {
@@ -70,6 +86,57 @@ class BackupArchiveReader
                     $fileStem = (string) $matches[2];
                 } else {
                     continue;
+                }
+
+                $stat = $zip->statIndex($index);
+                if (! is_array($stat)) {
+                    throw new RuntimeException(sprintf('Unable to read metadata for backup entry "%s".', $entryName));
+                }
+
+                $entryUncompressedBytes = max(0, (int) ($stat['size'] ?? 0));
+                $entryCompressedBytes = max(0, (int) ($stat['comp_size'] ?? 0));
+
+                if ($entryUncompressedBytes > $maxEntryUncompressedBytes) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Backup entry "%s" exceeds the maximum allowed uncompressed size (%d bytes).',
+                            $entryName,
+                            $maxEntryUncompressedBytes
+                        )
+                    );
+                }
+
+                if (
+                    $entryCompressedBytes > 0
+                    && $entryUncompressedBytes > ($entryCompressedBytes * $maxCompressionRatio)
+                ) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Backup entry "%s" exceeds the maximum allowed compression ratio (%d:1).',
+                            $entryName,
+                            $maxCompressionRatio
+                        )
+                    );
+                }
+
+                $restorableEntryCount++;
+                if ($restorableEntryCount > $maxEntries) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Backup archive contains too many restorable entries (maximum %d).',
+                            $maxEntries
+                        )
+                    );
+                }
+
+                $restorableUncompressedBytes += $entryUncompressedBytes;
+                if ($restorableUncompressedBytes > $maxTotalUncompressedBytes) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Backup archive exceeds the maximum allowed total uncompressed size (%d bytes).',
+                            $maxTotalUncompressedBytes
+                        )
+                    );
                 }
 
                 $contents = $zip->getFromIndex($index);

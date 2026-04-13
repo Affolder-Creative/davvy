@@ -647,6 +647,50 @@ class BackupManagementTest extends TestCase
         $this->assertSame($initialAddressBookCount, AddressBook::query()->count());
     }
 
+    public function test_admin_restore_endpoint_rejects_entry_exceeding_uncompressed_size_limit(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        config()->set('services.backups.restore_max_entry_uncompressed_bytes', 1024);
+
+        $directory = storage_path('framework/testing/backups-restore-size-guard');
+        if (! is_dir($directory)) {
+            mkdir($directory, 0775, true);
+        }
+        $archivePath = $directory.'/restore-oversized-entry.zip';
+        @unlink($archivePath);
+
+        $zip = new ZipArchive;
+        $opened = $zip->open($archivePath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+        $this->assertTrue($opened === true, 'Unable to create oversized restore archive fixture.');
+
+        $zip->addFromString(
+            'calendars/user-999/999-oversized.ics',
+            str_repeat("A", 2048)
+        );
+        $zip->close();
+
+        $upload = UploadedFile::fake()->createWithContent(
+            'restore.zip',
+            (string) file_get_contents($archivePath),
+        );
+
+        $response = $this->actingAs($admin)
+            ->post('/api/admin/backups/restore', [
+                'backup' => $upload,
+                'mode' => 'merge',
+                'dry_run' => '0',
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('status', 'failed');
+
+        $this->assertStringContainsString(
+            'maximum allowed uncompressed size',
+            (string) $response->json('reason', '')
+        );
+    }
+
     private function seedBackupData(): void
     {
         $owner = User::factory()->create();
