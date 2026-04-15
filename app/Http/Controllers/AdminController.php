@@ -10,6 +10,7 @@ use App\Models\AppSetting;
 use App\Models\Calendar;
 use App\Models\ContactChangeRequest;
 use App\Models\User;
+use App\Services\AdminAuditLogService;
 use App\Services\Backups\BackupRestoreDispatchService;
 use App\Services\Backups\BackupRunDispatchService;
 use App\Services\Backups\BackupSettingsService;
@@ -36,6 +37,7 @@ class AdminController extends Controller
         private readonly BackupSettingsService $backupSettings,
         private readonly BackupRunDispatchService $backupRunDispatchService,
         private readonly BackupRestoreDispatchService $backupRestoreDispatchService,
+        private readonly AdminAuditLogService $auditLog,
         private readonly TwoFactorSettingsService $twoFactorSettings,
         private readonly TwoFactorService $twoFactor,
         private readonly UserOnboardingService $onboarding,
@@ -328,14 +330,32 @@ class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
         ]);
 
+        $beforeEnabled = $this->registrationSettings->isPublicRegistrationEnabled();
+        $beforeRequireApproval = $this->registrationSettings->isPublicRegistrationApprovalRequired();
+
         $this->registrationSettings->setPublicRegistrationEnabled(
             enabled: (bool) $data['enabled'],
             actor: $request->user()
         );
 
+        $enabled = $this->registrationSettings->isPublicRegistrationEnabled();
+        $requireApproval = $this->registrationSettings->isPublicRegistrationApprovalRequired();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.public_registration.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $enabled,
+                'before_require_approval' => $beforeRequireApproval,
+                'require_approval' => $requireApproval,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->registrationSettings->isPublicRegistrationEnabled(),
-            'require_approval' => $this->registrationSettings->isPublicRegistrationApprovalRequired(),
+            'enabled' => $enabled,
+            'require_approval' => $requireApproval,
         ]);
     }
 
@@ -348,13 +368,27 @@ class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
         ]);
 
+        $beforeEnabled = $this->registrationSettings->isPublicRegistrationApprovalRequired();
+
         $this->registrationSettings->setPublicRegistrationApprovalRequired(
             enabled: (bool) $data['enabled'],
             actor: $request->user()
         );
 
+        $enabled = $this->registrationSettings->isPublicRegistrationApprovalRequired();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.registration_approval.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $enabled,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->registrationSettings->isPublicRegistrationApprovalRequired(),
+            'enabled' => $enabled,
         ]);
     }
 
@@ -367,13 +401,27 @@ class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
         ]);
 
+        $beforeEnabled = $this->registrationSettings->isOwnerShareManagementEnabled();
+
         $this->registrationSettings->setOwnerShareManagementEnabled(
             enabled: (bool) $data['enabled'],
             actor: $request->user()
         );
 
+        $enabled = $this->registrationSettings->isOwnerShareManagementEnabled();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.owner_share_management.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $enabled,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->registrationSettings->isOwnerShareManagementEnabled(),
+            'enabled' => $enabled,
         ]);
     }
 
@@ -386,13 +434,27 @@ class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
         ]);
 
+        $beforeEnabled = $this->registrationSettings->isDavCompatibilityModeEnabled();
+
         $this->registrationSettings->setDavCompatibilityModeEnabled(
             enabled: (bool) $data['enabled'],
             actor: $request->user()
         );
 
+        $enabled = $this->registrationSettings->isDavCompatibilityModeEnabled();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.dav_compatibility_mode.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $enabled,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->registrationSettings->isDavCompatibilityModeEnabled(),
+            'enabled' => $enabled,
         ]);
     }
 
@@ -404,6 +466,8 @@ class AdminController extends Controller
         $data = $request->validate([
             'enabled' => ['required', 'boolean'],
         ]);
+
+        $beforeEnabled = $this->registrationSettings->isContactManagementEnabled();
 
         if (
             (bool) $data['enabled']
@@ -420,8 +484,20 @@ class AdminController extends Controller
             actor: $request->user()
         );
 
+        $enabled = $this->registrationSettings->isContactManagementEnabled();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.contact_management.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $enabled,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->registrationSettings->isContactManagementEnabled(),
+            'enabled' => $enabled,
         ]);
     }
 
@@ -434,6 +510,7 @@ class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
         ]);
 
+        $beforeEnabled = $this->registrationSettings->isContactChangeModerationEnabled();
         $enabled = (bool) $data['enabled'];
 
         if (
@@ -465,8 +542,20 @@ class AdminController extends Controller
             actor: $request->user()
         );
 
+        $currentEnabled = $this->registrationSettings->isContactChangeModerationEnabled();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.contact_change_moderation.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $currentEnabled,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->registrationSettings->isContactChangeModerationEnabled(),
+            'enabled' => $currentEnabled,
         ]);
     }
 
@@ -479,13 +568,27 @@ class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
         ]);
 
+        $beforeEnabled = $this->registrationSettings->isPrivateWorkingSetEnabled();
+
         $this->registrationSettings->setPrivateWorkingSetEnabled(
             enabled: (bool) $data['enabled'],
             actor: $request->user()
         );
 
+        $enabled = $this->registrationSettings->isPrivateWorkingSetEnabled();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.private_working_set.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $enabled,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->registrationSettings->isPrivateWorkingSetEnabled(),
+            'enabled' => $enabled,
         ]);
     }
 
@@ -498,14 +601,30 @@ class AdminController extends Controller
             'enabled' => ['required', 'boolean'],
         ]);
 
+        $beforeEnabled = $this->twoFactorSettings->isEnforced();
+
         $this->twoFactorSettings->setEnforced(
             enabled: (bool) $data['enabled'],
             actor: $request->user(),
         );
 
+        $enabled = $this->twoFactorSettings->isEnforced();
+        $gracePeriodDays = $this->twoFactorSettings->gracePeriodDays();
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.setting.two_factor_enforcement.updated',
+            context: [
+                'before_enabled' => $beforeEnabled,
+                'enabled' => $enabled,
+                'grace_period_days' => $gracePeriodDays,
+            ],
+            request: $request,
+        );
+
         return response()->json([
-            'enabled' => $this->twoFactorSettings->isEnforced(),
-            'grace_period_days' => $this->twoFactorSettings->gracePeriodDays(),
+            'enabled' => $enabled,
+            'grace_period_days' => $gracePeriodDays,
         ]);
     }
 
@@ -623,6 +742,8 @@ class AdminController extends Controller
      */
     public function setBackupSettings(Request $request): JsonResponse
     {
+        $before = $this->backupSettings->current();
+
         $data = $request->validate([
             'enabled' => ['required', 'boolean'],
             'local_enabled' => ['required', 'boolean'],
@@ -656,7 +777,19 @@ class AdminController extends Controller
             abort(422, __('backups.at_least_one_retention_tier_gt_zero'));
         }
 
-        return response()->json($this->backupSettings->update($data, $request->user()));
+        $updated = $this->backupSettings->update($data, $request->user());
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.backup.settings.updated',
+            context: [
+                'before' => $before,
+                'after' => $updated,
+            ],
+            request: $request,
+        );
+
+        return response()->json($updated);
     }
 
     /**
@@ -677,6 +810,13 @@ class AdminController extends Controller
                 'reason' => __('backups.backup_failed_reason', ['reason' => $throwable->getMessage()]),
             ], 422);
         }
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.backup.run.queued',
+            context: $queued,
+            request: $request,
+        );
 
         return response()->json($queued, 202);
     }
@@ -741,6 +881,15 @@ class AdminController extends Controller
                 'reason' => __('backups.restore_failed_reason', ['reason' => $throwable->getMessage()]),
             ], 422);
         }
+
+        $this->auditLog->record(
+            actor: $request->user(),
+            action: 'admin.backup.restore.queued',
+            context: array_merge($queued, [
+                'fallback_owner_id' => $fallbackOwnerId,
+            ]),
+            request: $request,
+        );
 
         return response()->json($queued, 202);
     }

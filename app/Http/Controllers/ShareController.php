@@ -8,6 +8,7 @@ use App\Models\AddressBook;
 use App\Models\Calendar;
 use App\Models\ResourceShare;
 use App\Models\User;
+use App\Services\AdminAuditLogService;
 use App\Services\AddressBookMirrorService;
 use App\Services\AddressBookPrivateWorkingSetService;
 use App\Services\RegistrationSettingsService;
@@ -20,6 +21,7 @@ class ShareController extends Controller
         private readonly RegistrationSettingsService $settings,
         private readonly AddressBookMirrorService $mirrorService,
         private readonly AddressBookPrivateWorkingSetService $privateWorkingSetService,
+        private readonly AdminAuditLogService $auditLog,
     ) {}
 
     /**
@@ -173,6 +175,12 @@ class ShareController extends Controller
             }
         }
 
+        $existingShare = ResourceShare::query()->where([
+            'resource_type' => $resourceType,
+            'resource_id' => $data['resource_id'],
+            'shared_with_id' => $target->id,
+        ])->first();
+
         $share = ResourceShare::query()->updateOrCreate(
             [
                 'resource_type' => $resourceType,
@@ -189,6 +197,22 @@ class ShareController extends Controller
             $this->mirrorService->syncUserConfig($target);
             $this->privateWorkingSetService->syncUserConfig($target);
         }
+
+        $this->auditLog->record(
+            actor: $actor,
+            action: 'admin.share.upserted',
+            context: [
+                'operation' => $existingShare ? 'updated' : 'created',
+                'share_id' => (int) $share->id,
+                'resource_type' => $resourceType->value,
+                'resource_id' => (int) $data['resource_id'],
+                'owner_id' => (int) $resourceOwnerId,
+                'shared_with_id' => (int) $target->id,
+                'previous_permission' => $existingShare?->permission?->value,
+                'permission' => $share->permission->value,
+            ],
+            request: $request,
+        );
 
         return response()->json($share->fresh(), 201);
     }
@@ -210,6 +234,14 @@ class ShareController extends Controller
 
         $sharedWith = $share->sharedWith;
         $resourceType = $share->resource_type;
+        $shareContext = [
+            'share_id' => (int) $share->id,
+            'resource_type' => $resourceType->value,
+            'resource_id' => (int) $share->resource_id,
+            'owner_id' => (int) $share->owner_id,
+            'shared_with_id' => (int) $share->shared_with_id,
+            'permission' => $share->permission->value,
+        ];
 
         $share->delete();
 
@@ -217,6 +249,13 @@ class ShareController extends Controller
             $this->mirrorService->syncUserConfig($sharedWith);
             $this->privateWorkingSetService->syncUserConfig($sharedWith);
         }
+
+        $this->auditLog->record(
+            actor: $actor,
+            action: 'admin.share.deleted',
+            context: $shareContext,
+            request: $request,
+        );
 
         return response()->json(['ok' => true]);
     }
