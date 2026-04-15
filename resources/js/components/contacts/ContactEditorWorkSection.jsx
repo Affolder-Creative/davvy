@@ -40,7 +40,7 @@ export default function ContactEditorWorkSection({
       {isOpen ? (
         <div className="mt-3 px-1 pb-1">
           <div className="grid gap-3 md:grid-cols-2">
-            <Field label={t("editor.workSection.field.company")}>
+            <Field label={t("editor.workSection.field.company")} required>
               <input
                 className="input"
                 value={form.company}

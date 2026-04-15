@@ -51,7 +51,7 @@ export default function ContactEditorNameSection({
                 />
               </Field>
             ) : null}
-            <Field label={t("editor.nameSection.field.first")}>
+            <Field label={t("editor.nameSection.field.first")} required>
               <input
                 className="input"
                 value={form.first_name}
@@ -71,7 +71,7 @@ export default function ContactEditorNameSection({
                 />
               </Field>
             ) : null}
-            <Field label={t("editor.nameSection.field.last")}>
+            <Field label={t("editor.nameSection.field.last")} required>
               <input
                 className="input"
                 value={form.last_name}

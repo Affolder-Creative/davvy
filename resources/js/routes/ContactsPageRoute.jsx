@@ -78,8 +78,12 @@ function InfoCard({ title, value, helper, copyable = false }) {
   );
 }
 
-function Field({ label, children }) {
-  return <FieldComponent label={label}>{children}</FieldComponent>;
+function Field({ label, required = false, children }) {
+  return (
+    <FieldComponent label={label} required={required}>
+      {children}
+    </FieldComponent>
+  );
 }
 
 function LabeledValueEditor({

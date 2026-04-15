@@ -4,10 +4,17 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ContactEditorNameSection from "./ContactEditorNameSection";
 
-function FieldStub({ label, children }) {
+function FieldStub({ label, required = false, children }) {
   return (
     <label>
-      <span>{label}</span>
+      <span>
+        {label}
+        {required ? (
+          <span className="required-indicator" aria-hidden="true">
+            *
+          </span>
+        ) : null}
+      </span>
       {children}
     </label>
   );
@@ -47,8 +54,14 @@ describe("ContactEditorNameSection", () => {
 
     expect(screen.getByLabelText("Prefix")).toBeInTheDocument();
     expect(screen.getByLabelText("Nickname")).toBeInTheDocument();
+    expect(screen.getByLabelText(/First Name/).closest("label")).toHaveTextContent(
+      "*",
+    );
+    expect(screen.getByLabelText(/Last Name/).closest("label")).toHaveTextContent(
+      "*",
+    );
 
-    await user.type(screen.getByLabelText("First Name"), "A");
+    await user.type(screen.getByLabelText(/First Name/), "A");
     expect(props.updateFormField).toHaveBeenCalledWith("first_name", "A");
   });
 

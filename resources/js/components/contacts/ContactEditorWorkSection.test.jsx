@@ -4,10 +4,17 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ContactEditorWorkSection from "./ContactEditorWorkSection";
 
-function FieldStub({ label, children }) {
+function FieldStub({ label, required = false, children }) {
   return (
     <label>
-      <span>{label}</span>
+      <span>
+        {label}
+        {required ? (
+          <span className="required-indicator" aria-hidden="true">
+            *
+          </span>
+        ) : null}
+      </span>
       {children}
     </label>
   );
@@ -40,8 +47,11 @@ describe("ContactEditorWorkSection", () => {
     await user.click(screen.getByRole("button", { name: /work/i }));
     expect(props.onToggle).toHaveBeenCalledTimes(1);
 
-    await user.type(screen.getByLabelText("Company"), "A");
+    await user.type(screen.getByLabelText(/Company/), "A");
     expect(props.updateFormField).toHaveBeenCalledWith("company", "A");
+    expect(screen.getByLabelText(/Company/).closest("label")).toHaveTextContent(
+      "*",
+    );
     expect(screen.getByLabelText("Department")).toBeInTheDocument();
   });
 
