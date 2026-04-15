@@ -8,23 +8,20 @@ ARG PHP_IMAGE=php:8.4-fpm-alpine@sha256:b7bad36533116d6360d00c3b12820be69bf7655a
 FROM --platform=$BUILDPLATFORM ${COMPOSER_IMAGE} AS vendor-prod
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN --mount=type=cache,id=composer-cache,target=/tmp/composer-cache \
-    COMPOSER_CACHE_DIR=/tmp/composer-cache composer install --no-dev --no-scripts --prefer-dist --no-interaction \
-    && COMPOSER_CACHE_DIR=/tmp/composer-cache composer check-platform-reqs
+RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction \
+    && composer check-platform-reqs
 
 FROM --platform=$BUILDPLATFORM ${COMPOSER_IMAGE} AS vendor-dev
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN --mount=type=cache,id=composer-cache,target=/tmp/composer-cache \
-    COMPOSER_CACHE_DIR=/tmp/composer-cache composer install --no-scripts --prefer-dist --no-interaction \
-    && COMPOSER_CACHE_DIR=/tmp/composer-cache composer check-platform-reqs
+RUN composer install --no-scripts --prefer-dist --no-interaction \
+    && composer check-platform-reqs
 
 FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS frontend
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY scripts/check-react-major-parity.mjs ./scripts/check-react-major-parity.mjs
-RUN --mount=type=cache,id=npm-cache,target=/root/.npm \
-    node ./scripts/check-react-major-parity.mjs \
+RUN node ./scripts/check-react-major-parity.mjs \
     && npm ci --no-audit --no-fund
 COPY resources ./resources
 COPY vite.config.js tailwind.config.js postcss.config.js ./
