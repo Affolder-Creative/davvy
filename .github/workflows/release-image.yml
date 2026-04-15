@@ -24,6 +24,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
+  DRY_RUN_RETENTION_COUNT: "20"
 
 jobs:
   php-quality-gate:
@@ -59,18 +60,21 @@ jobs:
           cache-from: type=gha,scope=release-smoke-amd64
           cache-to: type=gha,mode=max,scope=release-smoke-amd64
 
-  publish:
-    name: Build and Publish GHCR Image
-    if: ${{ github.event_name == 'release' }}
+  prepare-build-metadata:
+    name: Prepare publish metadata
     needs:
       - php-quality-gate
       - dockerized-tests-gate
       - container-build-gate
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    env:
-      COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
-      COOLIFY_WEBHOOK_TOKEN: ${{ secrets.COOLIFY_WEBHOOK_TOKEN }}
+    outputs:
+      image_name: ${{ steps.refs.outputs.image_name }}
+      publish_image_ref: ${{ steps.refs.outputs.publish_image_ref }}
+      cache_image_ref: ${{ steps.refs.outputs.cache_image_ref }}
+      is_release: ${{ steps.refs.outputs.is_release }}
+      effective_tag: ${{ steps.effective_tag.outputs.tag }}
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
 
     steps:
       - name: Check out repository
@@ -80,8 +84,69 @@ jobs:
         id: image
         run: echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+      - name: Resolve image references
+        id: refs
+        env:
+          IMAGE_NAME: ${{ steps.image.outputs.name }}
+        run: |
+          set -euo pipefail
+          echo "image_name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "cache_image_ref=${REGISTRY}/${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "is_release=true" >> "$GITHUB_OUTPUT"
+            echo "publish_image_ref=${REGISTRY}/${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_release=false" >> "$GITHUB_OUTPUT"
+            echo "publish_image_ref=${REGISTRY}/${IMAGE_NAME}-dry-run" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Resolve effective tag value
+        id: effective_tag
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${{ inputs.dry_run_tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Determine latest tag eligibility
+        id: latest
+        run: |
+          if [ "${{ github.event_name == 'release' && github.event.release.prerelease == false }}" = "true" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ steps.refs.outputs.publish_image_ref }}
+          tags: |
+            type=raw,value=${{ steps.effective_tag.outputs.tag }}
+            type=semver,pattern={{version}},value=${{ steps.effective_tag.outputs.tag }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.effective_tag.outputs.tag }}
+            type=semver,pattern={{major}},value=${{ steps.effective_tag.outputs.tag }}
+            type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ steps.latest.outputs.enabled == 'true' }}
+
+  build-amd64:
+    name: Build amd64 image
+    needs:
+      - prepare-build-metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -93,35 +158,236 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v6
-        with:
-          images: ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
-          tags: |
-            type=raw,value=${{ github.event.release.tag_name }}
-            type=semver,pattern={{version}},value=${{ github.event.release.tag_name }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ github.event.release.tag_name }}
-            type=semver,pattern={{major}},value=${{ github.event.release.tag_name }}
-            type=sha,prefix=sha-
-            type=raw,value=latest,enable=${{ github.event.release.prerelease == false }}
-
-      - name: Build and push image
+      - name: Build and push amd64 image by digest
         id: build
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: true
-          labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/amd64
+          labels: ${{ needs.prepare-build-metadata.outputs.labels }}
+          outputs: type=image,name=${{ needs.prepare-build-metadata.outputs.publish_image_ref }},push-by-digest=true,name-canonical=true,push=true
           cache-from: |
-            type=gha,scope=release-multiarch
+            type=gha,scope=release-amd64
             type=gha,scope=release-smoke-amd64
-          cache-to: type=gha,mode=max,scope=release-multiarch
+            type=registry,ref=${{ needs.prepare-build-metadata.outputs.cache_image_ref }}:buildcache-amd64
+          cache-to: |
+            type=gha,mode=max,scope=release-amd64
+            type=registry,ref=${{ needs.prepare-build-metadata.outputs.cache_image_ref }}:buildcache-amd64,mode=max
+
+      - name: Smoke test amd64 runtime image
+        env:
+          IMAGE_REF: ${{ needs.prepare-build-metadata.outputs.publish_image_ref }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          image_ref="${IMAGE_REF}@${DIGEST}"
+
+          docker run --rm --platform linux/amd64 "${image_ref}" php -v
+          docker run --rm --platform linux/amd64 "${image_ref}" sh -c "php -m | grep -qi '^imagick$'"
+
+          container_id="$(docker run -d --rm --platform linux/amd64 \
+            -e RUN_DB_MIGRATIONS=false \
+            -e RUN_SCHEDULER=false \
+            -e RUN_QUEUE_WORKER=false \
+            -e APP_ENV=testing \
+            -e APP_URL=http://localhost \
+            -e APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= \
+            -e PORT=8080 \
+            -p 18080:8080 \
+            "${image_ref}")"
+
+          cleanup() {
+            docker logs "${container_id}" || true
+            docker stop "${container_id}" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for _ in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:18080/up" >/dev/null; then
+              docker stop "${container_id}" >/dev/null 2>&1 || true
+              trap - EXIT
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Runtime health endpoint failed for ${image_ref}" >&2
+          exit 1
+
+  build-arm64:
+    name: Build arm64 image
+    needs:
+      - prepare-build-metadata
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push arm64 image by digest
+        id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          labels: ${{ needs.prepare-build-metadata.outputs.labels }}
+          outputs: type=image,name=${{ needs.prepare-build-metadata.outputs.publish_image_ref }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: |
+            type=gha,scope=release-arm64
+            type=registry,ref=${{ needs.prepare-build-metadata.outputs.cache_image_ref }}:buildcache-arm64
+          cache-to: |
+            type=gha,mode=max,scope=release-arm64
+            type=registry,ref=${{ needs.prepare-build-metadata.outputs.cache_image_ref }}:buildcache-arm64,mode=max
+
+      - name: Smoke test arm64 runtime image
+        env:
+          IMAGE_REF: ${{ needs.prepare-build-metadata.outputs.publish_image_ref }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          image_ref="${IMAGE_REF}@${DIGEST}"
+
+          docker run --rm --platform linux/arm64 "${image_ref}" php -v
+          docker run --rm --platform linux/arm64 "${image_ref}" sh -c "php -m | grep -qi '^imagick$'"
+
+          container_id="$(docker run -d --rm --platform linux/arm64 \
+            -e RUN_DB_MIGRATIONS=false \
+            -e RUN_SCHEDULER=false \
+            -e RUN_QUEUE_WORKER=false \
+            -e APP_ENV=testing \
+            -e APP_URL=http://localhost \
+            -e APP_KEY=base64:MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI= \
+            -e PORT=8080 \
+            -p 18080:8080 \
+            "${image_ref}")"
+
+          cleanup() {
+            docker logs "${container_id}" || true
+            docker stop "${container_id}" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for _ in $(seq 1 30); do
+            if curl -fsS "http://127.0.0.1:18080/up" >/dev/null; then
+              docker stop "${container_id}" >/dev/null 2>&1 || true
+              trap - EXIT
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Runtime health endpoint failed for ${image_ref}" >&2
+          exit 1
+
+  publish-manifest:
+    name: Publish multi-arch manifest
+    needs:
+      - prepare-build-metadata
+      - build-amd64
+      - build-arm64
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
+      COOLIFY_WEBHOOK_TOKEN: ${{ secrets.COOLIFY_WEBHOOK_TOKEN }}
+    outputs:
+      manifest_digest: ${{ steps.verify.outputs.manifest_digest }}
+      verified_tag: ${{ steps.verify.outputs.verified_tag }}
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create multi-arch manifests for tags
+        env:
+          IMAGE_REF: ${{ needs.prepare-build-metadata.outputs.publish_image_ref }}
+          PUBLISHED_TAGS: ${{ needs.prepare-build-metadata.outputs.tags }}
+          AMD64_DIGEST: ${{ needs.build-amd64.outputs.digest }}
+          ARM64_DIGEST: ${{ needs.build-arm64.outputs.digest }}
+        run: |
+          set -euo pipefail
+          amd_ref="${IMAGE_REF}@${AMD64_DIGEST}"
+          arm_ref="${IMAGE_REF}@${ARM64_DIGEST}"
+
+          while IFS= read -r tag; do
+            [ -n "${tag}" ] || continue
+            docker buildx imagetools create \
+              --tag "${tag}" \
+              "${amd_ref}" \
+              "${arm_ref}"
+          done <<< "${PUBLISHED_TAGS}"
+
+      - name: Verify manifest platforms and capture digest
+        id: verify
+        env:
+          PUBLISHED_TAGS: ${{ needs.prepare-build-metadata.outputs.tags }}
+        run: |
+          set -euo pipefail
+
+          verify_tag="$(printf '%s\n' "${PUBLISHED_TAGS}" | sed -n '/./{p;q;}')"
+          if [ -z "${verify_tag}" ]; then
+            echo "No tags were produced by docker/metadata-action." >&2
+            exit 1
+          fi
+
+          inspect_json="$(docker buildx imagetools inspect "${verify_tag}" --format '{{json .}}')"
+
+          INSPECT_JSON="${inspect_json}" python3 - <<'PY'
+          import json
+          import os
+          import sys
+
+          payload = json.loads(os.environ["INSPECT_JSON"])
+          manifests = payload.get("manifest", {}).get("manifests", [])
+          platforms = {
+              (entry.get("platform", {}).get("os"), entry.get("platform", {}).get("architecture"))
+              for entry in manifests
+          }
+
+          required = [("linux", "amd64"), ("linux", "arm64")]
+          missing = [f"{os_name}/{arch}" for os_name, arch in required if (os_name, arch) not in platforms]
+          if missing:
+              print("Missing required platform(s): " + ", ".join(missing), file=sys.stderr)
+              sys.exit(1)
+
+          digest = payload.get("manifest", {}).get("digest")
+          if not digest:
+              print("Unable to determine manifest digest from inspect output.", file=sys.stderr)
+              sys.exit(1)
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as fh:
+              fh.write(f"manifest_digest={digest}\n")
+          PY
+
+          echo "verified_tag=${verify_tag}" >> "$GITHUB_OUTPUT"
 
       - name: Determine attestation support
+        if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' }}
         id: attest_support
         run: |
           if [ "${{ github.event.repository.private }}" = "true" ] && [ "${{ github.event.repository.owner.type }}" = "User" ]; then
@@ -131,15 +397,15 @@ jobs:
           fi
 
       - name: Attest build provenance
-        if: ${{ steps.attest_support.outputs.enabled == 'true' }}
+        if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' && steps.attest_support.outputs.enabled == 'true' }}
         uses: actions/attest-build-provenance@v4
         with:
-          subject-name: ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
-          subject-digest: ${{ steps.build.outputs.digest }}
+          subject-name: ${{ needs.prepare-build-metadata.outputs.publish_image_ref }}
+          subject-digest: ${{ steps.verify.outputs.manifest_digest }}
           push-to-registry: true
 
       - name: Trigger Coolify webhook (optional)
-        if: ${{ env.COOLIFY_WEBHOOK_URL != '' }}
+        if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' && env.COOLIFY_WEBHOOK_URL != '' }}
         run: |
           set -euo pipefail
           if [ -n "${COOLIFY_WEBHOOK_TOKEN:-}" ]; then
@@ -150,21 +416,23 @@ jobs:
             curl -fsS -X POST "${COOLIFY_WEBHOOK_URL}"
           fi
 
-      - name: Publish workflow summary
+      - name: Publish workflow summary (release)
+        if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' }}
         env:
-          PUBLISHED_TAGS: ${{ steps.meta.outputs.tags }}
+          PUBLISHED_TAGS: ${{ needs.prepare-build-metadata.outputs.tags }}
         run: |
           {
-            echo "## GHCR image published"
+            echo "## GHCR multi-arch image published"
             echo ""
-            echo "Image: \`${{ env.REGISTRY }}/${{ steps.image.outputs.name }}\`"
+            echo "Image: \`${{ needs.prepare-build-metadata.outputs.publish_image_ref }}\`"
             echo ""
             echo "Tags:"
             while IFS= read -r line; do
               [ -n "$line" ] && echo "- \`$line\`"
             done <<< "$PUBLISHED_TAGS"
             echo ""
-            echo "Digest: \`${{ steps.build.outputs.digest }}\`"
+            echo "Verified manifest tag: \`${{ steps.verify.outputs.verified_tag }}\`"
+            echo "Manifest digest: \`${{ steps.verify.outputs.manifest_digest }}\`"
             echo ""
             if [ "${{ steps.attest_support.outputs.enabled }}" = "true" ]; then
               echo "Attestation: published"
@@ -179,74 +447,110 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
-  dry-run:
-    name: Release Dry Run - Validate publish stage
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    needs:
-      - php-quality-gate
-      - dockerized-tests-gate
-      - container-build-gate
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
-
-      - name: Normalize image name
-        id: image
-        run: echo "name=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Extract Docker metadata (dry run)
-        id: meta
-        uses: docker/metadata-action@v6
-        with:
-          images: ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
-          tags: |
-            type=raw,value=${{ inputs.dry_run_tag }}
-            type=semver,pattern={{version}},value=${{ inputs.dry_run_tag }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.dry_run_tag }}
-            type=semver,pattern={{major}},value=${{ inputs.dry_run_tag }}
-            type=sha,prefix=sha-
-
-      - name: Build image (dry run, no push)
-        id: build
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: false
-          labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.tags }}
-          cache-from: |
-            type=gha,scope=release-multiarch
-            type=gha,scope=release-smoke-amd64
-          cache-to: type=gha,mode=max,scope=release-multiarch
-
-      - name: Dry-run workflow summary
+      - name: Publish workflow summary (dry run)
+        if: ${{ needs.prepare-build-metadata.outputs.is_release != 'true' }}
         env:
-          DRY_RUN_TAGS: ${{ steps.meta.outputs.tags }}
+          DRY_RUN_TAGS: ${{ needs.prepare-build-metadata.outputs.tags }}
         run: |
           {
             echo "## Release dry run passed"
             echo ""
-            echo "Image: \`${{ env.REGISTRY }}/${{ steps.image.outputs.name }}\`"
+            echo "Dry-run image namespace: \`${{ needs.prepare-build-metadata.outputs.publish_image_ref }}\`"
             echo ""
             echo "Resolved tags:"
             while IFS= read -r line; do
               [ -n "$line" ] && echo "- \`$line\`"
             done <<< "$DRY_RUN_TAGS"
             echo ""
-            echo "Push: skipped"
-            echo "Attestation: skipped"
-            echo "Coolify webhook: skipped"
+            echo "Verified manifest tag: \`${{ steps.verify.outputs.verified_tag }}\`"
+            echo "Manifest digest: \`${{ steps.verify.outputs.manifest_digest }}\`"
             echo ""
             echo "Dry-run input tag: \`${{ inputs.dry_run_tag }}\`"
+            echo ""
+            echo "Note: dry-run builds publish to a dedicated image namespace ending with \`-dry-run\`."
           } >> "$GITHUB_STEP_SUMMARY"
+
+  cleanup-dry-run-images:
+    name: Cleanup old dry-run image versions
+    if: ${{ needs.prepare-build-metadata.outputs.is_release != 'true' }}
+    needs:
+      - prepare-build-metadata
+      - publish-manifest
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Prune stale GHCR dry-run package versions
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const packageName = `${context.repo.repo.toLowerCase()}-dry-run`;
+            const keep = Number(process.env.DRY_RUN_RETENTION_COUNT || "20");
+            const isOrg = context.payload.repository?.owner?.type === "Organization";
+
+            const listMethod = isOrg
+              ? github.rest.packages.getAllPackageVersionsForPackageOwnedByOrg
+              : github.rest.packages.getAllPackageVersionsForPackageOwnedByUser;
+            const deleteMethod = isOrg
+              ? github.rest.packages.deletePackageVersionForOrg
+              : github.rest.packages.deletePackageVersionForUser;
+
+            const baseParams = {
+              package_type: "container",
+              package_name: packageName,
+            };
+            if (isOrg) {
+              baseParams.org = owner;
+            } else {
+              baseParams.username = owner;
+            }
+
+            let versions;
+            try {
+              versions = await github.paginate(listMethod, {
+                ...baseParams,
+                per_page: 100,
+              });
+            } catch (error) {
+              if (error.status === 404) {
+                core.info(`No dry-run package found for ${owner}/${packageName}; skipping cleanup.`);
+                return;
+              }
+              throw error;
+            }
+
+            versions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const stale = versions.slice(keep);
+
+            if (stale.length === 0) {
+              core.info(`Dry-run package retention satisfied: ${versions.length} version(s) <= keep=${keep}.`);
+              return;
+            }
+
+            core.info(`Deleting ${stale.length} stale dry-run version(s); keeping latest ${keep}.`);
+            let deleted = 0;
+            for (const version of stale) {
+              const tags = (version.metadata?.container?.tags || []).join(", ");
+              try {
+                await deleteMethod({
+                  ...baseParams,
+                  package_version_id: version.id,
+                });
+                deleted += 1;
+                core.info(`Deleted version id=${version.id}${tags ? ` tags=[${tags}]` : ""}`);
+              } catch (error) {
+                core.warning(`Failed to delete version id=${version.id}: ${error.message}`);
+              }
+            }
+
+            core.summary
+              .addHeading("Dry-run image cleanup")
+              .addRaw(`Package: \`${owner}/${packageName}\`\n`)
+              .addRaw(`Retention: keep latest ${keep}\n`)
+              .addRaw(`Deleted: ${deleted}\n`)
+              .write();
