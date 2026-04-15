@@ -5,23 +5,26 @@ ARG COMPOSER_IMAGE=composer:2@sha256:f0809732b2188154b3faa8e44ab900595acb0b09cd0
 ARG NODE_IMAGE=node:24-alpine@sha256:7fddd9ddeae8196abf4a3ef2de34e11f7b1a722119f91f28ddf1e99dcafdf114
 ARG PHP_IMAGE=php:8.4-fpm-alpine@sha256:b7bad36533116d6360d00c3b12820be69bf7655af6057f6222b57befa5eee5c4
 
-FROM ${COMPOSER_IMAGE} AS vendor-prod
+FROM --platform=$BUILDPLATFORM ${COMPOSER_IMAGE} AS vendor-prod
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction \
-    && composer check-platform-reqs
+RUN --mount=type=cache,target=/tmp/composer-cache \
+    COMPOSER_CACHE_DIR=/tmp/composer-cache composer install --no-dev --no-scripts --prefer-dist --no-interaction \
+    && COMPOSER_CACHE_DIR=/tmp/composer-cache composer check-platform-reqs
 
-FROM ${COMPOSER_IMAGE} AS vendor-dev
+FROM --platform=$BUILDPLATFORM ${COMPOSER_IMAGE} AS vendor-dev
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-scripts --prefer-dist --no-interaction \
-    && composer check-platform-reqs
+RUN --mount=type=cache,target=/tmp/composer-cache \
+    COMPOSER_CACHE_DIR=/tmp/composer-cache composer install --no-scripts --prefer-dist --no-interaction \
+    && COMPOSER_CACHE_DIR=/tmp/composer-cache composer check-platform-reqs
 
-FROM ${NODE_IMAGE} AS frontend
+FROM --platform=$BUILDPLATFORM ${NODE_IMAGE} AS frontend
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY scripts/check-react-major-parity.mjs ./scripts/check-react-major-parity.mjs
-RUN node ./scripts/check-react-major-parity.mjs \
+RUN --mount=type=cache,target=/root/.npm \
+    node ./scripts/check-react-major-parity.mjs \
     && npm ci --no-audit --no-fund
 COPY resources ./resources
 COPY vite.config.js tailwind.config.js postcss.config.js ./
