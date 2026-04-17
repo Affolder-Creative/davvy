@@ -83,6 +83,8 @@ class ContactPhotoManagementTest extends TestCase
             ->firstOrFail();
         $cardData = (string) $assignment->card?->data;
         $this->assertStringContainsString('PHOTO;ENCODING=b', $cardData);
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*TYPE=JPEG[^\n]*:/', $cardData);
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*MEDIATYPE=image\\/jpeg[^\n]*:/i', $cardData);
     }
 
     public function test_updating_contact_with_photo_remove_deletes_file_and_card_photo(): void
@@ -274,7 +276,10 @@ class ContactPhotoManagementTest extends TestCase
             ->where('contact_id', $contact->id)
             ->where('address_book_id', $book->id)
             ->firstOrFail();
-        $this->assertStringContainsString('PHOTO;ENCODING=b', (string) $assignment->card?->data);
+        $cardData = (string) $assignment->card?->data;
+        $this->assertStringContainsString('PHOTO;ENCODING=b', $cardData);
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*TYPE=JPEG[^\n]*:/', $cardData);
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*MEDIATYPE=image\\/jpeg[^\n]*:/i', $cardData);
     }
 
     private function createContactWithPhoto(User $user, AddressBook $book): Contact

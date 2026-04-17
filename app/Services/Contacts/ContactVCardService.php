@@ -464,6 +464,11 @@ class ContactVCardService
             $photoProperty = $vCard->add('PHOTO', base64_encode($photo['binary']));
             $photoProperty['ENCODING'] = 'b';
             $photoProperty['MEDIATYPE'] = $photo['mime'];
+
+            $photoType = $this->photoTypeFromMime($photo['mime']);
+            if ($photoType !== null) {
+                $photoProperty['TYPE'] = $photoType;
+            }
         }
 
         $data = $vCard->serialize();
@@ -812,6 +817,24 @@ class ContactVCardService
             'JPEG', 'JPG' => 'image/jpeg',
             'PNG' => 'image/png',
             'WEBP' => 'image/webp',
+            default => null,
+        };
+    }
+
+    /**
+     * Resolves PHOTO TYPE parameter token from MIME value.
+     */
+    private function photoTypeFromMime(?string $mime): ?string
+    {
+        $normalized = strtolower(trim((string) ($mime ?? '')));
+        if ($normalized === '') {
+            return null;
+        }
+
+        return match ($normalized) {
+            'image/jpeg', 'image/jpg' => 'JPEG',
+            'image/png' => 'PNG',
+            'image/webp' => 'WEBP',
             default => null,
         };
     }
