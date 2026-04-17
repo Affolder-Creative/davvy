@@ -136,6 +136,8 @@ class AppleCompatAddressBookMirrorTest extends TestCase
 
         $this->assertMatchesRegularExpression('/PHOTO;[^\n]*TYPE=JPEG[^\n]*:/', (string) $mirrored->data);
         $this->assertMatchesRegularExpression('/PHOTO;[^\n]*MEDIATYPE=image\\/jpeg[^\n]*:/i', (string) $mirrored->data);
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*VALUE=BINARY[^\n]*:/i', (string) $mirrored->data);
+        $this->assertSame(0, preg_match('/PHOTO;[^\n]*VALUE=URI[^\n]*:/i', (string) $mirrored->data));
     }
 
     public function test_enabling_apple_compat_adds_photo_type_to_data_uri_photo_without_explicit_type(): void

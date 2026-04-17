@@ -706,6 +706,17 @@ class AddressBookMirrorService
     private function normalizePhotoCompatibilityParameters(VCard $vcard): void
     {
         foreach ($vcard->select('PHOTO') as $photoProperty) {
+            $rawValue = trim((string) $photoProperty);
+            $valueType = strtoupper(trim((string) ($photoProperty['VALUE'] ?? '')));
+            if (in_array($valueType, ['', 'URI'], true) && $this->looksLikeBase64PhotoValue($rawValue)) {
+                $photoProperty['VALUE'] = 'BINARY';
+
+                $encoding = strtolower(trim((string) ($photoProperty['ENCODING'] ?? '')));
+                if ($encoding === '') {
+                    $photoProperty['ENCODING'] = 'b';
+                }
+            }
+
             $type = strtoupper(trim((string) ($photoProperty['TYPE'] ?? '')));
             if ($type !== '') {
                 continue;
@@ -713,7 +724,6 @@ class AddressBookMirrorService
 
             $mediaType = strtolower(trim((string) ($photoProperty['MEDIATYPE'] ?? '')));
             if ($mediaType === '') {
-                $rawValue = trim((string) $photoProperty);
                 if (preg_match('/^data:(?<mime>[^;,]+)/i', $rawValue, $matches) === 1) {
                     $mediaType = strtolower(trim((string) ($matches['mime'] ?? '')));
                 }
@@ -730,6 +740,23 @@ class AddressBookMirrorService
                 $photoProperty['TYPE'] = $mappedType;
             }
         }
+    }
+
+    /**
+     * Checks whether a PHOTO raw value appears to be embedded base64 bytes.
+     */
+    private function looksLikeBase64PhotoValue(string $rawValue): bool
+    {
+        $trimmed = trim($rawValue);
+        if ($trimmed === '') {
+            return false;
+        }
+
+        if (str_contains($trimmed, ':') || str_starts_with(strtolower($trimmed), 'data:')) {
+            return false;
+        }
+
+        return preg_match('/^[A-Za-z0-9+\/=\s]+$/', $trimmed) === 1;
     }
 
     /**

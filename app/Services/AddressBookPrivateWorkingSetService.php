@@ -1399,7 +1399,7 @@ class AddressBookPrivateWorkingSetService
             $target->add(clone $sourcePhoto);
         } catch (Throwable) {
             $fallback = $target->add('PHOTO', (string) $sourcePhoto);
-            foreach (['ENCODING', 'TYPE', 'MEDIATYPE'] as $parameter) {
+            foreach (['ENCODING', 'TYPE', 'MEDIATYPE', 'VALUE'] as $parameter) {
                 if (isset($sourcePhoto[$parameter])) {
                     $fallback[$parameter] = (string) $sourcePhoto[$parameter];
                 }

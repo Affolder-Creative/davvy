@@ -464,6 +464,7 @@ class ContactVCardService
             $photoProperty = $vCard->add('PHOTO', base64_encode($photo['binary']));
             $photoProperty['ENCODING'] = 'b';
             $photoProperty['MEDIATYPE'] = $photo['mime'];
+            $photoProperty['VALUE'] = 'BINARY';
 
             $photoType = $this->photoTypeFromMime($photo['mime']);
             if ($photoType !== null) {
