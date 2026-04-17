@@ -107,6 +107,67 @@ class AppleCompatAddressBookMirrorTest extends TestCase
         ]);
     }
 
+    public function test_enabling_apple_compat_adds_photo_type_to_mirrored_cards_when_only_mediatype_exists(): void
+    {
+        $user = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Family',
+            'uri' => 'family-photo',
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'source-photo.vcf',
+            'uid' => 'source-photo-uid',
+            'etag' => md5('source-photo'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Source Photo\nUID:source-photo-uid\nPHOTO;ENCODING=b;MEDIATYPE=image/jpeg:AA==\nEND:VCARD",
+        ]);
+
+        $this->actingAs($user)->patchJson('/api/address-books/apple-compat', [
+            'enabled' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $target = $this->defaultContactsBookFor($user);
+        $mirrored = Card::query()->where('address_book_id', $target->id)->firstOrFail();
+
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*TYPE=JPEG[^\n]*:/', (string) $mirrored->data);
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*MEDIATYPE=image\\/jpeg[^\n]*:/i', (string) $mirrored->data);
+    }
+
+    public function test_enabling_apple_compat_adds_photo_type_to_data_uri_photo_without_explicit_type(): void
+    {
+        $user = User::factory()->create();
+
+        $source = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Family',
+            'uri' => 'family-data-uri-photo',
+        ]);
+
+        Card::query()->create([
+            'address_book_id' => $source->id,
+            'uri' => 'source-photo-data-uri.vcf',
+            'uid' => 'source-photo-data-uri-uid',
+            'etag' => md5('source-photo-data-uri'),
+            'size' => 1,
+            'data' => "BEGIN:VCARD\nVERSION:4.0\nFN:Source Photo Data URI\nUID:source-photo-data-uri-uid\nPHOTO:data:image/png;base64,AA==\nEND:VCARD",
+        ]);
+
+        $this->actingAs($user)->patchJson('/api/address-books/apple-compat', [
+            'enabled' => true,
+            'source_ids' => [$source->id],
+        ])->assertOk();
+
+        $target = $this->defaultContactsBookFor($user);
+        $mirrored = Card::query()->where('address_book_id', $target->id)->firstOrFail();
+
+        $this->assertMatchesRegularExpression('/PHOTO;[^\n]*TYPE=PNG[^\n]*:/', (string) $mirrored->data);
+    }
+
     public function test_source_card_create_update_delete_propagates_to_contacts_when_apple_compat_enabled(): void
     {
         $user = User::factory()->create();

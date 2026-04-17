@@ -637,6 +637,7 @@ class AddressBookMirrorService
 
             $vcard->add(self::MIRROR_SOURCE_PROPERTY, $sourceAddressBook->id.'/'.$sourceCard->uri);
             $vcard->add(self::MIRROR_OWNER_PROPERTY, (string) $user->id);
+            $this->normalizePhotoCompatibilityParameters($vcard);
 
             $data = $vcard->serialize();
             $vcard->destroy();
@@ -697,6 +698,38 @@ class AddressBookMirrorService
         $vcard->destroy();
 
         return $data;
+    }
+
+    /**
+     * Normalizes PHOTO params for Apple compatibility mirrors.
+     */
+    private function normalizePhotoCompatibilityParameters(VCard $vcard): void
+    {
+        foreach ($vcard->select('PHOTO') as $photoProperty) {
+            $type = strtoupper(trim((string) ($photoProperty['TYPE'] ?? '')));
+            if ($type !== '') {
+                continue;
+            }
+
+            $mediaType = strtolower(trim((string) ($photoProperty['MEDIATYPE'] ?? '')));
+            if ($mediaType === '') {
+                $rawValue = trim((string) $photoProperty);
+                if (preg_match('/^data:(?<mime>[^;,]+)/i', $rawValue, $matches) === 1) {
+                    $mediaType = strtolower(trim((string) ($matches['mime'] ?? '')));
+                }
+            }
+
+            $mappedType = match ($mediaType) {
+                'image/jpeg', 'image/jpg' => 'JPEG',
+                'image/png' => 'PNG',
+                'image/webp' => 'WEBP',
+                default => null,
+            };
+
+            if ($mappedType !== null) {
+                $photoProperty['TYPE'] = $mappedType;
+            }
+        }
     }
 
     /**
