@@ -246,6 +246,54 @@ class BackupManagementTest extends TestCase
         $zip->close();
     }
 
+    public function test_backup_command_skips_malformed_calendar_object_and_still_creates_archive(): void
+    {
+        $this->seedBackupData();
+
+        $calendar = Calendar::query()->where('uri', 'household-calendar')->firstOrFail();
+        $malformedPayload = 'this-is-not-ical-data';
+
+        CalendarObject::query()->create([
+            'calendar_id' => $calendar->id,
+            'uri' => 'malformed-object.ics',
+            'uid' => 'backup-malformed-object',
+            'etag' => sha1($malformedPayload),
+            'size' => strlen($malformedPayload),
+            'component_type' => 'VEVENT',
+            'data' => $malformedPayload,
+        ]);
+
+        $archivePath = $this->createBackupArchiveAt(
+            directory: storage_path('framework/testing/backups-malformed-calendar-object'),
+            date: [2026, 3, 14, 2, 30, 0],
+        );
+
+        $zip = new ZipArchive;
+        $opened = $zip->open($archivePath);
+        $this->assertTrue($opened === true, 'Unable to open backup archive with malformed calendar object.');
+
+        $calendarPayload = null;
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $name = $zip->getNameIndex($index);
+            if ($name === false || ! str_contains($name, 'household-calendar.ics')) {
+                continue;
+            }
+
+            $payload = $zip->getFromIndex($index);
+            if (is_string($payload)) {
+                $calendarPayload = $payload;
+            }
+
+            break;
+        }
+
+        $zip->close();
+
+        $this->assertIsString($calendarPayload, 'Expected household-calendar.ics to exist in backup archive.');
+        $this->assertStringContainsString('SUMMARY:Backup Test Event', $calendarPayload);
+        $this->assertStringNotContainsString($malformedPayload, $calendarPayload);
+    }
+
     public function test_forced_backup_command_applies_daily_retention_for_local_and_remote_destinations(): void
     {
         $this->seedBackupData();

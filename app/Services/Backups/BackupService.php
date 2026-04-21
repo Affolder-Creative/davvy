@@ -618,7 +618,14 @@ class BackupService
                 $objectCount += $objects->count();
 
                 foreach ($objects as $object) {
-                    $source = Reader::read($object->data);
+                    try {
+                        $source = Reader::read($object->data);
+                    } catch (Throwable $throwable) {
+                        report($throwable);
+
+                        continue;
+                    }
+
                     if (! $source instanceof VCalendar) {
                         continue;
                     }
