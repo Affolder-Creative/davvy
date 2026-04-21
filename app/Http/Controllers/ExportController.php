@@ -12,6 +12,7 @@ use App\Services\ResourceAccessService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Sabre\VObject\Component;
 use Sabre\VObject\Component\VCalendar;
@@ -32,22 +33,29 @@ class ExportController extends Controller
      */
     public function exportAllCalendars(Request $request): BinaryFileResponse
     {
-        return $this->downloadZip(
-            addEntries: function (ZipArchive $zip, array &$usedNames) use ($request): bool {
+        $user = $request->user();
+        $skippedMalformedObjects = 0;
+        $calendarCount = 0;
+
+        $response = $this->downloadZip(
+            addEntries: function (ZipArchive $zip, array &$usedNames) use ($user, &$skippedMalformedObjects, &$calendarCount): bool {
                 $hasEntries = false;
 
-                foreach ($this->readableCalendarsQuery($request->user())
+                foreach ($this->readableCalendarsQuery($user)
                     ->orderBy('display_name')
                     ->orderBy('id')
                     ->cursor() as $calendar) {
                     $hasEntries = true;
+                    $calendarCount++;
+                    $calendarPayload = $this->buildCalendarPayload($calendar);
+                    $skippedMalformedObjects += $calendarPayload['skipped_malformed_objects'];
 
                     $entryName = $this->uniqueArchiveEntryName(
                         $this->resourceFileName((string) $calendar->display_name, 'calendar', 'ics'),
                         $usedNames,
                     );
 
-                    $zip->addFromString($entryName, $this->buildCalendarPayload($calendar));
+                    $zip->addFromString($entryName, $calendarPayload['payload']);
                 }
 
                 return $hasEntries;
@@ -56,6 +64,18 @@ class ExportController extends Controller
             emptyEntryContents: "No calendars are available for export.\n",
             archiveName: $this->exportArchiveName('calendars')
         );
+
+        $response->headers->set('X-Davvy-Skipped-Malformed-Objects', (string) $skippedMalformedObjects);
+        $this->logMalformedCalendarExportSummary(
+            scope: 'all-calendars',
+            user: $user,
+            skippedMalformedObjects: $skippedMalformedObjects,
+            extraContext: [
+                'calendar_count' => $calendarCount,
+            ],
+        );
+
+        return $response;
     }
 
     /**
@@ -69,14 +89,25 @@ class ExportController extends Controller
             abort(403, __('contacts.cannot_access_calendar'));
         }
 
+        $calendarPayload = $this->buildCalendarPayload($calendar);
+        $this->logMalformedCalendarExportSummary(
+            scope: 'single-calendar',
+            user: $user,
+            skippedMalformedObjects: $calendarPayload['skipped_malformed_objects'],
+            extraContext: [
+                'calendar_id' => (int) $calendar->id,
+            ],
+        );
+
         return response(
-            $this->buildCalendarPayload($calendar),
+            $calendarPayload['payload'],
             200,
             [
                 'Content-Type' => 'text/calendar; charset=utf-8',
                 'Content-Disposition' => $this->attachmentHeader(
                     $this->resourceFileName($calendar->display_name, 'calendar', 'ics')
                 ),
+                'X-Davvy-Skipped-Malformed-Objects' => (string) $calendarPayload['skipped_malformed_objects'],
             ]
         );
     }
@@ -184,22 +215,25 @@ class ExportController extends Controller
 
     /**
      * Builds calendar payload.
+     *
+     * @return array{payload:string,skipped_malformed_objects:int}
      */
-    private function buildCalendarPayload(Calendar $calendar): string
+    private function buildCalendarPayload(Calendar $calendar): array
     {
         $export = new VCalendar([
             'VERSION' => '2.0',
             'PRODID' => '-//Davvy//Calendar Export//EN',
         ]);
+        $skippedMalformedObjects = 0;
 
         $calendar->objects()
             ->orderBy('id')
-            ->chunkById(250, function ($objects) use ($export): void {
+            ->chunkById(250, function ($objects) use ($export, &$skippedMalformedObjects): void {
                 foreach ($objects as $object) {
                     try {
                         $source = Reader::read($object->data);
                     } catch (Throwable $throwable) {
-                        report($throwable);
+                        $skippedMalformedObjects++;
 
                         continue;
                     }
@@ -216,7 +250,10 @@ class ExportController extends Controller
                 }
             });
 
-        return $export->serialize();
+        return [
+            'payload' => $export->serialize(),
+            'skipped_malformed_objects' => $skippedMalformedObjects,
+        ];
     }
 
     /**
@@ -336,5 +373,27 @@ class ExportController extends Controller
     private function exportArchiveName(string $resourceType): string
     {
         return sprintf('davvy-%s-%s.zip', $resourceType, now()->format('Ymd-His'));
+    }
+
+    /**
+     * Logs a calendar export summary when malformed objects are skipped.
+     *
+     * @param  array<string, int|string>  $extraContext
+     */
+    private function logMalformedCalendarExportSummary(
+        string $scope,
+        User $user,
+        int $skippedMalformedObjects,
+        array $extraContext = [],
+    ): void {
+        if ($skippedMalformedObjects <= 0) {
+            return;
+        }
+
+        Log::warning('calendar_export_skipped_malformed_objects', array_merge([
+            'scope' => $scope,
+            'user_id' => (int) $user->id,
+            'skipped_malformed_objects' => $skippedMalformedObjects,
+        ], $extraContext));
     }
 }

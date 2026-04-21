@@ -36,6 +36,7 @@ class ResourceExportTest extends TestCase
         $response->assertOk();
         $response->assertHeader('content-type', 'text/calendar; charset=utf-8');
         $response->assertHeader('content-disposition', 'attachment; filename="work-calendar.ics"');
+        $response->assertHeader('x-davvy-skipped-malformed-objects', '0');
         $this->assertStringContainsString('BEGIN:VCALENDAR', (string) $response->getContent());
         $this->assertStringContainsString('SUMMARY:Work Sync', (string) $response->getContent());
     }
@@ -57,6 +58,7 @@ class ResourceExportTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('content-type', 'text/calendar; charset=utf-8');
+        $response->assertHeader('x-davvy-skipped-malformed-objects', '1');
         $this->assertStringContainsString('SUMMARY:Valid Event', (string) $response->getContent());
         $this->assertStringNotContainsString($malformedPayload, (string) $response->getContent());
     }
@@ -94,6 +96,7 @@ class ResourceExportTest extends TestCase
         $response->assertOk();
         $response->assertHeader('content-type', 'application/zip');
         $response->assertDownload();
+        $response->assertHeader('x-davvy-skipped-malformed-objects', '0');
 
         $entries = $this->zipEntries($response);
         $this->assertGreaterThanOrEqual(2, count($entries));
@@ -120,6 +123,7 @@ class ResourceExportTest extends TestCase
 
         $response->assertOk();
         $response->assertHeader('content-type', 'application/zip');
+        $response->assertHeader('x-davvy-skipped-malformed-objects', '1');
 
         $entries = $this->zipEntries($response);
         $this->assertArrayHasKey('mixed-calendar.ics', $entries);

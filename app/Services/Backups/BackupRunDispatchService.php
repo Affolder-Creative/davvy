@@ -173,6 +173,7 @@ class BackupRunDispatchService
                         'address_books' => 0,
                         'calendar_objects' => 0,
                         'cards' => 0,
+                        'skipped_malformed_objects' => 0,
                     ],
                 ],
             ], $requestedByUserId);

@@ -7,6 +7,7 @@ use App\Models\Calendar;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -33,7 +34,13 @@ class BackupService
      *   tiers: array<int, string>,
      *   artifact_count: int,
      *   artifacts: array<int, array{tier:string,period:string,file_name:string,local_path:?string,s3_path:?string}>,
-     *   resource_counts: array{calendars:int,address_books:int,calendar_objects:int,cards:int}
+     *   resource_counts: array{
+     *     calendars:int,
+     *     address_books:int,
+     *     calendar_objects:int,
+     *     cards:int,
+     *     skipped_malformed_objects:int
+     *   }
      * }
      */
     public function run(bool $force = false, string $trigger = 'scheduled'): array
@@ -150,13 +157,29 @@ class BackupService
 
             $this->pruneByRetention($settings);
 
-            $result = [
-                'status' => 'success',
-                'trigger' => $trigger,
-                'reason' => __('backups.created_backup_snapshots_for_tiers', [
+            $skippedMalformedObjects = (int) ($resourceCounts['skipped_malformed_objects'] ?? 0);
+
+            if ($skippedMalformedObjects > 0) {
+                Log::warning('backup_skipped_malformed_calendar_objects', [
+                    'trigger' => $trigger,
+                    'skipped_malformed_objects' => $skippedMalformedObjects,
+                    'calendar_count' => (int) ($resourceCounts['calendars'] ?? 0),
+                    'calendar_object_count' => (int) ($resourceCounts['calendar_objects'] ?? 0),
+                ]);
+            }
+
+            $reason = $this->appendMalformedObjectsSummary(
+                __('backups.created_backup_snapshots_for_tiers', [
                     'count' => count($artifacts),
                     'tiers' => implode(', ', array_keys($tiers)),
                 ]),
+                $skippedMalformedObjects,
+            );
+
+            $result = [
+                'status' => 'success',
+                'trigger' => $trigger,
+                'reason' => $reason,
                 'timezone' => $settings['timezone'],
                 'executed_at_utc' => $nowUtc->toIso8601String(),
                 'executed_at_local' => $nowLocal->toIso8601String(),
@@ -254,7 +277,16 @@ class BackupService
      * Builds archive.
      *
      * @param  array<int, string>  $tiers
-     * @return array{0:string,1:array{calendars:int,address_books:int,calendar_objects:int,cards:int}}
+     * @return array{
+     *   0:string,
+     *   1:array{
+     *     calendars:int,
+     *     address_books:int,
+     *     calendar_objects:int,
+     *     cards:int,
+     *     skipped_malformed_objects:int
+     *   }
+     * }
      */
     private function buildArchive(
         string $trigger,
@@ -280,6 +312,7 @@ class BackupService
         $addressBookCount = 0;
         $calendarObjectCount = 0;
         $cardCount = 0;
+        $skippedMalformedObjects = 0;
         $calendarCollections = [];
         $addressBookCollections = [];
 
@@ -292,6 +325,7 @@ class BackupService
             $calendarCount++;
             $calendarPayload = $this->buildCalendarPayload($calendar);
             $calendarObjectCount += $calendarPayload['object_count'];
+            $skippedMalformedObjects += $calendarPayload['skipped_malformed_objects'];
 
             $entryPath = sprintf(
                 'calendars/user-%d/%d-%s',
@@ -369,6 +403,7 @@ class BackupService
                 'address_books' => $addressBookCount,
                 'calendar_objects' => $calendarObjectCount,
                 'cards' => $cardCount,
+                'skipped_malformed_objects' => $skippedMalformedObjects,
             ],
             'collections' => [
                 'calendars' => $calendarCollections,
@@ -391,6 +426,7 @@ class BackupService
                 'address_books' => $addressBookCount,
                 'calendar_objects' => $calendarObjectCount,
                 'cards' => $cardCount,
+                'skipped_malformed_objects' => $skippedMalformedObjects,
             ],
         ];
     }
@@ -602,7 +638,7 @@ class BackupService
     /**
      * Builds calendar payload.
      *
-     * @return array{payload:string,object_count:int}
+     * @return array{payload:string,object_count:int,skipped_malformed_objects:int}
      */
     private function buildCalendarPayload(Calendar $calendar): array
     {
@@ -612,16 +648,17 @@ class BackupService
         ]);
 
         $objectCount = 0;
+        $skippedMalformedObjects = 0;
         $calendar->objects()
             ->orderBy('id')
-            ->chunkById(250, function ($objects) use ($export, &$objectCount): void {
+            ->chunkById(250, function ($objects) use ($export, &$objectCount, &$skippedMalformedObjects): void {
                 $objectCount += $objects->count();
 
                 foreach ($objects as $object) {
                     try {
                         $source = Reader::read($object->data);
                     } catch (Throwable $throwable) {
-                        report($throwable);
+                        $skippedMalformedObjects++;
 
                         continue;
                     }
@@ -641,6 +678,7 @@ class BackupService
         return [
             'payload' => $export->serialize(),
             'object_count' => $objectCount,
+            'skipped_malformed_objects' => $skippedMalformedObjects,
         ];
     }
 
@@ -707,7 +745,13 @@ class BackupService
      *   tiers: array<int, string>,
      *   artifact_count: int,
      *   artifacts: array<int, array{tier:string,period:string,file_name:string,local_path:?string,s3_path:?string}>,
-     *   resource_counts: array{calendars:int,address_books:int,calendar_objects:int,cards:int},
+     *   resource_counts: array{
+     *     calendars:int,
+     *     address_books:int,
+     *     calendar_objects:int,
+     *     cards:int,
+     *     skipped_malformed_objects:int
+     *   },
      *   code: string
      * }
      */
@@ -734,6 +778,7 @@ class BackupService
                 'address_books' => 0,
                 'calendar_objects' => 0,
                 'cards' => 0,
+                'skipped_malformed_objects' => 0,
             ],
             'code' => $code,
         ];
@@ -752,7 +797,13 @@ class BackupService
      *   tiers: array<int, string>,
      *   artifact_count: int,
      *   artifacts: array<int, array{tier:string,period:string,file_name:string,local_path:?string,s3_path:?string}>,
-     *   resource_counts: array{calendars:int,address_books:int,calendar_objects:int,cards:int}
+     *   resource_counts: array{
+     *     calendars:int,
+     *     address_books:int,
+     *     calendar_objects:int,
+     *     cards:int,
+     *     skipped_malformed_objects:int
+     *   }
      * }
      */
     private function failedResult(
@@ -777,7 +828,24 @@ class BackupService
                 'address_books' => 0,
                 'calendar_objects' => 0,
                 'cards' => 0,
+                'skipped_malformed_objects' => 0,
             ],
         ];
+    }
+
+    /**
+     * Appends malformed object summary to a backup result message.
+     */
+    private function appendMalformedObjectsSummary(string $reason, int $skippedMalformedObjects): string
+    {
+        if ($skippedMalformedObjects <= 0) {
+            return $reason;
+        }
+
+        return sprintf(
+            '%s Skipped %d malformed calendar object(s).',
+            $reason,
+            $skippedMalformedObjects,
+        );
     }
 }

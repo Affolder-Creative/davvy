@@ -687,9 +687,16 @@ Artisan::command('app:backup {--force : Run immediately, ignoring enabled flag a
     $trigger = $force ? 'manual-cli' : 'scheduled';
 
     $result = $backupService->run(force: $force, trigger: $trigger);
+    $skippedMalformedObjects = (int) (($result['resource_counts']['skipped_malformed_objects'] ?? 0));
 
     if ($result['status'] === 'success') {
         $this->info($result['reason']);
+        if ($skippedMalformedObjects > 0) {
+            $this->warn(sprintf(
+                'Skipped %d malformed calendar object(s) while building backup payloads.',
+                $skippedMalformedObjects,
+            ));
+        }
 
         return 0;
     }

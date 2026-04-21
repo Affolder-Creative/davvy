@@ -166,6 +166,7 @@ class BackupManagementTest extends TestCase
         $this->assertSame('success', $result['status'] ?? null);
         $this->assertSame(1, $result['artifact_count'] ?? null);
         $this->assertSame('daily', $result['tiers'][0] ?? null);
+        $this->assertSame(0, $result['resource_counts']['skipped_malformed_objects'] ?? null);
 
         $dailyFiles = glob($localRoot.'/daily/*.zip');
         $this->assertIsArray($dailyFiles);
@@ -287,11 +288,21 @@ class BackupManagementTest extends TestCase
             break;
         }
 
+        $manifestPayload = $zip->getFromName('manifest.json');
+        if ($manifestPayload === false) {
+            $manifestPayload = null;
+        }
+
         $zip->close();
 
         $this->assertIsString($calendarPayload, 'Expected household-calendar.ics to exist in backup archive.');
         $this->assertStringContainsString('SUMMARY:Backup Test Event', $calendarPayload);
         $this->assertStringNotContainsString($malformedPayload, $calendarPayload);
+        $this->assertIsString($manifestPayload, 'Expected manifest.json to exist in backup archive.');
+
+        $manifest = json_decode($manifestPayload, true);
+        $this->assertIsArray($manifest, 'manifest.json payload is not valid JSON.');
+        $this->assertSame(1, $manifest['counts']['skipped_malformed_objects'] ?? null);
     }
 
     public function test_forced_backup_command_applies_daily_retention_for_local_and_remote_destinations(): void
