@@ -17,6 +17,7 @@ use Sabre\VObject\Component;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Reader;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Throwable;
 use ZipArchive;
 
 class ExportController extends Controller
@@ -195,7 +196,13 @@ class ExportController extends Controller
             ->orderBy('id')
             ->chunkById(250, function ($objects) use ($export): void {
                 foreach ($objects as $object) {
-                    $source = Reader::read($object->data);
+                    try {
+                        $source = Reader::read($object->data);
+                    } catch (Throwable $throwable) {
+                        report($throwable);
+
+                        continue;
+                    }
 
                     if (! $source instanceof VCalendar) {
                         continue;

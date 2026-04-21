@@ -40,6 +40,27 @@ class ResourceExportTest extends TestCase
         $this->assertStringContainsString('SUMMARY:Work Sync', (string) $response->getContent());
     }
 
+    public function test_single_calendar_export_skips_malformed_calendar_object_data(): void
+    {
+        $user = User::factory()->create();
+        $calendar = Calendar::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Mixed Calendar',
+            'uri' => 'mixed-calendar',
+        ]);
+
+        $this->createCalendarObject($calendar, 'valid-event', 'Valid Event');
+        $malformedPayload = 'this-is-not-ical-data';
+        $this->createMalformedCalendarObject($calendar, 'malformed-event', $malformedPayload);
+
+        $response = $this->actingAs($user)->get("/api/exports/calendars/{$calendar->id}");
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'text/calendar; charset=utf-8');
+        $this->assertStringContainsString('SUMMARY:Valid Event', (string) $response->getContent());
+        $this->assertStringNotContainsString($malformedPayload, (string) $response->getContent());
+    }
+
     public function test_user_can_export_all_calendars_including_shared_resources(): void
     {
         $owner = User::factory()->create();
@@ -80,6 +101,30 @@ class ResourceExportTest extends TestCase
         $this->assertContains('team-calendar.ics', array_keys($entries));
         $this->assertTrue($this->zipEntryContains($entries, 'SUMMARY:Owned Event'));
         $this->assertTrue($this->zipEntryContains($entries, 'SUMMARY:Shared Event'));
+    }
+
+    public function test_export_all_calendars_skips_malformed_calendar_object_data(): void
+    {
+        $user = User::factory()->create();
+        $calendar = Calendar::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Mixed Calendar',
+            'uri' => 'mixed-calendar',
+        ]);
+
+        $this->createCalendarObject($calendar, 'valid-event', 'Valid Event');
+        $malformedPayload = 'this-is-not-ical-data';
+        $this->createMalformedCalendarObject($calendar, 'malformed-event', $malformedPayload);
+
+        $response = $this->actingAs($user)->get('/api/exports/calendars');
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/zip');
+
+        $entries = $this->zipEntries($response);
+        $this->assertArrayHasKey('mixed-calendar.ics', $entries);
+        $this->assertStringContainsString('SUMMARY:Valid Event', $entries['mixed-calendar.ics']);
+        $this->assertStringNotContainsString($malformedPayload, $entries['mixed-calendar.ics']);
     }
 
     public function test_user_can_export_single_shared_address_book_as_vcard_file(): void
@@ -217,6 +262,19 @@ class ResourceExportTest extends TestCase
             'size' => strlen($ics),
             'component_type' => 'VEVENT',
             'data' => $ics,
+        ]);
+    }
+
+    private function createMalformedCalendarObject(Calendar $calendar, string $uid, string $payload): void
+    {
+        CalendarObject::query()->create([
+            'calendar_id' => $calendar->id,
+            'uri' => "{$uid}.ics",
+            'uid' => $uid,
+            'etag' => sha1($payload),
+            'size' => strlen($payload),
+            'component_type' => 'VEVENT',
+            'data' => $payload,
         ]);
     }
 
