@@ -108,8 +108,10 @@ describe("AppShell", () => {
     await user.click(screen.getByRole("button", { name: "Sign Out" }));
 
     await waitFor(() => expect(api.post).toHaveBeenCalledWith("/api/auth/logout"));
-    expect(auth.setAuth).toHaveBeenCalledTimes(1);
-    expect(screen.getByTestId("path")).toHaveTextContent("/login");
+    await waitFor(() => expect(auth.setAuth).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(screen.getByTestId("path")).toHaveTextContent("/login"),
+    );
 
     const updater = auth.setAuth.mock.calls[0][0];
     expect(typeof updater).toBe("function");
