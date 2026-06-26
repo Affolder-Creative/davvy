@@ -83,12 +83,12 @@
     "regenerateCodes": "No se pudieron regenerar los códigos de respaldo.",
     "createAppPassword": "No se pudo crear la contraseña DAV.",
     "revokeAppPassword": "No se pudo revocar la contraseña DAV.",
-    "loadWebPush": "Unable to load push notification settings.",
-    "webPushUnavailable": "WebPush is not available on this server yet.",
-    "webPushSubscriptionInvalid": "The browser returned an invalid push subscription.",
-    "enableWebPush": "Unable to enable push notifications.",
-    "disableWebPush": "Unable to disable push notifications.",
-    "updateWebPushPreferences": "Unable to update push notification preferences."
+    "loadWebPush": "No se pudieron cargar los ajustes de notificaciones push.",
+    "webPushUnavailable": "WebPush aún no está disponible en este servidor.",
+    "webPushSubscriptionInvalid": "El navegador devolvió una suscripción push no válida.",
+    "enableWebPush": "No se pudieron habilitar las notificaciones push.",
+    "disableWebPush": "No se pudieron deshabilitar las notificaciones push.",
+    "updateWebPushPreferences": "No se pudieron actualizar las preferencias de notificaciones push."
   },
   "notices": {
     "passwordSuccess": "Contraseña actualizada. Utilice su nueva contraseña para iniciar sesión en la aplicación y en los clientes DAV.",
@@ -98,38 +98,38 @@
     "backupCodesRegenerated": "Códigos de respaldo regenerados.",
     "appPasswordCreated": "Contraseña de la aplicación DAV creada.",
     "appPasswordRevoked": "Contraseña de la aplicación DAV revocada.",
-    "webPushEnabled": "Push notifications enabled for this device.",
-    "webPushDisabled": "Push notifications disabled for this device.",
-    "webPushPreferencesSaved": "Push notification preferences saved."
+    "webPushEnabled": "Notificaciones push habilitadas para este dispositivo.",
+    "webPushDisabled": "Notificaciones push deshabilitadas para este dispositivo.",
+    "webPushPreferencesSaved": "Preferencias de notificaciones push guardadas."
   },
   "confirmations": {
     "disable2fa": "¿Deshabilitar la autenticación de dos factores y revocar todas las contraseñas DAV?"
   },
   "webPush": {
-    "title": "Push Notifications",
-    "description": "Enable device notifications for review work, admin approvals, and backup operations.",
-    "deviceHelp": "On iPhone and iPad, install Davvy to the Home Screen before enabling notifications.",
-    "enableDevice": "Enable This Device",
-    "enabling": "Enabling...",
-    "disableDevice": "Disable This Device",
-    "disabling": "Disabling...",
-    "refresh": "Refresh Status",
+    "title": "Notificaciones push",
+    "description": "Habilita notificaciones en el dispositivo para revisiones, aprobaciones administrativas y operaciones de copia de seguridad.",
+    "deviceHelp": "En iPhone y iPad, instala Davvy en la pantalla de inicio antes de habilitar las notificaciones.",
+    "enableDevice": "Habilitar este dispositivo",
+    "enabling": "Habilitando...",
+    "disableDevice": "Deshabilitar este dispositivo",
+    "disabling": "Deshabilitando...",
+    "refresh": "Actualizar estado",
     "status": {
-      "loading": "Checking...",
-      "disabled": "Push notifications are disabled by the server.",
-      "unsupported": "This browser does not support WebPush.",
-      "unavailable": "WebPush is not fully configured yet.",
-      "denied": "Notification permission is blocked for this device.",
-      "enabled": "This device is subscribed.",
-      "ready": "Ready to enable on this device."
+      "loading": "Comprobando...",
+      "disabled": "El servidor tiene deshabilitadas las notificaciones push.",
+      "unsupported": "Este navegador no admite WebPush.",
+      "unavailable": "WebPush aún no está completamente configurado.",
+      "denied": "El permiso de notificaciones está bloqueado para este dispositivo.",
+      "enabled": "Este dispositivo está suscrito.",
+      "ready": "Listo para habilitar en este dispositivo."
     },
     "categories": {
-      "reviewQueue": "Review Queue",
-      "reviewQueueHelp": "Notify me when contact changes need my review.",
-      "pendingRegistration": "Registration Approvals",
-      "pendingRegistrationHelp": "Notify me when a new account is waiting for admin approval.",
-      "backupOperations": "Backup Operations",
-      "backupOperationsHelp": "Notify me when admin backup or restore operations finish."
+      "reviewQueue": "Cola de revisión",
+      "reviewQueueHelp": "Avísame cuando haya cambios de contacto que necesiten mi revisión.",
+      "pendingRegistration": "Aprobaciones de registro",
+      "pendingRegistrationHelp": "Avísame cuando haya una nueva cuenta esperando aprobación administrativa.",
+      "backupOperations": "Operaciones de copia de seguridad",
+      "backupOperationsHelp": "Avísame cuando finalicen operaciones administrativas de copia de seguridad o restauración."
     }
   }
 }

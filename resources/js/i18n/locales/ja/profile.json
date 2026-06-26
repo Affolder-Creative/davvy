@@ -83,12 +83,12 @@
     "regenerateCodes": "バックアップ コードを再生成できません。",
     "createAppPassword": "DAV アプリのパスワードを作成できません。",
     "revokeAppPassword": "DAV アプリのパスワードを取り消すことができません。",
-    "loadWebPush": "Unable to load push notification settings.",
-    "webPushUnavailable": "WebPush is not available on this server yet.",
-    "webPushSubscriptionInvalid": "The browser returned an invalid push subscription.",
-    "enableWebPush": "Unable to enable push notifications.",
-    "disableWebPush": "Unable to disable push notifications.",
-    "updateWebPushPreferences": "Unable to update push notification preferences."
+    "loadWebPush": "プッシュ通知設定を読み込めません。",
+    "webPushUnavailable": "このサーバーでは WebPush はまだ利用できません。",
+    "webPushSubscriptionInvalid": "ブラウザーから無効なプッシュ購読が返されました。",
+    "enableWebPush": "プッシュ通知を有効にできません。",
+    "disableWebPush": "プッシュ通知を無効にできません。",
+    "updateWebPushPreferences": "プッシュ通知設定を更新できません。"
   },
   "notices": {
     "passwordSuccess": "パスワードが更新されました。アプリのログインと DAV クライアントには新しいパスワードを使用します。",
@@ -98,38 +98,38 @@
     "backupCodesRegenerated": "バックアップコードが再生成されました。",
     "appPasswordCreated": "DAV アプリのパスワードが作成されました。",
     "appPasswordRevoked": "DAV アプリのパスワードが取り消されました。",
-    "webPushEnabled": "Push notifications enabled for this device.",
-    "webPushDisabled": "Push notifications disabled for this device.",
-    "webPushPreferencesSaved": "Push notification preferences saved."
+    "webPushEnabled": "このデバイスのプッシュ通知を有効にしました。",
+    "webPushDisabled": "このデバイスのプッシュ通知を無効にしました。",
+    "webPushPreferencesSaved": "プッシュ通知設定を保存しました。"
   },
   "confirmations": {
     "disable2fa": "2 要素認証を無効にして、すべての DAV アプリのパスワードを取り消しますか?"
   },
   "webPush": {
-    "title": "Push Notifications",
-    "description": "Enable device notifications for review work, admin approvals, and backup operations.",
-    "deviceHelp": "On iPhone and iPad, install Davvy to the Home Screen before enabling notifications.",
-    "enableDevice": "Enable This Device",
-    "enabling": "Enabling...",
-    "disableDevice": "Disable This Device",
-    "disabling": "Disabling...",
-    "refresh": "Refresh Status",
+    "title": "プッシュ通知",
+    "description": "レビュー作業、管理者承認、バックアップ操作についてデバイス通知を有効にします。",
+    "deviceHelp": "iPhone と iPad では、通知を有効にする前に Davvy をホーム画面に追加してください。",
+    "enableDevice": "このデバイスを有効にする",
+    "enabling": "有効化中...",
+    "disableDevice": "このデバイスを無効にする",
+    "disabling": "無効化中...",
+    "refresh": "状態を更新",
     "status": {
-      "loading": "Checking...",
-      "disabled": "Push notifications are disabled by the server.",
-      "unsupported": "This browser does not support WebPush.",
-      "unavailable": "WebPush is not fully configured yet.",
-      "denied": "Notification permission is blocked for this device.",
-      "enabled": "This device is subscribed.",
-      "ready": "Ready to enable on this device."
+      "loading": "確認中...",
+      "disabled": "プッシュ通知はサーバーで無効になっています。",
+      "unsupported": "このブラウザーは WebPush をサポートしていません。",
+      "unavailable": "WebPush はまだ完全に設定されていません。",
+      "denied": "このデバイスでは通知権限がブロックされています。",
+      "enabled": "このデバイスは購読済みです。",
+      "ready": "このデバイスで有効にできます。"
     },
     "categories": {
-      "reviewQueue": "Review Queue",
-      "reviewQueueHelp": "Notify me when contact changes need my review.",
-      "pendingRegistration": "Registration Approvals",
-      "pendingRegistrationHelp": "Notify me when a new account is waiting for admin approval.",
-      "backupOperations": "Backup Operations",
-      "backupOperationsHelp": "Notify me when admin backup or restore operations finish."
+      "reviewQueue": "レビューキュー",
+      "reviewQueueHelp": "連絡先の変更に自分のレビューが必要なときに通知します。",
+      "pendingRegistration": "登録承認",
+      "pendingRegistrationHelp": "新しいアカウントが管理者承認を待っているときに通知します。",
+      "backupOperations": "バックアップ操作",
+      "backupOperationsHelp": "管理者によるバックアップまたは復元操作が完了したときに通知します。"
     }
   }
 }

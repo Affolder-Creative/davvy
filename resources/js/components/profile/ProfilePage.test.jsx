@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProfilePage from "./ProfilePage";
+import { setI18nLocale } from "../../i18n";
 
 const webPushMocks = vi.hoisted(() => ({
   supported: false,
@@ -83,7 +84,9 @@ function buildProps(overrides = {}) {
 }
 
 describe("ProfilePage", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await setI18nLocale("en");
+
     webPushMocks.supported = false;
     webPushMocks.permission = "default";
     webPushMocks.subscription = null;
