@@ -11,10 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 
 class User extends Authenticatable
 {
     use HasFactory;
+    use HasPushSubscriptions;
     use Notifiable;
 
     protected $fillable = [
@@ -135,6 +137,11 @@ class User extends Authenticatable
     public function appPasswords(): HasMany
     {
         return $this->hasMany(UserAppPassword::class);
+    }
+
+    public function notificationPreference(): HasOne
+    {
+        return $this->hasOne(UserNotificationPreference::class);
     }
 
     public function onboardingTokens(): HasMany

@@ -587,6 +587,7 @@ export default function AdminPage({
             : user,
         ),
       }));
+      window.dispatchEvent(new Event("notifications-updated"));
     } catch (err) {
       setState((prev) => ({
         ...prev,
@@ -812,6 +813,7 @@ export default function AdminPage({
           status: "success",
           message: t("notices.approvedPending", { approvedCount }),
         });
+        window.dispatchEvent(new Event("notifications-updated"));
       }
     } catch (err) {
       setState((prev) => ({

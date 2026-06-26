@@ -82,7 +82,13 @@
     "disableTwoFactor": "2 要素を無効にできません。",
     "regenerateCodes": "バックアップ コードを再生成できません。",
     "createAppPassword": "DAV アプリのパスワードを作成できません。",
-    "revokeAppPassword": "DAV アプリのパスワードを取り消すことができません。"
+    "revokeAppPassword": "DAV アプリのパスワードを取り消すことができません。",
+    "loadWebPush": "Unable to load push notification settings.",
+    "webPushUnavailable": "WebPush is not available on this server yet.",
+    "webPushSubscriptionInvalid": "The browser returned an invalid push subscription.",
+    "enableWebPush": "Unable to enable push notifications.",
+    "disableWebPush": "Unable to disable push notifications.",
+    "updateWebPushPreferences": "Unable to update push notification preferences."
   },
   "notices": {
     "passwordSuccess": "パスワードが更新されました。アプリのログインと DAV クライアントには新しいパスワードを使用します。",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "2 要素認証が無効になり、DAV アプリのパスワードが取り消されました。",
     "backupCodesRegenerated": "バックアップコードが再生成されました。",
     "appPasswordCreated": "DAV アプリのパスワードが作成されました。",
-    "appPasswordRevoked": "DAV アプリのパスワードが取り消されました。"
+    "appPasswordRevoked": "DAV アプリのパスワードが取り消されました。",
+    "webPushEnabled": "Push notifications enabled for this device.",
+    "webPushDisabled": "Push notifications disabled for this device.",
+    "webPushPreferencesSaved": "Push notification preferences saved."
   },
   "confirmations": {
     "disable2fa": "2 要素認証を無効にして、すべての DAV アプリのパスワードを取り消しますか?"
+  },
+  "webPush": {
+    "title": "Push Notifications",
+    "description": "Enable device notifications for review work, admin approvals, and backup operations.",
+    "deviceHelp": "On iPhone and iPad, install Davvy to the Home Screen before enabling notifications.",
+    "enableDevice": "Enable This Device",
+    "enabling": "Enabling...",
+    "disableDevice": "Disable This Device",
+    "disabling": "Disabling...",
+    "refresh": "Refresh Status",
+    "status": {
+      "loading": "Checking...",
+      "disabled": "Push notifications are disabled by the server.",
+      "unsupported": "This browser does not support WebPush.",
+      "unavailable": "WebPush is not fully configured yet.",
+      "denied": "Notification permission is blocked for this device.",
+      "enabled": "This device is subscribed.",
+      "ready": "Ready to enable on this device."
+    },
+    "categories": {
+      "reviewQueue": "Review Queue",
+      "reviewQueueHelp": "Notify me when contact changes need my review.",
+      "pendingRegistration": "Registration Approvals",
+      "pendingRegistrationHelp": "Notify me when a new account is waiting for admin approval.",
+      "backupOperations": "Backup Operations",
+      "backupOperationsHelp": "Notify me when admin backup or restore operations finish."
+    }
   }
 }

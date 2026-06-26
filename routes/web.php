@@ -13,6 +13,7 @@ use App\Http\Controllers\ContactPhotoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DavController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ShareController;
 use Illuminate\Support\Facades\Route;
 
@@ -57,6 +58,12 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/api/auth/logout', [AuthController::class, 'logout']);
     Route::patch('/api/auth/password', [AuthController::class, 'changePassword'])->middleware('throttle:auth-password');
     Route::patch('/api/auth/locale', [AuthController::class, 'updateLocale']);
+
+    Route::get('/api/notifications/counts', [NotificationController::class, 'counts']);
+    Route::get('/api/notifications/web-push', [NotificationController::class, 'webPush']);
+    Route::put('/api/notifications/web-push/preferences', [NotificationController::class, 'updateWebPushPreferences']);
+    Route::post('/api/notifications/web-push/subscriptions', [NotificationController::class, 'storeWebPushSubscription']);
+    Route::delete('/api/notifications/web-push/subscriptions', [NotificationController::class, 'destroyWebPushSubscription']);
 
     Route::get('/api/auth/2fa', [AuthController::class, 'twoFactorStatus']);
     Route::post('/api/auth/2fa/setup', [AuthController::class, 'startTwoFactorSetup'])->middleware('throttle:auth-2fa-action');

@@ -10,6 +10,7 @@ use App\Models\Card;
 use App\Models\Contact;
 use App\Models\ContactChangeRequest;
 use App\Models\User;
+use App\Services\Notifications\WebPushDispatchService;
 use App\Services\RegistrationSettingsService;
 use App\Services\ResourceAccessService;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,6 +27,7 @@ class ContactChangeRequestService
         private readonly ContactVCardService $vCardService,
         private readonly ResourceAccessService $accessService,
         private readonly RegistrationSettingsService $settingsService,
+        private readonly WebPushDispatchService $webPushDispatch,
     ) {}
 
     /**
@@ -574,6 +576,8 @@ class ContactChangeRequestService
                 'meta' => $meta !== [] ? $meta : null,
             ]);
         }
+
+        $this->webPushDispatch->notifyReviewQueueCreated($queueOwnerIds, count($rows));
 
         return [
             'group_uuid' => $groupUuid,

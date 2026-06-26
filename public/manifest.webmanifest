@@ -2,6 +2,7 @@
   "name": "Davvy",
   "short_name": "Davvy",
   "description": "Privacy-first, CalDAV/CardDAV with shared calendars, contacts, and a web dashboard.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
