@@ -1,8 +1,30 @@
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProfilePage from "./ProfilePage";
+import { setI18nLocale } from "../../i18n";
+
+const webPushMocks = vi.hoisted(() => ({
+  supported: false,
+  permission: "default",
+  subscription: null,
+  isWebPushSupported: vi.fn(() => false),
+  notificationPermission: vi.fn(() => "default"),
+  currentPushSubscription: vi.fn(() => Promise.resolve(null)),
+  subscribeToWebPush: vi.fn(),
+  unsubscribeFromWebPush: vi.fn(),
+  serializePushSubscription: vi.fn(),
+}));
+
+vi.mock("../../lib/webPush", () => ({
+  isWebPushSupported: webPushMocks.isWebPushSupported,
+  notificationPermission: webPushMocks.notificationPermission,
+  currentPushSubscription: webPushMocks.currentPushSubscription,
+  subscribeToWebPush: webPushMocks.subscribeToWebPush,
+  unsubscribeFromWebPush: webPushMocks.unsubscribeFromWebPush,
+  serializePushSubscription: webPushMocks.serializePushSubscription,
+}));
 
 function AppShellStub({ children }) {
   return <div>{children}</div>;
@@ -41,11 +63,16 @@ function buildProps(overrides = {}) {
       fallbackLocale: "en",
       setAuth: vi.fn(),
       refreshAuth: vi.fn().mockResolvedValue(undefined),
+      webPushEnabled: false,
+      webPushAvailable: false,
     },
     theme: {},
     api: {
+      get: vi.fn().mockResolvedValue({ data: {} }),
       patch: vi.fn().mockResolvedValue({}),
       post: vi.fn().mockResolvedValue({ data: {} }),
+      put: vi.fn().mockResolvedValue({ data: {} }),
+      delete: vi.fn().mockResolvedValue({ data: {} }),
     },
     extractError: vi.fn((_, fallback) => fallback),
     AppShell: AppShellStub,
@@ -57,6 +84,24 @@ function buildProps(overrides = {}) {
 }
 
 describe("ProfilePage", () => {
+  beforeEach(async () => {
+    await setI18nLocale("en");
+
+    webPushMocks.supported = false;
+    webPushMocks.permission = "default";
+    webPushMocks.subscription = null;
+    webPushMocks.isWebPushSupported.mockImplementation(() => webPushMocks.supported);
+    webPushMocks.notificationPermission.mockImplementation(
+      () => webPushMocks.permission,
+    );
+    webPushMocks.currentPushSubscription.mockImplementation(() =>
+      Promise.resolve(webPushMocks.subscription),
+    );
+    webPushMocks.subscribeToWebPush.mockReset();
+    webPushMocks.unsubscribeFromWebPush.mockReset();
+    webPushMocks.serializePushSubscription.mockReset();
+  });
+
   it("renders profile cards", () => {
     render(<ProfilePage {...buildProps()} />);
 
@@ -294,5 +339,92 @@ describe("ProfilePage", () => {
     expect(optionLabels).toEqual(["English", "Español"]);
     expect(screen.queryByRole("option", { name: "Deutsch" })).not.toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "Français" })).not.toBeInTheDocument();
+  });
+
+  it("enables push notifications for the current device", async () => {
+    const user = userEvent.setup();
+    webPushMocks.supported = true;
+    webPushMocks.permission = "default";
+    const browserSubscription = { endpoint: "https://push.example.test/abc" };
+    const subscriptionPayload = {
+      endpoint: "https://push.example.test/abc",
+      keys: {
+        p256dh: "p256dh-key",
+        auth: "auth-token",
+      },
+      content_encoding: "aes128gcm",
+    };
+    webPushMocks.subscribeToWebPush.mockResolvedValue(browserSubscription);
+    webPushMocks.serializePushSubscription.mockReturnValue(subscriptionPayload);
+
+    const props = buildProps({
+      auth: {
+        user: {
+          name: "Admin User",
+          email: "admin@example.com",
+          role: "admin",
+        },
+        twoFactorEnabled: false,
+        locale: "en",
+        supportedLocales: ["en"],
+        fallbackLocale: "en",
+        setAuth: vi.fn(),
+        refreshAuth: vi.fn().mockResolvedValue(undefined),
+        webPushEnabled: true,
+        webPushAvailable: true,
+      },
+      api: {
+        get: vi.fn().mockResolvedValue({
+          data: {
+            enabled: true,
+            available: true,
+            public_key: "public-key",
+            subscription_count: 0,
+            preferences: {
+              review_queue_enabled: false,
+              admin_pending_registration_enabled: false,
+              admin_backup_operations_enabled: false,
+            },
+          },
+        }),
+        patch: vi.fn().mockResolvedValue({}),
+        post: vi.fn().mockResolvedValue({
+          data: {
+            subscription_count: 1,
+            preferences: {
+              review_queue_enabled: true,
+              admin_pending_registration_enabled: true,
+              admin_backup_operations_enabled: true,
+            },
+          },
+        }),
+        put: vi.fn().mockResolvedValue({ data: {} }),
+        delete: vi.fn().mockResolvedValue({ data: {} }),
+      },
+    });
+
+    render(<ProfilePage {...props} />);
+
+    await waitFor(() =>
+      expect(
+        screen.getAllByText("Ready to enable on this device.").length,
+      ).toBeGreaterThan(0),
+    );
+    await user.click(screen.getByRole("button", { name: "Enable This Device" }));
+
+    await waitFor(() =>
+      expect(webPushMocks.subscribeToWebPush).toHaveBeenCalledWith("public-key"),
+    );
+    expect(webPushMocks.serializePushSubscription).toHaveBeenCalledWith(
+      browserSubscription,
+    );
+    expect(props.api.post).toHaveBeenCalledWith(
+      "/api/notifications/web-push/subscriptions",
+      subscriptionPayload,
+    );
+    expect(
+      await screen.findByText("Push notifications enabled for this device."),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/review queue/i)).toBeChecked();
   });
 });

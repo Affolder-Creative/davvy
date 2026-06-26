@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  registerDavvyServiceWorker,
+  setDavvyAppBadge,
+} from "../../lib/webPush";
 
 /**
  * Renders the App Shell.
@@ -35,6 +39,7 @@ export default function AppShell({
   const logout = async () => {
     setMobileAccountMenuOpen(false);
     setSponsorModalOpen(false);
+    await setDavvyAppBadge(0);
     await api.post("/api/auth/logout");
     auth.setAuth((current) => ({
       ...current,
@@ -45,47 +50,66 @@ export default function AppShell({
   };
 
   useEffect(() => {
-    if (!auth.user || !auth.contactChangeModerationEnabled) {
+    if (!auth.user) {
       setReviewQueueCount(0);
+      void setDavvyAppBadge(0);
       return undefined;
     }
 
     let active = true;
 
-    const refreshReviewQueueCount = async () => {
+    const refreshNotificationCounts = async () => {
       try {
-        const response = await api.get("/api/contact-change-requests/summary");
+        const response = await api.get("/api/notifications/counts");
         if (!active) {
           return;
         }
 
-        setReviewQueueCount(Number(response.data?.needs_review_count || 0));
+        const nextReviewQueueCount = Number(response.data?.review_queue || 0);
+        const nextTotal = Number(response.data?.total || 0);
+        setReviewQueueCount(
+          auth.contactChangeModerationEnabled ? nextReviewQueueCount : 0,
+        );
+        void setDavvyAppBadge(nextTotal);
       } catch {
         if (!active) {
           return;
         }
 
         setReviewQueueCount(0);
+        void setDavvyAppBadge(0);
       }
     };
 
-    void refreshReviewQueueCount();
+    void refreshNotificationCounts();
 
     const onQueueUpdated = () => {
-      void refreshReviewQueueCount();
+      void refreshNotificationCounts();
     };
 
     window.addEventListener("review-queue-updated", onQueueUpdated);
+    window.addEventListener("notifications-updated", onQueueUpdated);
     const timer = window.setInterval(() => {
-      void refreshReviewQueueCount();
+      void refreshNotificationCounts();
     }, 30000);
 
     return () => {
       active = false;
       window.removeEventListener("review-queue-updated", onQueueUpdated);
+      window.removeEventListener("notifications-updated", onQueueUpdated);
       window.clearInterval(timer);
     };
   }, [auth.contactChangeModerationEnabled, auth.user, location.pathname]);
+
+  useEffect(() => {
+    if (!auth.user || !auth.webPushEnabled) {
+      return undefined;
+    }
+
+    void registerDavvyServiceWorker();
+
+    return undefined;
+  }, [auth.user, auth.webPushEnabled]);
 
   useEffect(() => {
     setMobileAccountMenuOpen(false);

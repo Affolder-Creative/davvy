@@ -567,9 +567,15 @@ Artisan::command('app:preflight', function (): int {
 
     $runDbSeed = filter_var(env('RUN_DB_SEED', false), FILTER_VALIDATE_BOOL);
     $runScheduler = filter_var(env('RUN_SCHEDULER', true), FILTER_VALIDATE_BOOL);
+    $runQueueWorker = filter_var(env('RUN_QUEUE_WORKER', true), FILTER_VALIDATE_BOOL);
     $secureCookieEnabled = filter_var(env('SESSION_SECURE_COOKIE', false), FILTER_VALIDATE_BOOL);
     $defaultAdminEmail = trim((string) env('DEFAULT_ADMIN_EMAIL', ''));
     $defaultAdminPassword = (string) env('DEFAULT_ADMIN_PASSWORD', '');
+    $queueConnection = trim((string) config('queue.default', 'sync'));
+    $webPushEnabled = (bool) config('services.webpush.enabled', false);
+    $vapidSubject = trim((string) config('webpush.vapid.subject', ''));
+    $vapidPublicKey = trim((string) config('webpush.vapid.public_key', ''));
+    $vapidPrivateKey = trim((string) config('webpush.vapid.private_key', ''));
     $backupsEnabled = (bool) config('services.backups.enabled', false);
     $backupLocalEnabled = (bool) config('services.backups.local_enabled', true);
     $backupS3Enabled = (bool) config('services.backups.s3_enabled', false);
@@ -595,6 +601,29 @@ Artisan::command('app:preflight', function (): int {
 
     if ($appUrl === '') {
         $errors[] = 'APP_URL is missing.';
+    }
+
+    if ($webPushEnabled) {
+        if ($vapidPublicKey === '') {
+            $errors[] = 'ENABLE_WEB_PUSH_NOTIFICATIONS=true requires VAPID_PUBLIC_KEY.';
+        }
+
+        if ($vapidPrivateKey === '') {
+            $errors[] = 'ENABLE_WEB_PUSH_NOTIFICATIONS=true requires VAPID_PRIVATE_KEY.';
+        }
+
+        if ($vapidSubject === '') {
+            $errors[] = 'ENABLE_WEB_PUSH_NOTIFICATIONS=true requires VAPID_SUBJECT.';
+        } elseif (
+            ! str_starts_with(strtolower($vapidSubject), 'mailto:')
+            && filter_var($vapidSubject, FILTER_VALIDATE_URL) === false
+        ) {
+            $errors[] = 'VAPID_SUBJECT must be a valid URL or mailto: address.';
+        }
+
+        if ($queueConnection !== 'sync' && ! $runQueueWorker) {
+            $warnings[] = 'ENABLE_WEB_PUSH_NOTIFICATIONS=true while RUN_QUEUE_WORKER=false. Run queue workers externally so push notifications can be delivered.';
+        }
     }
 
     if ($appEnv === 'production') {

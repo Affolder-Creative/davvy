@@ -21,6 +21,8 @@ import { SUPPORTED_LOCALES } from "../../lib/locale";
  *   twoFactorSetupRequired: boolean,
  *   twoFactorMandated: boolean,
  *   twoFactorGraceExpiresAt: string|null,
+ *   webPushEnabled: boolean,
+ *   webPushAvailable: boolean,
  *   sponsorship: {enabled: boolean, links: SponsorshipLink[]}
  * }} AuthState
  */
@@ -69,6 +71,8 @@ export function createDefaultAuthState() {
     twoFactorSetupRequired: false,
     twoFactorMandated: false,
     twoFactorGraceExpiresAt: null,
+    webPushEnabled: false,
+    webPushAvailable: false,
     locale: "en",
     supportedLocales: [...SUPPORTED_LOCALES],
     fallbackLocale: "en",
@@ -161,6 +165,8 @@ export function buildAuthStateFromPayload(payload, { user = null } = {}) {
     twoFactorSetupRequired: !!source.two_factor_setup_required,
     twoFactorMandated: !!source.two_factor_mandated,
     twoFactorGraceExpiresAt: source.two_factor_grace_expires_at || null,
+    webPushEnabled: !!source.web_push_enabled,
+    webPushAvailable: !!source.web_push_available,
     locale,
     supportedLocales,
     fallbackLocale,

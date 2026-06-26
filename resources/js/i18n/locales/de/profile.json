@@ -82,7 +82,13 @@
     "disableTwoFactor": "Zwei-Faktor-Authentifizierung konnte nicht deaktiviert werden.",
     "regenerateCodes": "Backup-Codes konnten nicht neu generiert werden.",
     "createAppPassword": "DAV-App-Passwort konnte nicht erstellt werden.",
-    "revokeAppPassword": "DAV-App-Passwort konnte nicht widerrufen werden."
+    "revokeAppPassword": "DAV-App-Passwort konnte nicht widerrufen werden.",
+    "loadWebPush": "WebPush-Benachrichtigungseinstellungen konnten nicht geladen werden.",
+    "webPushUnavailable": "WebPush ist auf diesem Server noch nicht verfügbar.",
+    "webPushSubscriptionInvalid": "Der Browser hat ein ungültiges Push-Abonnement zurückgegeben.",
+    "enableWebPush": "Push-Benachrichtigungen konnten nicht aktiviert werden.",
+    "disableWebPush": "Push-Benachrichtigungen konnten nicht deaktiviert werden.",
+    "updateWebPushPreferences": "Push-Benachrichtigungseinstellungen konnten nicht aktualisiert werden."
   },
   "notices": {
     "passwordSuccess": "Passwort aktualisiert. Verwenden Sie Ihr neues Passwort für die App-Anmeldung und DAV-Clients.",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "Die Zwei-Faktor-Authentifizierung wurde deaktiviert und DAV-App-Passwörter wurden widerrufen.",
     "backupCodesRegenerated": "Backup-Codes neu generiert.",
     "appPasswordCreated": "DAV-App-Passwort erstellt.",
-    "appPasswordRevoked": "DAV-App-Passwort widerrufen."
+    "appPasswordRevoked": "DAV-App-Passwort widerrufen.",
+    "webPushEnabled": "Push-Benachrichtigungen für dieses Gerät aktiviert.",
+    "webPushDisabled": "Push-Benachrichtigungen für dieses Gerät deaktiviert.",
+    "webPushPreferencesSaved": "Push-Benachrichtigungseinstellungen gespeichert."
   },
   "confirmations": {
     "disable2fa": "Zwei-Faktor-Authentifizierung deaktivieren und alle DAV-App-Passwörter widerrufen?"
+  },
+  "webPush": {
+    "title": "Push-Benachrichtigungen",
+    "description": "Aktivieren Sie Gerätebenachrichtigungen für Prüfaufgaben, Administratorgenehmigungen und Backup-Vorgänge.",
+    "deviceHelp": "Installieren Sie Davvy auf iPhone und iPad auf dem Home-Bildschirm, bevor Sie Benachrichtigungen aktivieren.",
+    "enableDevice": "Dieses Gerät aktivieren",
+    "enabling": "Wird aktiviert...",
+    "disableDevice": "Dieses Gerät deaktivieren",
+    "disabling": "Wird deaktiviert...",
+    "refresh": "Status aktualisieren",
+    "status": {
+      "loading": "Wird geprüft...",
+      "disabled": "Push-Benachrichtigungen sind serverseitig deaktiviert.",
+      "unsupported": "Dieser Browser unterstützt WebPush nicht.",
+      "unavailable": "WebPush ist noch nicht vollständig konfiguriert.",
+      "denied": "Die Benachrichtigungsberechtigung ist für dieses Gerät blockiert.",
+      "enabled": "Dieses Gerät ist abonniert.",
+      "ready": "Bereit zur Aktivierung auf diesem Gerät."
+    },
+    "categories": {
+      "reviewQueue": "Prüfwarteschlange",
+      "reviewQueueHelp": "Benachrichtigen Sie mich, wenn Kontaktänderungen meine Prüfung erfordern.",
+      "pendingRegistration": "Registrierungsgenehmigungen",
+      "pendingRegistrationHelp": "Benachrichtigen Sie mich, wenn ein neues Konto auf Administratorgenehmigung wartet.",
+      "backupOperations": "Backup-Vorgänge",
+      "backupOperationsHelp": "Benachrichtigen Sie mich, wenn administrative Backup- oder Wiederherstellungsvorgänge abgeschlossen sind."
+    }
   }
 }

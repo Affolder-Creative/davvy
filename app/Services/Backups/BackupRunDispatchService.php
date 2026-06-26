@@ -4,6 +4,7 @@ namespace App\Services\Backups;
 
 use App\Jobs\Backups\RunBackupOperationJob;
 use App\Models\AppSetting;
+use App\Services\Notifications\WebPushDispatchService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -24,7 +25,10 @@ class BackupRunDispatchService
         'result_json' => 'backup_run_result_json',
     ];
 
-    public function __construct(private readonly BackupService $backupService) {}
+    public function __construct(
+        private readonly BackupService $backupService,
+        private readonly WebPushDispatchService $webPushDispatch,
+    ) {}
 
     /**
      * @return array{
@@ -145,6 +149,12 @@ class BackupRunDispatchService
                 'finished_at_utc' => $finishedAtUtc,
                 'result' => $result,
             ], $requestedByUserId);
+
+            $this->webPushDispatch->notifyBackupOperationFinished(
+                operation: 'run',
+                status: (string) ($result['status'] ?? 'success'),
+                message: (string) ($result['reason'] ?? 'Backup run completed.'),
+            );
         } catch (Throwable $throwable) {
             report($throwable);
 
@@ -177,6 +187,12 @@ class BackupRunDispatchService
                     ],
                 ],
             ], $requestedByUserId);
+
+            $this->webPushDispatch->notifyBackupOperationFinished(
+                operation: 'run',
+                status: 'failed',
+                message: $failedReason,
+            );
         } finally {
             try {
                 $lock->release();

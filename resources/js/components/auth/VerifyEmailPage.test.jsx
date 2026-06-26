@@ -80,7 +80,7 @@ describe("VerifyEmailPage", () => {
         user: { id: 5, role: "regular" },
       }),
     );
-    expect(screen.getByText("Dashboard Home")).toBeInTheDocument();
+    expect(await screen.findByText("Dashboard Home")).toBeInTheDocument();
   });
 
   it("renders a malformed-link message when token is missing", () => {

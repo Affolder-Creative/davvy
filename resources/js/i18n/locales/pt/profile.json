@@ -82,7 +82,13 @@
     "disableTwoFactor": "Não é possível desativar dois fatores.",
     "regenerateCodes": "Não é possível regenerar códigos de backup.",
     "createAppPassword": "Não foi possível criar a senha do aplicativo DAV.",
-    "revokeAppPassword": "Não foi possível revogar a senha do aplicativo DAV."
+    "revokeAppPassword": "Não foi possível revogar a senha do aplicativo DAV.",
+    "loadWebPush": "Não foi possível carregar as configurações de notificações push.",
+    "webPushUnavailable": "WebPush ainda não está disponível neste servidor.",
+    "webPushSubscriptionInvalid": "O navegador retornou uma assinatura push inválida.",
+    "enableWebPush": "Não foi possível habilitar as notificações push.",
+    "disableWebPush": "Não foi possível desabilitar as notificações push.",
+    "updateWebPushPreferences": "Não foi possível atualizar as preferências de notificações push."
   },
   "notices": {
     "passwordSuccess": "Senha atualizada. Use sua nova senha para login no aplicativo e clientes DAV.",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "A autenticação de dois fatores foi desativada e as senhas do aplicativo DAV foram revogadas.",
     "backupCodesRegenerated": "Códigos de backup regenerados.",
     "appPasswordCreated": "Senha do aplicativo DAV criada.",
-    "appPasswordRevoked": "Senha do aplicativo DAV revogada."
+    "appPasswordRevoked": "Senha do aplicativo DAV revogada.",
+    "webPushEnabled": "Notificações push habilitadas para este dispositivo.",
+    "webPushDisabled": "Notificações push desabilitadas para este dispositivo.",
+    "webPushPreferencesSaved": "Preferências de notificações push salvas."
   },
   "confirmations": {
     "disable2fa": "Desativar a autenticação de dois fatores e revogar todas as senhas do aplicativo DAV?"
+  },
+  "webPush": {
+    "title": "Notificações push",
+    "description": "Habilite notificações no dispositivo para revisões, aprovações administrativas e operações de backup.",
+    "deviceHelp": "No iPhone e iPad, instale o Davvy na Tela de Início antes de habilitar notificações.",
+    "enableDevice": "Habilitar este dispositivo",
+    "enabling": "Habilitando...",
+    "disableDevice": "Desabilitar este dispositivo",
+    "disabling": "Desabilitando...",
+    "refresh": "Atualizar status",
+    "status": {
+      "loading": "Verificando...",
+      "disabled": "As notificações push estão desabilitadas pelo servidor.",
+      "unsupported": "Este navegador não oferece suporte ao WebPush.",
+      "unavailable": "WebPush ainda não está totalmente configurado.",
+      "denied": "A permissão de notificações está bloqueada para este dispositivo.",
+      "enabled": "Este dispositivo está inscrito.",
+      "ready": "Pronto para habilitar neste dispositivo."
+    },
+    "categories": {
+      "reviewQueue": "Fila de revisão",
+      "reviewQueueHelp": "Avise-me quando alterações de contatos precisarem da minha revisão.",
+      "pendingRegistration": "Aprovações de registro",
+      "pendingRegistrationHelp": "Avise-me quando uma nova conta estiver aguardando aprovação administrativa.",
+      "backupOperations": "Operações de backup",
+      "backupOperationsHelp": "Avise-me quando operações administrativas de backup ou restauração forem concluídas."
+    }
   }
 }

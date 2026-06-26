@@ -4,6 +4,7 @@ namespace App\Services\Backups;
 
 use App\Jobs\Backups\RunBackupRestoreOperationJob;
 use App\Models\AppSetting;
+use App\Services\Notifications\WebPushDispatchService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -26,7 +27,10 @@ class BackupRestoreDispatchService
         'result_json' => 'backup_restore_result_json',
     ];
 
-    public function __construct(private readonly BackupRestoreService $backupRestoreService) {}
+    public function __construct(
+        private readonly BackupRestoreService $backupRestoreService,
+        private readonly WebPushDispatchService $webPushDispatch,
+    ) {}
 
     /**
      * @return array{
@@ -182,6 +186,12 @@ class BackupRestoreDispatchService
                 'finished_at_utc' => $finishedAtUtc,
                 'result' => $result,
             ], $requestedByUserId);
+
+            $this->webPushDispatch->notifyBackupOperationFinished(
+                operation: 'restore',
+                status: (string) ($result['status'] ?? 'success'),
+                message: (string) ($result['reason'] ?? 'Backup restore completed.'),
+            );
         } catch (Throwable $throwable) {
             report($throwable);
 
@@ -209,6 +219,12 @@ class BackupRestoreDispatchService
                     'warnings' => [],
                 ],
             ], $requestedByUserId);
+
+            $this->webPushDispatch->notifyBackupOperationFinished(
+                operation: 'restore',
+                status: 'failed',
+                message: $failedReason,
+            );
         } finally {
             if (is_file($stagedArchivePath)) {
                 @unlink($stagedArchivePath);

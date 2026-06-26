@@ -38,6 +38,10 @@ Set these in your app service environment.
 | `CACHE_STORE` | `database` | Recommended |
 | `QUEUE_CONNECTION` | `database` | Recommended |
 | `TRUSTED_PROXIES` | `*` or explicit proxies | Recommended behind reverse proxy |
+| `ENABLE_WEB_PUSH_NOTIFICATIONS` | `false` | Set `true` only after configuring VAPID keys and queue workers |
+| `VAPID_PUBLIC_KEY` | _(empty)_ | Required when WebPush is enabled |
+| `VAPID_PRIVATE_KEY` | _(empty)_ | Required when WebPush is enabled; store as a secret |
+| `VAPID_SUBJECT` | `mailto:admin@<your-domain>` or `https://<your-domain>` | Required for Safari/iOS WebPush |
 | `ENABLE_PUBLIC_REGISTRATION` | `false` | Env default only; setting is primarily managed via app settings/admin toggle |
 | `ONBOARDING_REQUIRE_PUBLIC_EMAIL_VERIFICATION` | `true` | Require verification before sign-in for public registration users |
 | `ONBOARDING_SEND_EMAILS` | `true` (with working mailer) | Sends onboarding verification and invitation emails |

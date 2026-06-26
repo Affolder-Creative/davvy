@@ -82,7 +82,13 @@
     "disableTwoFactor": "Impossible de désactiver l’authentification à deux facteurs.",
     "regenerateCodes": "Impossible de régénérer les codes de secours.",
     "createAppPassword": "Impossible de créer le mot de passe d’application DAV.",
-    "revokeAppPassword": "Impossible de révoquer le mot de passe d’application DAV."
+    "revokeAppPassword": "Impossible de révoquer le mot de passe d’application DAV.",
+    "loadWebPush": "Impossible de charger les paramètres de notifications push.",
+    "webPushUnavailable": "WebPush n’est pas encore disponible sur ce serveur.",
+    "webPushSubscriptionInvalid": "Le navigateur a renvoyé un abonnement push non valide.",
+    "enableWebPush": "Impossible d’activer les notifications push.",
+    "disableWebPush": "Impossible de désactiver les notifications push.",
+    "updateWebPushPreferences": "Impossible de mettre à jour les préférences de notifications push."
   },
   "notices": {
     "passwordSuccess": "Mot de passe mis à jour. Utilisez votre nouveau mot de passe pour la connexion à l’application et les clients DAV.",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "L’authentification à deux facteurs a été désactivée et les mots de passe d’application DAV ont été révoqués.",
     "backupCodesRegenerated": "Codes de secours régénérés.",
     "appPasswordCreated": "Mot de passe d’application DAV créé.",
-    "appPasswordRevoked": "Mot de passe d’application DAV révoqué."
+    "appPasswordRevoked": "Mot de passe d’application DAV révoqué.",
+    "webPushEnabled": "Notifications push activées pour cet appareil.",
+    "webPushDisabled": "Notifications push désactivées pour cet appareil.",
+    "webPushPreferencesSaved": "Préférences de notifications push enregistrées."
   },
   "confirmations": {
     "disable2fa": "Désactiver l’authentification à deux facteurs et révoquer tous les mots de passe d’application DAV ?"
+  },
+  "webPush": {
+    "title": "Notifications push",
+    "description": "Activez les notifications de l’appareil pour les révisions, les approbations administratives et les opérations de sauvegarde.",
+    "deviceHelp": "Sur iPhone et iPad, ajoutez Davvy à l’écran d’accueil avant d’activer les notifications.",
+    "enableDevice": "Activer cet appareil",
+    "enabling": "Activation...",
+    "disableDevice": "Désactiver cet appareil",
+    "disabling": "Désactivation...",
+    "refresh": "Actualiser le statut",
+    "status": {
+      "loading": "Vérification...",
+      "disabled": "Les notifications push sont désactivées par le serveur.",
+      "unsupported": "Ce navigateur ne prend pas en charge WebPush.",
+      "unavailable": "WebPush n’est pas encore entièrement configuré.",
+      "denied": "L’autorisation de notification est bloquée pour cet appareil.",
+      "enabled": "Cet appareil est abonné.",
+      "ready": "Prêt à être activé sur cet appareil."
+    },
+    "categories": {
+      "reviewQueue": "File de révision",
+      "reviewQueueHelp": "Prévenez-moi lorsque des modifications de contacts nécessitent ma révision.",
+      "pendingRegistration": "Approbations des inscriptions",
+      "pendingRegistrationHelp": "Prévenez-moi lorsqu’un nouveau compte attend une approbation administrateur.",
+      "backupOperations": "Opérations de sauvegarde",
+      "backupOperationsHelp": "Prévenez-moi lorsque des opérations administratives de sauvegarde ou de restauration se terminent."
+    }
   }
 }

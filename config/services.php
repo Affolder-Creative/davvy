@@ -5,6 +5,9 @@ return [
         'enabled' => (bool) env('ENABLE_PUBLIC_REGISTRATION', false),
         'require_approval' => (bool) env('ENABLE_PUBLIC_REGISTRATION_REQUIRE_APPROVAL', false),
     ],
+    'webpush' => [
+        'enabled' => (bool) env('ENABLE_WEB_PUSH_NOTIFICATIONS', false),
+    ],
     'sharing' => [
         'owner_management_enabled' => (bool) env('ENABLE_OWNER_SHARE_MANAGEMENT', true),
     ],

@@ -80,10 +80,26 @@ Onboarding flow behavior:
 - For stricter production posture, set `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER=false` and rely on delivered email links only.
 - Local `.env.example` and `.env.ddev.example` intentionally prefer non-delivery-safe defaults (`MAIL_MAILER=log`, `ONBOARDING_SEND_EMAILS=false`, `ONBOARDING_EXPOSE_LINKS_WITHOUT_MAILER=true`) for development and testing workflows.
 
+### WebPush Notifications
+
+| Variable | Default | Notes |
+| --- | --- | --- |
+| `ENABLE_WEB_PUSH_NOTIFICATIONS` | `false` | Enables opt-in browser push notifications and app-icon badging support |
+| `VAPID_PUBLIC_KEY` | _(empty)_ | Public VAPID key passed to browser Push API subscriptions |
+| `VAPID_PRIVATE_KEY` | _(empty)_ | Private VAPID key used by the server to send push messages |
+| `VAPID_SUBJECT` | _(empty)_ | Required for Safari/iOS; use a stable `https://...` URL or `mailto:` contact |
+
+WebPush notes:
+- Production WebPush requires HTTPS and stable VAPID keys. Do not rotate VAPID keys casually; existing browser subscriptions are tied to them.
+- Generate keys with `php artisan webpush:vapid` after installing dependencies, then store them as platform secrets.
+- Push delivery is queued through Laravel notifications. Keep `QUEUE_CONNECTION=database` and `RUN_QUEUE_WORKER=true`, or run queue workers externally.
+- iOS/iPadOS users must install Davvy to the Home Screen before Safari exposes web push permission for the app.
+
 ### Davvy Feature and Runtime Flags
 
 | Variable | Default | Notes |
 | --- | --- | --- |
+| `ENABLE_WEB_PUSH_NOTIFICATIONS` | `false` | Enables opt-in WebPush notifications for review queue, pending registration approval, and admin backup operations |
 | `ENABLE_PUBLIC_REGISTRATION` | `false` | Env default only; setting is generally managed in DB/admin UI |
 | `ENABLE_PUBLIC_REGISTRATION_REQUIRE_APPROVAL` | `false` | Env fallback only; first admin enable of public registration defaults this setting to `true` unless already set |
 | `ENABLE_OWNER_SHARE_MANAGEMENT` | `true` | Seeds/initial default for owner sharing |

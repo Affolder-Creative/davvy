@@ -82,7 +82,13 @@
     "disableTwoFactor": "2 要素を無効にできません。",
     "regenerateCodes": "バックアップ コードを再生成できません。",
     "createAppPassword": "DAV アプリのパスワードを作成できません。",
-    "revokeAppPassword": "DAV アプリのパスワードを取り消すことができません。"
+    "revokeAppPassword": "DAV アプリのパスワードを取り消すことができません。",
+    "loadWebPush": "プッシュ通知設定を読み込めません。",
+    "webPushUnavailable": "このサーバーでは WebPush はまだ利用できません。",
+    "webPushSubscriptionInvalid": "ブラウザーから無効なプッシュ購読が返されました。",
+    "enableWebPush": "プッシュ通知を有効にできません。",
+    "disableWebPush": "プッシュ通知を無効にできません。",
+    "updateWebPushPreferences": "プッシュ通知設定を更新できません。"
   },
   "notices": {
     "passwordSuccess": "パスワードが更新されました。アプリのログインと DAV クライアントには新しいパスワードを使用します。",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "2 要素認証が無効になり、DAV アプリのパスワードが取り消されました。",
     "backupCodesRegenerated": "バックアップコードが再生成されました。",
     "appPasswordCreated": "DAV アプリのパスワードが作成されました。",
-    "appPasswordRevoked": "DAV アプリのパスワードが取り消されました。"
+    "appPasswordRevoked": "DAV アプリのパスワードが取り消されました。",
+    "webPushEnabled": "このデバイスのプッシュ通知を有効にしました。",
+    "webPushDisabled": "このデバイスのプッシュ通知を無効にしました。",
+    "webPushPreferencesSaved": "プッシュ通知設定を保存しました。"
   },
   "confirmations": {
     "disable2fa": "2 要素認証を無効にして、すべての DAV アプリのパスワードを取り消しますか?"
+  },
+  "webPush": {
+    "title": "プッシュ通知",
+    "description": "レビュー作業、管理者承認、バックアップ操作についてデバイス通知を有効にします。",
+    "deviceHelp": "iPhone と iPad では、通知を有効にする前に Davvy をホーム画面に追加してください。",
+    "enableDevice": "このデバイスを有効にする",
+    "enabling": "有効化中...",
+    "disableDevice": "このデバイスを無効にする",
+    "disabling": "無効化中...",
+    "refresh": "状態を更新",
+    "status": {
+      "loading": "確認中...",
+      "disabled": "プッシュ通知はサーバーで無効になっています。",
+      "unsupported": "このブラウザーは WebPush をサポートしていません。",
+      "unavailable": "WebPush はまだ完全に設定されていません。",
+      "denied": "このデバイスでは通知権限がブロックされています。",
+      "enabled": "このデバイスは購読済みです。",
+      "ready": "このデバイスで有効にできます。"
+    },
+    "categories": {
+      "reviewQueue": "レビューキュー",
+      "reviewQueueHelp": "連絡先の変更に自分のレビューが必要なときに通知します。",
+      "pendingRegistration": "登録承認",
+      "pendingRegistrationHelp": "新しいアカウントが管理者承認を待っているときに通知します。",
+      "backupOperations": "バックアップ操作",
+      "backupOperationsHelp": "管理者によるバックアップまたは復元操作が完了したときに通知します。"
+    }
   }
 }

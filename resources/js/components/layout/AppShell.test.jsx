@@ -59,7 +59,9 @@ function renderShell({
   auth = createAuth(),
   theme = createTheme(),
   api = {
-    get: vi.fn().mockResolvedValue({ data: { needs_review_count: 0 } }),
+    get: vi.fn().mockResolvedValue({
+      data: { review_queue: 0, pending_registrations: 0, total: 0 },
+    }),
     post: vi.fn().mockResolvedValue({}),
   },
 } = {}) {
@@ -89,17 +91,25 @@ function renderShell({
 describe("AppShell", () => {
   it("shows review queue badge from summary endpoint when moderation is enabled", async () => {
     const api = {
-      get: vi.fn().mockResolvedValue({ data: { needs_review_count: 12 } }),
+      get: vi.fn().mockResolvedValue({
+        data: { review_queue: 12, pending_registrations: 3, total: 15 },
+      }),
       post: vi.fn().mockResolvedValue({}),
     };
+    const setAppBadge = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "setAppBadge", {
+      configurable: true,
+      value: setAppBadge,
+    });
 
     renderShell({ api });
 
     await waitFor(() =>
-      expect(api.get).toHaveBeenCalledWith("/api/contact-change-requests/summary"),
+      expect(api.get).toHaveBeenCalledWith("/api/notifications/counts"),
     );
     expect(screen.getByRole("link", { name: /review queue/i })).toBeInTheDocument();
     expect(screen.getByText("12")).toBeInTheDocument();
+    await waitFor(() => expect(setAppBadge).toHaveBeenCalledWith(15));
   });
 
   it("logs out and navigates to login", async () => {

@@ -82,7 +82,13 @@
     "disableTwoFactor": "No se pudo deshabilitar dos factores.",
     "regenerateCodes": "No se pudieron regenerar los códigos de respaldo.",
     "createAppPassword": "No se pudo crear la contraseña DAV.",
-    "revokeAppPassword": "No se pudo revocar la contraseña DAV."
+    "revokeAppPassword": "No se pudo revocar la contraseña DAV.",
+    "loadWebPush": "No se pudieron cargar los ajustes de notificaciones push.",
+    "webPushUnavailable": "WebPush aún no está disponible en este servidor.",
+    "webPushSubscriptionInvalid": "El navegador devolvió una suscripción push no válida.",
+    "enableWebPush": "No se pudieron habilitar las notificaciones push.",
+    "disableWebPush": "No se pudieron deshabilitar las notificaciones push.",
+    "updateWebPushPreferences": "No se pudieron actualizar las preferencias de notificaciones push."
   },
   "notices": {
     "passwordSuccess": "Contraseña actualizada. Utilice su nueva contraseña para iniciar sesión en la aplicación y en los clientes DAV.",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "La autenticación de dos factores ha sido deshabilitada y las contraseñas de aplicaciones DAV han sido revocadas.",
     "backupCodesRegenerated": "Códigos de respaldo regenerados.",
     "appPasswordCreated": "Contraseña de la aplicación DAV creada.",
-    "appPasswordRevoked": "Contraseña de la aplicación DAV revocada."
+    "appPasswordRevoked": "Contraseña de la aplicación DAV revocada.",
+    "webPushEnabled": "Notificaciones push habilitadas para este dispositivo.",
+    "webPushDisabled": "Notificaciones push deshabilitadas para este dispositivo.",
+    "webPushPreferencesSaved": "Preferencias de notificaciones push guardadas."
   },
   "confirmations": {
     "disable2fa": "¿Deshabilitar la autenticación de dos factores y revocar todas las contraseñas DAV?"
+  },
+  "webPush": {
+    "title": "Notificaciones push",
+    "description": "Habilita notificaciones en el dispositivo para revisiones, aprobaciones administrativas y operaciones de copia de seguridad.",
+    "deviceHelp": "En iPhone y iPad, instala Davvy en la pantalla de inicio antes de habilitar las notificaciones.",
+    "enableDevice": "Habilitar este dispositivo",
+    "enabling": "Habilitando...",
+    "disableDevice": "Deshabilitar este dispositivo",
+    "disabling": "Deshabilitando...",
+    "refresh": "Actualizar estado",
+    "status": {
+      "loading": "Comprobando...",
+      "disabled": "El servidor tiene deshabilitadas las notificaciones push.",
+      "unsupported": "Este navegador no admite WebPush.",
+      "unavailable": "WebPush aún no está completamente configurado.",
+      "denied": "El permiso de notificaciones está bloqueado para este dispositivo.",
+      "enabled": "Este dispositivo está suscrito.",
+      "ready": "Listo para habilitar en este dispositivo."
+    },
+    "categories": {
+      "reviewQueue": "Cola de revisión",
+      "reviewQueueHelp": "Avísame cuando haya cambios de contacto que necesiten mi revisión.",
+      "pendingRegistration": "Aprobaciones de registro",
+      "pendingRegistrationHelp": "Avísame cuando haya una nueva cuenta esperando aprobación administrativa.",
+      "backupOperations": "Operaciones de copia de seguridad",
+      "backupOperationsHelp": "Avísame cuando finalicen operaciones administrativas de copia de seguridad o restauración."
+    }
   }
 }

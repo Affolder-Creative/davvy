@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Enums\Role;
 use App\Models\User;
 use App\Models\UserAppPassword;
+use App\Services\Notifications\NotificationPreferenceService;
+use App\Services\Notifications\WebPushDispatchService;
 use App\Services\RegistrationSettingsService;
 use App\Services\Security\AppPasswordService;
 use App\Services\Security\PendingTwoFactorLoginService;
@@ -38,6 +40,8 @@ class AuthController extends Controller
         private readonly PendingTwoFactorLoginService $pendingTwoFactorLogin,
         private readonly AppPasswordService $appPasswords,
         private readonly UserOnboardingService $onboarding,
+        private readonly WebPushDispatchService $webPushDispatch,
+        private readonly NotificationPreferenceService $notificationPreferences,
     ) {}
 
     /**
@@ -74,6 +78,10 @@ class AuthController extends Controller
             'approved_at' => $approvalRequired ? null : now(),
             'approved_by' => null,
         ]);
+
+        if ($approvalRequired) {
+            $this->webPushDispatch->notifyPendingRegistrationCreated();
+        }
 
         if ($verificationRequired) {
             $verification = $this->onboarding->issueEmailVerification($user);
@@ -622,6 +630,8 @@ class AuthController extends Controller
             'private_working_set_enabled' => $this->registrationSettings->isPrivateWorkingSetEnabled(),
             'two_factor_enforcement_enabled' => $this->twoFactorSettings->isEnforced(),
             'two_factor_grace_period_days' => $this->twoFactorSettings->gracePeriodDays(),
+            'web_push_enabled' => $this->notificationPreferences->isWebPushEnabled(),
+            'web_push_available' => $this->notificationPreferences->isAvailable(),
             'sponsorship' => $this->sponsorshipLinks->publicConfig(),
         ], $this->localePayload());
     }

@@ -82,7 +82,13 @@
     "disableTwoFactor": "无法禁用双因素。",
     "regenerateCodes": "无法重新生成备份代码。",
     "createAppPassword": "无法创建 DAV 应用程序密码。",
-    "revokeAppPassword": "无法撤销 DAV 应用程序密码。"
+    "revokeAppPassword": "无法撤销 DAV 应用程序密码。",
+    "loadWebPush": "无法加载推送通知设置。",
+    "webPushUnavailable": "此服务器尚未提供 WebPush。",
+    "webPushSubscriptionInvalid": "浏览器返回了无效的推送订阅。",
+    "enableWebPush": "无法启用推送通知。",
+    "disableWebPush": "无法禁用推送通知。",
+    "updateWebPushPreferences": "无法更新推送通知偏好设置。"
   },
   "notices": {
     "passwordSuccess": "密码已更新。使用您的新密码登录应用程序和 DAV 客户端。",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "双因素身份验证已被禁用，DAV 应用程序密码已被撤销。",
     "backupCodesRegenerated": "备份代码已重新生成。",
     "appPasswordCreated": "DAV 应用程序密码已创建。",
-    "appPasswordRevoked": "DAV 应用程序密码已撤销。"
+    "appPasswordRevoked": "DAV 应用程序密码已撤销。",
+    "webPushEnabled": "已为此设备启用推送通知。",
+    "webPushDisabled": "已为此设备禁用推送通知。",
+    "webPushPreferencesSaved": "已保存推送通知偏好设置。"
   },
   "confirmations": {
     "disable2fa": "禁用双因素身份验证并撤销所有 DAV 应用程序密码？"
+  },
+  "webPush": {
+    "title": "推送通知",
+    "description": "启用设备通知，用于审核工作、管理员批准和备份操作。",
+    "deviceHelp": "在 iPhone 和 iPad 上，请先将 Davvy 添加到主屏幕，然后再启用通知。",
+    "enableDevice": "启用此设备",
+    "enabling": "正在启用...",
+    "disableDevice": "禁用此设备",
+    "disabling": "正在禁用...",
+    "refresh": "刷新状态",
+    "status": {
+      "loading": "正在检查...",
+      "disabled": "服务器已禁用推送通知。",
+      "unsupported": "此浏览器不支持 WebPush。",
+      "unavailable": "WebPush 尚未完全配置。",
+      "denied": "此设备的通知权限已被阻止。",
+      "enabled": "此设备已订阅。",
+      "ready": "可在此设备上启用。"
+    },
+    "categories": {
+      "reviewQueue": "审核队列",
+      "reviewQueueHelp": "当联系人更改需要我审核时通知我。",
+      "pendingRegistration": "注册批准",
+      "pendingRegistrationHelp": "当新帐户等待管理员批准时通知我。",
+      "backupOperations": "备份操作",
+      "backupOperationsHelp": "当管理员备份或恢复操作完成时通知我。"
+    }
   }
 }

@@ -82,7 +82,13 @@
     "disableTwoFactor": "Impossibile disabilitare il due fattori.",
     "regenerateCodes": "Impossibile rigenerare i codici di backup.",
     "createAppPassword": "Impossibile creare la password dell'app DAV.",
-    "revokeAppPassword": "Impossibile revocare la password dell'app DAV."
+    "revokeAppPassword": "Impossibile revocare la password dell'app DAV.",
+    "loadWebPush": "Impossibile caricare le impostazioni delle notifiche push.",
+    "webPushUnavailable": "WebPush non è ancora disponibile su questo server.",
+    "webPushSubscriptionInvalid": "Il browser ha restituito una sottoscrizione push non valida.",
+    "enableWebPush": "Impossibile abilitare le notifiche push.",
+    "disableWebPush": "Impossibile disabilitare le notifiche push.",
+    "updateWebPushPreferences": "Impossibile aggiornare le preferenze delle notifiche push."
   },
   "notices": {
     "passwordSuccess": "Password aggiornata. Utilizza la tua nuova password per l'accesso all'app e i client DAV.",
@@ -91,9 +97,39 @@
     "2faDisableSuccess": "L'autenticazione a due fattori è stata disabilitata e le password dell'app DAV sono state revocate.",
     "backupCodesRegenerated": "Codici di backup rigenerati.",
     "appPasswordCreated": "Password dell'app DAV creata.",
-    "appPasswordRevoked": "Password dell'app DAV revocata."
+    "appPasswordRevoked": "Password dell'app DAV revocata.",
+    "webPushEnabled": "Notifiche push abilitate per questo dispositivo.",
+    "webPushDisabled": "Notifiche push disabilitate per questo dispositivo.",
+    "webPushPreferencesSaved": "Preferenze delle notifiche push salvate."
   },
   "confirmations": {
     "disable2fa": "Disabilitare l'autenticazione a due fattori e revocare tutte le password dell'app DAV?"
+  },
+  "webPush": {
+    "title": "Notifiche push",
+    "description": "Abilita le notifiche del dispositivo per revisioni, approvazioni amministrative e operazioni di backup.",
+    "deviceHelp": "Su iPhone e iPad, installa Davvy nella schermata Home prima di abilitare le notifiche.",
+    "enableDevice": "Abilita questo dispositivo",
+    "enabling": "Abilitazione...",
+    "disableDevice": "Disabilita questo dispositivo",
+    "disabling": "Disabilitazione...",
+    "refresh": "Aggiorna stato",
+    "status": {
+      "loading": "Controllo...",
+      "disabled": "Le notifiche push sono disabilitate dal server.",
+      "unsupported": "Questo browser non supporta WebPush.",
+      "unavailable": "WebPush non è ancora completamente configurato.",
+      "denied": "L'autorizzazione alle notifiche è bloccata per questo dispositivo.",
+      "enabled": "Questo dispositivo è iscritto.",
+      "ready": "Pronto per l'abilitazione su questo dispositivo."
+    },
+    "categories": {
+      "reviewQueue": "Coda di revisione",
+      "reviewQueueHelp": "Avvisami quando modifiche ai contatti richiedono la mia revisione.",
+      "pendingRegistration": "Approvazioni registrazione",
+      "pendingRegistrationHelp": "Avvisami quando un nuovo account è in attesa dell'approvazione amministrativa.",
+      "backupOperations": "Operazioni di backup",
+      "backupOperationsHelp": "Avvisami quando terminano operazioni amministrative di backup o ripristino."
+    }
   }
 }

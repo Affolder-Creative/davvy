@@ -5,6 +5,14 @@ import { buildAuthStateFromPayload } from "../auth/authStateMapper";
 import { setI18nLocale } from "../../i18n";
 import { setApiLocale } from "../../lib/api";
 import { buildLocaleOptions } from "../../lib/locale";
+import {
+  currentPushSubscription,
+  isWebPushSupported,
+  notificationPermission,
+  serializePushSubscription,
+  subscribeToWebPush,
+  unsubscribeFromWebPush,
+} from "../../lib/webPush";
 
 /**
  * Renders the Profile Page.
@@ -54,6 +62,24 @@ export default function ProfilePage({
   const [localeFormValue, setLocaleFormValue] = useState(
     auth.locale || auth.fallbackLocale || "en",
   );
+  const [webPushLoading, setWebPushLoading] = useState(false);
+  const [webPushBusy, setWebPushBusy] = useState(false);
+  const [webPushError, setWebPushError] = useState("");
+  const [webPushSuccess, setWebPushSuccess] = useState("");
+  const [webPushState, setWebPushState] = useState({
+    enabled: false,
+    available: false,
+    publicKey: null,
+    supported: false,
+    permission: "default",
+    subscribed: false,
+    subscriptionCount: 0,
+    preferences: {
+      review_queue_enabled: false,
+      admin_pending_registration_enabled: false,
+      admin_backup_operations_enabled: false,
+    },
+  });
 
   const graceDeadlineLabel = useMemo(() => {
     if (!auth.twoFactorGraceExpiresAt) {
@@ -86,6 +112,7 @@ export default function ProfilePage({
       }),
     [supportedLocales, auth.fallbackLocale],
   );
+  const webPushSupported = useMemo(() => isWebPushSupported(), []);
 
   useEffect(() => {
     if (backupCodesCopyState === "idle") {
@@ -112,6 +139,74 @@ export default function ProfilePage({
     return () => window.clearTimeout(timer);
   }, [localeSuccess]);
 
+  useEffect(() => {
+    if (!webPushSuccess) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setWebPushSuccess(""), 2200);
+    return () => window.clearTimeout(timer);
+  }, [webPushSuccess]);
+
+  const normalizeWebPushPreferences = (preferences) => ({
+    review_queue_enabled: !!preferences?.review_queue_enabled,
+    admin_pending_registration_enabled:
+      auth.user.role === "admin" &&
+      !!preferences?.admin_pending_registration_enabled,
+    admin_backup_operations_enabled:
+      auth.user.role === "admin" &&
+      !!preferences?.admin_backup_operations_enabled,
+  });
+
+  const refreshWebPushStatus = async ({ withLoading = true } = {}) => {
+    if (!auth.webPushEnabled) {
+      setWebPushState((previous) => ({
+        ...previous,
+        enabled: false,
+        available: false,
+        supported: webPushSupported,
+        permission: notificationPermission(),
+        subscribed: false,
+      }));
+      return;
+    }
+
+    if (withLoading) {
+      setWebPushLoading(true);
+    }
+    setWebPushError("");
+
+    try {
+      const [configResponse, subscription] = await Promise.all([
+        api.get("/api/notifications/web-push"),
+        webPushSupported ? currentPushSubscription() : Promise.resolve(null),
+      ]);
+      const data = configResponse.data ?? {};
+
+      setWebPushState({
+        enabled: !!data.enabled,
+        available: !!data.available,
+        publicKey: data.public_key || null,
+        supported: webPushSupported,
+        permission: notificationPermission(),
+        subscribed: !!subscription,
+        subscriptionCount: Number(data.subscription_count || 0),
+        preferences: normalizeWebPushPreferences(data.preferences),
+      });
+    } catch (err) {
+      setWebPushError(extractError(err, t("errors.loadWebPush")));
+    } finally {
+      if (withLoading) {
+        setWebPushLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    void refreshWebPushStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.webPushEnabled, webPushSupported]);
+
   const updateLocale = async (event) => {
     event.preventDefault();
     setLocaleSubmitting(true);
@@ -137,6 +232,112 @@ export default function ProfilePage({
       setLocaleError(extractError(err, t("errors.updateLocale")));
     } finally {
       setLocaleSubmitting(false);
+    }
+  };
+
+  const enableWebPush = async () => {
+    setWebPushBusy(true);
+    setWebPushError("");
+    setWebPushSuccess("");
+
+    try {
+      if (!webPushState.available || !webPushState.publicKey) {
+        throw new Error(t("errors.webPushUnavailable"));
+      }
+
+      const subscription = await subscribeToWebPush(webPushState.publicKey);
+      const payload = serializePushSubscription(subscription);
+      if (!payload?.endpoint || !payload?.keys?.p256dh || !payload?.keys?.auth) {
+        throw new Error(t("errors.webPushSubscriptionInvalid"));
+      }
+
+      const response = await api.post(
+        "/api/notifications/web-push/subscriptions",
+        payload,
+      );
+
+      setWebPushState((previous) => ({
+        ...previous,
+        permission: notificationPermission(),
+        subscribed: true,
+        subscriptionCount: Number(response.data?.subscription_count || 1),
+        preferences: normalizeWebPushPreferences(response.data?.preferences),
+      }));
+      setWebPushSuccess(t("notices.webPushEnabled"));
+    } catch (err) {
+      setWebPushError(
+        extractError(err, err?.message || t("errors.enableWebPush")),
+      );
+    } finally {
+      setWebPushBusy(false);
+    }
+  };
+
+  const disableWebPush = async () => {
+    setWebPushBusy(true);
+    setWebPushError("");
+    setWebPushSuccess("");
+
+    try {
+      const subscription = await unsubscribeFromWebPush();
+      if (subscription?.endpoint) {
+        const response = await api.delete(
+          "/api/notifications/web-push/subscriptions",
+          {
+            data: {
+              endpoint: subscription.endpoint,
+            },
+          },
+        );
+
+        setWebPushState((previous) => ({
+          ...previous,
+          subscribed: false,
+          permission: notificationPermission(),
+          subscriptionCount: Number(response.data?.subscription_count || 0),
+        }));
+      } else {
+        setWebPushState((previous) => ({
+          ...previous,
+          subscribed: false,
+          permission: notificationPermission(),
+        }));
+      }
+
+      setWebPushSuccess(t("notices.webPushDisabled"));
+    } catch (err) {
+      setWebPushError(extractError(err, t("errors.disableWebPush")));
+    } finally {
+      setWebPushBusy(false);
+    }
+  };
+
+  const updateWebPushPreference = async (key, enabled) => {
+    setWebPushBusy(true);
+    setWebPushError("");
+    setWebPushSuccess("");
+
+    const nextPreferences = {
+      ...webPushState.preferences,
+      [key]: enabled,
+    };
+
+    try {
+      const response = await api.put("/api/notifications/web-push/preferences", {
+        [key]: enabled,
+      });
+
+      setWebPushState((previous) => ({
+        ...previous,
+        preferences: normalizeWebPushPreferences(
+          response.data?.preferences ?? nextPreferences,
+        ),
+      }));
+      setWebPushSuccess(t("notices.webPushPreferencesSaved"));
+    } catch (err) {
+      setWebPushError(extractError(err, t("errors.updateWebPushPreferences")));
+    } finally {
+      setWebPushBusy(false);
     }
   };
 
@@ -354,6 +555,27 @@ export default function ProfilePage({
     }
   };
 
+  const webPushStatusLabel = !auth.webPushEnabled
+    ? t("webPush.status.disabled")
+    : !webPushState.supported
+      ? t("webPush.status.unsupported")
+      : !webPushState.available
+        ? t("webPush.status.unavailable")
+        : webPushState.permission === "denied"
+          ? t("webPush.status.denied")
+          : webPushState.subscribed
+            ? t("webPush.status.enabled")
+            : t("webPush.status.ready");
+  const canEnableWebPush =
+    auth.webPushEnabled &&
+    webPushState.available &&
+    webPushState.supported &&
+    webPushState.permission !== "denied" &&
+    !webPushState.subscribed;
+  const canDisableWebPush = webPushState.supported && webPushState.subscribed;
+  const webPushPreferencesDisabled =
+    webPushBusy || !webPushState.subscribed || !webPushState.available;
+
   return (
     <AppShell auth={auth} theme={theme}>
       <section className="fade-up grid gap-4 md:grid-cols-3">
@@ -372,6 +594,156 @@ export default function ProfilePage({
           value={auth.user.role.toUpperCase()}
           helper={t("cards.2.description")}
         />
+      </section>
+
+      <section className="surface mt-6 rounded-3xl p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-app-strong">
+              {t("webPush.title")}
+            </h2>
+            <p className="mt-1 text-sm text-app-muted">
+              {t("webPush.description")}
+            </p>
+          </div>
+          <span className="rounded-full border border-app-edge bg-app-surface px-3 py-1 text-xs font-semibold text-app-muted">
+            {webPushLoading ? t("webPush.status.loading") : webPushStatusLabel}
+          </span>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-app-edge bg-app-panel p-4">
+          <p className="text-sm text-app-strong">{webPushStatusLabel}</p>
+          <p className="mt-1 text-sm text-app-muted">
+            {t("webPush.deviceHelp")}
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {canEnableWebPush ? (
+              <button
+                className="btn"
+                type="button"
+                onClick={enableWebPush}
+                disabled={webPushBusy}
+              >
+                {webPushBusy
+                  ? t("webPush.enabling")
+                  : t("webPush.enableDevice")}
+              </button>
+            ) : null}
+            {canDisableWebPush ? (
+              <button
+                className="btn-outline btn-outline-sm"
+                type="button"
+                onClick={disableWebPush}
+                disabled={webPushBusy}
+              >
+                {webPushBusy
+                  ? t("webPush.disabling")
+                  : t("webPush.disableDevice")}
+              </button>
+            ) : null}
+            <button
+              className="btn-outline btn-outline-sm"
+              type="button"
+              onClick={() => refreshWebPushStatus({ withLoading: false })}
+              disabled={webPushBusy || !auth.webPushEnabled}
+            >
+              {t("webPush.refresh")}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <label className="rounded-2xl border border-app-edge bg-app-surface p-4">
+            <span className="flex items-start gap-3">
+              <input
+                className="mt-1 h-4 w-4 accent-app-accent"
+                type="checkbox"
+                checked={webPushState.preferences.review_queue_enabled}
+                disabled={webPushPreferencesDisabled}
+                onChange={(event) =>
+                  updateWebPushPreference(
+                    "review_queue_enabled",
+                    event.target.checked,
+                  )
+                }
+              />
+              <span>
+                <span className="block text-sm font-semibold text-app-strong">
+                  {t("webPush.categories.reviewQueue")}
+                </span>
+                <span className="mt-1 block text-sm text-app-muted">
+                  {t("webPush.categories.reviewQueueHelp")}
+                </span>
+              </span>
+            </span>
+          </label>
+
+          {auth.user.role === "admin" ? (
+            <>
+              <label className="rounded-2xl border border-app-edge bg-app-surface p-4">
+                <span className="flex items-start gap-3">
+                  <input
+                    className="mt-1 h-4 w-4 accent-app-accent"
+                    type="checkbox"
+                    checked={
+                      webPushState.preferences
+                        .admin_pending_registration_enabled
+                    }
+                    disabled={webPushPreferencesDisabled}
+                    onChange={(event) =>
+                      updateWebPushPreference(
+                        "admin_pending_registration_enabled",
+                        event.target.checked,
+                      )
+                    }
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-app-strong">
+                      {t("webPush.categories.pendingRegistration")}
+                    </span>
+                    <span className="mt-1 block text-sm text-app-muted">
+                      {t("webPush.categories.pendingRegistrationHelp")}
+                    </span>
+                  </span>
+                </span>
+              </label>
+
+              <label className="rounded-2xl border border-app-edge bg-app-surface p-4">
+                <span className="flex items-start gap-3">
+                  <input
+                    className="mt-1 h-4 w-4 accent-app-accent"
+                    type="checkbox"
+                    checked={
+                      webPushState.preferences.admin_backup_operations_enabled
+                    }
+                    disabled={webPushPreferencesDisabled}
+                    onChange={(event) =>
+                      updateWebPushPreference(
+                        "admin_backup_operations_enabled",
+                        event.target.checked,
+                      )
+                    }
+                  />
+                  <span>
+                    <span className="block text-sm font-semibold text-app-strong">
+                      {t("webPush.categories.backupOperations")}
+                    </span>
+                    <span className="mt-1 block text-sm text-app-muted">
+                      {t("webPush.categories.backupOperationsHelp")}
+                    </span>
+                  </span>
+                </span>
+              </label>
+            </>
+          ) : null}
+        </div>
+
+        {webPushError ? (
+          <p className="mt-3 text-sm text-app-danger">{webPushError}</p>
+        ) : null}
+        {webPushSuccess ? (
+          <p className="mt-3 text-sm text-app-accent">{webPushSuccess}</p>
+        ) : null}
       </section>
 
       <section className="surface mt-6 rounded-3xl p-6">
