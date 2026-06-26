@@ -163,6 +163,7 @@
         "label": "Événements marquants et dates",
         "description": "Date de naissance, dates importantes et comportement du calendrier.",
         "birthday": "Date de naissance",
+        "deathDate": "Date de décès",
         "month": "Mois",
         "monthPlaceholder": "MM",
         "day": "Jour",

@@ -79,6 +79,11 @@ export const OPTIONAL_CONTACT_FIELDS = [
     labelKey: "editor.dateEditor.title",
     fallback: "Date",
   },
+  {
+    id: "death_date",
+    labelKey: "editor.personalSection.milestonesDates.deathDate",
+    fallback: "Death Date",
+  },
 ];
 
 /**
@@ -193,6 +198,14 @@ function hasDateRowContent(rows) {
     : false;
 }
 
+function hasDatePartsContent(parts) {
+  return (
+    hasTextValue(parts?.year) ||
+    hasTextValue(parts?.month) ||
+    hasTextValue(parts?.day)
+  );
+}
+
 function hasAddressRowContent(rows) {
   return Array.isArray(rows)
     ? rows.some(
@@ -251,6 +264,7 @@ export function deriveContactSectionOpenState(form) {
     hasTextValue(form.birthday?.month) ||
     hasTextValue(form.birthday?.day) ||
     hasTextValue(form.birthday?.year) ||
+    hasDatePartsContent(form.death_date) ||
     hasDateRowContent(form.dates);
 
   const communicationHasValue =
@@ -285,6 +299,10 @@ export function deriveOptionalFieldVisibility(form) {
       return hasDateRowContent(form.dates);
     }
 
+    if (field.id === "death_date") {
+      return hasDatePartsContent(form.death_date);
+    }
+
     if (field.id === "pronouns_custom") {
       return hasTextValue(form.pronouns_custom) || form.pronouns === "custom";
     }
@@ -309,6 +327,10 @@ export function optionalFieldHasValue(form, fieldId) {
     return hasDateRowContent(form.dates);
   }
 
+  if (fieldId === "death_date") {
+    return hasDatePartsContent(form.death_date);
+  }
+
   if (fieldId === "pronouns_custom") {
     return hasTextValue(form.pronouns_custom);
   }
@@ -329,6 +351,8 @@ export function clearOptionalFieldValue(form, fieldId) {
       return { ...form, instant_messages: [createEmptyLabeledValue("other")] };
     case "dates":
       return { ...form, dates: [createEmptyDate("anniversary")] };
+    case "death_date":
+      return { ...form, death_date: { year: "", month: "", day: "" } };
     case "pronouns_custom":
       return {
         ...form,
@@ -420,6 +444,7 @@ export function createEmptyContactForm(defaultAddressBookIds = []) {
     exclude_milestone_calendars: false,
     categories: [],
     birthday: { year: "", month: "", day: "" },
+    death_date: { year: "", month: "", day: "" },
     phones: [createEmptyLabeledValue("mobile")],
     emails: [createEmptyLabeledValue("home")],
     urls: [createEmptyLabeledValue("homepage")],
@@ -547,6 +572,7 @@ export function hydrateContactForm(contact, defaultAddressBookIds = []) {
           .filter((value) => value !== "")
       : [],
     birthday: datePartsToFormValue(contact.birthday),
+    death_date: datePartsToFormValue(contact.death_date),
     phones: nonEmptyRows(contact.phones, () =>
       createEmptyLabeledValue("mobile"),
     ),

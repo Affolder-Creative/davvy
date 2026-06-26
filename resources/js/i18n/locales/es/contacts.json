@@ -163,6 +163,7 @@
         "label": "Hitos y fechas",
         "description": "Cumpleaños, fechas destacadas y comportamiento del calendario.",
         "birthday": "Cumpleaños",
+        "deathDate": "Fecha de fallecimiento",
         "month": "Mes",
         "monthPlaceholder": "MM",
         "day": "Día",

@@ -163,6 +163,7 @@
         "label": "Marcos e datas",
         "description": "Aniversário, datas notáveis ​​e comportamento do calendário.",
         "birthday": "Aniversário",
+        "deathDate": "Data de falecimento",
         "month": "Mês",
         "monthPlaceholder": "Milímetros",
         "day": "Dia",

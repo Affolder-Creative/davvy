@@ -53,6 +53,7 @@ function buildProps(overrides = {}) {
       profile: "",
       head_of_household: false,
       birthday: { month: "", day: "", year: "" },
+      death_date: { month: "", day: "", year: "" },
       dates: [],
       related_names: [],
       categories: [],
@@ -60,7 +61,8 @@ function buildProps(overrides = {}) {
     },
     Field: FieldStub,
     isOptionalFieldVisible: vi.fn(
-      (id) => id === "pronouns_custom" || id === "dates",
+      (id) =>
+        id === "pronouns_custom" || id === "dates" || id === "death_date",
     ),
     updateFormField: vi.fn(),
     PRONOUN_OPTIONS: [
@@ -69,6 +71,7 @@ function buildProps(overrides = {}) {
     ],
     showOptionalField: vi.fn(),
     updateBirthdayField: vi.fn(),
+    updateDeathDateField: vi.fn(),
     DateEditor: DateEditorStub,
     labelOptions: { dates: [], related_names: [] },
     RelatedNameEditor: RelatedNameEditorStub,
@@ -94,8 +97,11 @@ describe("ContactEditorPersonalSection", () => {
     expect(props.updateFormField).toHaveBeenCalledWith("pronouns", "custom");
     expect(props.showOptionalField).toHaveBeenCalledWith("pronouns_custom");
 
-    await user.type(screen.getByLabelText("Month"), "1");
+    await user.type(screen.getAllByLabelText("Month")[0], "1");
     expect(props.updateBirthdayField).toHaveBeenCalledWith("month", "1");
+
+    await user.type(screen.getAllByLabelText("Month")[1], "2");
+    expect(props.updateDeathDateField).toHaveBeenCalledWith("month", "2");
 
     await user.click(screen.getByRole("checkbox", { name: "Head of Household" }));
     expect(props.updateFormField).toHaveBeenCalledWith("head_of_household", true);

@@ -64,6 +64,7 @@ describe("contactFormUtils", () => {
       expect.objectContaining({ label: "other", related_contact_id: null }),
     );
     expect(form.categories).toEqual([]);
+    expect(form.death_date).toEqual({ year: "", month: "", day: "" });
   });
 
   it("hydrates contacts and preserves safe defaults", () => {
@@ -72,6 +73,7 @@ describe("contactFormUtils", () => {
         id: 11,
         first_name: "Alex",
         birthday: { year: 1990, month: 3, day: 5 },
+        death_date: { year: 2025, month: 4, day: 10 },
         categories: ["Family", "friends", "family"],
         related_names: [{ label: "spouse", value: "Taylor", related_contact_id: "42" }],
         dates: [{ label: "anniversary", year: "2020", month: "7", day: "9" }],
@@ -85,6 +87,11 @@ describe("contactFormUtils", () => {
     expect(hydrated.id).toBe(11);
     expect(hydrated.first_name).toBe("Alex");
     expect(hydrated.birthday).toEqual({ year: "1990", month: "03", day: "05" });
+    expect(hydrated.death_date).toEqual({
+      year: "2025",
+      month: "04",
+      day: "10",
+    });
     expect(hydrated.categories).toEqual(["Family", "friends", "family"]);
     expect(hydrated.related_names[0]).toEqual(
       expect.objectContaining({ label: "spouse", related_contact_id: 42 }),
@@ -107,6 +114,7 @@ describe("contactFormUtils", () => {
     populated.pronouns = "they/them";
     populated.phones = [{ label: "mobile", value: "555-0100", custom_label: "" }];
     populated.categories = ["Friends"];
+    populated.death_date = { year: "2025", month: "04", day: "10" };
 
     expect(deriveContactSectionOpenState(populated)).toEqual({
       ...defaults,
@@ -122,14 +130,21 @@ describe("contactFormUtils", () => {
     form.pronouns_custom = "ze/zir";
     form.instant_messages = [{ label: "other", custom_label: "", value: "alex-im" }];
     form.dates = [{ label: "other", custom_label: "", year: "", month: "12", day: "" }];
+    form.death_date = { year: "2025", month: "04", day: "10" };
 
     const visible = deriveOptionalFieldVisibility(form);
     expect(visible).toEqual(
-      expect.arrayContaining(["pronouns_custom", "instant_messages", "dates"]),
+      expect.arrayContaining([
+        "pronouns_custom",
+        "instant_messages",
+        "dates",
+        "death_date",
+      ]),
     );
 
     expect(optionalFieldHasValue(form, "pronouns_custom")).toBe(true);
     expect(optionalFieldHasValue(form, "dates")).toBe(true);
+    expect(optionalFieldHasValue(form, "death_date")).toBe(true);
     expect(optionalFieldHasValue(form, "instant_messages")).toBe(true);
 
     const clearedPronouns = clearOptionalFieldValue(form, "pronouns_custom");
@@ -140,5 +155,12 @@ describe("contactFormUtils", () => {
     expect(clearedDates.dates).toEqual([
       { label: "anniversary", custom_label: "", year: "", month: "", day: "" },
     ]);
+
+    const clearedDeathDate = clearOptionalFieldValue(form, "death_date");
+    expect(clearedDeathDate.death_date).toEqual({
+      year: "",
+      month: "",
+      day: "",
+    });
   });
 });

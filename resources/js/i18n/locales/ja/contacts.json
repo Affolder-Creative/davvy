@@ -163,6 +163,7 @@
         "label": "マイルストーンと日付",
         "description": "誕生日、注目すべき日付、カレンダーの動作。",
         "birthday": "誕生日",
+        "deathDate": "死亡日",
         "month": "月",
         "monthPlaceholder": "MM",
         "day": "日",

@@ -17,6 +17,7 @@ export default function ContactEditorPersonalSection({
   PRONOUN_OPTIONS,
   showOptionalField,
   updateBirthdayField,
+  updateDeathDateField,
   DateEditor,
   labelOptions,
   RelatedNameEditor,
@@ -222,6 +223,70 @@ export default function ContactEditorPersonalSection({
                   </Field>
                 </div>
               </section>
+
+              {isOptionalFieldVisible("death_date") ? (
+                <section className="rounded-2xl border border-app-edge bg-app-surface p-4">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-app-base">
+                    {t("editor.personalSection.milestonesDates.deathDate")}
+                  </h3>
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
+                    <Field
+                      label={t("editor.personalSection.milestonesDates.month")}
+                    >
+                      <input
+                        className="input"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={2}
+                        placeholder={t(
+                          "editor.personalSection.milestonesDates.monthPlaceholder",
+                        )}
+                        value={form.death_date?.month ?? ""}
+                        onChange={(event) =>
+                          updateDeathDateField("month", event.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field
+                      label={t("editor.personalSection.milestonesDates.day")}
+                    >
+                      <input
+                        className="input"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={2}
+                        placeholder={t(
+                          "editor.personalSection.milestonesDates.dayPlaceholder",
+                        )}
+                        value={form.death_date?.day ?? ""}
+                        onChange={(event) =>
+                          updateDeathDateField("day", event.target.value)
+                        }
+                      />
+                    </Field>
+                    <Field
+                      label={t("editor.personalSection.milestonesDates.year")}
+                    >
+                      <input
+                        className="input"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={4}
+                        placeholder={t(
+                          "editor.personalSection.milestonesDates.yearPlaceholder",
+                        )}
+                        value={form.death_date?.year ?? ""}
+                        onChange={(event) =>
+                          updateDeathDateField("year", event.target.value)
+                        }
+                      />
+                    </Field>
+                  </div>
+                </section>
+              ) : null}
 
               {isOptionalFieldVisible("dates") ? (
                 <DateEditor

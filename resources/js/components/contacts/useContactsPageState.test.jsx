@@ -9,6 +9,7 @@ function createEmptyContactForm(addressBookIds = []) {
     last_name: "",
     company: "",
     birthday: { month: "", day: "", year: "" },
+    death_date: { month: "", day: "", year: "" },
     dates: [],
     related_names: [],
     categories: [],
@@ -179,6 +180,47 @@ describe("useContactsPageState", () => {
 
     await waitFor(() => expect(deps.auth.refreshAuth).toHaveBeenCalledTimes(1));
     expect(deps.navigate).toHaveBeenCalledWith("/", { replace: true });
+  });
+
+  it("sends death date parts in save payload", async () => {
+    const normalizeDatePartsForPayload = vi.fn((parts) => ({
+      year: parts?.year ? Number(parts.year) : null,
+      month: parts?.month ? Number(parts.month) : null,
+      day: parts?.day ? Number(parts.day) : null,
+    }));
+    const deps = createBaseDependencies({
+      normalizeDatePartsForPayload,
+    });
+
+    const { result } = renderHook(() => useContactsPageState(deps));
+
+    await waitFor(() => expect(deps.api.get).toHaveBeenCalledWith("/api/contacts"));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.updateFormField("first_name", "Alex");
+      result.current.updateDeathDateField("year", "2025");
+      result.current.updateDeathDateField("month", "04");
+      result.current.updateDeathDateField("day", "10");
+    });
+
+    await act(async () => {
+      await result.current.saveContact({ preventDefault() {} });
+    });
+
+    expect(deps.api.post).toHaveBeenCalledWith(
+      "/api/contacts",
+      expect.objectContaining({
+        first_name: "Alex",
+        address_book_ids: [3],
+        death_date: { year: 2025, month: 4, day: 10 },
+      }),
+    );
+    expect(normalizeDatePartsForPayload).toHaveBeenCalledWith({
+      year: "2025",
+      month: "04",
+      day: "10",
+    });
   });
 
   it("stages a photo upload token and tracks remove/undo state", async () => {

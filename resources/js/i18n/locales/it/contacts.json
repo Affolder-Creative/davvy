@@ -163,6 +163,7 @@
         "label": "Pietre miliari e date",
         "description": "Compleanno, date importanti e comportamento del calendario.",
         "birthday": "Compleanno",
+        "deathDate": "Data di morte",
         "month": "Mese",
         "monthPlaceholder": "MM",
         "day": "Giorno",

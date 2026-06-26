@@ -552,12 +552,24 @@ class ContactMilestoneCalendarService
                 continue;
             }
 
+            $deathDate = $this->normalizeDeathDateParts($payload['death_date'] ?? null);
             $contactName = $this->birthdayMilestoneName($contact);
             if ($contactName === null) {
                 continue;
             }
 
             foreach ($this->upcomingOccurrenceYears($dateParts, $generationYears) as $occurrenceYear) {
+                if (
+                    $this->occurrenceIsOnOrAfterDate(
+                        $occurrenceYear,
+                        $dateParts['month'],
+                        $dateParts['day'],
+                        $deathDate,
+                    )
+                ) {
+                    continue;
+                }
+
                 $yearSuffix = (string) $occurrenceYear;
                 $uri = $this->managedUri(
                     type: AddressBookContactMilestoneCalendar::TYPE_BIRTHDAY,
@@ -599,8 +611,13 @@ class ContactMilestoneCalendarService
     {
         $events = [];
         $anniversariesByDate = [];
+        $contacts = $this->contactsForAddressBook($addressBook->id);
+        $deathDatesByContactId = $this->deathDatesByContactIdForContacts(
+            $contacts,
+            (int) $addressBook->owner_id,
+        );
 
-        foreach ($this->contactsForAddressBook($addressBook->id) as $contact) {
+        foreach ($contacts as $contact) {
             $payload = is_array($contact->payload) ? $contact->payload : [];
             if ($this->contactExcludedFromMilestones($payload)) {
                 continue;
@@ -621,6 +638,11 @@ class ContactMilestoneCalendarService
             $firstName = $this->anniversaryFirstName($payload, $contactName);
             $lastName = $this->anniversaryLastName($payload, $contactName);
             $isHeadOfHousehold = $this->payloadBoolean($payload['head_of_household'] ?? false);
+            $suppressionDate = $this->earliestAnniversarySuppressionDate(
+                $contact,
+                $payload,
+                $deathDatesByContactId,
+            );
 
             foreach ($anniversaries as $anniversary) {
                 $dateParts = $anniversary['date_parts'];
@@ -636,6 +658,7 @@ class ContactMilestoneCalendarService
                     'is_head_of_household' => $isHeadOfHousehold,
                     'contact_name_keys' => $contactNameKeys,
                     'related_name_keys' => $relatedNameKeys,
+                    'anniversary_suppression_date' => $suppressionDate,
                 ];
             }
         }
@@ -654,8 +677,23 @@ class ContactMilestoneCalendarService
                 $primaryDateParts = $primary['anniversary']['date_parts'];
                 $secondaryDateParts = $secondary['anniversary']['date_parts'];
                 $baseYear = $primaryDateParts['year'] ?? $secondaryDateParts['year'];
+                $suppressionDate = $this->earliestDateParts([
+                    $left['anniversary_suppression_date'] ?? null,
+                    $right['anniversary_suppression_date'] ?? null,
+                ]);
 
                 foreach ($this->upcomingOccurrenceYears($primaryDateParts, $generationYears) as $occurrenceYear) {
+                    if (
+                        $this->occurrenceIsOnOrAfterDate(
+                            $occurrenceYear,
+                            $primaryDateParts['month'],
+                            $primaryDateParts['day'],
+                            $suppressionDate,
+                        )
+                    ) {
+                        continue;
+                    }
+
                     $suffix = $this->anniversaryPairSuffix($left, $right, $occurrenceYear);
                     $primaryContact = $primary['contact'];
                     $primaryContactId = (int) $primaryContact->id;
@@ -699,8 +737,20 @@ class ContactMilestoneCalendarService
                 $contactId = (int) $contact->id;
                 $anniversary = $entry['anniversary'];
                 $dateParts = $anniversary['date_parts'];
+                $suppressionDate = $entry['anniversary_suppression_date'] ?? null;
 
                 foreach ($this->upcomingOccurrenceYears($dateParts, $generationYears) as $occurrenceYear) {
+                    if (
+                        $this->occurrenceIsOnOrAfterDate(
+                            $occurrenceYear,
+                            $dateParts['month'],
+                            $dateParts['day'],
+                            is_array($suppressionDate) ? $suppressionDate : null,
+                        )
+                    ) {
+                        continue;
+                    }
+
                     $suffix = $anniversary['id'].'-'.$occurrenceYear;
                     $uri = $this->managedUri(
                         type: AddressBookContactMilestoneCalendar::TYPE_ANNIVERSARY,
@@ -774,6 +824,186 @@ class ContactMilestoneCalendarService
         }
 
         return $keys;
+    }
+
+    /**
+     * Returns death dates for contacts and linked spouse contacts.
+     *
+     * @param  Collection<int, Contact>  $contacts
+     * @return array<int, array{year:int,month:int,day:int}>
+     */
+    private function deathDatesByContactIdForContacts(Collection $contacts, int $ownerId): array
+    {
+        $contactIds = [];
+
+        foreach ($contacts as $contact) {
+            $contactIds[(int) $contact->id] = (int) $contact->id;
+            $payload = is_array($contact->payload) ? $contact->payload : [];
+
+            foreach ($this->linkedSpouseContactIds($payload) as $linkedContactId) {
+                $contactIds[$linkedContactId] = $linkedContactId;
+            }
+        }
+
+        if ($contactIds === []) {
+            return [];
+        }
+
+        $deathDates = [];
+        Contact::query()
+            ->where('owner_id', $ownerId)
+            ->whereIn('id', array_values($contactIds))
+            ->get(['id', 'payload'])
+            ->each(function (Contact $contact) use (&$deathDates): void {
+                $payload = is_array($contact->payload) ? $contact->payload : [];
+                $deathDate = $this->normalizeDeathDateParts($payload['death_date'] ?? null);
+
+                if ($deathDate !== null) {
+                    $deathDates[(int) $contact->id] = $deathDate;
+                }
+            });
+
+        return $deathDates;
+    }
+
+    /**
+     * Returns earliest death date affecting anniversary generation.
+     *
+     * @param  array<string, mixed>  $payload
+     * @param  array<int, array{year:int,month:int,day:int}>  $deathDatesByContactId
+     * @return array{year:int,month:int,day:int}|null
+     */
+    private function earliestAnniversarySuppressionDate(
+        Contact $contact,
+        array $payload,
+        array $deathDatesByContactId,
+    ): ?array {
+        $dates = [];
+        $contactId = (int) $contact->id;
+
+        if (isset($deathDatesByContactId[$contactId])) {
+            $dates[] = $deathDatesByContactId[$contactId];
+        }
+
+        foreach ($this->linkedSpouseContactIds($payload) as $linkedContactId) {
+            if (isset($deathDatesByContactId[$linkedContactId])) {
+                $dates[] = $deathDatesByContactId[$linkedContactId];
+            }
+        }
+
+        return $this->earliestDateParts($dates);
+    }
+
+    /**
+     * Returns linked spouse-like contact IDs from payload.
+     *
+     * @param  array<string, mixed>  $payload
+     * @return array<int, int>
+     */
+    private function linkedSpouseContactIds(array $payload): array
+    {
+        $rows = is_array($payload['related_names'] ?? null) ? $payload['related_names'] : [];
+        $ids = [];
+
+        foreach ($rows as $row) {
+            if (! is_array($row) || ! $this->isSpouseLikeRelatedNameRow($row)) {
+                continue;
+            }
+
+            $relatedContactId = $this->toInteger($row['related_contact_id'] ?? null);
+            if ($relatedContactId === null || $relatedContactId <= 0) {
+                continue;
+            }
+
+            $ids[$relatedContactId] = $relatedContactId;
+        }
+
+        return array_values($ids);
+    }
+
+    /**
+     * Normalizes complete death date parts.
+     *
+     * @return array{year:int,month:int,day:int}|null
+     */
+    private function normalizeDeathDateParts(mixed $value): ?array
+    {
+        if (! is_array($value)) {
+            return null;
+        }
+
+        $year = $this->toInteger($value['year'] ?? null);
+        $month = $this->toInteger($value['month'] ?? null);
+        $day = $this->toInteger($value['day'] ?? null);
+
+        if ($year === null || $month === null || $day === null) {
+            return null;
+        }
+
+        if ($year < 1 || $year > 9999 || ! checkdate($month, $day, $year)) {
+            return null;
+        }
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'day' => $day,
+        ];
+    }
+
+    /**
+     * Checks whether generated all-day occurrence is on or after date.
+     *
+     * @param  array{year:int,month:int,day:int}|null  $dateParts
+     */
+    private function occurrenceIsOnOrAfterDate(int $year, int $month, int $day, ?array $dateParts): bool
+    {
+        if ($dateParts === null) {
+            return false;
+        }
+
+        return sprintf('%04d-%02d-%02d', $year, $month, $day) >= $this->datePartsKey($dateParts);
+    }
+
+    /**
+     * Returns earliest complete date parts.
+     *
+     * @param  array<int, mixed>  $datePartsList
+     * @return array{year:int,month:int,day:int}|null
+     */
+    private function earliestDateParts(array $datePartsList): ?array
+    {
+        $earliest = null;
+        $earliestKey = null;
+
+        foreach ($datePartsList as $dateParts) {
+            if (! is_array($dateParts)) {
+                continue;
+            }
+
+            $normalized = $this->normalizeDeathDateParts($dateParts);
+            if ($normalized === null) {
+                continue;
+            }
+
+            $key = $this->datePartsKey($normalized);
+            if ($earliestKey === null || $key < $earliestKey) {
+                $earliest = $normalized;
+                $earliestKey = $key;
+            }
+        }
+
+        return $earliest;
+    }
+
+    /**
+     * Returns comparable date key.
+     *
+     * @param  array{year:int,month:int,day:int}  $dateParts
+     */
+    private function datePartsKey(array $dateParts): string
+    {
+        return sprintf('%04d-%02d-%02d', $dateParts['year'], $dateParts['month'], $dateParts['day']);
     }
 
     /**

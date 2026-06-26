@@ -492,6 +492,213 @@ class ContactMilestoneCalendarTest extends TestCase
         $this->assertStringNotContainsString('Sam Taylor', $anniversaryData);
     }
 
+    public function test_death_date_removes_and_restores_future_birthday_events(): void
+    {
+        $this->travelTo(Carbon::create(2026, 1, 15, 12, 0, 0, 'UTC'));
+
+        $user = User::factory()->create();
+        $addressBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Family',
+            'uri' => 'family',
+        ]);
+
+        $created = $this->actingAs($user)
+            ->postJson('/api/contacts', $this->contactPayload([
+                'address_book_ids' => [$addressBook->id],
+            ]));
+        $created->assertCreated();
+        $contactId = (int) $created->json('id');
+
+        $enabled = $this->actingAs($user)
+            ->patchJson('/api/address-books/'.$addressBook->id.'/milestone-calendars', [
+                'birthdays_enabled' => true,
+                'anniversaries_enabled' => false,
+            ])
+            ->assertOk();
+
+        $birthdayCalendarId = (int) $enabled->json('milestone_calendars.birthdays.calendar_id');
+        $this->assertCount(3, CalendarObject::query()->where('calendar_id', $birthdayCalendarId)->get());
+
+        $this->actingAs($user)
+            ->patchJson('/api/contacts/'.$contactId, $this->contactPayload([
+                'death_date' => [
+                    'year' => 2026,
+                    'month' => 6,
+                    'day' => 15,
+                ],
+                'address_book_ids' => [$addressBook->id],
+            ]))
+            ->assertOk();
+
+        $this->assertCount(0, CalendarObject::query()->where('calendar_id', $birthdayCalendarId)->get());
+
+        $this->actingAs($user)
+            ->patchJson('/api/contacts/'.$contactId, $this->contactPayload([
+                'death_date' => [
+                    'year' => null,
+                    'month' => null,
+                    'day' => null,
+                ],
+                'address_book_ids' => [$addressBook->id],
+            ]))
+            ->assertOk();
+
+        $restoredObjects = CalendarObject::query()
+            ->where('calendar_id', $birthdayCalendarId)
+            ->get();
+        $this->assertCount(3, $restoredObjects);
+        $this->assertStringContainsString(
+            'SUMMARY:🎂 Alex Rivera\'s 36th Birthday',
+            $restoredObjects->pluck('data')->implode("\n"),
+        );
+    }
+
+    public function test_death_date_suppresses_linked_spouse_anniversaries_across_address_books(): void
+    {
+        $this->travelTo(Carbon::create(2026, 1, 15, 12, 0, 0, 'UTC'));
+
+        $user = User::factory()->create();
+        $johnBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'John',
+            'uri' => 'john',
+        ]);
+        $janeBook = AddressBook::factory()->create([
+            'owner_id' => $user->id,
+            'display_name' => 'Jane',
+            'uri' => 'jane',
+        ]);
+
+        $jane = $this->actingAs($user)
+            ->postJson('/api/contacts', $this->contactPayload([
+                'first_name' => 'Jane',
+                'last_name' => 'Doe',
+                'dates' => [
+                    [
+                        'label' => 'anniversary',
+                        'custom_label' => null,
+                        'year' => 2013,
+                        'month' => 11,
+                        'day' => 5,
+                    ],
+                ],
+                'address_book_ids' => [$janeBook->id],
+            ]));
+        $jane->assertCreated();
+        $janeId = (int) $jane->json('id');
+
+        $john = $this->actingAs($user)
+            ->postJson('/api/contacts', $this->contactPayload([
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'dates' => [
+                    [
+                        'label' => 'anniversary',
+                        'custom_label' => null,
+                        'year' => 2013,
+                        'month' => 11,
+                        'day' => 5,
+                    ],
+                ],
+                'related_names' => [
+                    [
+                        'label' => 'spouse',
+                        'custom_label' => null,
+                        'value' => 'Jane Doe',
+                        'related_contact_id' => $janeId,
+                    ],
+                ],
+                'address_book_ids' => [$johnBook->id],
+            ]));
+        $john->assertCreated();
+        $johnId = (int) $john->json('id');
+
+        $johnEnabled = $this->actingAs($user)
+            ->patchJson('/api/address-books/'.$johnBook->id.'/milestone-calendars', [
+                'birthdays_enabled' => false,
+                'anniversaries_enabled' => true,
+            ])
+            ->assertOk();
+        $janeEnabled = $this->actingAs($user)
+            ->patchJson('/api/address-books/'.$janeBook->id.'/milestone-calendars', [
+                'birthdays_enabled' => false,
+                'anniversaries_enabled' => true,
+            ])
+            ->assertOk();
+
+        $johnAnniversaryCalendarId = (int) $johnEnabled->json('milestone_calendars.anniversaries.calendar_id');
+        $janeAnniversaryCalendarId = (int) $janeEnabled->json('milestone_calendars.anniversaries.calendar_id');
+        $this->assertCount(3, CalendarObject::query()->where('calendar_id', $johnAnniversaryCalendarId)->get());
+        $this->assertCount(3, CalendarObject::query()->where('calendar_id', $janeAnniversaryCalendarId)->get());
+
+        $this->actingAs($user)
+            ->patchJson('/api/contacts/'.$johnId, $this->contactPayload([
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'death_date' => [
+                    'year' => 2026,
+                    'month' => 11,
+                    'day' => 5,
+                ],
+                'dates' => [
+                    [
+                        'label' => 'anniversary',
+                        'custom_label' => null,
+                        'year' => 2013,
+                        'month' => 11,
+                        'day' => 5,
+                    ],
+                ],
+                'related_names' => [
+                    [
+                        'label' => 'spouse',
+                        'custom_label' => null,
+                        'value' => 'Jane Doe',
+                        'related_contact_id' => $janeId,
+                    ],
+                ],
+                'address_book_ids' => [$johnBook->id],
+            ]))
+            ->assertOk();
+
+        $this->assertCount(0, CalendarObject::query()->where('calendar_id', $johnAnniversaryCalendarId)->get());
+        $this->assertCount(0, CalendarObject::query()->where('calendar_id', $janeAnniversaryCalendarId)->get());
+
+        $this->actingAs($user)
+            ->patchJson('/api/contacts/'.$johnId, $this->contactPayload([
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'death_date' => [
+                    'year' => null,
+                    'month' => null,
+                    'day' => null,
+                ],
+                'dates' => [
+                    [
+                        'label' => 'anniversary',
+                        'custom_label' => null,
+                        'year' => 2013,
+                        'month' => 11,
+                        'day' => 5,
+                    ],
+                ],
+                'related_names' => [
+                    [
+                        'label' => 'spouse',
+                        'custom_label' => null,
+                        'value' => 'Jane Doe',
+                        'related_contact_id' => $janeId,
+                    ],
+                ],
+                'address_book_ids' => [$johnBook->id],
+            ]))
+            ->assertOk();
+
+        $this->assertCount(3, CalendarObject::query()->where('calendar_id', $johnAnniversaryCalendarId)->get());
+        $this->assertCount(3, CalendarObject::query()->where('calendar_id', $janeAnniversaryCalendarId)->get());
+    }
+
     public function test_milestone_titles_omit_ordinal_when_source_year_is_missing(): void
     {
         $this->travelTo(Carbon::create(2026, 1, 15, 12, 0, 0, 'UTC'));

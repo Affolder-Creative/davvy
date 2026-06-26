@@ -1408,6 +1408,86 @@ class ContactManagementTest extends TestCase
         $this->assertStringContainsString('X-DAVVY-HEAD-OF-HOUSEHOLD:1', $card->data);
     }
 
+    public function test_contact_can_store_death_date_and_write_vcard_deathdate(): void
+    {
+        $user = User::factory()->create();
+        $book = AddressBook::factory()->create(['owner_id' => $user->id, 'uri' => 'death-date-book']);
+
+        $response = $this->actingAs($user)->postJson('/api/contacts', $this->payload([
+            'death_date' => [
+                'year' => 2025,
+                'month' => 4,
+                'day' => 10,
+            ],
+            'address_book_ids' => [$book->id],
+        ]));
+
+        $response->assertCreated();
+        $response->assertJsonPath('death_date.year', 2025);
+        $response->assertJsonPath('death_date.month', 4);
+        $response->assertJsonPath('death_date.day', 10);
+
+        $contactId = (int) $response->json('id');
+        $uid = (string) $response->json('uid');
+        $card = Card::query()
+            ->where('address_book_id', $book->id)
+            ->where('uid', $uid)
+            ->firstOrFail();
+
+        $this->assertStringContainsString('DEATHDATE:2025-04-10', $card->data);
+
+        $this->actingAs($user)
+            ->patchJson('/api/contacts/'.$contactId, $this->payload([
+                'death_date' => [
+                    'year' => 2026,
+                    'month' => 5,
+                    'day' => 11,
+                ],
+                'address_book_ids' => [$book->id],
+            ]))
+            ->assertOk()
+            ->assertJsonPath('death_date.year', 2026)
+            ->assertJsonPath('death_date.month', 5)
+            ->assertJsonPath('death_date.day', 11);
+
+        $updatedCard = Card::query()
+            ->where('address_book_id', $book->id)
+            ->where('uid', $uid)
+            ->firstOrFail();
+
+        $this->assertStringContainsString('DEATHDATE:2026-05-11', $updatedCard->data);
+    }
+
+    public function test_contact_rejects_partial_or_invalid_death_date(): void
+    {
+        $user = User::factory()->create();
+        $book = AddressBook::factory()->create(['owner_id' => $user->id, 'uri' => 'invalid-death-date-book']);
+
+        $this->actingAs($user)
+            ->postJson('/api/contacts', $this->payload([
+                'death_date' => [
+                    'year' => 2025,
+                    'month' => 4,
+                    'day' => null,
+                ],
+                'address_book_ids' => [$book->id],
+            ]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['death_date']);
+
+        $this->actingAs($user)
+            ->postJson('/api/contacts', $this->payload([
+                'death_date' => [
+                    'year' => 2025,
+                    'month' => 2,
+                    'day' => 31,
+                ],
+                'address_book_ids' => [$book->id],
+            ]))
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['death_date']);
+    }
+
     public function test_create_contact_requires_write_access_to_selected_address_books(): void
     {
         $owner = User::factory()->create();

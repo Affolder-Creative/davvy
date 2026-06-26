@@ -365,6 +365,11 @@ class ContactVCardService
             $vCard->add('BDAY', $birthday);
         }
 
+        $deathDate = $this->fullDateString($payload['death_date'] ?? []);
+        if ($deathDate !== null) {
+            $vCard->add('DEATHDATE', $deathDate);
+        }
+
         $addedAnniversary = false;
         foreach ($this->rows($payload['dates'] ?? []) as $row) {
             $value = $this->dateString($row);
@@ -561,6 +566,11 @@ class ContactVCardService
         $birthday = $this->parseDateParts($this->firstPropertyValue($component, 'BDAY'));
         if ($birthday !== null) {
             $payload['birthday'] = $birthday;
+        }
+
+        $deathDate = $this->parseDateParts($this->firstPropertyValue($component, 'DEATHDATE'));
+        if ($deathDate !== null && $this->fullDateString($deathDate) !== null) {
+            $payload['death_date'] = $deathDate;
         }
 
         foreach ($component->select('TEL') as $property) {
@@ -948,6 +958,7 @@ class ContactVCardService
             'exclude_milestone_calendars' => false,
             'categories' => [],
             'birthday' => [],
+            'death_date' => [],
             'phones' => [],
             'emails' => [],
             'urls' => [],
@@ -1445,6 +1456,28 @@ class ContactVCardService
         }
 
         return sprintf('--%02d-%02d', $month, $day);
+    }
+
+    /**
+     * Returns full date string.
+     *
+     * @param  array<string, mixed>  $parts
+     */
+    private function fullDateString(array $parts): ?string
+    {
+        $year = $this->toInteger($parts['year'] ?? null);
+        $month = $this->toInteger($parts['month'] ?? null);
+        $day = $this->toInteger($parts['day'] ?? null);
+
+        if ($year === null || $month === null || $day === null) {
+            return null;
+        }
+
+        if ($year < 1 || $year > 9999 || ! checkdate($month, $day, $year)) {
+            return null;
+        }
+
+        return sprintf('%04d-%02d-%02d', $year, $month, $day);
     }
 
     /**

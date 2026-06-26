@@ -160,6 +160,10 @@ class ContactController extends Controller
             'birthday.year' => ['nullable', 'integer', 'between:1,9999'],
             'birthday.month' => ['nullable', 'integer', 'between:1,12'],
             'birthday.day' => ['nullable', 'integer', 'between:1,31'],
+            'death_date' => ['nullable', 'array'],
+            'death_date.year' => ['nullable', 'integer', 'between:1,9999'],
+            'death_date.month' => ['nullable', 'integer', 'between:1,12'],
+            'death_date.day' => ['nullable', 'integer', 'between:1,31'],
             'phones' => ['nullable', 'array'],
             'phones.*.label' => ['nullable', 'string', 'max:64'],
             'phones.*.custom_label' => ['nullable', 'string', 'max:100'],
@@ -233,6 +237,10 @@ class ContactController extends Controller
             'exclude_milestone_calendars' => (bool) ($data['exclude_milestone_calendars'] ?? false),
             'categories' => $this->normalizeCategories($data['categories'] ?? []),
             'birthday' => $this->normalizeDateParts($data['birthday'] ?? []),
+            'death_date' => $this->normalizeCompleteDateParts(
+                $data['death_date'] ?? [],
+                'death_date',
+            ),
             'phones' => $this->normalizeValueRows($data['phones'] ?? []),
             'emails' => $this->normalizeValueRows($data['emails'] ?? []),
             'urls' => $this->normalizeValueRows($data['urls'] ?? []),
@@ -493,6 +501,42 @@ class ContactController extends Controller
             'month' => $this->normalizeInt($parts['month'] ?? null),
             'day' => $this->normalizeInt($parts['day'] ?? null),
         ];
+    }
+
+    /**
+     * Normalizes a complete date field.
+     *
+     * @param  array<string, mixed>  $parts
+     * @return array{year:?int, month:?int, day:?int}
+     */
+    private function normalizeCompleteDateParts(array $parts, string $field): array
+    {
+        $normalized = $this->normalizeDateParts($parts);
+        $hasAnyPart = $normalized['year'] !== null
+            || $normalized['month'] !== null
+            || $normalized['day'] !== null;
+
+        if (! $hasAnyPart) {
+            return $normalized;
+        }
+
+        if (
+            $normalized['year'] === null
+            || $normalized['month'] === null
+            || $normalized['day'] === null
+        ) {
+            throw ValidationException::withMessages([
+                $field => [__('validation.date')],
+            ]);
+        }
+
+        if (! checkdate($normalized['month'], $normalized['day'], $normalized['year'])) {
+            throw ValidationException::withMessages([
+                $field => [__('validation.date')],
+            ]);
+        }
+
+        return $normalized;
     }
 
     /**

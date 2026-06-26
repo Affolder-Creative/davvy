@@ -163,6 +163,7 @@
         "label": "里程碑和日期",
         "description": "生日、重要日期和日历行为。",
         "birthday": "生日",
+        "deathDate": "死亡日期",
         "month": "月份",
         "monthPlaceholder": "MM",
         "day": "日",

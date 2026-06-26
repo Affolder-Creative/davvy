@@ -163,6 +163,7 @@
         "label": "Meilensteine & Daten",
         "description": "Geburtstag, wichtige Daten und Kalenderverhalten.",
         "birthday": "Geburtstag",
+        "deathDate": "Sterbedatum",
         "month": "Monat",
         "monthPlaceholder": "MM",
         "day": "Tag",

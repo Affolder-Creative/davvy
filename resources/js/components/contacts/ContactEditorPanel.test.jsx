@@ -67,6 +67,7 @@ function buildProps(overrides = {}) {
     PRONOUN_OPTIONS: [{ value: "", label: "None" }],
     showOptionalField: vi.fn(),
     updateBirthdayField: vi.fn(),
+    updateDeathDateField: vi.fn(),
     DateEditor: noopComponent("DateEditor"),
     LabeledValueEditor: noopComponent("LabeledValueEditor"),
     AddressEditor: noopComponent("AddressEditor"),

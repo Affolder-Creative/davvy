@@ -437,6 +437,17 @@ export default function useContactsPageState({
     }));
   };
 
+  const updateDeathDateField = (field, value) => {
+    const normalizedValue = normalizeDatePartInput(field, value);
+    setForm((prev) => ({
+      ...prev,
+      death_date: {
+        ...prev.death_date,
+        [field]: normalizedValue,
+      },
+    }));
+  };
+
   const saveContact = async (event) => {
     event.preventDefault();
 
@@ -459,6 +470,7 @@ export default function useContactsPageState({
     const payload = {
       ...form,
       birthday: normalizeDatePartsForPayload(form.birthday),
+      death_date: normalizeDatePartsForPayload(form.death_date),
       dates: normalizeDateRowsForPayload(form.dates),
       address_book_ids: form.address_book_ids.map((id) => Number(id)),
       photo_upload_token: form.photo_upload_token || null,
@@ -736,6 +748,7 @@ export default function useContactsPageState({
     selectContact,
     updateFormField,
     updateBirthdayField,
+    updateDeathDateField,
     toggleAssignedAddressBook,
     showOptionalField,
     hideOptionalField,

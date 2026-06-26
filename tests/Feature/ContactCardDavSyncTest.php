@@ -213,7 +213,7 @@ class ContactCardDavSyncTest extends TestCase
         app(LaravelCardDavBackend::class)->updateCard(
             $addressBook->id,
             $cardUri,
-            "BEGIN:VCARD\nVERSION:4.0\nFN:Jordan Parker\nN:Parker;Jordan;;;\nUID:{$uid}\nORG:Acme Co;Research\nTITLE:Lead Engineer\nTEL;TYPE=CELL:+15555550111\nEMAIL;TYPE=WORK:jordan.parker@example.com\nX-DAVVY-PRONOUNS:they/them\nX-DAVVY-HEAD-OF-HOUSEHOLD:1\nX-DAVVY-EXCLUDE-MILESTONES:1\nEND:VCARD"
+            "BEGIN:VCARD\nVERSION:4.0\nFN:Jordan Parker\nN:Parker;Jordan;;;\nUID:{$uid}\nORG:Acme Co;Research\nTITLE:Lead Engineer\nTEL;TYPE=CELL:+15555550111\nEMAIL;TYPE=WORK:jordan.parker@example.com\nDEATHDATE:2025-04-10\nX-DAVVY-PRONOUNS:they/them\nX-DAVVY-HEAD-OF-HOUSEHOLD:1\nX-DAVVY-EXCLUDE-MILESTONES:1\nEND:VCARD"
         );
 
         $contact = Contact::query()->findOrFail($contactId);
@@ -225,6 +225,9 @@ class ContactCardDavSyncTest extends TestCase
         $this->assertSame('Research', $payload['department'] ?? null);
         $this->assertSame('Lead Engineer', $payload['job_title'] ?? null);
         $this->assertSame('they/them', $payload['pronouns'] ?? null);
+        $this->assertSame(2025, $payload['death_date']['year'] ?? null);
+        $this->assertSame(4, $payload['death_date']['month'] ?? null);
+        $this->assertSame(10, $payload['death_date']['day'] ?? null);
         $this->assertSame('+15555550111', $payload['phones'][0]['value'] ?? null);
         $this->assertSame('jordan.parker@example.com', $payload['emails'][0]['value'] ?? null);
         $this->assertTrue((bool) ($payload['head_of_household'] ?? false));

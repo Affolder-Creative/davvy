@@ -116,6 +116,7 @@ export default function ContactsPage({
     selectContact,
     updateFormField,
     updateBirthdayField,
+    updateDeathDateField,
     toggleAssignedAddressBook,
     showOptionalField,
     hideOptionalField,
@@ -303,6 +304,7 @@ export default function ContactsPage({
                 PRONOUN_OPTIONS={PRONOUN_OPTIONS}
                 showOptionalField={showOptionalField}
                 updateBirthdayField={updateBirthdayField}
+                updateDeathDateField={updateDeathDateField}
                 DateEditor={DateEditor}
                 LabeledValueEditor={LabeledValueEditor}
                 AddressEditor={AddressEditor}

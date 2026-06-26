@@ -35,6 +35,7 @@ export default function ContactEditorPanel({
   PRONOUN_OPTIONS,
   showOptionalField,
   updateBirthdayField,
+  updateDeathDateField,
   DateEditor,
   LabeledValueEditor,
   AddressEditor,
@@ -149,6 +150,7 @@ export default function ContactEditorPanel({
           PRONOUN_OPTIONS={PRONOUN_OPTIONS}
           showOptionalField={showOptionalField}
           updateBirthdayField={updateBirthdayField}
+          updateDeathDateField={updateDeathDateField}
           DateEditor={DateEditor}
           labelOptions={labelOptions}
           RelatedNameEditor={RelatedNameEditor}

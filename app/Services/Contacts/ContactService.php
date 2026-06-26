@@ -191,6 +191,11 @@ class ContactService
                 ...(is_array($createdResult['related_address_book_ids'] ?? null)
                     ? $createdResult['related_address_book_ids']
                     : []),
+                ...$this->linkedSpouseAddressBookIdsForDeathDateSync(
+                    $createdResult['contact'],
+                    [],
+                    is_array($createdResult['contact']->payload) ? $createdResult['contact']->payload : [],
+                ),
             ],
         );
 
@@ -386,9 +391,157 @@ class ContactService
             ...(is_array($updatedResult['related_address_book_ids'] ?? null)
                 ? $updatedResult['related_address_book_ids']
                 : []),
+            ...$this->linkedSpouseAddressBookIdsForDeathDateSync(
+                $updatedResult['contact'],
+                $previousPayload,
+                $payload,
+            ),
         ]);
 
         return $updatedResult['contact'];
+    }
+
+    /**
+     * Returns linked spouse address-book IDs that need death-date milestone sync.
+     *
+     * @param  array<string, mixed>  $previousPayload
+     * @param  array<string, mixed>  $nextPayload
+     * @return array<int, int>
+     */
+    private function linkedSpouseAddressBookIdsForDeathDateSync(
+        Contact $contact,
+        array $previousPayload,
+        array $nextPayload,
+    ): array {
+        if (! $this->deathDateChanged($previousPayload, $nextPayload)) {
+            return [];
+        }
+
+        $linkedContactIds = [
+            ...$this->linkedSpouseContactIds($previousPayload),
+            ...$this->linkedSpouseContactIds($nextPayload),
+        ];
+        $linkedContactIds = collect($linkedContactIds)
+            ->map(fn (mixed $id): int => (int) $id)
+            ->filter(fn (int $id): bool => $id > 0 && $id !== (int) $contact->id)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($linkedContactIds === []) {
+            return [];
+        }
+
+        return Contact::query()
+            ->where('owner_id', $contact->owner_id)
+            ->whereIn('id', $linkedContactIds)
+            ->get()
+            ->flatMap(fn (Contact $linkedContact): array => $this->assignmentService->addressBookIdsForContact($linkedContact))
+            ->map(fn (mixed $id): int => (int) $id)
+            ->filter(fn (int $id): bool => $id > 0)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Checks whether death date changed.
+     *
+     * @param  array<string, mixed>  $previousPayload
+     * @param  array<string, mixed>  $nextPayload
+     */
+    private function deathDateChanged(array $previousPayload, array $nextPayload): bool
+    {
+        return $this->completeDateKey($previousPayload['death_date'] ?? null)
+            !== $this->completeDateKey($nextPayload['death_date'] ?? null);
+    }
+
+    /**
+     * Returns linked spouse contact IDs.
+     *
+     * @param  array<string, mixed>  $payload
+     * @return array<int, int>
+     */
+    private function linkedSpouseContactIds(array $payload): array
+    {
+        $rows = is_array($payload['related_names'] ?? null) ? $payload['related_names'] : [];
+        $ids = [];
+
+        foreach ($rows as $row) {
+            if (! is_array($row) || ! $this->isSpouseLikeRelatedNameRow($row)) {
+                continue;
+            }
+
+            $relatedContactId = $this->normalizeInt($row['related_contact_id'] ?? null);
+            if ($relatedContactId === null || $relatedContactId <= 0) {
+                continue;
+            }
+
+            $ids[$relatedContactId] = $relatedContactId;
+        }
+
+        return array_values($ids);
+    }
+
+    /**
+     * Checks whether related-name row represents a spouse-like relation.
+     *
+     * @param  array<string, mixed>  $row
+     */
+    private function isSpouseLikeRelatedNameRow(array $row): bool
+    {
+        $label = str_replace(['_', '-'], ' ', Str::lower(trim((string) ($row['label'] ?? ''))));
+        $customLabel = str_replace(['_', '-'], ' ', Str::lower(trim((string) ($row['custom_label'] ?? ''))));
+
+        if (preg_match('/\b(spouse|partner|husband|wife|boyfriend|girlfriend|fiance|fiancee)\b/', $label) === 1) {
+            return true;
+        }
+
+        return preg_match('/\b(spouse|partner|husband|wife|boyfriend|girlfriend|fiance|fiancee)\b/', $customLabel) === 1;
+    }
+
+    /**
+     * Returns comparable complete date key.
+     */
+    private function completeDateKey(mixed $value): ?string
+    {
+        if (! is_array($value)) {
+            return null;
+        }
+
+        $year = $this->normalizeInt($value['year'] ?? null);
+        $month = $this->normalizeInt($value['month'] ?? null);
+        $day = $this->normalizeInt($value['day'] ?? null);
+
+        if ($year === null || $month === null || $day === null) {
+            return null;
+        }
+
+        if ($year < 1 || $year > 9999 || ! checkdate($month, $day, $year)) {
+            return null;
+        }
+
+        return sprintf('%04d-%02d-%02d', $year, $month, $day);
+    }
+
+    /**
+     * Normalizes integer-like values.
+     */
+    private function normalizeInt(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && preg_match('/^-?\d+$/', $value) === 1) {
+            return (int) $value;
+        }
+
+        return null;
     }
 
     /**

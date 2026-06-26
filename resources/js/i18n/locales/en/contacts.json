@@ -197,6 +197,7 @@
         "label": "Milestones & Dates",
         "description": "Birthday, notable dates, and calendar behavior.",
         "birthday": "Birthday",
+        "deathDate": "Death Date",
         "month": "Month",
         "monthPlaceholder": "MM",
         "day": "Day",

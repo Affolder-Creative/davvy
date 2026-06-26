@@ -71,6 +71,7 @@ function createEmptyContactForm(addressBookIds = []) {
     last_name: "",
     company: "",
     birthday: { month: "", day: "", year: "" },
+    death_date: { month: "", day: "", year: "" },
     dates: [],
     related_names: [],
     categories: [],
