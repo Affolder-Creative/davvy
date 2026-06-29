@@ -27,7 +27,6 @@ class PwaShellTest extends TestCase
         $this->assertStringContainsString('images/splash/ios-splash-light-2048x2732.png', $html);
         $this->assertStringContainsString('(device-width: 1024px) and (device-height: 1366px)', $html);
 
-
         $this->assertFileExists(public_path('images/splash/ios-splash-light-1170x2532.png'));
         $this->assertFileExists(public_path('images/splash/ios-splash-dark-2532x1170.png'));
     }
