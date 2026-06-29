@@ -44,97 +44,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('common.app_title') }}</title>
-    <style>
-        :root {
-            --app-loading-bg-start: #f7faf9;
-            --app-loading-bg-end: #eff3ea;
-            --app-loading-bg-glow-1: #d8f2ee;
-            --app-loading-bg-glow-2: #ffeecf;
-            --app-loading-text: #0b1c1a;
-            --app-loading-muted: #4f6360;
-        }
-
-        :root.dark,
-        :root[data-theme="dark"] {
-            --app-loading-bg-start: #090909;
-            --app-loading-bg-end: #141414;
-            --app-loading-bg-glow-1: #3f3f462e;
-            --app-loading-bg-glow-2: #27272a2e;
-            --app-loading-text: #f5f5f5;
-            --app-loading-muted: #a3a3a3;
-        }
-
-        html {
-            min-height: 100%;
-            background:
-                radial-gradient(circle at 10% 20%, var(--app-loading-bg-glow-1) 0%, transparent 44%),
-                radial-gradient(circle at 80% 0%, var(--app-loading-bg-glow-2) 0%, transparent 38%),
-                linear-gradient(160deg, var(--app-loading-bg-start), var(--app-loading-bg-end));
-        }
-
-        body {
-            margin: 0;
-        }
-
-        .app-loading-screen {
-            box-sizing: border-box;
-            display: flex;
-            min-height: 100vh;
-            min-height: 100dvh;
-            align-items: center;
-            justify-content: center;
-            padding: calc(2rem + env(safe-area-inset-top, 0px)) calc(1.5rem + env(safe-area-inset-right, 0px)) calc(2rem + env(safe-area-inset-bottom, 0px)) calc(1.5rem + env(safe-area-inset-left, 0px));
-            color: var(--app-loading-text);
-            font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-            text-align: center;
-            background:
-                radial-gradient(circle at 10% 20%, var(--app-loading-bg-glow-1) 0%, transparent 44%),
-                radial-gradient(circle at 80% 0%, var(--app-loading-bg-glow-2) 0%, transparent 38%),
-                linear-gradient(160deg, var(--app-loading-bg-start), var(--app-loading-bg-end));
-        }
-
-        .app-loading-brand {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.65rem;
-            transform: translateY(-2vh);
-        }
-
-        .app-loading-icon {
-            display: block;
-            width: clamp(5.5rem, 22vw, 8.5rem);
-            height: clamp(5.5rem, 22vw, 8.5rem);
-        }
-
-        .app-loading-icon-dark {
-            display: none;
-        }
-
-        :root.dark .app-loading-icon-light,
-        :root[data-theme="dark"] .app-loading-icon-light {
-            display: none;
-        }
-
-        :root.dark .app-loading-icon-dark,
-        :root[data-theme="dark"] .app-loading-icon-dark {
-            display: block;
-        }
-
-        .app-loading-title {
-            margin: 0.1rem 0 0;
-            font-size: clamp(2rem, 8vw, 3.25rem);
-            font-weight: 500;
-            line-height: 1;
-        }
-
-        .app-loading-label {
-            margin: 0;
-            color: var(--app-loading-muted);
-            font-size: 0.92rem;
-            font-weight: 650;
-        }
-    </style>
     <script>
         (function () {
             const storageKey = "davvy-theme";
@@ -159,15 +68,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
 </head>
 <body>
-<div id="app">
-    <div class="app-loading-screen" role="status" aria-live="polite" aria-label="Loading Davvy">
-        <div class="app-loading-brand">
-            <img class="app-loading-icon app-loading-icon-light" src="{{ asset('davvy.png') }}" alt="" width="136" height="136">
-            <img class="app-loading-icon app-loading-icon-dark" src="{{ asset('davvy_dark.png') }}" alt="" width="136" height="136">
-            <p class="app-loading-title">Davvy</p>
-            <p class="app-loading-label">Loading Davvy...</p>
-        </div>
-    </div>
-</div>
+<div id="app"></div>
 </body>
 </html>

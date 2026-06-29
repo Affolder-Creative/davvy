@@ -116,67 +116,6 @@ html {
   min-height: 100dvh;
 }
 
-.app-loading-screen {
-  display: flex;
-  min-height: 100vh;
-  min-height: 100dvh;
-  align-items: center;
-  justify-content: center;
-  padding: calc(2rem + var(--safe-area-top))
-    calc(1.5rem + var(--safe-area-right))
-    calc(2rem + var(--safe-area-bottom))
-    calc(1.5rem + var(--safe-area-left));
-  color: var(--ink);
-  text-align: center;
-  background:
-    radial-gradient(circle at 10% 20%, var(--bg-glow-1) 0%, transparent 44%),
-    radial-gradient(circle at 80% 0%, var(--bg-glow-2) 0%, transparent 38%),
-    linear-gradient(160deg, var(--bg-start), var(--bg-end));
-}
-
-.app-loading-brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.65rem;
-  transform: translateY(-2vh);
-}
-
-.app-loading-icon {
-  display: block;
-  width: clamp(5.5rem, 22vw, 8.5rem);
-  height: clamp(5.5rem, 22vw, 8.5rem);
-}
-
-.app-loading-icon-dark {
-  display: none;
-}
-
-:root.dark .app-loading-icon-light,
-:root[data-theme="dark"] .app-loading-icon-light {
-  display: none;
-}
-
-:root.dark .app-loading-icon-dark,
-:root[data-theme="dark"] .app-loading-icon-dark {
-  display: block;
-}
-
-.app-loading-title {
-  margin: 0.1rem 0 0;
-  color: var(--ink);
-  font-size: clamp(2rem, 8vw, 3.25rem);
-  font-weight: 500;
-  line-height: 1;
-}
-
-.app-loading-label {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.92rem;
-  font-weight: 650;
-}
-
 .shell-safe-top {
   padding-top: calc(1.5rem + var(--safe-area-top));
 }
