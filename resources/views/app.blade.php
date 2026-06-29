@@ -32,7 +32,7 @@
                 $splashHeight = $orientation === 'portrait' ? $startupImage['image_height'] : $startupImage['image_width'];
             @endphp
             @foreach (['light', 'dark'] as $scheme)
-                <link rel="apple-touch-startup-image" href="{{ asset("images/splash/ios-splash-{$scheme}-{$splashWidth}x{$splashHeight}.png") }}" media="(prefers-color-scheme: {{ $scheme }}) and (device-width: {{ $startupImage['width'] }}px) and (device-height: {{ $startupImage['height'] }}px) and (-webkit-device-pixel-ratio: {{ $startupImage['ratio'] }}) and (orientation: {{ $orientation }})">
+    <link rel="apple-touch-startup-image" href="{{ asset("images/splash/ios-splash-{$scheme}-{$splashWidth}x{$splashHeight}.png") }}" media="(prefers-color-scheme: {{ $scheme }}) and (device-width: {{ $startupImage['width'] }}px) and (device-height: {{ $startupImage['height'] }}px) and (-webkit-device-pixel-ratio: {{ $startupImage['ratio'] }}) and (orientation: {{ $orientation }})">
             @endforeach
         @endforeach
     @endforeach
