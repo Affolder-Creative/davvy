@@ -42,6 +42,8 @@ When an `app_settings` key exists, it overrides env defaults.
 | `DB_USERNAME` | `davvy` | Required |
 | `DB_PASSWORD` | `secret` (local example) | Required |
 | `SESSION_DRIVER` | `database` | Recommended for multi-replica |
+| `SESSION_LIFETIME` | `120` | Normal session lifetime in minutes |
+| `AUTH_REMEMBER_DURATION_MINUTES` | `43200` | Persistent trusted-device login duration in minutes when users keep "Stay signed in" enabled |
 | `SESSION_SECURE_COOKIE` | `true` (production) | Set to `false` for local development |
 | `SESSION_HTTP_ONLY` | `true` | Recommended |
 | `SESSION_SAME_SITE` | `lax` | Recommended |
@@ -93,7 +95,8 @@ WebPush notes:
 - Production WebPush requires HTTPS and stable VAPID keys. Do not rotate VAPID keys casually; existing browser subscriptions are tied to them.
 - Generate keys with `php artisan webpush:vapid` after installing dependencies, then store them as platform secrets.
 - Push delivery is queued through Laravel notifications. Keep `QUEUE_CONNECTION=database` and `RUN_QUEUE_WORKER=true`, or run queue workers externally.
-- iOS/iPadOS users must install Davvy to the Home Screen before Safari exposes web push permission for the app.
+- Stored WebPush subscriptions can receive notifications after the interactive web session expires, but reopening protected Davvy routes, refreshing counts, or managing preferences requires a valid session or remember cookie.
+- iOS/iPadOS users must install Davvy to the Home Screen before Safari exposes web push permission for the app; see WebKit's [iOS Web Push](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/) and [Declarative Web Push](https://webkit.org/blog/16535/meet-declarative-web-push/) notes for platform behavior.
 
 ### Davvy Feature and Runtime Flags
 

@@ -9,18 +9,13 @@ self.addEventListener("notificationclick", (event) => {
 
 async function handlePush(event) {
   const payload = parsePushPayload(event);
-  const title = payload.title || "Davvy";
-  const options = {
-    body: payload.body || "",
-    icon: payload.icon || "/images/icons/icon-192.png",
-    badge: payload.badge || "/images/icons/icon-192.png",
-    tag: payload.tag || payload.data?.type || "davvy-notification",
-    data: payload.data || {},
-  };
+  const notification = normalizeNotificationPayload(payload);
 
-  const badgeCount = Number(options.data.badge_count ?? payload.badge_count ?? 0);
-  await updateBadge(badgeCount);
-  await self.registration.showNotification(title, options);
+  await updateBadge(notification.badgeCount);
+  await self.registration.showNotification(
+    notification.title,
+    notification.options,
+  );
 }
 
 function parsePushPayload(event) {
@@ -38,6 +33,58 @@ function parsePushPayload(event) {
       data: {},
     };
   }
+}
+
+function normalizeNotificationPayload(payload) {
+  const declarative =
+    payload.notification && typeof payload.notification === "object"
+      ? payload.notification
+      : {};
+  const payloadData =
+    payload.data && typeof payload.data === "object" ? payload.data : {};
+  const declarativeData =
+    declarative.data && typeof declarative.data === "object"
+      ? declarative.data
+      : {};
+  const data = {
+    ...payloadData,
+    ...declarativeData,
+  };
+  const badgeCount = normalizeBadgeCount(
+    data.badge_count ??
+      declarative.app_badge ??
+      payload.app_badge ??
+      payload.badge_count,
+  );
+  const targetUrl = normalizeTargetUrl(
+    declarative.navigate ?? data.url ?? payload.url,
+  );
+
+  return {
+    title: declarative.title || payload.title || "Davvy",
+    badgeCount,
+    options: {
+      body: declarative.body || payload.body || "",
+      icon: declarative.icon || payload.icon || "/images/icons/icon-192.png",
+      badge: declarative.badge || payload.badge || "/images/icons/icon-192.png",
+      tag:
+        declarative.tag ||
+        payload.tag ||
+        data.type ||
+        "davvy-notification",
+      data: {
+        ...data,
+        url: targetUrl,
+        badge_count: badgeCount,
+      },
+    },
+  };
+}
+
+function normalizeBadgeCount(value) {
+  const count = Number(value ?? 0);
+
+  return Number.isFinite(count) && count > 0 ? count : 0;
 }
 
 async function updateBadge(count) {

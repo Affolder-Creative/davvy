@@ -22,6 +22,7 @@ Set these in your app service environment.
 | `DB_USERNAME` | platform-specific | Required |
 | `DB_PASSWORD` | platform-specific | Required |
 | `SESSION_DRIVER` | `database` | Recommended |
+| `AUTH_REMEMBER_DURATION_MINUTES` | `43200` | Trusted-device login duration for PWA/browser sessions with "Stay signed in" enabled |
 | `SESSION_SECURE_COOKIE` | `true` | Required in production |
 | `SESSION_HTTP_ONLY` | `true` | Recommended |
 | `SESSION_SAME_SITE` | `lax` | Recommended |

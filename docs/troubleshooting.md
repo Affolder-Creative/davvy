@@ -23,6 +23,15 @@ Check:
 - Complete `/login/2fa` challenge using authenticator code or backup code.
 - If challenge expired, sign in again with email/password to start a new challenge.
 
+### Home Screen app asks you to sign in again while notifications still arrive
+Stored WebPush subscriptions are independent of the current browser session, so notifications may continue after the interactive Davvy session expires.
+
+Fix:
+- keep `Stay signed in on this device` enabled on trusted PWA devices
+- set `AUTH_REMEMBER_DURATION_MINUTES` to the desired trusted-device duration
+- confirm production cookies are accepted (`APP_URL=https://...`, `SESSION_SECURE_COOKIE=true`, correct proxy headers)
+- use Profile -> Push notifications to disable notifications on a device before removing trusted access
+
 ### `423 Locked` on authenticated API endpoints
 - Global 2FA enforcement is active and your grace period ended.
 - Complete 2FA enrollment from Profile -> Security, then retry.

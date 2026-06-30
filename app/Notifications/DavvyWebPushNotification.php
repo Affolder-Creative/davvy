@@ -2,11 +2,12 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Messages\DavvyWebPushMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\WebPush\WebPushChannel;
-use NotificationChannels\WebPush\WebPushMessage;
+use NotificationChannels\WebPush\WebPushMessageInterface;
 
 class DavvyWebPushNotification extends Notification implements ShouldQueue
 {
@@ -29,22 +30,18 @@ class DavvyWebPushNotification extends Notification implements ShouldQueue
         return [WebPushChannel::class];
     }
 
-    public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
+    public function toWebPush(object $notifiable, Notification $notification): WebPushMessageInterface
     {
-        return (new WebPushMessage)
-            ->title($this->title)
-            ->body($this->body)
-            ->icon('/images/icons/icon-192.png')
-            ->badge('/images/icons/icon-192.png')
-            ->tag($this->tag)
-            ->data([
+        return new DavvyWebPushMessage(
+            title: $this->title,
+            body: $this->body,
+            url: $this->url,
+            tag: $this->tag,
+            badgeCount: $this->badgeCount,
+            data: [
                 'type' => $this->type,
-                'url' => $this->url,
-                'badge_count' => max(0, $this->badgeCount),
-            ])
-            ->options([
-                'TTL' => 3600,
-            ]);
+            ],
+        );
     }
 
     /**

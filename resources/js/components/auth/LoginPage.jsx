@@ -19,7 +19,11 @@ export default function LoginPage({
 }) {
   const { t } = useTranslation("auth");
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    remember: true,
+  });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -73,6 +77,14 @@ export default function LoginPage({
             required
           />
         </Field>
+        <label className="flex items-center gap-2 text-sm text-app-muted">
+          <input
+            type="checkbox"
+            checked={form.remember}
+            onChange={(e) => setForm({ ...form, remember: e.target.checked })}
+          />
+          <span>{t("login.remember")}</span>
+        </label>
         {error ? <p className="text-sm text-app-danger">{error}</p> : null}
         <button className="btn w-full" disabled={submitting}>
           {submitting ? t("login.submitting") : t("login.submit")}

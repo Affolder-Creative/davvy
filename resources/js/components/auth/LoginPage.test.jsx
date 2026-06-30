@@ -85,12 +85,14 @@ describe("LoginPage", () => {
 
     await user.type(screen.getByLabelText("Email"), "admin@example.com");
     await user.type(screen.getByLabelText("Password"), "secret123");
+    expect(screen.getByLabelText("Stay signed in on this device")).toBeChecked();
     await user.click(screen.getByRole("button", { name: "Sign In" }));
 
     await waitFor(() =>
       expect(props.api.post).toHaveBeenCalledWith("/api/auth/login", {
         email: "admin@example.com",
         password: "secret123",
+        remember: true,
       }),
     );
     expect(props.auth.setAuth).toHaveBeenCalledWith(
@@ -113,6 +115,26 @@ describe("LoginPage", () => {
       }),
     );
     expect(screen.getByText("Dashboard Home")).toBeInTheDocument();
+  });
+
+  it("allows users to opt out of persistent sign-in", async () => {
+    const user = userEvent.setup();
+    const props = buildProps();
+
+    renderPage(props);
+
+    await user.type(screen.getByLabelText("Email"), "admin@example.com");
+    await user.type(screen.getByLabelText("Password"), "secret123");
+    await user.click(screen.getByLabelText("Stay signed in on this device"));
+    await user.click(screen.getByRole("button", { name: "Sign In" }));
+
+    await waitFor(() =>
+      expect(props.api.post).toHaveBeenCalledWith("/api/auth/login", {
+        email: "admin@example.com",
+        password: "secret123",
+        remember: false,
+      }),
+    );
   });
 
   it("shows extracted error when sign-in fails", async () => {

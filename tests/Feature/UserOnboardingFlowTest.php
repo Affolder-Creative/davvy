@@ -7,6 +7,7 @@ use App\Mail\PublicRegistrationVerificationMail;
 use App\Models\User;
 use App\Services\RegistrationSettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
@@ -161,6 +162,33 @@ class UserOnboardingFlowTest extends TestCase
         ])
             ->assertStatus(403)
             ->assertJsonPath('message', 'Verify your email address before signing in.');
+    }
+
+    public function test_login_remember_flag_controls_recaller_cookie(): void
+    {
+        $user = User::factory()->create([
+            'email' => 'remember-me@example.test',
+            'password' => 'Password123!',
+        ]);
+        $recallerCookie = Auth::guard('web')->getRecallerName();
+
+        $this->postJson('/api/auth/login', [
+            'email' => $user->email,
+            'password' => 'Password123!',
+            'remember' => true,
+        ])
+            ->assertOk()
+            ->assertCookie($recallerCookie);
+
+        $this->postJson('/api/auth/logout')->assertOk();
+
+        $this->postJson('/api/auth/login', [
+            'email' => $user->email,
+            'password' => 'Password123!',
+            'remember' => false,
+        ])
+            ->assertOk()
+            ->assertCookieMissing($recallerCookie);
     }
 
     public function test_registration_and_admin_create_send_mail_when_enabled(): void

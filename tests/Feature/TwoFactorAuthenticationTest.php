@@ -8,6 +8,7 @@ use App\Services\Security\AppPasswordService;
 use App\Services\Security\TotpService;
 use App\Services\Security\TwoFactorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class TwoFactorAuthenticationTest extends TestCase
@@ -27,6 +28,7 @@ class TwoFactorAuthenticationTest extends TestCase
         $login = $this->postJson('/api/auth/login', [
             'email' => 'two-factor@example.test',
             'password' => 'Password123!',
+            'remember' => true,
         ]);
 
         $login->assertStatus(202);
@@ -41,6 +43,7 @@ class TwoFactorAuthenticationTest extends TestCase
         $verify->assertOk();
         $verify->assertJsonPath('user.id', $user->id);
         $verify->assertJsonPath('two_factor_enabled', true);
+        $verify->assertCookie(Auth::guard('web')->getRecallerName());
 
         $this->assertAuthenticatedAs($user);
     }

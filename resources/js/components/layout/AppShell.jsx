@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  registerDavvyServiceWorker,
+  currentPushSubscription,
+  serializePushSubscription,
   setDavvyAppBadge,
 } from "../../lib/webPush";
 
@@ -106,10 +107,37 @@ export default function AppShell({
       return undefined;
     }
 
-    void registerDavvyServiceWorker();
+    let active = true;
 
-    return undefined;
-  }, [auth.user, auth.webPushEnabled]);
+    const syncExistingPushSubscription = async () => {
+      try {
+        const subscription = await currentPushSubscription();
+        if (!active || !subscription) {
+          return;
+        }
+
+        const payload = serializePushSubscription(subscription);
+        if (
+          !payload?.endpoint ||
+          !payload?.keys?.p256dh ||
+          !payload?.keys?.auth
+        ) {
+          return;
+        }
+
+        await api.post("/api/notifications/web-push/subscriptions", payload);
+      } catch {
+        // Subscription refresh is best-effort; notification delivery can continue
+        // for already-valid stored subscriptions.
+      }
+    };
+
+    void syncExistingPushSubscription();
+
+    return () => {
+      active = false;
+    };
+  }, [api, auth.user, auth.webPushEnabled]);
 
   useEffect(() => {
     setMobileAccountMenuOpen(false);

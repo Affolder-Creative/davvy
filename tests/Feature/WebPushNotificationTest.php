@@ -219,6 +219,37 @@ class WebPushNotificationTest extends TestCase
         Notification::assertNotSentTo($regular, DavvyWebPushNotification::class);
     }
 
+    public function test_web_push_notification_uses_declarative_payload_shape(): void
+    {
+        $user = User::factory()->create();
+        $notification = new DavvyWebPushNotification(
+            type: 'review_queue',
+            title: 'Davvy Review Queue',
+            body: 'A contact change is waiting for your review.',
+            url: '/review-queue',
+            tag: 'davvy-review-queue-'.$user->id,
+            badgeCount: 3,
+        );
+
+        $message = $notification->toWebPush($user, $notification);
+        $payload = $message->toArray();
+
+        $this->assertSame(8030, $payload['web_push'] ?? null);
+        $this->assertTrue($payload['mutable'] ?? false);
+        $this->assertSame(3600, $message->getOptions()['TTL'] ?? null);
+        $this->assertSame('application/json', $message->getOptions()['contentType'] ?? null);
+        $this->assertSame('Davvy Review Queue', $payload['notification']['title'] ?? null);
+        $this->assertSame('A contact change is waiting for your review.', $payload['notification']['body'] ?? null);
+        $this->assertSame(url('/images/icons/icon-192.png'), $payload['notification']['icon'] ?? null);
+        $this->assertSame(url('/images/icons/icon-192.png'), $payload['notification']['badge'] ?? null);
+        $this->assertSame('davvy-review-queue-'.$user->id, $payload['notification']['tag'] ?? null);
+        $this->assertSame(url('/review-queue'), $payload['notification']['navigate'] ?? null);
+        $this->assertSame(3, $payload['notification']['app_badge'] ?? null);
+        $this->assertSame('review_queue', $payload['notification']['data']['type'] ?? null);
+        $this->assertSame('/review-queue', $payload['notification']['data']['url'] ?? null);
+        $this->assertSame(3, $payload['notification']['data']['badge_count'] ?? null);
+    }
+
     public function test_preflight_fails_when_web_push_is_enabled_without_vapid_values(): void
     {
         config()->set('services.webpush.enabled', true);

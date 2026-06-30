@@ -1,9 +1,20 @@
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router-dom";
+import {
+  currentPushSubscription,
+  serializePushSubscription,
+  setDavvyAppBadge,
+} from "../../lib/webPush";
 import AppShell from "./AppShell";
+
+vi.mock("../../lib/webPush", () => ({
+  currentPushSubscription: vi.fn(),
+  serializePushSubscription: vi.fn(),
+  setDavvyAppBadge: vi.fn(),
+}));
 
 function ThemeControlStub({ theme, setTheme, className = "" }) {
   return (
@@ -89,6 +100,13 @@ function renderShell({
 }
 
 describe("AppShell", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    currentPushSubscription.mockResolvedValue(null);
+    serializePushSubscription.mockReturnValue(null);
+    setDavvyAppBadge.mockResolvedValue(undefined);
+  });
+
   it("shows review queue badge from summary endpoint when moderation is enabled", async () => {
     const api = {
       get: vi.fn().mockResolvedValue({
@@ -96,11 +114,6 @@ describe("AppShell", () => {
       }),
       post: vi.fn().mockResolvedValue({}),
     };
-    const setAppBadge = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, "setAppBadge", {
-      configurable: true,
-      value: setAppBadge,
-    });
 
     renderShell({ api });
 
@@ -109,7 +122,41 @@ describe("AppShell", () => {
     );
     expect(screen.getByRole("link", { name: /review queue/i })).toBeInTheDocument();
     expect(screen.getByText("12")).toBeInTheDocument();
-    await waitFor(() => expect(setAppBadge).toHaveBeenCalledWith(15));
+    await waitFor(() => expect(setDavvyAppBadge).toHaveBeenCalledWith(15));
+  });
+
+  it("silently re-syncs an existing web push subscription on startup", async () => {
+    const subscription = { endpoint: "https://push.example.test/abc" };
+    const payload = {
+      endpoint: "https://push.example.test/abc",
+      keys: {
+        p256dh: "p256dh-key",
+        auth: "auth-token",
+      },
+      content_encoding: "aes128gcm",
+    };
+    currentPushSubscription.mockResolvedValue(subscription);
+    serializePushSubscription.mockReturnValue(payload);
+    const api = {
+      get: vi.fn().mockResolvedValue({
+        data: { review_queue: 0, pending_registrations: 0, total: 0 },
+      }),
+      post: vi.fn().mockResolvedValue({}),
+    };
+
+    renderShell({
+      auth: createAuth({ webPushEnabled: true }),
+      api,
+    });
+
+    await waitFor(() => expect(currentPushSubscription).toHaveBeenCalledTimes(1));
+    expect(serializePushSubscription).toHaveBeenCalledWith(subscription);
+    await waitFor(() =>
+      expect(api.post).toHaveBeenCalledWith(
+        "/api/notifications/web-push/subscriptions",
+        payload,
+      ),
+    );
   });
 
   it("logs out and navigates to login", async () => {

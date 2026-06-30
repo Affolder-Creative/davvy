@@ -42,6 +42,7 @@ Authenticate user and create session.
 Request body:
 - `email` (required)
 - `password` (required)
+- `remember` (optional boolean, creates a persistent trusted-device cookie when `true`)
 
 Response:
 - `user`
@@ -69,6 +70,7 @@ When 2FA is enabled for the user, login returns `202` with:
 - `two_factor_required=true`
 - `challenge_expires_at`
 - no authenticated session until challenge completion
+- the original `remember` choice is preserved and applied after successful 2FA verification
 
 #### `GET /api/auth/login/2fa/status`
 Returns whether a pending login challenge exists for this browser session.
