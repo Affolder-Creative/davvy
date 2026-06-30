@@ -27,53 +27,30 @@ function parsePushPayload(event) {
     const parsed = event.data.json();
     return parsed && typeof parsed === "object" ? parsed : {};
   } catch {
-    return {
-      title: "Davvy",
-      body: event.data.text(),
-      data: {},
-    };
+    return {};
   }
 }
 
 function normalizeNotificationPayload(payload) {
-  const declarative =
+  const source =
     payload.notification && typeof payload.notification === "object"
       ? payload.notification
       : {};
-  const payloadData =
-    payload.data && typeof payload.data === "object" ? payload.data : {};
-  const declarativeData =
-    declarative.data && typeof declarative.data === "object"
-      ? declarative.data
-      : {};
-  const data = {
-    ...payloadData,
-    ...declarativeData,
-  };
-  const badgeCount = normalizeBadgeCount(
-    data.badge_count ??
-      declarative.app_badge ??
-      payload.app_badge ??
-      payload.badge_count,
-  );
-  const targetUrl = normalizeTargetUrl(
-    declarative.navigate ?? data.url ?? payload.url,
-  );
+  const sourceData =
+    source.data && typeof source.data === "object" ? source.data : {};
+  const badgeCount = normalizeBadgeCount(source.app_badge);
+  const targetUrl = normalizeTargetUrl(source.navigate);
 
   return {
-    title: declarative.title || payload.title || "Davvy",
+    title: source.title || "Davvy",
     badgeCount,
     options: {
-      body: declarative.body || payload.body || "",
-      icon: declarative.icon || payload.icon || "/images/icons/icon-192.png",
-      badge: declarative.badge || payload.badge || "/images/icons/icon-192.png",
-      tag:
-        declarative.tag ||
-        payload.tag ||
-        data.type ||
-        "davvy-notification",
+      body: source.body || "",
+      icon: source.icon || "/images/icons/icon-192.png",
+      badge: source.badge || "/images/icons/icon-192.png",
+      tag: source.tag || sourceData.type || "davvy-notification",
       data: {
-        ...data,
+        ...sourceData,
         url: targetUrl,
         badge_count: badgeCount,
       },
