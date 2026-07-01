@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Davvy feature overview: identity and access, built-in localization and multi-language support, sharing, managed contacts, interoperability, automated backup rotation with restore tooling, and deployment controls."
+      content="Davvy feature overview: identity and access, localization, sharing, managed contacts, interoperability, PWA push notifications, automated backup rotation, restore tooling, and deployment controls."
     />
     <title>Features | Davvy</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -361,6 +361,38 @@
               </div>
             </article>
 
+            <!-- PWA + Notifications -->
+            <article class="feature-card-large reveal">
+              <div class="feature-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </div>
+              <h3>PWA + Notifications</h3>
+              <p>
+                Install Davvy as a standalone web app with app icons, iOS Home
+                Screen metadata, and opt-in WebPush notifications. Users can
+                subscribe devices for review queue alerts, while admins can also
+                receive registration approval and backup/restore completion
+                notices when WebPush is enabled and configured.
+              </p>
+              <div class="feature-details">
+                <span class="feature-tag">Installable PWA</span>
+                <span class="feature-tag">WebPush</span>
+                <span class="feature-tag">App Badges</span>
+                <span class="feature-tag">iOS Home Screen</span>
+              </div>
+            </article>
+
             <!-- Automated Backups -->
             <article class="feature-card-large reveal">
               <div class="feature-icon">
@@ -389,13 +421,14 @@
                 Built-in scheduled backup snapshots for calendars and address
                 books with retention strategy controls for daily, weekly,
                 monthly, and yearly tiers. Store locally, remotely on S3, or
-                both, then restore with merge/replace modes and dry-run
-                previews.
+                both, then run queued backup or restore operations with status
+                polling, merge/replace modes, and dry-run previews.
               </p>
               <div class="feature-details">
                 <span class="feature-tag">Run Now</span>
                 <span class="feature-tag">Schedule Windows</span>
                 <span class="feature-tag">Local + S3</span>
+                <span class="feature-tag">Status Polling</span>
                 <span class="feature-tag">ZIP Restore Import</span>
               </div>
             </article>
@@ -418,14 +451,15 @@
               </div>
               <h3>Milestone Calendars</h3>
               <p>
-                Address books can auto-generate and maintain dedicated birthday
-                and anniversary calendars based on managed contact data,
-                including combined couple anniversaries when relationships are
-                mutually inferred.
+                Address books can auto-generate and maintain milestone calendars
+                for contact birthdays and anniversaries. Death dates suppress
+                future milestones, and mutually inferred relationships can
+                create combined couple anniversaries.
               </p>
               <div class="feature-details">
                 <span class="feature-tag">Birthdays</span>
                 <span class="feature-tag">Anniversaries</span>
+                <span class="feature-tag">Death-date Aware</span>
                 <span class="feature-tag">Auto-generated</span>
               </div>
             </article>

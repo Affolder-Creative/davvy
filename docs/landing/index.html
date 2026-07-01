@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Davvy is a self-hosted CalDAV and CardDAV server with a modern web dashboard, per-user language preferences, localized web UI (Chinese, English, French, German, Italian, Japanese, Portuguese, and Spanish), sharing controls, and automated backup rotation with restore tooling."
+      content="Davvy is a self-hosted CalDAV and CardDAV server with a modern installable web dashboard, localized UI, sharing controls, opt-in push notifications, automated backup rotation, and guided restore tooling."
     />
     <title>Davvy | Self-hosted CalDAV + CardDAV</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
@@ -128,8 +128,9 @@
               <p class="hero-subtitle">
                 A self-hosted CalDAV and CardDAV server with a modern web
                 dashboard. Manage calendars, contacts, sharing, and client
-                compatibility. Choose your language per user, then protect
-                everything with automated backup rotation and one-click restore
+                compatibility from an installable web app. Choose your language
+                per user, subscribe to opt-in push notifications, then protect
+                everything with automated backup rotation and guided restore
                 imports.
               </p>
               <div class="hero-actions">
@@ -374,6 +375,29 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+              </div>
+              <h3>PWA + push notifications</h3>
+              <p>
+                Install Davvy as a web app and opt devices into WebPush alerts
+                for review queue work, registration approvals, and backup or
+                restore completion.
+              </p>
+            </article>
+
+            <article class="feature-card reveal">
+              <div class="feature-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
                   <path d="M5 8l6 6" />
                   <path d="M4 14l6-6 2-3" />
                   <path d="M2 5h12" />
@@ -481,8 +505,9 @@
               </div>
               <h3>Milestone calendars</h3>
               <p>
-                Auto-generate birthday and anniversary calendars from contact
-                data, including combined couple anniversaries when spouse
+                Auto-generate milestone calendars for contact birthdays and
+                anniversaries, with death-date-aware suppression of future
+                milestones and combined couple anniversaries when spouse
                 relationships are inferred. Optional Apple compatibility
                 mirroring improves visibility in iOS and macOS.
               </p>
@@ -513,8 +538,9 @@
               <h3>Automated backup + restore</h3>
               <p>
                 Capture local and optional S3 snapshots with daily, weekly,
-                monthly, and yearly retention tiers, then restore from ZIP
-                archives in Admin Control Center.
+                monthly, and yearly retention tiers, then queue guided ZIP
+                restores with merge, replace, dry-run, and status tracking in
+                Admin Control Center.
               </p>
             </article>
 
@@ -806,7 +832,7 @@
                   />
                   <line x1="4" y1="22" x2="4" y2="15" />
                 </svg>
-                Laravel 12 + React 18
+                Laravel 13 + React 19
               </span>
               <span class="open-source-stat">
                 <svg
