@@ -8,6 +8,8 @@ class PwaShellTest extends TestCase
 {
     public function test_app_shell_includes_ios_pwa_launch_metadata_and_boot_screen(): void
     {
+        $this->withoutVite();
+
         $response = $this->get('/login');
 
         $response->assertOk();
