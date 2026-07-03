@@ -13,6 +13,14 @@ describe("PwaStatusBanner", () => {
     );
   });
 
+  it("uses safe-area top spacing for iOS standalone status bars", () => {
+    render(<PwaStatusBanner isOnline={false} />);
+
+    expect(screen.getByRole("status").parentElement).toHaveClass(
+      "pwa-status-safe-top",
+    );
+  });
+
   it("shows update action", async () => {
     const user = userEvent.setup();
     const onActivateUpdate = vi.fn();

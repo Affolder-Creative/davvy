@@ -124,6 +124,10 @@ html {
   padding-top: calc(2.5rem + var(--safe-area-top));
 }
 
+.pwa-status-safe-top {
+  padding-top: calc(0.75rem + var(--safe-area-top));
+}
+
 .theme-control {
   display: inline-flex;
   align-items: center;
