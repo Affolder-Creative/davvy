@@ -13,12 +13,13 @@ describe("PwaStatusBanner", () => {
     );
   });
 
-  it("uses safe-area top spacing for iOS standalone status bars", () => {
+  it("uses a fixed bottom snackbar wrapper", () => {
     render(<PwaStatusBanner isOnline={false} />);
 
     expect(screen.getByRole("status").parentElement).toHaveClass(
-      "pwa-status-safe-top",
+      "pwa-status-viewport",
     );
+    expect(screen.getByRole("status")).toHaveClass("pwa-status-card");
   });
 
   it("shows update action", async () => {

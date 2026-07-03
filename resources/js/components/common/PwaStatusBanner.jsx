@@ -58,9 +58,9 @@ function StatusShell({ children, tone = "info" }) {
       : "border-app-accent-edge bg-app-surface";
 
   return (
-    <div className="pwa-status-safe-top mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="pwa-status-viewport px-4 sm:px-6 lg:px-8">
       <div
-        className={`${toneClass} flex flex-col gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold text-app-strong shadow-sm sm:flex-row sm:items-center sm:justify-between`}
+        className={`${toneClass} pwa-status-card flex flex-col gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold text-app-strong shadow-sm sm:flex-row sm:items-center sm:justify-between`}
         role="status"
         aria-live="polite"
       >

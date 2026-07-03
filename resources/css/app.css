@@ -124,8 +124,19 @@ html {
   padding-top: calc(2.5rem + var(--safe-area-top));
 }
 
-.pwa-status-safe-top {
-  padding-top: calc(0.75rem + var(--safe-area-top));
+.pwa-status-viewport {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(4.25rem + var(--safe-area-bottom));
+  z-index: 50;
+  pointer-events: none;
+}
+
+.pwa-status-card {
+  width: min(100%, 42rem);
+  margin-inline: auto;
+  pointer-events: auto;
 }
 
 .theme-control {
@@ -559,6 +570,12 @@ html {
   .theme-control-window-bottom-right {
     right: calc(0.75rem + var(--safe-area-right));
     bottom: calc(0.75rem + var(--safe-area-bottom));
+  }
+}
+
+@media (min-width: 641px) {
+  .pwa-status-viewport {
+    bottom: calc(1rem + var(--safe-area-bottom));
   }
 }
 
