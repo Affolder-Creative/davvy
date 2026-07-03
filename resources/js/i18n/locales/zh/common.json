@@ -23,5 +23,12 @@
   },
   "states": {
     "loadingApp": "正在加载 Davvy..."
+  },
+  "pwa": {
+    "offline": "你当前处于离线状态。实时数据和 DAV 操作会在重新连接后恢复。",
+    "offlineReady": "Davvy 已准备好离线启动。",
+    "updateReady": "Davvy 的新版本已准备就绪。",
+    "reload": "重新加载",
+    "dismiss": "关闭"
   }
 }

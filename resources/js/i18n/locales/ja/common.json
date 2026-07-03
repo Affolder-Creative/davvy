@@ -23,5 +23,12 @@
   },
   "states": {
     "loadingApp": "Davvy を読み込み中..."
+  },
+  "pwa": {
+    "offline": "オフラインです。ライブデータと DAV 操作は再接続後に再開します。",
+    "offlineReady": "Davvy はオフライン起動の準備ができています。",
+    "updateReady": "Davvy の新しいバージョンを利用できます。",
+    "reload": "再読み込み",
+    "dismiss": "閉じる"
   }
 }

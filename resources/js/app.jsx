@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from "react";
+import React, { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   BrowserRouter,
@@ -10,10 +10,16 @@ import { I18nextProvider, useTranslation } from "react-i18next";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import useAuthState from "./components/auth/useAuthState";
 import FullPageState from "./components/common/FullPageState";
+import PwaStatusBanner from "./components/common/PwaStatusBanner";
 import { ToastProvider } from "./components/common/ToastProvider";
 import useThemePreference from "./components/theme/useThemePreference";
 import i18n, { setI18nLocale } from "./i18n";
 import { api, setApiLocale } from "./lib/api";
+import { useNetworkStatus } from "./lib/networkStatus";
+import {
+  activateWaitingServiceWorker,
+  registerDavvyServiceWorker,
+} from "./lib/pwa";
 
 const LoginPage = lazy(() =>
   import("./routes/AuthPageRoutes").then((module) => ({
@@ -61,9 +67,55 @@ function RouteLoader({ children }) {
 function App() {
   const { t } = useTranslation("common");
   const theme = useThemePreference();
+  const { isOnline } = useNetworkStatus();
   const { auth, value } = useAuthState({
     api,
   });
+  const [waitingServiceWorker, setWaitingServiceWorker] = useState(null);
+  const [offlineReady, setOfflineReady] = useState(false);
+  const updateReloadRequested = useRef(false);
+
+  useEffect(() => {
+    let active = true;
+
+    const onControllerChange = () => {
+      if (!updateReloadRequested.current) {
+        return;
+      }
+
+      window.location.reload();
+    };
+
+    navigator.serviceWorker?.addEventListener(
+      "controllerchange",
+      onControllerChange,
+    );
+
+    void registerDavvyServiceWorker({
+      onUpdateAvailable: (registration) => {
+        if (!active) {
+          return;
+        }
+
+        setWaitingServiceWorker(registration);
+      },
+      onOfflineReady: () => {
+        if (!active) {
+          return;
+        }
+
+        setOfflineReady(true);
+      },
+    });
+
+    return () => {
+      active = false;
+      navigator.serviceWorker?.removeEventListener(
+        "controllerchange",
+        onControllerChange,
+      );
+    };
+  }, []);
 
   useEffect(() => {
     setApiLocale(auth.locale, {
@@ -77,115 +129,136 @@ function App() {
     });
   }, [auth.locale, auth.supportedLocales, auth.fallbackLocale]);
 
+  const pwaStatusBanner = (
+    <PwaStatusBanner
+      isOnline={isOnline}
+      updateAvailable={Boolean(waitingServiceWorker)}
+      offlineReady={offlineReady}
+      onActivateUpdate={() => {
+        updateReloadRequested.current = true;
+        activateWaitingServiceWorker(waitingServiceWorker);
+      }}
+      onDismissOfflineReady={() => setOfflineReady(false)}
+    />
+  );
+
   if (auth.loading) {
-    return <FullPageState label={t("states.loadingApp")} />;
+    return (
+      <>
+        {pwaStatusBanner}
+        <FullPageState label={t("states.loadingApp")} />
+      </>
+    );
   }
 
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <RouteLoader>
-            <LoginPage auth={value} theme={theme} />
-          </RouteLoader>
-        }
-      />
-      <Route
-        path="/login/2fa"
-        element={
-          <RouteLoader>
-            <LoginTwoFactorPage auth={value} theme={theme} />
-          </RouteLoader>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <RouteLoader>
-            <RegisterPage auth={value} theme={theme} />
-          </RouteLoader>
-        }
-      />
-      <Route
-        path="/verify-email"
-        element={
-          <RouteLoader>
-            <VerifyEmailPage auth={value} theme={theme} />
-          </RouteLoader>
-        }
-      />
-      <Route
-        path="/invite"
-        element={
-          <RouteLoader>
-            <InviteAcceptPage auth={value} theme={theme} />
-          </RouteLoader>
-        }
-      />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute auth={value}>
+    <>
+      {pwaStatusBanner}
+      <Routes>
+        <Route
+          path="/login"
+          element={
             <RouteLoader>
-              <DashboardPage auth={value} theme={theme} />
+              <LoginPage auth={value} theme={theme} />
             </RouteLoader>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/contacts"
-        element={
-          <ProtectedRoute auth={value}>
-            {value.contactManagementEnabled ? (
+          }
+        />
+        <Route
+          path="/login/2fa"
+          element={
+            <RouteLoader>
+              <LoginTwoFactorPage auth={value} theme={theme} />
+            </RouteLoader>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <RouteLoader>
+              <RegisterPage auth={value} theme={theme} />
+            </RouteLoader>
+          }
+        />
+        <Route
+          path="/verify-email"
+          element={
+            <RouteLoader>
+              <VerifyEmailPage auth={value} theme={theme} />
+            </RouteLoader>
+          }
+        />
+        <Route
+          path="/invite"
+          element={
+            <RouteLoader>
+              <InviteAcceptPage auth={value} theme={theme} />
+            </RouteLoader>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute auth={value}>
               <RouteLoader>
-                <ContactsPage auth={value} theme={theme} />
+                <DashboardPage auth={value} theme={theme} />
               </RouteLoader>
-            ) : (
-              <Navigate to="/" replace />
-            )}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/review-queue"
-        element={
-          <ProtectedRoute auth={value}>
-            {value.contactChangeModerationEnabled ? (
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <ProtectedRoute auth={value}>
+              {value.contactManagementEnabled ? (
+                <RouteLoader>
+                  <ContactsPage auth={value} theme={theme} />
+                </RouteLoader>
+              ) : (
+                <Navigate to="/" replace />
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/review-queue"
+          element={
+            <ProtectedRoute auth={value}>
+              {value.contactChangeModerationEnabled ? (
+                <RouteLoader>
+                  <ContactChangeQueuePage auth={value} theme={theme} />
+                </RouteLoader>
+              ) : (
+                <Navigate to="/" replace />
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute auth={value} adminOnly>
               <RouteLoader>
-                <ContactChangeQueuePage auth={value} theme={theme} />
+                <AdminPage auth={value} theme={theme} />
               </RouteLoader>
-            ) : (
-              <Navigate to="/" replace />
-            )}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute auth={value} adminOnly>
-            <RouteLoader>
-              <AdminPage auth={value} theme={theme} />
-            </RouteLoader>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute auth={value}>
-            <RouteLoader>
-              <ProfilePage auth={value} theme={theme} />
-            </RouteLoader>
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="*"
-        element={<Navigate to={auth.user ? "/" : "/login"} replace />}
-      />
-    </Routes>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute auth={value}>
+              <RouteLoader>
+                <ProfilePage auth={value} theme={theme} />
+              </RouteLoader>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={<Navigate to={auth.user ? "/" : "/login"} replace />}
+        />
+      </Routes>
+    </>
   );
 }
 

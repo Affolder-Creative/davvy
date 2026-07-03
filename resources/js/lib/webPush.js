@@ -1,7 +1,11 @@
+import {
+  isServiceWorkerSupported,
+  registerDavvyServiceWorker as registerPwaServiceWorker,
+} from "./pwa";
+
 export function isWebPushSupported() {
   return (
-    typeof window !== "undefined" &&
-    "serviceWorker" in navigator &&
+    isServiceWorkerSupported() &&
     "PushManager" in window &&
     "Notification" in window
   );
@@ -16,16 +20,16 @@ export function notificationPermission() {
 }
 
 export async function registerDavvyServiceWorker() {
-  if (!isWebPushSupported()) {
+  if (!isServiceWorkerSupported()) {
     return null;
   }
 
-  return navigator.serviceWorker.register("/sw.js");
+  return registerPwaServiceWorker();
 }
 
 export async function currentPushSubscription() {
   const registration = await registerDavvyServiceWorker();
-  if (!registration) {
+  if (!registration?.pushManager) {
     return null;
   }
 

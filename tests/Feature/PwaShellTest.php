@@ -32,4 +32,24 @@ class PwaShellTest extends TestCase
         $this->assertFileExists(public_path('images/splash/ios-splash-ns-light-1170x2532.png'));
         $this->assertFileExists(public_path('images/splash/ios-splash-ns-dark-2532x1170.png'));
     }
+
+    public function test_manifest_keeps_pwa_identity_and_shortcuts(): void
+    {
+        $manifest = json_decode((string) file_get_contents(public_path('manifest.webmanifest')), true);
+
+        $this->assertIsArray($manifest);
+        $this->assertSame('Davvy', $manifest['name'] ?? null);
+        $this->assertSame('/', $manifest['id'] ?? null);
+        $this->assertSame('/', $manifest['start_url'] ?? null);
+        $this->assertSame('/', $manifest['scope'] ?? null);
+        $this->assertSame('standalone', $manifest['display'] ?? null);
+        $this->assertSame('#00786f', $manifest['theme_color'] ?? null);
+
+        $shortcutUrls = collect($manifest['shortcuts'] ?? [])->pluck('url')->all();
+
+        $this->assertContains('/', $shortcutUrls);
+        $this->assertContains('/contacts', $shortcutUrls);
+        $this->assertContains('/profile', $shortcutUrls);
+        $this->assertFileExists(public_path('sw.js'));
+    }
 }

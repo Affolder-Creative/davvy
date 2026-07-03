@@ -67,6 +67,10 @@ export function getApiLocale() {
  * @returns {string}
  */
 export function extractError(error, fallback = "Something went wrong.") {
+  if (isOfflineNetworkError(error)) {
+    return "You appear to be offline. Reconnect and try again.";
+  }
+
   if (error?.response?.data?.message) {
     return error.response.data.message;
   }
@@ -79,4 +83,12 @@ export function extractError(error, fallback = "Something went wrong.") {
   }
 
   return fallback;
+}
+
+export function isOfflineNetworkError(error) {
+  return (
+    typeof navigator !== "undefined" &&
+    navigator.onLine === false &&
+    !error?.response
+  );
 }

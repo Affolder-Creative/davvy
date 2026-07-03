@@ -23,5 +23,12 @@
   },
   "states": {
     "loadingApp": "Loading Davvy..."
+  },
+  "pwa": {
+    "offline": "You are offline. Live data and DAV actions will resume after reconnecting.",
+    "offlineReady": "Davvy is ready for offline launch.",
+    "updateReady": "A new version of Davvy is ready.",
+    "reload": "Reload",
+    "dismiss": "Dismiss"
   }
 }

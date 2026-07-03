@@ -23,5 +23,12 @@
   },
   "states": {
     "loadingApp": "Caricamento Davvy..."
+  },
+  "pwa": {
+    "offline": "Sei offline. I dati live e le azioni DAV riprenderanno dopo la riconnessione.",
+    "offlineReady": "Davvy è pronto per l’avvio offline.",
+    "updateReady": "Una nuova versione di Davvy è pronta.",
+    "reload": "Ricarica",
+    "dismiss": "Chiudi"
   }
 }

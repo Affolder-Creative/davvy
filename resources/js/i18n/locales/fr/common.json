@@ -23,5 +23,12 @@
   },
   "states": {
     "loadingApp": "Chargement de Davvy..."
+  },
+  "pwa": {
+    "offline": "Vous êtes hors ligne. Les données en direct et les actions DAV reprendront après reconnexion.",
+    "offlineReady": "Davvy est prêt à s’ouvrir hors ligne.",
+    "updateReady": "Une nouvelle version de Davvy est prête.",
+    "reload": "Recharger",
+    "dismiss": "Fermer"
   }
 }

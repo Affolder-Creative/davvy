@@ -35,5 +35,46 @@
       "sizes": "1024x1024",
       "type": "image/png"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open Davvy dashboard.",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/images/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "short_name": "Contacts",
+      "description": "Open contact management.",
+      "url": "/contacts",
+      "icons": [
+        {
+          "src": "/images/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "short_name": "Profile",
+      "description": "Open profile settings.",
+      "url": "/profile",
+      "icons": [
+        {
+          "src": "/images/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
   ]
 }

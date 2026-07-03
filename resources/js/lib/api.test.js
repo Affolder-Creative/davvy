@@ -1,5 +1,22 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { extractError, getApiLocale, setApiLocale } from './api';
+
+const originalOnLine = Object.getOwnPropertyDescriptor(navigator, "onLine");
+
+afterEach(() => {
+  if (originalOnLine) {
+    Object.defineProperty(navigator, "onLine", originalOnLine);
+  } else {
+    delete navigator.onLine;
+  }
+});
+
+function setNavigatorOnline(value) {
+  Object.defineProperty(navigator, "onLine", {
+    configurable: true,
+    value,
+  });
+}
 
 describe('extractError', () => {
   it('returns top-level API message when available', () => {
@@ -31,6 +48,14 @@ describe('extractError', () => {
 
   it('returns caller fallback when payload does not include known keys', () => {
     expect(extractError({}, 'Request failed.')).toBe('Request failed.');
+  });
+
+  it("returns a friendly offline message for network failures", () => {
+    setNavigatorOnline(false);
+
+    expect(extractError({ request: {} }, "Request failed.")).toBe(
+      "You appear to be offline. Reconnect and try again.",
+    );
   });
 });
 
