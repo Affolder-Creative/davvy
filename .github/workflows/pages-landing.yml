@@ -20,7 +20,7 @@ concurrency:
 jobs:
   deploy:
     name: Deploy GitHub Pages (docs/landing)
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 10
     environment:
       name: github-pages

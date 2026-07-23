@@ -40,7 +40,7 @@ jobs:
 
   container-build-gate:
     name: Release Gate - Container build smoke test
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 30
 
     steps:
@@ -66,7 +66,7 @@ jobs:
       - php-quality-gate
       - dockerized-tests-gate
       - container-build-gate
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     outputs:
       image_name: ${{ steps.refs.outputs.image_name }}
       publish_image_ref: ${{ steps.refs.outputs.publish_image_ref }}
@@ -136,7 +136,7 @@ jobs:
     name: Build amd64 image
     needs:
       - prepare-build-metadata
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 45
     permissions:
       contents: read
@@ -219,7 +219,7 @@ jobs:
     name: Build arm64 image
     needs:
       - prepare-build-metadata
-    runs-on: ubuntu-24.04-arm
+    runs-on: depot-ubuntu-24.04-arm
     timeout-minutes: 45
     permissions:
       contents: read
@@ -303,7 +303,7 @@ jobs:
       - prepare-build-metadata
       - build-amd64
       - build-arm64
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 45
     env:
       COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
@@ -476,7 +476,7 @@ jobs:
     needs:
       - prepare-build-metadata
       - publish-manifest
-    runs-on: ubuntu-latest
+    runs-on: depot-ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
