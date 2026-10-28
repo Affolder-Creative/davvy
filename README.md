@@ -95,7 +95,7 @@ It is designed for:
 
 ## Quick Start (Docker Compose) 🐳
 
-The repository `compose.yml` is tuned for production-style deployment (including Coolify magic variables).
+The repository `compose.yml` is tuned for production-style deployment (including Coolify magic variables). It pulls the public image `ghcr.io/affolder-creative/davvy:latest`; no GHCR login is required.
 
 For local development, prefer the DDEV flow below. If you still want local Docker Compose:
 
@@ -111,10 +111,13 @@ For local development, prefer the DDEV flow below. If you still want local Docke
 3. Start app + database:
 
 ```bash
-docker compose up --build
+docker compose pull
+docker compose up -d
 ```
 
 If you need host-accessible ports locally, uncomment the `ports` mappings in `compose.yml`.
+
+Existing installations using `ghcr.io/kaffolder7/davvy` must update their image reference. See [image migration instructions](docs/deployment.md#container-image-and-migration).
 
 ## Local Development (DDEV) 💻
 

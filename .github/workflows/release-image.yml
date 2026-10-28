@@ -40,6 +40,7 @@ jobs:
 
   container-build-gate:
     name: Release Gate - Container build smoke test
+    needs: dockerized-tests-gate
     runs-on: depot-ubuntu-latest
     timeout-minutes: 30
 
@@ -305,9 +306,6 @@ jobs:
       - build-arm64
     runs-on: depot-ubuntu-latest
     timeout-minutes: 45
-    env:
-      COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
-      COOLIFY_WEBHOOK_TOKEN: ${{ secrets.COOLIFY_WEBHOOK_TOKEN }}
     outputs:
       manifest_digest: ${{ steps.verify.outputs.manifest_digest }}
       verified_tag: ${{ steps.verify.outputs.verified_tag }}
@@ -404,18 +402,6 @@ jobs:
           subject-digest: ${{ steps.verify.outputs.manifest_digest }}
           push-to-registry: true
 
-      - name: Trigger Coolify webhook (optional)
-        if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' && env.COOLIFY_WEBHOOK_URL != '' }}
-        run: |
-          set -euo pipefail
-          if [ -n "${COOLIFY_WEBHOOK_TOKEN:-}" ]; then
-            curl -fsS -X POST \
-              -H "Authorization: Bearer ${COOLIFY_WEBHOOK_TOKEN}" \
-              "${COOLIFY_WEBHOOK_URL}"
-          else
-            curl -fsS -X POST "${COOLIFY_WEBHOOK_URL}"
-          fi
-
       - name: Publish workflow summary (release)
         if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' }}
         env:
@@ -440,11 +426,7 @@ jobs:
               echo "Attestation: skipped (unsupported for private user-owned repositories)"
             fi
             echo ""
-            if [ -n "${COOLIFY_WEBHOOK_URL:-}" ]; then
-              echo "Coolify webhook: triggered"
-            else
-              echo "Coolify webhook: skipped (set \`COOLIFY_WEBHOOK_URL\` secret to enable)"
-            fi
+            echo "Anonymous pull verification and optional deployment run in downstream jobs."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish workflow summary (dry run)
@@ -469,6 +451,76 @@ jobs:
             echo ""
             echo "Note: dry-run builds publish to a dedicated image namespace ending with \`-dry-run\`."
           } >> "$GITHUB_STEP_SUMMARY"
+
+  verify-public-image:
+    name: Anonymous pull (${{ matrix.arch }})
+    if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' }}
+    needs:
+      - prepare-build-metadata
+      - publish-manifest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: depot-ubuntu-latest
+          - arch: arm64
+            runner: depot-ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Verify anonymous manifest and pull
+        env:
+          IMAGE_REF: ${{ needs.prepare-build-metadata.outputs.publish_image_ref }}
+          RELEASE_TAG: ${{ needs.prepare-build-metadata.outputs.effective_tag }}
+          MANIFEST_DIGEST: ${{ needs.publish-manifest.outputs.manifest_digest }}
+          EVENT_NAME: ${{ github.event_name }}
+          IS_PRERELEASE: ${{ github.event.release.prerelease }}
+          PLATFORM: linux/${{ matrix.arch }}
+        run: |
+          python3 scripts/deployment_images.py verify-public \
+            --image "$IMAGE_REF" --event-name "$EVENT_NAME" \
+            --tag "$RELEASE_TAG" --prerelease "$IS_PRERELEASE" \
+            --digest "$MANIFEST_DIGEST" --platform "$PLATFORM"
+          echo "Anonymous pull verified for $PLATFORM: $IMAGE_REF:$RELEASE_TAG (and latest for stable releases)." >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-coolify:
+    name: Deploy verified release to Coolify
+    needs:
+      - prepare-build-metadata
+      - verify-public-image
+    if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' }}
+    runs-on: depot-ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    env:
+      COOLIFY_WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
+      COOLIFY_WEBHOOK_TOKEN: ${{ secrets.COOLIFY_WEBHOOK_TOKEN }}
+    steps:
+      - name: Trigger Coolify webhook (optional)
+        if: ${{ needs.prepare-build-metadata.outputs.is_release == 'true' && env.COOLIFY_WEBHOOK_URL != '' }}
+        run: |
+          set -euo pipefail
+          if [ -n "${COOLIFY_WEBHOOK_TOKEN:-}" ]; then
+            curl -fsS -X POST \
+              -H "Authorization: Bearer ${COOLIFY_WEBHOOK_TOKEN}" \
+              "${COOLIFY_WEBHOOK_URL}"
+          else
+            curl -fsS -X POST "${COOLIFY_WEBHOOK_URL}"
+          fi
+
+      - name: Record deployment result
+        run: |
+          if [ -n "${COOLIFY_WEBHOOK_URL:-}" ]; then
+            echo "Coolify webhook: triggered after anonymous pulls passed on both architectures." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Coolify webhook: skipped (COOLIFY_WEBHOOK_URL is unset)." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   cleanup-dry-run-images:
     name: Cleanup old dry-run image versions

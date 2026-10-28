@@ -1,5 +1,26 @@
 # Troubleshooting
 
+## Container image pull is unauthorized or denied
+
+A failure fetching a GHCR image manifest happens before Davvy starts. Application passwords, DAV settings, and database migrations cannot resolve it.
+
+- Confirm the deployment uses `ghcr.io/affolder-creative/davvy:latest`. Replace `ghcr.io/kaffolder7/davvy` in saved Compose or Coolify definitions using the [migration instructions](./deployment.md#container-image-and-migration).
+- A package maintainer must confirm that the organization’s `davvy` container package exists, is **Public**, and contains the requested tag. A public source repository alone does not prove anonymous package access works.
+- For publication failures, check that `Affolder-Creative/davvy` has Actions write access to the package. Package ownership and repository links may need repair after a repository transfer.
+- If a clean anonymous pull works but a deployment still fails, check that host’s saved GHCR credentials and registry configuration.
+
+Test without using saved Docker credentials on a Linux Docker host:
+
+```bash
+anonymous_config="$(mktemp -d)"
+docker --config "$anonymous_config" pull ghcr.io/affolder-creative/davvy:latest
+rm -rf "$anonymous_config"
+```
+
+For a remote Docker context, also select that host explicitly; the empty configuration does not retain saved contexts.
+
+Maintainers should follow the [release checklist](./release-checklist-core.md#container-publication-and-anonymous-access). Manually dispatching the release workflow publishes only to `-dry-run` and cannot repair production `latest`.
+
 ## Web Auth and Session Issues
 
 ### `401` on `GET /api/auth/me`

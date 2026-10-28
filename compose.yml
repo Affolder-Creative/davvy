@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/kaffolder7/davvy:latest
+    image: ghcr.io/affolder-creative/davvy:latest
     pull_policy: always
     depends_on:
       postgres:

@@ -2,6 +2,21 @@
 
 Use this checklist for every production release, regardless of platform.
 
+## Container publication and anonymous access
+
+The production image is `ghcr.io/affolder-creative/davvy`. Before the first organization release, a package administrator must verify the package is Public and grant Actions write access to `Affolder-Creative/davvy`. If the package does not exist yet, let the release workflow create it, set it to Public, then rerun the failed jobs. See [GitHub package access and visibility](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
+
+For the namespace migration and subsequent releases:
+
+1. Merge the deployment fix and publish a new patch release from the merged commit. Keep existing release tags unchanged. Manual workflow dispatch is a dry run that publishes to `-dry-run`, not the production package.
+2. Confirm the deployment configuration check passes. It compares the Compose app image with the lowercase repository-derived release destination before container builds.
+3. Confirm both anonymous-pull jobs pass. They check the release tag and, for stable releases, `latest`; verify the published digest and both architectures; and download the image on native amd64 and arm64 runners with empty Docker credentials. Prereleases do not check `latest`, and dry runs do not require public package visibility.
+4. If anonymous verification fails, inspect package visibility, tag publication, and the reported digest/platform mismatch. Repair the package setting or publication problem and rerun failed jobs. The optional Coolify webhook is blocked until both anonymous-pull jobs pass. A failure does not undo already published tags.
+5. On a clean host, deploy the documented Compose configuration with a disposable database and volumes. Confirm `/up` returns HTTP 200. Use a separate Compose project for this check, preserving existing installations.
+6. Tell existing users to update saved image references using the [migration instructions](./deployment.md#container-image-and-migration). Retain existing data volumes and configuration; historical images are not deleted or republished by this fix.
+
+Do not consider issue #133 resolved until the production package is anonymously downloadable and the fresh deployment check succeeds.
+
 ## 1. Common App Environment Variables
 
 Set these in your app service environment.

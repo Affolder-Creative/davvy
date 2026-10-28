@@ -7,6 +7,25 @@ Supported/common targets:
 - Coolify
 - Generic Docker hosts
 
+## Container image and migration
+
+The supported public image is `ghcr.io/affolder-creative/davvy:latest`, with version tags available for pinned deployments. Stable releases publish `latest`; prereleases publish version tags without updating `latest`. Both `linux/amd64` and `linux/arm64` are supported. A GHCR login or personal access token is not required.
+
+For an existing Compose or Coolify installation using the old personal namespace:
+
+1. Change the app image from `ghcr.io/kaffolder7/davvy:latest` to `ghcr.io/affolder-creative/davvy:latest`. For a pinned version, first verify that version is available in the organization package; historical tags are not automatically migrated.
+2. Keep the existing Compose project name, environment values, `APP_KEY`, database, and volumes.
+3. In Coolify, refresh the Compose definition and redeploy. On a Docker host, run:
+
+```bash
+docker compose pull app
+docker compose up -d
+```
+
+The old personal namespace will not receive new releases. Updating the image reference does not require deleting or recreating your data volumes.
+
+If the pull returns `unauthorized` or `denied`, see [container image access troubleshooting](./troubleshooting.md#container-image-pull-is-unauthorized-or-denied). Building from the repository Dockerfile remains an alternative while registry access is being repaired.
+
 ## Runtime Behavior at Startup
 
 Container entrypoint performs:
