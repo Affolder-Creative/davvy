@@ -38,8 +38,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  deployment-checks:
+    name: Deployment image checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Test deployment checks
+        run: python3 -m unittest discover -s tests/deployment -v
+
+      - name: Verify Compose release image
+        env:
+          REPOSITORY: ${{ github.repository }}
+          APP_KEY: ci-placeholder
+          SERVICE_URL_APP: http://localhost:8080
+          POSTGRES_DB: davvy
+          SERVICE_USER_POSTGRES: davvy
+          SERVICE_PASSWORD_POSTGRES: ci-placeholder
+          DEFAULT_ADMIN_EMAIL: ""
+          DEFAULT_ADMIN_PASSWORD: ""
+        run: |
+          set -euo pipefail
+          docker compose --env-file /dev/null -f compose.yml config --format json |
+            python3 scripts/deployment_images.py check-config --repository "$REPOSITORY"
+
   dockerized-tests:
     name: Dockerized Laravel Tests
+    needs: deployment-checks
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
