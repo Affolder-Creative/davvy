@@ -159,6 +159,9 @@ jobs:
       - name: Run Vitest suite
         run: npx vitest run
 
+      - name: Build production frontend
+        run: npm run build
+
   docs-link-check:
     name: Docs Link Check
     runs-on: ubuntu-latest
